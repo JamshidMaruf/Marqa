@@ -9,4 +9,6 @@ public interface ICourseService
     Task DeleteAsync(int id);
     Task<CourseViewModel> GetAsync(int id);
     Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId);
+    Task AttachStudentAsync(int courseId, int studentId);
+    Task DetachStudentAsync(int courseId, int studentId);
 }

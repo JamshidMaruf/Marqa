@@ -1,10 +1,12 @@
-﻿namespace Marqa.Domain.Entities;
+﻿using Marqa.Domain.Enums;
 
-public class LessonAttendance : BaseEntity
+namespace Marqa.Domain.Entities;
+
+public class LessonAttendance : Auditable
 {
     public int LessonId { get; set; }
     public int StudentId { get; set; }
-    public bool IsAttended { get; set; }
+    public AttendanceStatus Status { get; set; }
 
     // Navigation
     public Lesson Lesson { get; set; }

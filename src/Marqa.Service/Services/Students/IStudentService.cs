@@ -9,5 +9,5 @@ public interface IStudentService
     Task UpdateAsync(int id, StudentUpdateModel model);
     Task DeleteAsync(int id);
     Task<StudentViewModel> GetAsync(int id);
-    Task<List<StudentViewModel>> GetAllAsync(int companyId);
+    Task<List<StudentViewModel>> GetAllByCourseAsync(int courseId);
 }

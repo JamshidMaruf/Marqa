@@ -1,6 +1,8 @@
-﻿namespace Marqa.Domain.Entities;
+﻿using Marqa.Domain.Enums;
 
-public class Course : BaseEntity
+namespace Marqa.Domain.Entities;
+
+public class Course : Auditable
 {
     public string Name { get; set; }
     public int SubjectId { get; set; }
@@ -10,7 +12,9 @@ public class Course : BaseEntity
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public int CompanyId { get; set; }
-
+    public CourseStatus Status { get; set; }
+    public int MaxStudentCount { get; set; }
+    public string Description { get; set; }
     // Navigation
     public Company Company { get; set; }
     public Subject Subject { get; set; }
@@ -18,4 +22,5 @@ public class Course : BaseEntity
     public ICollection<CourseWeekday> CourseWeekdays { get; set; }
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }
+    public ICollection<Student> Students { get; set; }
 }

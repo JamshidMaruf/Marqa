@@ -21,7 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<StudentCourse> StudentCourses { get; set; }
     public DbSet<LessonAttendance> LessonAttendances { get; set; }
     public DbSet<HomeTask> HomeTasks { get; set; }
-    public DbSet<StudentHomeTask> StudentHomeTasks { get; set; }
+    public DbSet<StudentHomeTaskResult> StudentHomeTasks { get; set; }
     public DbSet<Exam> Exams { get; set; }
-    public DbSet<StudentExam> StudentExams { get; set; }
+    public DbSet<StudentExamResult> StudentExams { get; set; }
 }

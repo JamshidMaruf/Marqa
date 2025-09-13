@@ -2,8 +2,6 @@
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Services.Lessons.Models;
-using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
@@ -13,8 +11,10 @@ public class CourseService : ICourseService
     private readonly IRepository<Lesson> lessonRepository;
     private readonly IRepository<Course> courseRepository;
     private readonly IRepository<Subject> subjectRepository;
+    private readonly IRepository<Student> studentRepository;
     private readonly IRepository<Teacher> teacherRepository;
     private readonly IRepository<Company> companyRepository;
+    private readonly IRepository<StudentCourse> studentCourseRepository;
     private readonly IRepository<CourseWeekday> courseWeekdayRepository;
     public CourseService()
     {
@@ -22,7 +22,9 @@ public class CourseService : ICourseService
         courseRepository = new Repository<Course>();
         subjectRepository = new Repository<Subject>();
         teacherRepository = new Repository<Teacher>();
+        studentRepository = new Repository<Student>();
         companyRepository = new Repository<Company>();
+        studentCourseRepository = new Repository<StudentCourse>();
         courseWeekdayRepository = new Repository<CourseWeekday>();
     }
 
@@ -45,7 +47,10 @@ public class CourseService : ICourseService
             LessonCount = model.LessonCount,
             StartDate = model.StartDate,
             StartTime = model.StartTime,
-            TeacherId = model.TeacherId
+            TeacherId = model.TeacherId,
+            Status = model.Status,
+            Description = model.Description,
+            MaxStudentCount = model.MaxStudentCount
         });
 
         var weekDays = new List<DayOfWeek>();
@@ -74,6 +79,7 @@ public class CourseService : ICourseService
     {
         var existCourse = await courseRepository
             .SelectAllAsQueryable()
+            .Where(c => !c.IsDeleted)
             .Include(c => c.Lessons)
             .Include(c => c.CourseWeekdays)
             .FirstOrDefaultAsync(t => t.Id == id)
@@ -83,6 +89,9 @@ public class CourseService : ICourseService
         existCourse.TeacherId = model.TeacherId;
         existCourse.StartTime = model.StartTime;
         existCourse.StartDate = model.StartDate;
+        existCourse.Status = model.Status;
+        existCourse.MaxStudentCount = model.MaxStudentCount;
+        existCourse.Description = model.Description;   
 
         // Delete lessons
         foreach (var lesson in existCourse.Lessons)
@@ -117,6 +126,7 @@ public class CourseService : ICourseService
     {
         var existCourse = await courseRepository
             .SelectAllAsQueryable()
+            .Where(c => !c.IsDeleted)
             .Include(c => c.Lessons)
             .Include(c => c.CourseWeekdays)
             .FirstOrDefaultAsync(t => t.Id == id)
@@ -138,10 +148,12 @@ public class CourseService : ICourseService
     {
         var existCourse = await courseRepository
             .SelectAllAsQueryable()
+            .Where(c => !c.IsDeleted)
             .Include(c => c.Subject)
             .Include(c => c.Teacher)
             .Include(c => c.Lessons)
             .Include(c => c.CourseWeekdays)
+            .Include(c => c.Students)
             .Select(c => new CourseViewModel
             {
                 Id = id,
@@ -150,6 +162,8 @@ public class CourseService : ICourseService
                 LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
+                Status = c.Status,
+                AvailableStudentCount = c.Students.Count,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -181,10 +195,11 @@ public class CourseService : ICourseService
     {
         var query = courseRepository
             .SelectAllAsQueryable()
-            .Where(c => c.CompanyId == companyId)
+            .Where(c => c.CompanyId == companyId && !c.IsDeleted)
             .Include(c => c.Subject)
             .Include(c => c.Teacher)
             .Include(c => c.Lessons)
+            .Include(c => c.Students)
             .Include(c => c.CourseWeekdays)
             .AsQueryable();
 
@@ -203,6 +218,8 @@ public class CourseService : ICourseService
                 LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
+                Status = c.Status,
+                AvailableStudentCount = c.Students.Count,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -225,6 +242,32 @@ public class CourseService : ICourseService
                 }).ToList(),
             })
             .ToListAsync();
+    }
+
+    public async Task AttachStudentAsync(int courseId, int studentId)
+    {
+        _ = await courseRepository.SelectAsync(courseId)
+            ?? throw new NotFoundException("Course is not found");
+        
+        _ = await studentRepository.SelectAsync(studentId)
+            ?? throw new NotFoundException("Student is not found");
+
+        await studentCourseRepository.InsertAsync(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+    }
+
+    public async Task DetachStudentAsync(int courseId, int studentId)
+    {
+        _ = await courseRepository.SelectAsync(courseId)
+            ?? throw new NotFoundException("Course is not found");
+        
+        _ = await studentRepository.SelectAsync(studentId)
+            ?? throw new NotFoundException("Student is not found");
+
+        var studentCourse = await studentCourseRepository.SelectAllAsQueryable()
+            .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
+
+        if (studentCourse is not null)
+            await studentCourseRepository.DeleteAsync(studentCourse);
     }
 
     private async Task GenerateLessonAsync(

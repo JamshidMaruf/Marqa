@@ -2,7 +2,7 @@
 
 namespace Marqa.DataAccess.Repositories;
 
-public interface IRepository<TEntity> where TEntity : BaseEntity
+public interface IRepository<TEntity> where TEntity : Auditable
 {
     Task<TEntity> InsertAsync(TEntity entity);
     Task UpdateAsync(TEntity entity);

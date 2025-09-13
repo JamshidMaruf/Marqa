@@ -1,5 +1,6 @@
 ﻿using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
 
@@ -23,5 +24,10 @@ public class LessonService : ILessonService
         existLesson.Date = model.Date;
 
         await lessoonRepository.UpdateAsync(existLesson);
+    }
+
+    public Task CheckUpAsync(int lessonId, int studentId, AttendanceStatus status)
+    {
+        throw new NotImplementedException();
     }
 }

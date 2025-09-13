@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class Exam : BaseEntity
+public class Exam : Auditable
 {
     public int CourseId { get; set; }
     public DateTime StartTime { get; set; }

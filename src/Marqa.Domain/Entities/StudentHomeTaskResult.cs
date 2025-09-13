@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class StudentHomeTask : BaseEntity
+public class StudentHomeTaskResult : Auditable
 {
     public int StudentId { get; set; }
     public int HomeTaskId { get; set; }

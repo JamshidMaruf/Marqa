@@ -10,11 +10,13 @@ public class StudentService : IStudentService
 {
     private readonly IRepository<Company> companyRepository;
     private readonly IRepository<Student> studentRepository;
+    private readonly IRepository<Course> courseRepository;
     private readonly IRepository<StudentCourse> studentCourseRepository;
     public StudentService()
     {
         companyRepository = new Repository<Company>();
         studentRepository = new Repository<Student>();
+        courseRepository = new Repository<Course>();
         studentCourseRepository = new Repository<StudentCourse>();
     }
 
@@ -59,17 +61,6 @@ public class StudentService : IStudentService
         var existStudent = await studentRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Student is not found");
 
-        var courses = await studentCourseRepository
-            .SelectAllAsQueryable()
-            .Include(t => t.Course)
-            .Where(x => x.StudentId == id)
-            .Select(t => new StudentViewModel.CourseInfo
-            {
-                Id = t.Id,  
-                Name = t.Course.Name,
-            })
-            .ToListAsync();
-
         return new StudentViewModel
         {
             Id = existStudent.Id,
@@ -77,23 +68,26 @@ public class StudentService : IStudentService
             LastName = existStudent.LastName,
             DateOfBirth = existStudent.DateOfBirth,
             Gender = existStudent.Gender,
-            Courses = courses
         };
     }
 
-    public async Task<List<StudentViewModel>> GetAllAsync(int companyId)
+    public async Task<List<StudentViewModel>> GetAllByCourseAsync(int courseId)
     {
-        return await studentRepository
-            .SelectAllAsQueryable()
-            .Where(t => t.CompanyId == companyId)
-            .Select(t => new StudentViewModel
-            {
-                Id = t.Id,
-                FirstName = t.FirstName,
-                LastName = t.LastName,
-                DateOfBirth = t.DateOfBirth,
-                Gender = t.Gender,
-            })
-            .ToListAsync();
+        var courseStudents = await courseRepository
+                .SelectAllAsQueryable()
+                .Where(c => c.Id == courseId && !c.IsDeleted)
+                .Include(c => c.Students)
+                .Select(c => c.Students.Select(s =>  new StudentViewModel
+                {
+                    Id = s.Id,
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    DateOfBirth = s.DateOfBirth,
+                    Gender = s.Gender,
+                }))
+                .FirstOrDefaultAsync()
+                ?? throw new NotFoundException("Course is not found");
+        
+        return courseStudents.ToList();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class HomeTask : BaseEntity
+public class HomeTask : Auditable
 {
     public int LessonId { get; set; }
     public DateTime Deadline { get; set; }
