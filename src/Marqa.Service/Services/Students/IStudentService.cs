@@ -1,0 +1,13 @@
+﻿using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Students.Models;
+
+namespace Marqa.Service.Services.Students;
+
+public interface IStudentService
+{
+    Task CreateAsync(StudentCreateModel model);
+    Task UpdateAsync(int id, StudentUpdateModel model);
+    Task DeleteAsync(int id);
+    Task<StudentViewModel> GetAsync(int id);
+    Task<List<StudentViewModel>> GetAllAsync(int companyId);
+}

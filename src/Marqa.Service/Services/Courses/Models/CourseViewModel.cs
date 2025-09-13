@@ -1,0 +1,40 @@
+﻿using Marqa.Service.Services.Lessons.Models;
+using Marqa.Service.Services.Teachers.Models;
+
+namespace Marqa.Service.Services.Courses.Models;
+
+public class CourseViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public SubjectInfo Subject { get; set; }
+    public TeacherInfo Teacher { get; set; }
+    public int LessonCount { get; set; }
+    public DateOnly StartDate { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
+    public List<DayOfWeek> Weekdays { get; set; }
+    public List<LessonInfo> Lessons { get; set; }
+
+    public class TeacherInfo
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class SubjectInfo
+    {
+        public int SubjectId { get; set; }
+        public string SubjectName { get; set; }
+    }
+
+    public class LessonInfo
+    {
+        public int Id { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public DateOnly Date { get; set; }
+        public string Room { get; set; }
+    }
+}
