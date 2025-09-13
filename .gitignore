@@ -16,6 +16,12 @@
 # Mono auto generated files
 mono_crash.*
 
+# macOS temporary files
+.DS_Store
+
+# JetBrains / Rider / IntelliJ IDEA
+.idea/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
