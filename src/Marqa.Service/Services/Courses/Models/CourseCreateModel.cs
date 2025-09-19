@@ -1,4 +1,5 @@
 ﻿using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Courses.Models;
 
@@ -13,5 +14,8 @@ public class CourseCreateModel
     public DateOnly StartDate { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public CourseStatus Status  { get; set; }
+    public int MaxStudentCount { get; set; }
+    public string Description { get; set; }
     public List<DayOfWeek> Weekdays { get; set; } = new();
 }

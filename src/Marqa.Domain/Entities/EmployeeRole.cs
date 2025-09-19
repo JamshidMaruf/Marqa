@@ -1,6 +1,6 @@
-﻿namespace Marqa.Domain.Entities;
+namespace Marqa.Domain.Entities;
 
-public class Subject : Auditable
+public class EmployeeRole : Auditable
 {
     public string Name { get; set; }
     public int CompanyId { get; set; }

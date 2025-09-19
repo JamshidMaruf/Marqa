@@ -59,6 +59,7 @@ public class CompanyService : ICompanyService
     public async Task<List<CompanyViewModel>> GetAllAsync()
     {
         return await companyRepository.SelectAllAsQueryable()
+            .Where(t => !t.IsDeleted)
             .Select(c => new CompanyViewModel
             {
                 Name = c.Name,

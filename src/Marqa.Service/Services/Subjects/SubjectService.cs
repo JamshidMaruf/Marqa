@@ -18,6 +18,7 @@ public class SubjectService : ISubjectService
     {
         var alreadyExistSubject = await subjectRepository
             .SelectAllAsQueryable()
+            .Where(s => !s.IsDeleted)
             .FirstOrDefaultAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
 
         if (alreadyExistSubject != null)
@@ -34,6 +35,7 @@ public class SubjectService : ISubjectService
     {
         var existSubject = await subjectRepository
             .SelectAllAsQueryable()
+            .Where(s => !s.IsDeleted)
             .FirstOrDefaultAsync(s => s.Id == id && s.CompanyId == model.CompanyId)
             ?? throw new NotFoundException("Subjet is not found");
 
@@ -66,7 +68,7 @@ public class SubjectService : ISubjectService
     {
         return await subjectRepository
             .SelectAllAsQueryable()
-            .Where(s => s.CompanyId == companyId)
+            .Where(s => s.CompanyId == companyId && !s.IsDeleted)
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,

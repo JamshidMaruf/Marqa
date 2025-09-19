@@ -1,4 +1,6 @@
-﻿namespace Marqa.Service.Services.Courses.Models;
+﻿using Marqa.Domain.Enums;
+
+namespace Marqa.Service.Services.Courses.Models;
 
 public class CourseUpdateModel
 {
@@ -9,6 +11,9 @@ public class CourseUpdateModel
     public DateOnly StartDate { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public CourseStatus Status  { get; set; }
+    public int MaxStudentCount { get; set; }
+    public string Description { get; set; }
     public List<DayOfWeek> Weekdays { get; set; } = new();
 
 }

@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class CourseWeekday : BaseEntity
+public class CourseWeekday : Auditable
 {
     public DayOfWeek Weekday { get; set; }
     public int CourseId { get; set; }

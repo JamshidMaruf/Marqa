@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Lessons.Models;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Lessons.Models;
 using Marqa.Service.Services.Teachers.Models;
 
 namespace Marqa.Service.Services.Courses.Models;
@@ -13,6 +14,10 @@ public class CourseViewModel
     public DateOnly StartDate { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public CourseStatus Status  { get; set; }
+    public int MaxStudentCount { get; set; }
+    public int AvailableStudentCount { get; set; }
+    public string Description { get; set; }
     public List<DayOfWeek> Weekdays { get; set; }
     public List<LessonInfo> Lessons { get; set; }
 

@@ -1,6 +1,8 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using System.Globalization;
+using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,25 +11,32 @@ namespace Marqa.Service.Services.Teachers;
 public class TeacherService : ITeacherService
 {
     private readonly IRepository<Company> companyRepository;
-    private readonly IRepository<Teacher> teacherRepository;
+    private readonly IRepository<Employee> teacherRepository;
     public TeacherService()
     {
         companyRepository = new Repository<Company>();
-        teacherRepository = new Repository<Teacher>();
+        teacherRepository = new Repository<Employee>();
     }
-
+    
     public async Task CreateAsync(TeacherCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        await teacherRepository.InsertAsync(new Teacher
+        await teacherRepository.InsertAsync(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
             LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
+            Phone = model.Phone,
+            Email = model.Email,
+            Status = model.Status,
+            PasswordHash = model.Password.Hash(),
+            JoiningDate = model.JoiningDate,
+            Specialization = model.Specialization,
+            Info = model.Info
         });
     }
 
@@ -40,6 +49,11 @@ public class TeacherService : ITeacherService
         existTeacher.LastName = model.LastName;
         existTeacher.DateOfBirth = model.DateOfBirth;
         existTeacher.Gender = model.Gender;
+        existTeacher.Phone = model.Phone;
+        existTeacher.Email = model.Email;
+        existTeacher.Status = model.Status;
+        existTeacher.JoiningDate = model.JoiningDate;
+        existTeacher.Specialization = model.Specialization; 
 
         await teacherRepository.UpdateAsync(existTeacher);
     }
@@ -56,7 +70,9 @@ public class TeacherService : ITeacherService
     {
         var existTeacher = await teacherRepository
             .SelectAllAsQueryable()
+            .Where(c => !c.IsDeleted)
             .Include(t => t.Company)
+            .Include(c => c.Subject)
             .Include(t => t.Courses)
             .ThenInclude(c => c.Subject)
             .Select(t => new TeacherViewModel
@@ -66,6 +82,16 @@ public class TeacherService : ITeacherService
                 Gender = t.Gender,
                 FirstName = t.FirstName,
                 LastName = t.LastName,
+                Email = t.Email,
+                Phone = t.Phone,
+                Status = t.Status,
+                JoiningDate = t.JoiningDate,
+                Specialization = t.Specialization,
+                Subject = new TeacherViewModel.SubjectInfo
+                {
+                    Id = t.Subject.Id,
+                    Name = t.Subject.Name,
+                },
                 Company = new TeacherViewModel.CompanyInfo
                 {
                     Id = t.CompanyId,
@@ -85,10 +111,28 @@ public class TeacherService : ITeacherService
         return existTeacher;
     }
 
-    public async Task<List<TeacherViewModel>> GetAllAsync(int companyId)
+    public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search, int? subjectId)
     {
-        return await teacherRepository
+        var query = teacherRepository
             .SelectAllAsQueryable()
+            .Where(c => !c.IsDeleted && c.CompanyId == companyId)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.ToLower();
+            query = query.Where(t => 
+                t.FirstName.ToLower().Contains(search) || 
+                t.LastName.ToLower().Contains(search) ||
+                t.Specialization.ToLower().Contains(search) ||
+                t.Phone.Contains(search) || 
+                t.Email.Contains(search));
+        }
+        
+        if(subjectId != null)
+            query = query.Where(t => t.SubjectId == subjectId);
+        
+        return await query
             .Include(t => t.Company)
             .Include(t => t.Courses)
             .ThenInclude(c => c.Subject)
@@ -99,6 +143,16 @@ public class TeacherService : ITeacherService
                 Gender = t.Gender,
                 FirstName = t.FirstName,
                 LastName = t.LastName,
+                Email = t.Email,
+                Phone = t.Phone,
+                Status = t.Status,
+                JoiningDate = t.JoiningDate,
+                Specialization = t.Specialization,
+                Subject = new TeacherViewModel.SubjectInfo
+                {
+                    Id = t.Subject.Id,
+                    Name = t.Subject.Name,
+                },
                 Company = new TeacherViewModel.CompanyInfo
                 {
                     Id = t.CompanyId,
