@@ -22,6 +22,21 @@ namespace Marqa.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.Property<int>("CoursesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CoursesId", "StudentsId");
+
+                    b.HasIndex("StudentsId");
+
+                    b.ToTable("CourseStudent");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -30,8 +45,20 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -46,10 +73,28 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LessonCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxStudentCount")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -61,13 +106,21 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("SubjectId");
 
@@ -86,6 +139,18 @@ namespace Marqa.DataAccess.Migrations
 
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Weekday")
                         .HasColumnType("int");
@@ -108,14 +173,26 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -132,17 +209,29 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -162,11 +251,20 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Number")
                         .HasColumnType("int");
@@ -176,6 +274,9 @@ namespace Marqa.DataAccess.Migrations
 
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("time");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -192,14 +293,26 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("IsAttended")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -218,8 +331,23 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -227,10 +355,24 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Students");
                 });
@@ -246,8 +388,20 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -258,7 +412,7 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("StudentCourses");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentExam", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentExamResult", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,14 +420,26 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ExamId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<double>("Score")
                         .HasColumnType("float");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -284,7 +450,7 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("StudentExams");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTask", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskResult", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,14 +458,26 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("HomeTaskId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<double>("Score")
                         .HasColumnType("float");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -318,10 +496,27 @@ namespace Marqa.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Subjects");
                 });
@@ -337,8 +532,17 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
@@ -346,18 +550,90 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly>("JoiningDate")
+                        .HasColumnType("date");
+
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialization")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
+                    b.HasIndex("SubjectId");
+
                     b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.Test", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tests");
+                });
+
+            modelBuilder.Entity("CourseStudent", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Course", null)
+                        .WithMany()
+                        .HasForeignKey("CoursesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marqa.Domain.Entities.Student", null)
+                        .WithMany()
+                        .HasForeignKey("StudentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Course", b =>
                 {
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Marqa.Domain.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
@@ -369,6 +645,8 @@ namespace Marqa.DataAccess.Migrations
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
 
                     b.Navigation("Subject");
 
@@ -438,6 +716,17 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.Student", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.StudentCourse", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", "Course")
@@ -457,7 +746,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentExam", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentExamResult", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Exam", "Exam")
                         .WithMany()
@@ -476,7 +765,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTask", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskResult", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.HomeTask", "HomeTask")
                         .WithMany()
@@ -495,6 +784,17 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.Subject", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany("Subjects")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Company", "Company")
@@ -503,11 +803,21 @@ namespace Marqa.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Marqa.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Company");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Company", b =>
                 {
+                    b.Navigation("Subjects");
+
                     b.Navigation("Teachers");
                 });
 

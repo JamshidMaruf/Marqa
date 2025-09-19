@@ -11,11 +11,11 @@ namespace Marqa.Service.Services.Teachers;
 public class TeacherService : ITeacherService
 {
     private readonly IRepository<Company> companyRepository;
-    private readonly IRepository<Teacher> teacherRepository;
+    private readonly IRepository<Employee> teacherRepository;
     public TeacherService()
     {
         companyRepository = new Repository<Company>();
-        teacherRepository = new Repository<Teacher>();
+        teacherRepository = new Repository<Employee>();
     }
     
     public async Task CreateAsync(TeacherCreateModel model)
@@ -23,7 +23,7 @@ public class TeacherService : ITeacherService
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        await teacherRepository.InsertAsync(new Teacher
+        await teacherRepository.InsertAsync(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -35,7 +35,8 @@ public class TeacherService : ITeacherService
             Status = model.Status,
             PasswordHash = model.Password.Hash(),
             JoiningDate = model.JoiningDate,
-            Specialization = model.Specialization
+            Specialization = model.Specialization,
+            Info = model.Info
         });
     }
 

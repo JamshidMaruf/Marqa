@@ -16,6 +16,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
     
     public async Task<TEntity> InsertAsync(TEntity entity)
     {
+        entity.CreatedAt = DateTime.UtcNow;
         var createdEntity = (await context.AddAsync(entity)).Entity;
         await context.SaveChangesAsync();
         return createdEntity;
@@ -23,12 +24,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
     public async Task UpdateAsync(TEntity entity)
     {
+        entity.UpdatedAt = DateTime.UtcNow;
         context.Update(entity);
         await context.SaveChangesAsync();
     }
    
     public async Task DeleteAsync(TEntity entity)
     {
+        entity.DeletedAt = DateTime.UtcNow;
         entity.IsDeleted = true;
         context.Update(entity);
         await context.SaveChangesAsync();

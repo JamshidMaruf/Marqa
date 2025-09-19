@@ -12,7 +12,7 @@ public class TeacherViewModel : Auditable
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public string Specialization { get; set; }
-    public TeacherStatus Status { get; set; }
+    public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
     public SubjectInfo Subject { get; set; }
     public CompanyInfo Company { get; set; }

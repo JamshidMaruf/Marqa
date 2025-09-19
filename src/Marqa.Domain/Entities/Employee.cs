@@ -16,6 +16,7 @@ public class Teacher : Auditable
     public int SubjectId { get; set; }
     public DateOnly JoiningDate { get; set; }
     public string Specialization { get; set; }
+    public string Info { get; set; }
     
     // Navigation
     public Company Company { get; set; }
