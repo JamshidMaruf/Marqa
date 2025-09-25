@@ -2,7 +2,7 @@
 
 namespace Marqa.Domain.Entities;
 
-public class Teacher : Auditable
+public class Employee : Auditable
 {
     public int CompanyId { get; set; }
     public string FirstName { get; set; }

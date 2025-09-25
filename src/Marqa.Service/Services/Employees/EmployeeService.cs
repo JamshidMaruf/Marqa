@@ -3,6 +3,7 @@ using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Teachers.Employees;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,10 +19,11 @@ public class TeacherService : ITeacherService
         teacherRepository = new Repository<Employee>();
     }
     
-    public async Task CreateAsync(TeacherCreateModel model)
+    public async Task CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company not found");
+        
 
         await teacherRepository.InsertAsync(new Employee
         {

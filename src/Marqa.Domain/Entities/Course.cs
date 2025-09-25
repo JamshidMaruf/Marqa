@@ -18,7 +18,7 @@ public class Course : Auditable
     // Navigation
     public Company Company { get; set; }
     public Subject Subject { get; set; }
-    public Teacher Teacher { get; set; }
+    public Employee Teacher { get; set; }
     public ICollection<CourseWeekday> CourseWeekdays { get; set; }
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }

@@ -12,7 +12,7 @@ public class CourseService : ICourseService
     private readonly IRepository<Course> courseRepository;
     private readonly IRepository<Subject> subjectRepository;
     private readonly IRepository<Student> studentRepository;
-    private readonly IRepository<Teacher> teacherRepository;
+    private readonly IRepository<Employee> teacherRepository;
     private readonly IRepository<Company> companyRepository;
     private readonly IRepository<StudentCourse> studentCourseRepository;
     private readonly IRepository<CourseWeekday> courseWeekdayRepository;
@@ -21,7 +21,7 @@ public class CourseService : ICourseService
         lessonRepository = new Repository<Lesson>();
         courseRepository = new Repository<Course>();
         subjectRepository = new Repository<Subject>();
-        teacherRepository = new Repository<Teacher>();
+        teacherRepository = new Repository<Employee>();
         studentRepository = new Repository<Student>();
         companyRepository = new Repository<Company>();
         studentCourseRepository = new Repository<StudentCourse>();
