@@ -2,7 +2,7 @@
 
 namespace Marqa.Service.Services.Teachers.Employees;
 
-public class TeacherCreateModel
+public class EmployeeCreateModel
 {
     public int CompanyId { get; set; }
     public string FirstName { get; set; }
