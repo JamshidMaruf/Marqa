@@ -11,17 +11,22 @@ public class EmployeeService : IEmployeeService
 {
     private readonly IRepository<Company> companyRepository;
     private readonly IRepository<Employee> employeeRepository;
+    private readonly IRepository<TeacherSubject> teacherSubjectRepository;
+    private readonly IRepository<Course> courseRepository;
+
     public EmployeeService()
     {
         companyRepository = new Repository<Company>();
         employeeRepository = new Repository<Employee>();
+        teacherSubjectRepository = new Repository<TeacherSubject>();
+        courseRepository = new Repository<Course>();
     }
-    
+
     public async Task CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
-        
+
 
         await employeeRepository.InsertAsync(new Employee
         {
@@ -53,7 +58,7 @@ public class EmployeeService : IEmployeeService
         existTeacher.Email = model.Email;
         existTeacher.Status = model.Status;
         existTeacher.JoiningDate = model.JoiningDate;
-        existTeacher.Specialization = model.Specialization; 
+        existTeacher.Specialization = model.Specialization;
 
         await employeeRepository.UpdateAsync(existTeacher);
     }
@@ -65,111 +70,6 @@ public class EmployeeService : IEmployeeService
 
         await employeeRepository.DeleteAsync(existEmployee);
     }
-
-    #region teachergets
-    public async Task<TeacherViewModel> GetAssync(int id)
-    {
-        var existTeacher = await employeeRepository
-            .SelectAllAsQueryable()
-            .Where(c => !c.IsDeleted)
-            .Include(t => t.Company)
-            .Include(c => c.Subject)
-            .Include(t => t.Courses)
-            .ThenInclude(c => c.Subject)
-            .Select(t => new TeacherViewModel
-            {
-                Id = t.Id,
-                DateOfBirth = t.DateOfBirth,
-                Gender = t.Gender,
-                FirstName = t.FirstName,
-                LastName = t.LastName,
-                Email = t.Email,
-                Phone = t.Phone,
-                Status = t.Status,
-                JoiningDate = t.JoiningDate,
-                Specialization = t.Specialization,
-                Subject = new TeacherViewModel.SubjectInfo
-                {
-                    Id = t.Subject.Id,
-                    Name = t.Subject.Name,
-                },
-                Company = new TeacherViewModel.CompanyInfo
-                {
-                    Id = t.CompanyId,
-                    Name = t.Company.Name,
-                },
-                Courses = t.Courses.Select(c => new TeacherViewModel.CourseInfo
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    SubjectId = c.SubjectId,
-                    SubjectName = c.Subject.Name,
-                }).ToList()
-            })
-            .FirstOrDefaultAsync(t => t.Id == id)
-            ?? throw new NotFoundException($"Employee was not found");
-
-        return existTeacher;
-    }
-
-    public async Task<List<TeacherViewModel>> GetAallAsync(int companyId, string search, int? subjectId)
-    {
-        var query = employeeRepository
-            .SelectAllAsQueryable()
-            .Where(c => !c.IsDeleted && c.CompanyId == companyId)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            search = search.ToLower();
-            query = query.Where(t => 
-                t.FirstName.ToLower().Contains(search) || 
-                t.LastName.ToLower().Contains(search) ||
-                t.Specialization.ToLower().Contains(search) ||
-                t.Phone.Contains(search) || 
-                t.Email.Contains(search));
-        }
-        
-        if(subjectId != null)
-            query = query.Where(t => t.SubjectId == subjectId);
-        
-        return await query
-            .Include(t => t.Company)
-            .Include(t => t.Courses)
-            .ThenInclude(c => c.Subject)
-            .Select(t => new TeacherViewModel
-            {
-                Id = t.Id,
-                DateOfBirth = t.DateOfBirth,
-                Gender = t.Gender,
-                FirstName = t.FirstName,
-                LastName = t.LastName,
-                Email = t.Email,
-                Phone = t.Phone,
-                Status = t.Status,
-                JoiningDate = t.JoiningDate,
-                Specialization = t.Specialization,
-                Subject = new TeacherViewModel.SubjectInfo
-                {
-                    Id = t.Subject.Id,
-                    Name = t.Subject.Name,
-                },
-                Company = new TeacherViewModel.CompanyInfo
-                {
-                    Id = t.CompanyId,
-                    Name = t.Company.Name,
-                },
-                Courses = t.Courses.Select(c => new TeacherViewModel.CourseInfo
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    SubjectId = c.SubjectId,
-                    SubjectName = c.Subject.Name,
-                }).ToList()
-            })
-            .ToListAsync();
-    }
-    #endregion
 
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
@@ -208,7 +108,7 @@ public class EmployeeService : IEmployeeService
 
         if (string.IsNullOrWhiteSpace(search))
         {
-            employees = employees.Where(e => 
+            employees = employees.Where(e =>
                 e.FirstName.Contains(search) ||
                 e.LastName.Contains(search) ||
                 e.Phone.Contains(search) ||
@@ -216,7 +116,7 @@ public class EmployeeService : IEmployeeService
                 e.Specialization.Contains(search));
         }
 
-        return await employees.Select(e => new EmployeeViewModel 
+        return await employees.Select(e => new EmployeeViewModel
         {
             Id = e.Id,
             FirstName = e.FirstName,
@@ -237,4 +137,114 @@ public class EmployeeService : IEmployeeService
             }
         }).ToListAsync();
     }
+
+    public async Task<TeacherViewModel> GetTeacherAsync(int id)
+    {
+        var teacher = await teacherSubjectRepository
+           .SelectAllAsQueryable()
+           .Where(ts => ts.TeacherId == id)
+           .Include(ts => ts.Teacher)
+           .Include(ts => ts.Subject)
+           .Select(ts => new TeacherViewModel
+           {
+               Id = ts.Teacher.Id,
+               DateOfBirth = ts.Teacher.DateOfBirth,
+               Gender = ts.Teacher.Gender,
+               FirstName = ts.Teacher.FirstName,
+               LastName = ts.Teacher.LastName,
+               Email = ts.Teacher.Email,
+               Phone = ts.Teacher.Phone,
+               Status = ts.Teacher.Status,
+               JoiningDate = ts.Teacher.JoiningDate,
+               Specialization = ts.Teacher.Specialization,
+               Subject = new TeacherViewModel.SubjectInfo
+               {
+                   Id = ts.Id,
+                   Name = ts.Subject.Name
+               }
+           }).FirstOrDefaultAsync();
+
+        var teacherCourses = employeeRepository
+            .SelectAllAsQueryable()
+            .GroupJoin(
+                courseRepository.SelectAllAsQueryable()
+                .Include(c => c.Subject),
+                t => t.Id,
+                c => c.TeacherId,
+                (teacher, courses) => new
+                {
+                    Id = teacher.Id,
+                    Courses = courses.Select(c => new TeacherViewModel.CourseInfo
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        SubjectId = c.Subject.Id,
+                        SubjectName = c.Subject.Name
+                    })
+                }).FirstOrDefaultAsync(result => result.Id == id);
+
+        teacher.Courses = teacherCourses.Result.Courses.ToList();
+
+        return teacher;
+    }
+
+    public Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search, int? subjectId)
+    {
+        throw new NotImplementedException();
+    }
+
+    // ushbu method bajarilishi kerak
+    //public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search, int? subjectId)
+    //{
+    //    var query = employeeRepository
+    //       .SelectAllAsQueryable()
+    //       .Where(c => !c.IsDeleted && c.CompanyId == companyId && c.Role.Name.ToLower() == "teacher");
+
+    //    if (!string.IsNullOrWhiteSpace(search))
+    //    {
+    //        search = search.ToLower();
+    //        query = query.Where(t =>
+    //            t.FirstName.ToLower().Contains(search) ||
+    //            t.LastName.ToLower().Contains(search) ||
+    //            t.Specialization.ToLower().Contains(search) ||
+    //            t.Phone.Contains(search) ||
+    //            t.Email.Contains(search));
+    //    }
+
+    //    if (subjectId != null)
+    //        query = query.Where(t => t.SubjectId == subjectId);
+
+    //    var subjects = await teacherSubjectRepository
+    //       .SelectAllAsQueryable()
+    //       .Include(ts => ts.Subject)
+    //       .Join(
+    //           employeeRepository.SelectAllAsQueryable(),
+    //           tsubject => tsubject.TeacherId,
+    //           teacher => teacher.Id,
+    //           (ts, t) => new TeacherViewModel.SubjectInfo
+    //           {
+    //               Id = ts.Id,
+    //               Name = ts.Subject.Name
+    //           }).ToListAsync();
+
+    //    var teacherCourses = employeeRepository
+    //        .SelectAllAsQueryable()
+    //        .Where(emp => emp.CompanyId == companyId && !emp.IsDeleted)
+    //        .GroupJoin(
+    //            courseRepository.SelectAllAsQueryable()
+    //            .Include(c => c.Subject),
+    //            t => t.Id,
+    //            c => c.TeacherId,
+    //            (teacher, courses) => new
+    //            {
+    //                Id = teacher.Id,
+    //                Courses = courses.Select(c => new TeacherViewModel.CourseInfo
+    //                {
+    //                    Id = c.Id,
+    //                    Name = c.Name,
+    //                    SubjectId = c.Subject.Id,
+    //                    SubjectName = c.Subject.Name
+    //                })
+    //            }).ToListAsync();
+    //}
 }

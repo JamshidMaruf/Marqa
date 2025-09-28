@@ -15,14 +15,7 @@ public class TeacherViewModel : Auditable
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
     public SubjectInfo Subject { get; set; }
-    public CompanyInfo Company { get; set; }
     public List<CourseInfo> Courses { get; set; }
-
-    public class CompanyInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
 
     public class SubjectInfo
     {
