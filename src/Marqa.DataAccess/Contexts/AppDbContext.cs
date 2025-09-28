@@ -1,4 +1,4 @@
-using Marqa.DataAccess.EntityConfigurations;
+﻿using Marqa.DataAccess.EntityConfigurations;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

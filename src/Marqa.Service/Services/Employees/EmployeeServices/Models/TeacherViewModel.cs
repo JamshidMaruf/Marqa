@@ -1,7 +1,7 @@
 ﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 
-namespace Marqa.Service.Services.Teachers.Models;
+namespace Marqa.Service.Services.Employees.EmployeeServices.Models;
 
 public class TeacherViewModel : Auditable
 {
