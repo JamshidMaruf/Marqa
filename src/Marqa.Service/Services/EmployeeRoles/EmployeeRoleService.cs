@@ -20,11 +20,11 @@ public class EmployeeRoleService : IEmployeeRoleService
         _ = await companyRepository.SelectAsync(model.CompanyId)
           ?? throw new NotFoundException("Company not found");
 
-        var existrole = await employeeRoleRepository.SelectAllAsQueryable()
+        var existRole = await employeeRoleRepository.SelectAllAsQueryable()
             .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
             .FirstOrDefaultAsync();
 
-        if (existrole != null)
+        if (existRole != null)
             throw new AlreadyExistException("This role already exists");
 
         await employeeRoleRepository.InsertAsync(new EmployeeRole
@@ -36,10 +36,10 @@ public class EmployeeRoleService : IEmployeeRoleService
 
     public async Task DeleteAsync(int id)
     {
-        var existrole = await employeeRoleRepository.SelectAsync(id)
+        var existRole = await employeeRoleRepository.SelectAsync(id)
             ?? throw new NotFoundException("Role not found");
 
-        await employeeRoleRepository.DeleteAsync(existrole);
+        await employeeRoleRepository.DeleteAsync(existRole);
     }
 
     public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyid)
@@ -65,7 +65,7 @@ public class EmployeeRoleService : IEmployeeRoleService
 
     public async Task<EmployeeRoleViewModel> GetAsync(int id)
     {
-        var existrole = await employeeRoleRepository.SelectAllAsQueryable()
+        var existRole = await employeeRoleRepository.SelectAllAsQueryable()
             .Where(x => x.Id == id)
             .Include(c => c.Company)
             .Select(s => new EmployeeRoleViewModel
@@ -80,23 +80,23 @@ public class EmployeeRoleService : IEmployeeRoleService
                 }
             }).FirstOrDefaultAsync()
             ?? throw new NotFoundException("Role not found");
-        return existrole;
+        return existRole;
     }
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
-        var existemployeerole = await employeeRoleRepository.SelectAsync(id)
+        var existemployeeRole = await employeeRoleRepository.SelectAsync(id)
              ?? throw new NotFoundException("Role not found");
 
-        var existrole = await employeeRoleRepository.SelectAllAsQueryable()
+        var existRole = await employeeRoleRepository.SelectAllAsQueryable()
             .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
             .FirstOrDefaultAsync();
 
-        if (existrole != null)
+        if (existRole != null)
             throw new AlreadyExistException("This role already exists");
 
-        existemployeerole.Name = model.Name;
-        existemployeerole.CompanyId = model.CompanyId;
-        await employeeRoleRepository.UpdateAsync(existemployeerole);
+        existemployeeRole.Name = model.Name;
+        existemployeeRole.CompanyId = model.CompanyId;
+        await employeeRoleRepository.UpdateAsync(existemployeeRole);
     }
 }
