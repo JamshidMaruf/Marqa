@@ -1,6 +1,6 @@
 ﻿using Marqa.Domain.Enums;
 
-namespace Marqa.Service.Services.Employees.EmployeeServices.Models;
+namespace Marqa.Service.Services.Employees.Models;
 
 public class EmployeeUpdateModel
 {

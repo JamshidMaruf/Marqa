@@ -1,11 +1,10 @@
-﻿using System.ComponentModel;
-using Marqa.Service.Services.Employees.EmployeeServices.Models;
+﻿using Marqa.Service.Services.Employees.Models;
 
-namespace Marqa.Service.Services.Employees.EmployeeServices;
+namespace Marqa.Service.Services.Employees;
 
 public interface IEmployeeService
 {
-    Task CreateAsync(EmployeeCreateModel model);
+    Task<int> CreateAsync(EmployeeCreateModel model);
     Task UpdateAsync(int id, EmployeeUpdateModel model);
     Task DeleteAsync(int id);
     Task<EmployeeViewModel> GetAsync(int id);

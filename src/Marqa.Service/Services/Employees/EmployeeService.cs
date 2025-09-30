@@ -2,10 +2,10 @@
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Services.Employees.EmployeeServices.Models;
+using Marqa.Service.Services.Employees.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Marqa.Service.Services.Employees.EmployeeServices;
+namespace Marqa.Service.Services.Employees;
 
 public class EmployeeService : IEmployeeService
 {
@@ -108,14 +108,12 @@ public class EmployeeService : IEmployeeService
             .Where(e => e.CompanyId == companyId && !e.IsDeleted);
 
         if (string.IsNullOrWhiteSpace(search))
-        {
             employees = employees.Where(e =>
                 e.FirstName.Contains(search) ||
                 e.LastName.Contains(search) ||
                 e.Phone.Contains(search) ||
                 e.Email.Contains(search) ||
                 e.Specialization.Contains(search));
-        }
 
         return await employees.Select(e => new EmployeeViewModel
         {
