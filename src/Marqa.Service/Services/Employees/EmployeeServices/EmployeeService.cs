@@ -22,13 +22,12 @@ public class EmployeeService : IEmployeeService
         courseRepository = new Repository<Course>();
     }
 
-    public async Task CreateAsync(EmployeeCreateModel model)
+    public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
 
-
-        await employeeRepository.InsertAsync(new Employee
+        var createdEmp = await employeeRepository.InsertAsync(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -43,6 +42,8 @@ public class EmployeeService : IEmployeeService
             Specialization = model.Specialization,
             Info = model.Info
         });
+
+        return createdEmp.Id;
     }
 
     public async Task UpdateAsync(int id, EmployeeUpdateModel model)
