@@ -16,7 +16,6 @@ public class Employee : Auditable
     public string Specialization { get; set; }
     public string Info { get; set; }
     public int CompanyId { get; set; }
-    public int SubjectId { get; set; }
     public int RoleId { get; set; }
     // Navigation
     public Company Company { get; set; }

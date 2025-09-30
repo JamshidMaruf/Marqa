@@ -209,13 +209,13 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("text");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Specialization")
                         .HasColumnType("text");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("SubjectId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -225,7 +225,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.HasIndex("SubjectId");
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Employees");
                 });
@@ -465,9 +465,6 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("text");
 
-                    b.Property<int>("StudentDetailId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -680,6 +677,41 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("Subjects");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("SubjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("TeacherSubjects");
+                });
+
             modelBuilder.Entity("CourseStudent", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", null)
@@ -710,7 +742,7 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("Marqa.Domain.Entities.Employee", "Teacher")
-                        .WithMany("Courses")
+                        .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -741,15 +773,15 @@ namespace Marqa.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Marqa.Domain.Entities.Subject", "Subject")
+                    b.HasOne("Marqa.Domain.Entities.EmployeeRole", "Role")
                         .WithMany()
-                        .HasForeignKey("SubjectId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
 
-                    b.Navigation("Subject");
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.EmployeeRole", b =>
@@ -905,6 +937,25 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherSubject", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marqa.Domain.Entities.Employee", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.Company", b =>
                 {
                     b.Navigation("Teachers");
@@ -917,11 +968,6 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Exams");
 
                     b.Navigation("Lessons");
-                });
-
-            modelBuilder.Entity("Marqa.Domain.Entities.Employee", b =>
-                {
-                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Student", b =>

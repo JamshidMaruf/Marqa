@@ -27,6 +27,7 @@ public class AppDbContext : DbContext
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<CourseWeekday> CourseWeekdays { get; set; }
     public DbSet<StudentHomeTaskResult> StudentHomeTasks { get; set; }
+    public DbSet<TeacherSubject> TeacherSubjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
