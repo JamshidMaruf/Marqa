@@ -1,4 +1,4 @@
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Employees.Models;
 
@@ -17,6 +17,7 @@ public class EmployeeViewModel
     public string Info { get; set; }
     public int RoleId { get; set; }
     public EmployeeRoleInfo Role { get; set; }
+
     public class EmployeeRoleInfo
     {
         public int Id { get; set; }

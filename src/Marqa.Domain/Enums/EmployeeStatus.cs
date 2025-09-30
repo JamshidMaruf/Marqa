@@ -1,6 +1,6 @@
-namespace Marqa.Domain.Enums;
+﻿namespace Marqa.Domain.Enums;
 
-public enum TeacherStatus
+public enum EmployeeStatus
 {
     Active = 1,
     Inactive = 2,

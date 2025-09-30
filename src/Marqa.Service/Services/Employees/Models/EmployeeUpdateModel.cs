@@ -1,8 +1,8 @@
 ﻿using Marqa.Domain.Enums;
 
-namespace Marqa.Service.Services.Teachers.Employees;
+namespace Marqa.Service.Services.Employees.Models;
 
-public class TeacherUpdateModel
+public class EmployeeUpdateModel
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

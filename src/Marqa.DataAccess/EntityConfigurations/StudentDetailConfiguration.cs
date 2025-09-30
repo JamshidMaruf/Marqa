@@ -1,4 +1,4 @@
-using Marqa.Domain.Entities;
+﻿using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
