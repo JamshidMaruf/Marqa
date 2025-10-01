@@ -10,8 +10,8 @@ public class CourseViewModel
     public TeacherInfo Teacher { get; set; }
     public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
-    public TimeSpan StartTime { get; set; }
-    public TimeSpan EndTime { get; set; }
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     public CourseStatus Status  { get; set; }
     public int MaxStudentCount { get; set; }
     public int AvailableStudentCount { get; set; }
@@ -35,8 +35,8 @@ public class CourseViewModel
     public class LessonInfo
     {
         public int Id { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public DateOnly Date { get; set; }
         public string Room { get; set; }
     }
