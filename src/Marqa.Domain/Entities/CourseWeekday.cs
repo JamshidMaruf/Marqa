@@ -8,3 +8,4 @@ public class CourseWeekday : Auditable
     // Navigation
     public Course Course { get; set; }
 }
+

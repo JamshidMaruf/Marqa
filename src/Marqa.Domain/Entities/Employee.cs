@@ -21,3 +21,4 @@ public class Employee : Auditable
     public Company Company { get; set; }
     public EmployeeRole Role { get; set; }
 }
+

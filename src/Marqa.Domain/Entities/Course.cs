@@ -1,4 +1,5 @@
 ﻿using Marqa.Domain.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Domain.Entities;
 

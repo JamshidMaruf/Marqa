@@ -1,4 +1,4 @@
-namespace Marqa.Domain.Enums;
+﻿namespace Marqa.Domain.Enums;
 
 public enum AttendanceStatus
 {
@@ -7,3 +7,4 @@ public enum AttendanceStatus
     Late = 2,
     Absent = 3
 }
+

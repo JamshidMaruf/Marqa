@@ -1,9 +1,12 @@
-﻿using Marqa.Domain.Enums;
+﻿using System.Reflection;
+using Marqa.Domain.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Domain.Entities;
 
 public class Student : Auditable
 { 
+    public string StudentID { get; set; } // access uchun generatsiya qilinadigan Id
     public string FirstName { get; set; }
     public string LastName { get; set; }   
     public string Phone { get; set; }
