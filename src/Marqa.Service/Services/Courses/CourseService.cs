@@ -72,6 +72,7 @@ public class CourseService : ICourseService
             model.EndTime,
             model.Room,
             model.LessonCount,
+            model.TeacherId,
             weekDays);
     }
 
@@ -117,6 +118,7 @@ public class CourseService : ICourseService
             model.EndTime,
             model.Room,
             model.LessonCount,
+            model.TeacherId,
             model.Weekdays);
 
         await courseRepository.UpdateAsync(existCourse);
@@ -273,10 +275,11 @@ public class CourseService : ICourseService
     private async Task GenerateLessonAsync(
         int courseId, 
         DateOnly startDate,
-        TimeSpan startTime,
-        TimeSpan endTime,
+        TimeOnly startTime,
+        TimeOnly endTime,
         string room,
         int lessonCount,
+        int teacherId,
         List<DayOfWeek> weekDays)
     {
         // First Lesson
@@ -287,7 +290,8 @@ public class CourseService : ICourseService
             EndTime = endTime,
             Room = room,
             Number = 1,
-            Date = startDate
+            Date = startDate,
+            TeacherId = teacherId       
         });
 
         var count = 2;
@@ -307,6 +311,7 @@ public class CourseService : ICourseService
                     Room = room,
                     Number = count,
                     Date = currentDate,
+                    TeacherId = teacherId
                 });
 
                 count++;
