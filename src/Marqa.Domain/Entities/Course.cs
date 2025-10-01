@@ -1,20 +1,21 @@
 ﻿using Marqa.Domain.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Domain.Entities;
 
 public class Course : Auditable
 {
     public string Name { get; set; }
-    public int SubjectId { get; set; }
-    public int TeacherId { get; set; }
     public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
-    public int CompanyId { get; set; }
     public CourseStatus Status { get; set; }
     public int MaxStudentCount { get; set; }
     public string Description { get; set; }
+    public int CompanyId { get; set; }
+    public int SubjectId { get; set; }
+    public int TeacherId { get; set; }
     // Navigation
     public Company Company { get; set; }
     public Subject Subject { get; set; }
