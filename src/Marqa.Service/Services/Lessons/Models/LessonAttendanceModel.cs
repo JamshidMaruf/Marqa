@@ -7,5 +7,4 @@ public class LessonAttendanceModel
     public int LessonId { get; set; }
     public int StudentId { get; set; }
     public AttendanceStatus Status { get; set; }
-    public int LateTimeInMinutes { get; set; }
 }

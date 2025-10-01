@@ -11,18 +11,23 @@ public class LessonService : ILessonService
     private readonly IRepository<Lesson> lessonRepository;
     private readonly IRepository<LessonAttendance> lessonAttendanceRepository;
     private readonly IRepository<Student> studentRepository;
+    private readonly IRepository<Employee> teacherRepository;
 
     public LessonService()
     {
         lessonRepository = new Repository<Lesson>();
         lessonAttendanceRepository = new Repository<LessonAttendance>();
         studentRepository = new Repository<Student>();
+        teacherRepository = new Repository<Employee>();
     }
 
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
         var lessonForUpdation = await lessonRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson is not found with this ID = {id}");
+
+        _ = await teacherRepository.SelectAsync(model.TeacherId)
+            ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
 
         lessonForUpdation.StartTime = model.StartTime;
         lessonForUpdation.EndTime = model.EndTime;

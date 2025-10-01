@@ -6,6 +6,6 @@ namespace Marqa.Service.Services.Lessons;
 public interface ILessonService
 {
     Task UpdateAsync(int id, LessonUpdateModel model);
-    Task CheckUpAsync(int lessonId, int studentId, AttendanceStatus status);
+    Task CheckUpAsync(LessonAttendanceModel model);
 }
 
