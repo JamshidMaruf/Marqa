@@ -14,4 +14,5 @@ public class EmployeeUpdateModel
     public DateOnly JoiningDate { get; set; }
     public string Specialization { get; set; }
     public string Info { get; set; }
+    public int RoleId { get; set; }
 }

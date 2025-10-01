@@ -29,7 +29,6 @@ public class HomeTaskService : IHomeTaskService
             LessonId = model.LessonId,
             Deadline = model.Deadline,
             Description = model.Description,
-            Title = model.Title,
             CreatedAt = DateTime.UtcNow,
             IsDeleted = false,
             Lesson = existlesson
@@ -54,7 +53,6 @@ public class HomeTaskService : IHomeTaskService
         {
             LessonId = existHomeTask.LessonId,
             Deadline = existHomeTask.Deadline,
-            Title = existHomeTask.Title,
             Description = existHomeTask.Description
         };
     }
@@ -66,7 +64,6 @@ public class HomeTaskService : IHomeTaskService
             ?? throw new NotFoundException("Home task is not found");
 
         existHomeTask.Deadline = model.Deadline;
-        existHomeTask.Title = model.Title;
         existHomeTask.Description = model.Description;
 
         await _homeTaskRepo.UpdateAsync(existHomeTask);

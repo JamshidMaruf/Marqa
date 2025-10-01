@@ -1,5 +1,4 @@
-﻿namespace Marqa.Service.Services.StudentDetails;
-namespace Marqa.Service.Services.StudentDetails.Models;
+﻿namespace Marqa.Service.Services.StudentDetails.Models;
 
 public class StudentDetailViewModel
 {

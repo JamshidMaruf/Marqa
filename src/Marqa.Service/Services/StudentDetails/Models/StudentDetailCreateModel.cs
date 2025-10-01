@@ -1,8 +1,4 @@
-﻿namespace Marqa.Service.Services.StudentDetails;
-namespace Marqa.Service.Services.StudentDetails.Models;
-
-namespace Marqa.Service.Services.StudentDetails.Models;
-namespace Marqa.Service.Services.StudentDetails.Models;
+﻿namespace Marqa.Service.Services.StudentDetails.Models;
 
 public class StudentDetailCreateModel
 {
@@ -13,7 +9,7 @@ public class StudentDetailCreateModel
     public string MotherFirstName { get; set; }
     public string MotherLastName { get; set; }
     public string MotherPhone { get; set; }
-    public string RelativeFirstName { get; set; }
-    public string RelativeLastName { get; set; }
-    public string RelativePhone { get; set; }
+    public string GuardianFirstName { get; set; }
+    public string GuardianLastName { get; set; }
+    public string GuardianPhone { get; set; }
 }

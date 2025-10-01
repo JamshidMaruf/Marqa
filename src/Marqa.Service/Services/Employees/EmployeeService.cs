@@ -21,7 +21,7 @@ public class EmployeeService : IEmployeeService
         teacherSubjectRepository = new Repository<TeacherSubject>();
         courseRepository = new Repository<Course>();
     }
-
+    // roleni qoshib ket hammasiga
     public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)

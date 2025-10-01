@@ -10,10 +10,11 @@ public class EmployeeCreateModel
     public DateTime DateOfBirth { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
-    public string Password { get; set; }
+    public string Password { get; set; } // shuni ham ob tashash keremidi yoki faqat student uchun generatsiya qilinadimi
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
     public string Specialization { get; set; }
     public string Info { get; set; }
+    public int RoleId { get; set; }
 }
