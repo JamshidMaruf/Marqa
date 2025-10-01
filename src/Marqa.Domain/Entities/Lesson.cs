@@ -3,8 +3,8 @@
 public class Lesson : Auditable
 {
     public int Number { get; set; }
-    public TimeSpan StartTime { get; set; }
-    public TimeSpan EndTime { get; set; }
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     public DateOnly Date { get; set; }
     public string Room { get; set; }
     public int CourseId { get; set; }
