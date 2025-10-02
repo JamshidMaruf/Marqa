@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Marqa.Service.Services.HomeTask.Models;
+﻿namespace Marqa.Service.Services.HomeTask.Models;
 public class HomeTaskCreateModel
 {
     public int LessonId { get; set; }
