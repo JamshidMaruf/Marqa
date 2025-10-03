@@ -6,11 +6,7 @@ namespace Marqa.DataAccess.Contexts;
 
 public class AppDbContext : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder
-            .UseNpgsql("Host=localhost;Port=5432;Database=marqadb;Username=postgres;Password=root;");
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     
     public DbSet<Company> Companies { get; set; }
     public DbSet<Course> Courses { get; set; }
@@ -26,7 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<StudentExamResult> StudentExams { get; set; }
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<CourseWeekday> CourseWeekdays { get; set; }
-    public DbSet<StudentHomeTaskResult> StudentHomeTasks { get; set; }
+    public DbSet<StudentHomeTask> StudentHomeTasks { get; set; }
     public DbSet<TeacherSubject> TeacherSubjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

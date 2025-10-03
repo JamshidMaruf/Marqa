@@ -6,21 +6,15 @@ using Marqa.Service.Services.HomeTask.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa;
-public class HomeTaskService : IHomeTaskService
+public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<HomeTask> homeTaskRepository)
+    : IHomeTaskService
 {
-    private readonly IRepository<Lesson> lessonRepo;
-    private readonly IRepository<HomeTask> homeTaskRepo;
-    public HomeTaskService()
-    {
-        lessonRepo = new Repository<Lesson>();
-        homeTaskRepo = new Repository<HomeTask>();
-    }
     public async Task CreateHomeTaskAsync(HomeTaskCreateModel model)
     {
-        var existlesson = await lessonRepo.SelectAsync(model.LessonId)
+        var existLesson = await lessonRepository.SelectAsync(model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
 
-        await homeTaskRepo.InsertAsync(new HomeTask
+        await homeTaskRepository.InsertAsync(new HomeTask
         {
             LessonId = model.LessonId,
             Deadline = model.Deadline,
@@ -30,26 +24,26 @@ public class HomeTaskService : IHomeTaskService
 
     public async Task UpdateHomeTaskAsync(int id, HomeTaskUpdateModel model)
     {
-        var existHomeTask = await homeTaskRepo.SelectAsync(id)
+        var existHomeTask = await homeTaskRepository.SelectAsync(id)
             ?? throw new NotFoundException("Home task is not found");
 
         existHomeTask.Deadline = model.Deadline;
         existHomeTask.Description = model.Description;
 
-        await homeTaskRepo.UpdateAsync(existHomeTask);
+        await homeTaskRepository.UpdateAsync(existHomeTask);
     }
 
     public async Task DeleteHomeTaskAsync(int id)
     {
-        var existHomeTask = await homeTaskRepo.SelectAsync(id)
+        var existHomeTask = await homeTaskRepository.SelectAsync(id)
             ?? throw new NotFoundException("Home task is not found");
 
-        await homeTaskRepo.DeleteAsync(existHomeTask);
+        await homeTaskRepository.DeleteAsync(existHomeTask);
     }
 
     public async Task<List<HomeTaskViewModel>> GetHomeTaskAsync(int lessonId)
     {
-        var existHomeTask = homeTaskRepo.SelectAllAsQueryable()
+        var existHomeTask = homeTaskRepository.SelectAllAsQueryable()
             .Where(ht => ht.LessonId == lessonId && !ht.IsDeleted);
 
         if (existHomeTask == null)
