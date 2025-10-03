@@ -1,5 +1,4 @@
-﻿
-using Marqa.DataAccess.Contexts;
+﻿using Marqa.DataAccess.Contexts;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,9 +7,9 @@ namespace Marqa.DataAccess.Repositories;
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditable
 {
     private readonly AppDbContext context;
-    public Repository()
+    public Repository(AppDbContext context)
     {
-        context = new AppDbContext();
+        this.context = context;
         context.Set<TEntity>();
     }
     
