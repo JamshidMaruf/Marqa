@@ -1,4 +1,5 @@
-﻿namespace Marqa.Service.Services.TeacherSubjects.Models;
+﻿namespace Marqa.Service.Services.Subjects.Models;
+
 public class TeacherSubjectCreateModel
 {
     public int TeacherId { get; set; }
