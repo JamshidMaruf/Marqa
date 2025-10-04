@@ -24,6 +24,10 @@ public class AppDbContext : DbContext
     public DbSet<CourseWeekday> CourseWeekdays { get; set; }
     public DbSet<StudentHomeTask> StudentHomeTasks { get; set; }
     public DbSet<TeacherSubject> TeacherSubjects { get; set; }
+    public DbSet<LessonFile> LessonFiles { get; set; }
+    public DbSet<LessonVideo> LessonVideos { get; set; }
+    public DbSet<StudentHomeTaskFeedback> StudentHomeTaskFeedbacks { get; set; }
+    public DbSet<StudentHomeTaskFile> StduentHomeTaskFiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
