@@ -6,15 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.EmployeeRoles;
 
-public class EmployeeRoleService : IEmployeeRoleService
+public class EmployeeRoleService(
+    IRepository<EmployeeRole> employeeRoleRepository,
+    IRepository<Company> companyRepository)
+    : IEmployeeRoleService
 {
-    private readonly IRepository<EmployeeRole> employeeRoleRepository;
-    private readonly IRepository<Company> companyRepository;
-    public EmployeeRoleService()
-    {
-        employeeRoleRepository = new Repository<EmployeeRole>();
-        companyRepository = new Repository<Company>();
-    }
     public async Task CreateAsync(EmployeeRoleCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)

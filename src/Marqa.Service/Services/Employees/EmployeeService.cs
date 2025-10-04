@@ -8,25 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Employees;
 
 public class EmployeeService(
-    IRepository<Employee> employeeRepository,
     IRepository<Company> companyRepository,
+    IRepository<Employee> employeeRepository,
     IRepository<TeacherSubject> teacherSubjectRepository,
-    IRepository<Course> courseRepository
-    ) : IEmployeeService
+    IRepository<Course> courseRepository)
+    : IEmployeeService
 {
-    private IRepository<Company> companyRepository;
-    private IRepository<Employee> employeeRepository;
-    private IRepository<TeacherSubject> teacherSubjectRepository;
-    private IRepository<Course> courseRepository;
-
-    public EmployeeService()
-    {
-        this.companyRepository = companyRepository;
-        this.employeeRepository = employeeRepository;
-        this.teacherSubjectRepository = teacherSubjectRepository;
-        this.courseRepository = courseRepository;
-    }
-    // roleni qoshib ket hammasiga
     public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)

@@ -1,10 +1,10 @@
-﻿using Marqa.Service.Services.HomeTask.Models;
+﻿using Marqa.Service.Services.HomeTasks.Models;
 
-namespace Marqa.Service.Services.HomeTask;
+namespace Marqa.Service.Services.HomeTasks;
 public interface IHomeTaskService
 {
-    Task CreateHomeTaskAsync(HomeTaskCreateModel model);
-    Task UpdateHomeTaskAsync(int id, HomeTaskUpdateModel model);
-    Task DeleteHomeTaskAsync(int id);
-    Task<List<HomeTaskViewModel>> GetHomeTaskAsync(int id);
+    Task CreateAsync(HomeTaskCreateModel model);
+    Task UpdateAsync(int id, HomeTaskUpdateModel model);
+    Task DeleteAsync(int id);
+    Task<List<HomeTaskViewModel>> GetAsync(int id);
 }

@@ -6,28 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
-public class CourseService : ICourseService
+public class CourseService(
+    IRepository<Lesson> lessonRepository,
+    IRepository<Course> courseRepository,
+    IRepository<Subject> subjectRepository,
+    IRepository<Student> studentRepository,
+    IRepository<Employee> teacherRepository,
+    IRepository<Company> companyRepository,
+    IRepository<StudentCourse> studentCourseRepository,
+    IRepository<CourseWeekday> courseWeekdayRepository)
+    : ICourseService
 {
-    private readonly IRepository<Lesson> lessonRepository;
-    private readonly IRepository<Course> courseRepository;
-    private readonly IRepository<Subject> subjectRepository;
-    private readonly IRepository<Student> studentRepository;
-    private readonly IRepository<Employee> teacherRepository;
-    private readonly IRepository<Company> companyRepository;
-    private readonly IRepository<StudentCourse> studentCourseRepository;
-    private readonly IRepository<CourseWeekday> courseWeekdayRepository;
-    public CourseService()
-    {
-        lessonRepository = new Repository<Lesson>();
-        courseRepository = new Repository<Course>();
-        subjectRepository = new Repository<Subject>();
-        teacherRepository = new Repository<Employee>();
-        studentRepository = new Repository<Student>();
-        companyRepository = new Repository<Company>();
-        studentCourseRepository = new Repository<StudentCourse>();
-        courseWeekdayRepository = new Repository<CourseWeekday>();
-    }
-
     public async Task CreateAsync(CourseCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
