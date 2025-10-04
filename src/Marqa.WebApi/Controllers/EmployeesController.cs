@@ -53,7 +53,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         }
     }
 
-    [HttpGet("Emloyee/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         try
@@ -68,7 +68,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         }
     }
 
-    [HttpGet("AllEmployees/{companyId:int}")]
+    [HttpGet("{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(int companyId, string search = default)
     {
         try
@@ -98,7 +98,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         }
     }
 
-    [HttpGet("AllTeachers/{companyId:int}")]
+    [HttpGet("Teachers/{companyId:int}")]
     public async Task<IActionResult> GetAllTeachersAsync(int companyId, string search=default, int subjectId=default)
     {
         try

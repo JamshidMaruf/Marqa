@@ -24,12 +24,42 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         }
     }
 
+    [HttpPost("TeacherSubject")]
+    public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
+    {
+        try
+        {
+            await subjectService.CreateAsync(model);
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] SubjectUpdateModel model)
     {
         try
         {
             await subjectService.UpdateAsync(id, model);
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPut("TeacherSubject/{id:int}")]
+    public async Task<IActionResult> PutAsync(int id, [FromBody] int subjectId)
+    {
+        try
+        {
+            await subjectService.UpdateAsync(id, subjectId);
 
             return Ok();
         }
@@ -84,33 +114,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         }
     }
 
-    [HttpPost("TeacherSubject")]
-    public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
-    {
-        try
-        {
-            await subjectService.CreateAsync(model);
 
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }
 
-    [HttpPut("TeacherSubject/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] int subjectId)
-    {
-        try
-        {
-            await subjectService.UpdateAsync(id, subjectId);
 
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }
 }
