@@ -6,14 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Companies;
 
-public class CompanyService : ICompanyService
+public class CompanyService(IRepository<Company> companyRepository) : ICompanyService
 {
-    private readonly IRepository<Company> companyRepository;
-    public CompanyService()
-    {
-        companyRepository = new Repository<Company>();
-    }
-
     public async Task CreateAsync(CompanyCreateModel model)
     {
         var existCompany = await companyRepository

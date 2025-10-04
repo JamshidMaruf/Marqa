@@ -1,11 +1,11 @@
 ﻿using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Services.HomeTask;
-using Marqa.Service.Services.HomeTask.Models;
+using Marqa.Service.Services.HomeTasks.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Marqa;
+namespace Marqa.Service.Services.HomeTasks;
+
 public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<HomeTask> homeTaskRepository)
     : IHomeTaskService
 {

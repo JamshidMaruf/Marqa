@@ -1,4 +1,4 @@
-﻿namespace Marqa.Service.Services.HomeTask.Models;
+﻿namespace Marqa.Service.Services.HomeTasks.Models;
 public class HomeTaskViewModel
 {
     public int Id { get; set; }
