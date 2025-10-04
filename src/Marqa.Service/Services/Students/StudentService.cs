@@ -6,20 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Students;
 
-public class StudentService : IStudentService
+public class StudentService(
+    IRepository<Company> companyRepository,
+    IRepository<Student> studentRepository,
+    IRepository<Course> courseRepository)
+    : IStudentService
 {
-    private readonly IRepository<Company> companyRepository;
-    private readonly IRepository<Student> studentRepository;
-    private readonly IRepository<Course> courseRepository;
-    private readonly IRepository<StudentCourse> studentCourseRepository;
-    public StudentService()
-    {
-        companyRepository = new Repository<Company>();
-        studentRepository = new Repository<Student>();
-        courseRepository = new Repository<Course>();
-        studentCourseRepository = new Repository<StudentCourse>();
-    }
-
     public async Task CreateAsync(StudentCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)

@@ -6,14 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Subjects;
 
-public class SubjectService : ISubjectService
+public class SubjectService(IRepository<Subject> subjectRepository) : ISubjectService
 {
-    private readonly IRepository<Subject> subjectRepository;
-    public SubjectService()
-    {
-        subjectRepository = new Repository<Subject>();
-    }
-
     public async Task CreateAsync(SubjectCreateModel model)
     {
         var alreadyExistSubject = await subjectRepository

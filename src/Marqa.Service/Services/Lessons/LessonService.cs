@@ -3,24 +3,17 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
+using Marqa.Service.Services.Students;
 
 namespace Marqa.Service.Services.Lessons;
 
-public class LessonService : ILessonService
+public class LessonService(
+    IRepository<Lesson> lessonRepository,
+    IRepository<LessonAttendance> lessonAttendanceRepository,
+    IRepository<Student> studentRepository,
+    IRepository<Employee> teacherRepository)
+    : ILessonService
 {
-    private readonly IRepository<Lesson> lessonRepository;
-    private readonly IRepository<LessonAttendance> lessonAttendanceRepository;
-    private readonly IRepository<Student> studentRepository;
-    private readonly IRepository<Employee> teacherRepository;
-
-    public LessonService()
-    {
-        lessonRepository = new Repository<Lesson>();
-        lessonAttendanceRepository = new Repository<LessonAttendance>();
-        studentRepository = new Repository<Student>();
-        teacherRepository = new Repository<Employee>();
-    }
-
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
         var lessonForUpdation = await lessonRepository.SelectAsync(id)
