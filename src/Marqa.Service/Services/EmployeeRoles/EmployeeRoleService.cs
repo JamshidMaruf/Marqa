@@ -38,11 +38,11 @@ public class EmployeeRoleService(
         await employeeRoleRepository.DeleteAsync(existRole);
     }
 
-    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyid)
+    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId)
     {
         var query = employeeRoleRepository.SelectAllAsQueryable();
-        if(companyid == null)
-            query = query.Where(x => x.CompanyId == companyid);
+        if(companyId == null)
+            query = query.Where(x => x.CompanyId == companyId);
 
         return await query
             .Include(x => x.Company)
