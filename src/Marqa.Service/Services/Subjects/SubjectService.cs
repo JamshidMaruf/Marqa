@@ -2,7 +2,6 @@
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Subjects.Models;
-using Marqa.Service.Services.TeacherSubjects.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Subjects;
