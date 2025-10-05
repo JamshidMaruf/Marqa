@@ -8,7 +8,7 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class SubjectsController(ISubjectService subjectService) : ControllerBase
 {
-    
+
     [HttpPost]
     public async Task<IActionResult> PostAsync(SubjectCreateModel model)
     {
@@ -23,7 +23,22 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
+    [HttpPost("TeacherSubject")]
+    public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
+    {
+        try
+        {
+            await subjectService.CreateAsync(model);
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] SubjectUpdateModel model)
     {
@@ -38,7 +53,22 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
+    [HttpPut("TeacherSubject/{id:int}")]
+    public async Task<IActionResult> PutAsync(int id, [FromBody] int subjectId)
+    {
+        try
+        {
+            await subjectService.UpdateAsync(id, subjectId);
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
@@ -53,7 +83,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
@@ -68,7 +98,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet("company/{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
@@ -83,4 +113,8 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+
+
+
 }

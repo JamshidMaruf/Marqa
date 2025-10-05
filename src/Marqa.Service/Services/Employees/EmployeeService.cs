@@ -93,7 +93,7 @@ public class EmployeeService(
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
 
-    public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
+    public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search=default)
     {
         var employees = employeeRepository
             .SelectAllAsQueryable()
@@ -175,7 +175,7 @@ public class EmployeeService(
     }
 
 
-    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
+    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search=default, int subjectId=default)
     {
         var teacherQuery = teacherSubjectRepository
             .SelectAllAsQueryable()
