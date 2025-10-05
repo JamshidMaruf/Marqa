@@ -1,5 +1,7 @@
-﻿using Marqa.Service.Services.Companies;
+﻿using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -15,11 +17,19 @@ public class CompaniesController(ICompanyService companyService) : ControllerBas
         {
             await companyService.CreateAsync(model);
 
-            return Created();
+            return Ok(new Response
+            {
+                Status = 201,
+                Message = "success",
+            });
         }
         catch(Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -31,11 +41,27 @@ public class CompaniesController(ICompanyService companyService) : ControllerBas
         {
             await companyService.UpdateAsync(id, model);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success"
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch(Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response()
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -60,11 +86,28 @@ public class CompaniesController(ICompanyService companyService) : ControllerBas
         {
             var company = await companyService.GetAsync(id);
 
-            return Ok(company);
+            return Ok(new Response<CompanyViewModel>
+            {
+                Status = 200,
+                Message = "success",
+                Data = company
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch(Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response()
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -75,11 +118,28 @@ public class CompaniesController(ICompanyService companyService) : ControllerBas
         {
             var companies = await companyService.GetAllAsync();
 
-            return Ok(companies);
+            return Ok(new Response<List<CompanyViewModel>>
+            {
+                Status = 200,
+                Message = "success",
+                Data = companies
+            });
         }
-        catch (Exception ex)
+        catch(NotFoundException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch(Exception ex)
+        {
+            return BadRequest(new Response()
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 }
