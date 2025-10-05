@@ -88,7 +88,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     {
         try
         {
-            var result = await employeeService.GetAsync(id);
+            var result = await employeeService.GetTeacherAsync(id);
 
             return Ok(result);
         }

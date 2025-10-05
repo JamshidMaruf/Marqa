@@ -174,13 +174,7 @@ public class EmployeeService(
         return teacher;
     }
 
-    public Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
-    {
-        throw new NotImplementedException();
-    }
-
-
-    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search=default, int subjectId=default)
+    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = teacherSubjectRepository
             .SelectAllAsQueryable()

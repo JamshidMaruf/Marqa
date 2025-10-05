@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Marqa.DataAccess\Marqa.DataAccess.csproj" />
+    <ProjectReference Include="..\Marqa.Domain\Marqa.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
