@@ -1,15 +1,21 @@
 ﻿using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.HomeTasks.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.HomeTasks;
 
-public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<HomeTask> homeTaskRepository)
-    : IHomeTaskService
+public class HomeTaskService(
+    IRepository<Lesson> lessonRepository, 
+    IRepository<HomeTask> homeTaskRepository,
+    IRepository<Student> studentRepository,
+    IRepository<StudentHomeTask> studentHomeTaskRepository,
+    IRepository<StudentHomeTaskFeedback> studentHomeTaskFeedbackRepository
+    ) : IHomeTaskService
 {
-    public async Task CreateHomeTaskAsync(HomeTaskCreateModel model)
+    public async Task CreateAsync(HomeTaskCreateModel model)
     {
         var existLesson = await lessonRepository.SelectAsync(model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
@@ -22,7 +28,7 @@ public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<H
         });
     }
 
-    public async Task UpdateHomeTaskAsync(int id, HomeTaskUpdateModel model)
+    public async Task UpdateAsync(int id, HomeTaskUpdateModel model)
     {
         var existHomeTask = await homeTaskRepository.SelectAsync(id)
             ?? throw new NotFoundException("Home task is not found");
@@ -33,7 +39,7 @@ public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<H
         await homeTaskRepository.UpdateAsync(existHomeTask);
     }
 
-    public async Task DeleteHomeTaskAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         var existHomeTask = await homeTaskRepository.SelectAsync(id)
             ?? throw new NotFoundException("Home task is not found");
@@ -41,7 +47,7 @@ public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<H
         await homeTaskRepository.DeleteAsync(existHomeTask);
     }
 
-    public async Task<List<HomeTaskViewModel>> GetHomeTaskAsync(int lessonId)
+    public async Task<List<HomeTaskViewModel>> GetAsync(int lessonId)
     {
         var existHomeTask = homeTaskRepository.SelectAllAsQueryable()
             .Where(ht => ht.LessonId == lessonId && !ht.IsDeleted);
@@ -57,5 +63,43 @@ public class HomeTaskService(IRepository<Lesson> lessonRepository, IRepository<H
             Description = homeTask.Description,
         })
             .ToListAsync();
+    }
+
+    public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
+    {
+        var existHomeTask = await homeTaskRepository.SelectAsync(model.HomeTaskId)
+            ?? throw new NotFoundException("Homa task not found!");
+
+        var existStudent = await studentRepository.SelectAsync(model.StudentId)
+            ?? throw new NotFoundException("Student not found!");
+
+        if (existHomeTask.Deadline < DateTime.Now)
+            throw new Exception("Homework time is over!");
+
+        var createUpload = await studentHomeTaskRepository
+            .InsertAsync(new StudentHomeTask
+            {
+                HomeTaskId = model.HomeTaskId,
+                StudentId = model.StudentId,
+                Info = model.Info,
+                UploadedAt = DateTime.Now,
+                Status = StudentHomeTaskStatus.accepted,
+            });
+    }
+
+    public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
+    {
+        var existHomeTaskUpload = await studentHomeTaskRepository.SelectAsync(model.StudentHomeTaskId)
+            ?? throw new NotFoundException("No completed home task found!");
+
+        await studentHomeTaskFeedbackRepository
+            .InsertAsync(new StudentHomeTaskFeedback
+            {
+                StudentHomeTaskId = model.StudentHomeTaskId,
+                TeacherId = model.TeacherId,
+                FeedBack = model.FeedBack
+            });
+
+        existHomeTaskUpload.Score = model.Score;
     }
 }
