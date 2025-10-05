@@ -11,7 +11,6 @@ public class SubjectService(
     IRepository<Employee> teacherRepository,
     IRepository<Subject> subjectRepository) : ISubjectService
 {
-
     public async Task CreateAsync(SubjectCreateModel model)
     {
         var alreadyExistSubject = await subjectRepository

@@ -56,6 +56,7 @@ public class CompanyService(IRepository<Company> companyRepository) : ICompanySe
             .Where(t => !t.IsDeleted)
             .Select(c => new CompanyViewModel
             {
+                Id = c.Id,
                 Name = c.Name,
             }).ToListAsync();
     }

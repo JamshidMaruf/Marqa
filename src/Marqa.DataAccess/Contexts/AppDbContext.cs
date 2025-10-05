@@ -7,7 +7,7 @@ namespace Marqa.DataAccess.Contexts;
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-    
+
     public DbSet<Company> Companies { get; set; }
     public DbSet<Course> Courses { get; set; }
     public DbSet<Employee> Employees { get; set; }
@@ -27,7 +27,7 @@ public class AppDbContext : DbContext
     public DbSet<LessonFile> LessonFiles { get; set; }
     public DbSet<LessonVideo> LessonVideos { get; set; }
     public DbSet<StudentHomeTaskFeedback> StudentHomeTaskFeedbacks { get; set; }
-    public DbSet<StudentHomeTaskFile> StduentHomeTaskFiles { get; set; }
+    public DbSet<StudentHomeTaskFile> StudentHomeTaskFiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
