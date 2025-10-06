@@ -4,6 +4,7 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
 using Marqa.Service.Services.Students;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Lessons;
 
@@ -39,10 +40,20 @@ public class LessonService(
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
         int lateMinutes = 0;
-
-        if (model.Status == AttendanceStatus.Late)
+        var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
+            .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
+            .FirstOrDefaultAsync();
+        if(lessonAttendance != null)
         {
-            lateMinutes = (int) (DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
+            lessonAttendance.Status = model.Status;
+            lessonAttendance.LateTimeInMinutes = lateMinutes;
+        }
+        else
+        {
+            if (model.Status == AttendanceStatus.Late)
+            {
+                lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
+            }
         }
 
         await lessonAttendanceRepository.InsertAsync(new LessonAttendance
