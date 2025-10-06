@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
 public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
 {
     [HttpPost]
@@ -81,4 +83,3 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         }
     }
 }
-

@@ -41,9 +41,6 @@ public class SubjectService(
             .FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
        
-        _ = await companyRepository.SelectAsync(model.CompanyId)
-         ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
-
         existSubject.Name = model.Name;
 
         await subjectRepository.UpdateAsync(existSubject);
@@ -73,10 +70,13 @@ public class SubjectService(
     {
         return await subjectRepository
             .SelectAllAsQueryable()
+            .Include(s => s.Company)
             .Where(s => s.CompanyId == companyId && !s.IsDeleted)
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,
+                CompanyId = s.CompanyId,
+                CompanyName = s.Company.Name,
                 Name = s.Name,
             })
             .ToListAsync();
