@@ -1,5 +1,7 @@
-﻿using Marqa.Service.Services.Courses;
+﻿using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -14,25 +16,133 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         try
         {
             await courseService.CreateAsync(model);
-            return Created();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch(AlreadyExistException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message,
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
-
+    [HttpPost("AttachStudent")]
+    public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId)
+    {
+        try
+        {
+            await courseService.AttachStudentAsync(courseId, studentId);
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
+        }
+      
+    }
+    
+    [HttpPost("DetachStudent")]
+    public async Task<IActionResult> DetachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId)
+    {
+        try
+        {
+            await courseService.DetachStudentAsync(courseId, studentId);
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
+        }
+    }
+    
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)
     {
         try
         {
             await courseService.UpdateAsync(id, model);
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch(AlreadyExistException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message,
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -42,11 +152,27 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         try
         {
             await courseService.DeleteAsync(id);
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -56,11 +182,28 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         try
         {
             var course = await courseService.GetAsync(id);
-            return Ok(course);
+            return Ok(new Response<CourseViewModel>
+            {
+                Status = 200,
+                Message = "success",
+                Data = course
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -70,11 +213,28 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         try
         {
             var courses = await courseService.GetAllAsync(companyId, search, subjectId);
-            return Ok(courses);
+            return Ok(new Response<List<CourseViewModel>>
+            {
+                Status = 200,
+                Message = "success",
+                Data = courses
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 }
