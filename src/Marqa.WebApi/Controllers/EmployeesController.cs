@@ -1,5 +1,7 @@
-﻿using Marqa.Service.Services.Employees;
+﻿using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -15,11 +17,27 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             await employeeService.CreateAsync(model);
 
-            return Created();
+            return Ok(new Response
+            {
+                Status = 201,
+                Message = "success"
+            });
+        }
+        catch(NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -30,11 +48,27 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             await employeeService.UpdateAsync(id, model);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success"
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -45,11 +79,27 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             await employeeService.DeleteAsync(id);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                 Message = "success"
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -60,11 +110,28 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             var result = await employeeService.GetAsync(id);
 
-            return Ok(result);
+            return Ok(new Response<EmployeeViewModel>
+            {
+                Status = 200,
+                Message = "success",
+                Data = result
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -75,12 +142,30 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             var result = await employeeService.GetAllAsync(companyId, search);
 
-            return Ok(result);
+            return Ok(new Response<IEnumerable<EmployeeViewModel>>
+            {
+                Status = 200,   
+                Message = "success",
+                Data = result
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
+
     }
 
     [HttpGet("Teacher/{id:int}")]
@@ -90,11 +175,28 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             var result = await employeeService.GetTeacherAsync(id);
 
-            return Ok(result);
+            return Ok(new Response<TeacherViewModel>
+            {
+                Status = 200,
+                Message = "success",
+                Data = result
+            });
         }
-        catch(Exception ex)
+        catch (NotFoundException ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -105,11 +207,28 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         {
             var result = await employeeService.GetAllTeachersAsync(companyId,search,subjectId);
 
-            return Ok(result);
+            return Ok(new Response<IEnumerable<TeacherViewModel>>
+            {
+                Status = 200,
+                Message = "success",
+                Data = result
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 }
