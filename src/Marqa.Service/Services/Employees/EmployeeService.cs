@@ -11,13 +11,17 @@ public class EmployeeService(
     IRepository<Company> companyRepository,
     IRepository<Employee> employeeRepository,
     IRepository<TeacherSubject> teacherSubjectRepository,
-    IRepository<Course> courseRepository)
+    IRepository<Course> courseRepository,
+    IRepository<EmployeeRole> employeeRoleRepository)
     : IEmployeeService
 {
     public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
+
+        _ = await employeeRoleRepository.SelectAsync(model.RoleId)
+            ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         var createdEmp = await employeeRepository.InsertAsync(new Employee
         {
@@ -32,7 +36,8 @@ public class EmployeeService(
             PasswordHash = model.Password.Hash(),
             JoiningDate = model.JoiningDate,
             Specialization = model.Specialization,
-            Info = model.Info
+            Info = model.Info,
+            RoleId = model.RoleId
         });
 
         return createdEmp.Id;
@@ -42,6 +47,9 @@ public class EmployeeService(
     {
         var existTeacher = await employeeRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Employee was not found");
+        
+        _ = await employeeRoleRepository.SelectAsync(model.RoleId)
+            ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         existTeacher.FirstName = model.FirstName;
         existTeacher.LastName = model.LastName;
@@ -52,6 +60,7 @@ public class EmployeeService(
         existTeacher.Status = model.Status;
         existTeacher.JoiningDate = model.JoiningDate;
         existTeacher.Specialization = model.Specialization;
+        existTeacher.RoleId = model.RoleId;
 
         await employeeRepository.UpdateAsync(existTeacher);
     }
@@ -174,13 +183,7 @@ public class EmployeeService(
         return teacher;
     }
 
-    public Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
-    {
-        throw new NotImplementedException();
-    }
-
-
-    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search=default, int subjectId=default)
+    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = teacherSubjectRepository
             .SelectAllAsQueryable()

@@ -1,5 +1,7 @@
-﻿using Marqa.Service.Services.Subjects;
+﻿using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Subjects.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -16,11 +18,35 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         {
             await subjectService.CreateAsync(model);
 
-            return Created();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
         }
-        catch (Exception e)
+        catch (AlreadyExistException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message,
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
         }
     }
 
@@ -29,13 +55,29 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
     {
         try
         {
-            await subjectService.CreateAsync(model);
+            await subjectService.AttachAsync(model);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -46,12 +88,29 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         {
             await subjectService.UpdateAsync(id, model);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
         }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
+        }
+
     }
 
     [HttpPut("TeacherSubject/{id:int}")]
@@ -59,13 +118,29 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
     {
         try
         {
-            await subjectService.UpdateAsync(id, subjectId);
+            await subjectService.EditAttachedSubjectAsync(id, subjectId);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -76,11 +151,27 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         {
             await subjectService.DeleteAsync(id);
 
-            return Ok();
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -91,11 +182,28 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         {
             var subject = await subjectService.GetAsync(id);
 
-            return Ok(subject);
+            return Ok(new Response<SubjectViewModel>
+            {
+                Status = 200,
+                Message = "success",
+                Data = subject
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
 
@@ -106,15 +214,28 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         {
             var subject = await subjectService.GetAllAsync(companyId);
 
-            return Ok(subject);
+            return Ok(new Response<IEnumerable<SubjectViewModel>>
+            {
+                Status = 200,
+                Message = "success",
+                Data = subject
+            });
         }
-        catch (Exception e)
+        catch (NotFoundException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 500,
+                Message = ex.Message
+            });
         }
     }
-
-
-
-
 }
