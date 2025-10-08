@@ -43,25 +43,26 @@ public class LessonService(
         var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
-        if(lessonAttendance != null)
+
+        if (model.Status == AttendanceStatus.Late)
+        {
+            lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
+        }
+
+        if (lessonAttendance != null)
         {
             lessonAttendance.Status = model.Status;
             lessonAttendance.LateTimeInMinutes = lateMinutes;
         }
         else
         {
-            if (model.Status == AttendanceStatus.Late)
+            await lessonAttendanceRepository.InsertAsync(new LessonAttendance
             {
-                lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
-            }
+                LessonId = model.LessonId,
+                StudentId = model.StudentId,
+                Status = model.Status,
+                LateTimeInMinutes = lateMinutes
+            });
         }
-
-        await lessonAttendanceRepository.InsertAsync(new LessonAttendance
-        {
-            LessonId = model.LessonId,
-            StudentId = model.StudentId,
-            Status = model.Status,
-            LateTimeInMinutes = lateMinutes
-        });
     }
 }
