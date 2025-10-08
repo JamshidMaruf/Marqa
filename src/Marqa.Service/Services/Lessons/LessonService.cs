@@ -17,7 +17,7 @@ public class LessonService(
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
         var lessonForUpdation = await lessonRepository.SelectAsync(id)
-            ?? throw new NotFoundException($"Lesson is not found with this ID = {id}");
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         _ = await teacherRepository.SelectAsync(model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
@@ -28,6 +28,16 @@ public class LessonService(
         lessonForUpdation.TeacherId = model.TeacherId;
 
         await lessonRepository.UpdateAsync(lessonForUpdation);
+    }
+
+    public async Task ModifyAsync(int id,string name)
+    {
+        var lesson = await lessonRepository.SelectAsync(id)
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
+
+        lesson.Name = name;
+
+        await lessonRepository.UpdateAsync(lesson);
     }
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
