@@ -50,7 +50,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         }
     }
 
-    [HttpPost("TeacherSubject")]
+    [HttpPost("AttachToTeacher")]
     public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
     {
         try
@@ -113,12 +113,12 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
     }
 
-    [HttpPut("TeacherSubject/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] int subjectId)
+    [HttpDelete("DetachFromTeacher")]
+    public async Task<IActionResult> DeleteAsync(int teacherId, int subjectId)
     {
         try
         {
-            await subjectService.EditAttachedSubjectAsync(id, subjectId);
+            await subjectService.DetachAsync(teacherId, subjectId);
 
             return Ok(new Response
             {

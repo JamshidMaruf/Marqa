@@ -47,6 +47,36 @@ public class LessonsController(ILessonService lessonService) : Controller
         }
     }
 
+    [HttpPatch]
+    public async Task<IActionResult> PatchAsync(int Id, string name)
+    {
+        try
+        {
+            await lessonService.ModifyAsync(Id, name);
+
+            return Ok(new Response
+            {
+                Status = 200,
+                Message = "success",
+            });
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(new Response
+            {
+                Status = 404,
+                Message = ex.Message
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new Response
+            {
+                Status = 400,
+                Message = ex.Message
+            });
+        }
+    }
     [HttpPost("CheckUp")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {

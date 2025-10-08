@@ -7,5 +7,6 @@ public interface ILessonService
 {
     Task UpdateAsync(int id, LessonUpdateModel model);
     Task CheckUpAsync(LessonAttendanceModel model);
+    Task ModifyAsync(int id, string name);
 }
 
