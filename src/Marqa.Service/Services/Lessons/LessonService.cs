@@ -3,7 +3,6 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
-using Marqa.Service.Services.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Lessons;

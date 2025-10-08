@@ -142,7 +142,7 @@ public class EmployeeService(
     {
         var teacher = await teacherSubjectRepository
            .SelectAllAsQueryable()
-           .Where(ts => ts.TeacherId == id)
+           .Where(ts => ts.TeacherId == id && !ts.IsDeleted)
            .Include(ts => ts.Teacher)
            .Include(ts => ts.Subject)
            .Select(ts => new TeacherViewModel
