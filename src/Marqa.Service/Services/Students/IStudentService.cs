@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Services.Students.Models;
+﻿using Marqa.Service.Services.Students.Models;
 
 namespace Marqa.Service.Services.Students;
 

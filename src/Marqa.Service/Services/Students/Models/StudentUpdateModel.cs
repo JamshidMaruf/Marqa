@@ -1,4 +1,5 @@
 ﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Students.Models.DetailModels;
 
 namespace Marqa.Service.Services.Students.Models;
 
@@ -10,5 +11,8 @@ public class StudentUpdateModel
     public Gender Gender { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
+
+    //details
+    public StudentDetailUpdateModel StudentDetailUpdateModel { get; set; }
 
 }

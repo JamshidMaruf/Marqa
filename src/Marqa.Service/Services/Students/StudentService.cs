@@ -2,29 +2,44 @@
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Students.Models;
+using Marqa.Service.Services.Students.Models.DetailModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Students;
 
-public class StudentService(
-    IRepository<Company> companyRepository,
-    IRepository<Student> studentRepository,
-    IRepository<Course> courseRepository)
-    : IStudentService
+public class StudentService(IRepository<Company> companyRepository, IRepository<Student> studentRepository, IRepository<StudentDetail> studentDetailRepository
+    , IRepository<Course> courseRepository, IRepository<StudentCourse> studentCourseRepository) : IStudentService
 {
     public async Task CreateAsync(StudentCreateModel model)
     {
         _ = await companyRepository.SelectAsync(model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        await studentRepository.InsertAsync(new Student
+        var student = new Student
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
             LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
-        });
+            Phone = model.Phone,
+            Email = model.Email,
+             StudentDetail=new StudentDetail
+             {
+                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
+                 FatherLastName = model.StudentDetailCreateModel.FatherLastName,
+                 FatherPhone = model.StudentDetailCreateModel.FatherPhone,
+                 MotherFirstName = model.StudentDetailCreateModel.MotherFirstName,
+                 MotherLastName = model.StudentDetailCreateModel.MotherLastName,
+                 MotherPhone = model.StudentDetailCreateModel.MotherPhone,
+                 GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
+                 GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
+                 GuardianPhone = model.StudentDetailCreateModel.GuardianPhone
+             }
+        };
+
+        await studentRepository.InsertAsync(student);
+
     }
 
     public async Task UpdateAsync(int id, StudentUpdateModel model)
@@ -36,8 +51,20 @@ public class StudentService(
         existStudent.LastName = model.LastName;
         existStudent.Gender = model.Gender;
         existStudent.DateOfBirth = model.DateOfBirth;
+        existStudent.Phone = model.Phone;
+        existStudent.Email = model.Email;
+        existStudent.StudentDetail.FatherFirstName=model.StudentDetailUpdateModel.FatherFirstName;
+        existStudent.StudentDetail.FatherLastName= model.StudentDetailUpdateModel.FatherLastName;
+        existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
+        existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
+        existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
+        existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
+        existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
+        existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
+        existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
 
         await studentRepository.UpdateAsync(existStudent);
+
     }
 
     public async Task DeleteAsync(int id)
@@ -50,7 +77,9 @@ public class StudentService(
 
     public async Task<StudentViewModel> GetAsync(int id)
     {
-        var existStudent = await studentRepository.SelectAsync(id)
+        var existStudent = await studentRepository.SelectAllAsQueryable()
+            .Include(s => s.StudentDetail)
+            .FirstOrDefaultAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Student is not found");
 
         return new StudentViewModel
@@ -60,6 +89,20 @@ public class StudentService(
             LastName = existStudent.LastName,
             DateOfBirth = existStudent.DateOfBirth,
             Gender = existStudent.Gender,
+            Phone = existStudent.Phone,
+            Email = existStudent.Email,
+            StudentDetailViewModel = new StudentDetailViewModel
+            {
+                FatherFirstName = existStudent.StudentDetail.FatherFirstName,
+                FatherLastName = existStudent.StudentDetail.FatherLastName,
+                FatherPhone = existStudent.StudentDetail.FatherPhone,
+                MotherFirstName = existStudent.StudentDetail.MotherFirstName,
+                MotherLastName = existStudent.StudentDetail.MotherLastName,
+                MotherPhone = existStudent.StudentDetail.MotherPhone,
+                RelativeFirstName = existStudent.StudentDetail.GuardianFirstName,
+                RelativeLastName = existStudent.StudentDetail.GuardianLastName,
+                RelativePhone = existStudent.StudentDetail.GuardianPhone
+            }
         };
     }
 
@@ -69,17 +112,34 @@ public class StudentService(
                 .SelectAllAsQueryable()
                 .Where(c => c.Id == courseId && !c.IsDeleted)
                 .Include(c => c.Students)
-                .Select(c => c.Students.Select(s =>  new StudentViewModel
+                .ThenInclude(s => s.StudentDetail)
+                .Select(c => c.Students.Select(s => new StudentViewModel
                 {
                     Id = s.Id,
                     FirstName = s.FirstName,
                     LastName = s.LastName,
                     DateOfBirth = s.DateOfBirth,
                     Gender = s.Gender,
+                    Phone = s.Phone,
+                    Email = s.Email,
+                    StudentDetailViewModel = new StudentDetailViewModel
+                    {
+                        Id = s.StudentDetail.Id,
+                        StudentId = s.Id,
+                        FatherFirstName = s.StudentDetail.FatherFirstName,
+                        FatherLastName = s.StudentDetail.FatherLastName,
+                        FatherPhone = s.StudentDetail.FatherPhone,
+                        MotherFirstName = s.StudentDetail.MotherFirstName,
+                        MotherLastName = s.StudentDetail.MotherLastName,
+                        MotherPhone = s.StudentDetail.MotherPhone,
+                        RelativeFirstName = s.StudentDetail.GuardianFirstName,
+                        RelativeLastName = s.StudentDetail.GuardianLastName,
+                        RelativePhone = s.StudentDetail.GuardianPhone
+                    }
                 }))
                 .FirstOrDefaultAsync()
                 ?? throw new NotFoundException("Course is not found");
-        
+
         return courseStudents.ToList();
     }
 }
