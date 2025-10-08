@@ -8,5 +8,5 @@ public interface IRepository<TEntity> where TEntity : Auditable
     Task UpdateAsync(TEntity entity);
     Task DeleteAsync(TEntity entity);
     Task<TEntity> SelectAsync(int id);
-    IQueryable<TEntity> SelectAllAsQueryable();
+    IQueryable<TEntity> SelectAllAsQueryable(); 
 }
