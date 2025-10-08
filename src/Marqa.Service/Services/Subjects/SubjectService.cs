@@ -1,10 +1,8 @@
-﻿using System.ComponentModel.Design;
-using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Subjects.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Internal;
 
 namespace Marqa.Service.Services.Subjects;
 
@@ -108,16 +106,14 @@ public class SubjectService(
         });
     }
 
-    public async Task EditAttachedSubjectAsync(int id, int subjectId)
+    public async Task DetachAsync(int teacherId, int subjectId)
     {
-        var teacherSubject = await teacherSubjectRepository.SelectAsync(id)
-                             ?? throw new NotFoundException("Attachment was not Found");
+        var teacherSubject = teacherSubjectRepository
+            .SelectAllAsQueryable()
+            .Where(ts => ts.TeacherId == teacherId && ts.SubjectId == subjectId) 
+            .FirstOrDefault()
+            ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        _ = await subjectRepository.SelectAsync(subjectId)
-            ?? throw new NotFoundException($"No subject was found with ID = {subjectId}.");
-
-        teacherSubject.SubjectId = subjectId;
-
-        await teacherSubjectRepository.UpdateAsync(teacherSubject);
+        await teacherSubjectRepository.DeleteAsync(teacherSubject);
     }
 }
