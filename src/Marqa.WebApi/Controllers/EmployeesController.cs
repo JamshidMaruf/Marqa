@@ -15,12 +15,12 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     {
         try
         {
-            await employeeService.CreateAsync(model);
+            int id = await employeeService.CreateAsync(model);
 
             return Ok(new Response
             {
                 Status = 201,
-                Message = "success"
+                Message = $"success employeeId: {id}"
             });
         }
         catch(NotFoundException ex)
@@ -135,8 +135,8 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         }
     }
 
-    [HttpGet("{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, string search = default)
+    [HttpGet("companyId{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(int companyId, string search = null)
     {
         try
         {

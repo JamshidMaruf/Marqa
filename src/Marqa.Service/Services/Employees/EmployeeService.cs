@@ -108,7 +108,7 @@ public class EmployeeService(
             .SelectAllAsQueryable()
             .Where(e => e.CompanyId == companyId && !e.IsDeleted);
 
-        if (string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
                 e.FirstName.Contains(search) ||
                 e.LastName.Contains(search) ||

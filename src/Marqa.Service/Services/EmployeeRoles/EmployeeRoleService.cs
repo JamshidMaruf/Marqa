@@ -41,7 +41,7 @@ public class EmployeeRoleService(
     public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId)
     {
         var query = employeeRoleRepository.SelectAllAsQueryable();
-        if(companyId == null)
+        if(companyId != null)
             query = query.Where(x => x.CompanyId == companyId);
 
         return await query
