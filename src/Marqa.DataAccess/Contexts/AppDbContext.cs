@@ -28,6 +28,7 @@ public class AppDbContext : DbContext
     public DbSet<LessonVideo> LessonVideos { get; set; }
     public DbSet<StudentHomeTaskFeedback> StudentHomeTaskFeedbacks { get; set; }
     public DbSet<StudentHomeTaskFile> StudentHomeTaskFiles { get; set; }
+    public DbSet<HomeTaskFile> HomeTaskFiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -159,7 +159,7 @@ public class EmployeeService(
                Specialization = ts.Teacher.Specialization,
                Subject = new TeacherViewModel.SubjectInfo
                {
-                   Id = ts.Id,
+                   Id = ts.SubjectId,
                    Name = ts.Subject.Name
                }
            })

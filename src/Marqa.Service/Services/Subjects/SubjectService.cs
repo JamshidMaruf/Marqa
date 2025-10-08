@@ -1,4 +1,5 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using System.ComponentModel.Design;
+using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Subjects.Models;
@@ -56,7 +57,17 @@ public class SubjectService(
 
     public async Task<SubjectViewModel> GetAsync(int id)
     {
-        var existSubject = await subjectRepository.SelectAsync(id)
+        var existSubject =  await subjectRepository
+            .SelectAllAsQueryable()
+            .Include(s => s.Company)
+            .Where(s => s.Id == id && !s.IsDeleted)
+            .Select(s => new SubjectViewModel
+            {
+                Id = s.Id,
+                CompanyId = s.CompanyId,
+                CompanyName = s.Company.Name,
+                Name = s.Name,
+            }).FirstOrDefaultAsync()
             ?? throw new NotFoundException("Subject was not found");
 
         return new SubjectViewModel
