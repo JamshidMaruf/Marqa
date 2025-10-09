@@ -30,7 +30,7 @@ public class LessonService(
         await lessonRepository.UpdateAsync(lessonForUpdation);
     }
 
-    public async Task ModifyAsync(int id,string name)
+    public async Task ModifyAsync(int id, string name)
     {
         var lesson = await lessonRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
@@ -73,11 +73,6 @@ public class LessonService(
                 LateTimeInMinutes = lateMinutes
             });
         }
-    }
-
-    public Task ModifyAsync(int lessonId, string name)
-    {
-        throw new NotImplementedException();
     }
 
     public Task UploadLessonVideoAsync(int lessonId, object video)
