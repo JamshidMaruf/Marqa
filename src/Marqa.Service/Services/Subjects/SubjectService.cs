@@ -3,7 +3,6 @@ using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Subjects.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Internal;
 
 namespace Marqa.Service.Services.Subjects;
 
@@ -56,7 +55,17 @@ public class SubjectService(
 
     public async Task<SubjectViewModel> GetAsync(int id)
     {
-        var existSubject = await subjectRepository.SelectAsync(id)
+        var existSubject =  await subjectRepository
+            .SelectAllAsQueryable()
+            .Include(s => s.Company)
+            .Where(s => s.Id == id && !s.IsDeleted)
+            .Select(s => new SubjectViewModel
+            {
+                Id = s.Id,
+                CompanyId = s.CompanyId,
+                CompanyName = s.Company.Name,
+                Name = s.Name,
+            }).FirstOrDefaultAsync()
             ?? throw new NotFoundException("Subject was not found");
 
         return new SubjectViewModel
@@ -97,13 +106,14 @@ public class SubjectService(
         });
     }
 
-    public async Task DetachSubjectAsync(int teacherId, int subjectId)
+    public async Task DetachAsync(int teacherId, int subjectId)
     {
-        _ = await subjectRepository.SelectAsync(subjectId)
-            ?? throw new NotFoundException($"No subject was found with ID = {subjectId}.");
+        var teacherSubject = teacherSubjectRepository
+            .SelectAllAsQueryable()
+            .Where(ts => ts.TeacherId == teacherId && ts.SubjectId == subjectId) 
+            .FirstOrDefault()
+            ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        teacherSubject.SubjectId = subjectId;
-
-        await teacherSubjectRepository.UpdateAsync(teacherSubject);
+        await teacherSubjectRepository.DeleteAsync(teacherSubject);
     }
 }

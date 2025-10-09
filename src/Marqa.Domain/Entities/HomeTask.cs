@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Marqa.Domain.Entities;
+﻿namespace Marqa.Domain.Entities;
 
 public class HomeTask : Auditable
 {

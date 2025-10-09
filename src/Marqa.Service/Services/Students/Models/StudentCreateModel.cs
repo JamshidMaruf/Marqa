@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Students.Models.DetailModels;
 
 namespace Marqa.Service.Services.Students.Models;
 
@@ -13,4 +12,10 @@ public class StudentCreateModel
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public int CompanyId { get; set; }
+
+
+    //student details
+
+    public StudentDetailCreateModel StudentDetailCreateModel { get; set; }
+
 }

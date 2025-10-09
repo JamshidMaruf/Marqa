@@ -3,7 +3,6 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
-using Marqa.Service.Services.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Lessons;
@@ -18,7 +17,7 @@ public class LessonService(
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
         var lessonForUpdation = await lessonRepository.SelectAsync(id)
-            ?? throw new NotFoundException($"Lesson is not found with this ID = {id}");
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         _ = await teacherRepository.SelectAsync(model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
@@ -29,6 +28,16 @@ public class LessonService(
         lessonForUpdation.TeacherId = model.TeacherId;
 
         await lessonRepository.UpdateAsync(lessonForUpdation);
+    }
+
+    public async Task ModifyAsync(int id,string name)
+    {
+        var lesson = await lessonRepository.SelectAsync(id)
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
+
+        lesson.Name = name;
+
+        await lessonRepository.UpdateAsync(lesson);
     }
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
@@ -43,26 +52,27 @@ public class LessonService(
         var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
-        if(lessonAttendance != null)
+
+        if (model.Status == AttendanceStatus.Late)
+        {
+            lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
+        }
+
+        if (lessonAttendance != null)
         {
             lessonAttendance.Status = model.Status;
             lessonAttendance.LateTimeInMinutes = lateMinutes;
         }
         else
         {
-            if (model.Status == AttendanceStatus.Late)
+            await lessonAttendanceRepository.InsertAsync(new LessonAttendance
             {
-                lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
-            }
+                LessonId = model.LessonId,
+                StudentId = model.StudentId,
+                Status = model.Status,
+                LateTimeInMinutes = lateMinutes
+            });
         }
-
-        await lessonAttendanceRepository.InsertAsync(new LessonAttendance
-        {
-            LessonId = model.LessonId,
-            StudentId = model.StudentId,
-            Status = model.Status,
-            LateTimeInMinutes = lateMinutes
-        });
     }
 
     public Task ModifyAsync(int lessonId, string name)
