@@ -7,10 +7,8 @@ public class Lesson : Auditable
     public TimeOnly EndTime { get; set; }
     public DateOnly Date { get; set; }
     public string Room { get; set; }
+    public string Name { get; set; }
     public int CourseId { get; set; }
-    
-    // shuni qoshdim ozimdan nega deganda lessonni boshqa oqituvchi otib beradigan bolsa log qilib ketish uchun 
-    // bundan tashqari lessonga beriladigan summani oqituvchiga transfer qilish uchun ham kerak boladi
     public int TeacherId { get; set; }
     // Navigation
     public Course Course { get; set; }

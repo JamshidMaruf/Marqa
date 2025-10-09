@@ -19,12 +19,15 @@ public class StudentService(
 
         await studentRepository.InsertAsync(new Student
         {
+            // Access ID ni generate qilish kerak. ID: <5 digits>
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
             LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
         });
+        
+        // Send SMS message
     }
 
     public async Task UpdateAsync(int id, StudentUpdateModel model)
@@ -81,5 +84,20 @@ public class StudentService(
                 ?? throw new NotFoundException("Course is not found");
         
         return courseStudents.ToList();
+    }
+
+    public Task SendOTPAsync(string phone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<(int StudentId, bool IsVerified)> VerifyOTPAsync(string phone, int otpCode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<Account>> GetAccountsAsync(int studentId)
+    {
+        throw new NotImplementedException();
     }
 }

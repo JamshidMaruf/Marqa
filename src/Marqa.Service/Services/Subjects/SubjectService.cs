@@ -97,11 +97,8 @@ public class SubjectService(
         });
     }
 
-    public async Task EditAttachedSubjectAsync(int id, int subjectId)
+    public async Task DetachSubjectAsync(int teacherId, int subjectId)
     {
-        var teacherSubject = await teacherSubjectRepository.SelectAsync(id)
-                             ?? throw new NotFoundException("Attachment was not Found");
-
         _ = await subjectRepository.SelectAsync(subjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {subjectId}.");
 

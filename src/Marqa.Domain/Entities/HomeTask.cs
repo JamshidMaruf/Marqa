@@ -12,10 +12,3 @@ public class HomeTask : Auditable
     public Lesson Lesson { get; set; }
     public HomeTaskFile HomeTaskFile { get; set; }
 }
-public class HomeTaskFile : Auditable
-{
-    public string FileName { get; set; }
-    public string FilePath { get; set; }
-    public int? HomeTaskId { get; set; }
-    public HomeTask HomeTask { get; set; }
-}

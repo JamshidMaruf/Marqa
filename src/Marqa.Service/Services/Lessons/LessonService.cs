@@ -64,4 +64,14 @@ public class LessonService(
             LateTimeInMinutes = lateMinutes
         });
     }
+
+    public Task ModifyAsync(int lessonId, string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UploadLessonVideoAsync(int lessonId, object video)
+    {
+        throw new NotImplementedException();
+    }
 }
