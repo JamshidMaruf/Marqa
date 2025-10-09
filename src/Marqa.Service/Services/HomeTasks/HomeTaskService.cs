@@ -26,6 +26,8 @@ public class HomeTaskService(
             Deadline = model.Deadline,
             Description = model.Description,
         });
+        
+        // Send Notification
     }
 
     public async Task UpdateAsync(int id, HomeTaskUpdateModel model)
@@ -101,5 +103,7 @@ public class HomeTaskService(
             });
 
         existHomeTaskUpload.Score = model.Score;
+        
+        // Send notification
     }
 }

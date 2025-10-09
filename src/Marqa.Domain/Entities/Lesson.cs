@@ -8,6 +8,7 @@ public class Lesson : Auditable
     public TimeOnly EndTime { get; set; }
     public DateOnly Date { get; set; }
     public string Room { get; set; }
+    public string Name { get; set; }
     public int CourseId { get; set; }
     public int TeacherId { get; set; }
 

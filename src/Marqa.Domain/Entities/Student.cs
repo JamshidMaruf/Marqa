@@ -6,7 +6,7 @@ namespace Marqa.Domain.Entities;
 
 public class Student : Auditable
 { 
-    public string StudentID { get; set; } // access uchun generatsiya qilinadigan Id
+    public string StudentAccessId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }   
     public string Phone { get; set; }
