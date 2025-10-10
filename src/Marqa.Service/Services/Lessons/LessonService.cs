@@ -30,7 +30,7 @@ public class LessonService(
         await lessonRepository.UpdateAsync(lessonForUpdation);
     }
 
-    public async Task ModifyAsync(int id,string name)
+    public async Task ModifyAsync(int id, string name)
     {
         var lesson = await lessonRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
@@ -48,20 +48,15 @@ public class LessonService(
         _ = await studentRepository.SelectAsync(model.StudentId)
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
-        int lateMinutes = 0;
         var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
-        if (model.Status == AttendanceStatus.Late)
-        {
-            lateMinutes = (int)(DateTime.Now.TimeOfDay - TimeSpan.Parse(lesson.StartTime.ToString())).TotalMinutes;
-        }
 
         if (lessonAttendance != null)
         {
             lessonAttendance.Status = model.Status;
-            lessonAttendance.LateTimeInMinutes = lateMinutes;
+            lessonAttendance.LateTimeInMinutes = model.LateTimeInMinutes;
         }
         else
         {
@@ -70,8 +65,13 @@ public class LessonService(
                 LessonId = model.LessonId,
                 StudentId = model.StudentId,
                 Status = model.Status,
-                LateTimeInMinutes = lateMinutes
+                LateTimeInMinutes = model.LateTimeInMinutes
             });
         }
+    }
+
+    public Task UploadLessonVideoAsync(int lessonId, object video)
+    {
+        throw new NotImplementedException();
     }
 }

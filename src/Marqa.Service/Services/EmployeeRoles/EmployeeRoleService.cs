@@ -81,7 +81,7 @@ public class EmployeeRoleService(
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
-        var existemployeeRole = await employeeRoleRepository.SelectAsync(id)
+        var existEmployeeRole = await employeeRoleRepository.SelectAsync(id)
              ?? throw new NotFoundException("Role not found");
 
         var existRole = await employeeRoleRepository.SelectAllAsQueryable()
@@ -91,8 +91,8 @@ public class EmployeeRoleService(
         if (existRole != null)
             throw new AlreadyExistException("This role already exists");
 
-        existemployeeRole.Name = model.Name;
-        existemployeeRole.CompanyId = model.CompanyId;
-        await employeeRoleRepository.UpdateAsync(existemployeeRole);
+        existEmployeeRole.Name = model.Name;
+        existEmployeeRole.CompanyId = model.CompanyId;
+        await employeeRoleRepository.UpdateAsync(existEmployeeRole);
     }
 }
