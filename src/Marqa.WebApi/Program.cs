@@ -6,6 +6,7 @@ using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
+using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IHomeTaskService, HomeTaskService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IPointSettingService,  PointSettingService>();
 
 var app = builder.Build();
 
