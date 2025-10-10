@@ -47,7 +47,7 @@ public class LessonsController(ILessonService lessonService) : Controller
         }
     }
 
-    [HttpPatch]
+    [HttpPatch("{name:required}")]
     public async Task<IActionResult> PatchAsync(int id, string name)
     {
         try
