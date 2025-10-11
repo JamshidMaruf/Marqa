@@ -7,7 +7,7 @@ public class PointSetting : Auditable
     public string Name { get; set; }
     public string Description { get; set; }
     public PointHistoryOperation Operation {get; set;}
-    public bool IsEnabled { get; set; } 
+    public bool IsEnabled { get; set; } = true;
     public string? QrCode { get; set; }
-}
+}   
 
