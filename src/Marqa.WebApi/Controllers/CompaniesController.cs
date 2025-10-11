@@ -13,133 +13,62 @@ public class CompaniesController(ICompanyService companyService) : ControllerBas
     [HttpPost]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)
     {
-        try
-        {
-            await companyService.CreateAsync(model);
+        await companyService.CreateAsync(model);
 
-            return Ok(new Response
-            {
-                Status = 201,
-                Message = "success",
-            });
-        }
-        catch(Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 201,
+            Message = "success",
+        });
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CompanyUpdateModel model)
     {
+        await companyService.UpdateAsync(id, model);
 
-        try
+        return Ok(new Response
         {
-            await companyService.UpdateAsync(id, model);
-
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success"
-            });
-        }
-        catch(NotFoundException ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(new Response()
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success"
+        });
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
-        {
-            await companyService.DeleteAsync(id);
+        await companyService.DeleteAsync(id);
 
-            return Ok();
-        }
-        catch(Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success"
+        });
     }
+    
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
-        {
-            var company = await companyService.GetAsync(id);
+        var company = await companyService.GetAsync(id);
 
-            return Ok(new Response<CompanyViewModel>
-            {
-                Status = 200,
-                Message = "success",
-                Data = company
-            });
-        }
-        catch(NotFoundException ex)
+        return Ok(new Response<CompanyViewModel>
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(new Response()
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+            Data = company
+        });
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllAsync()
     {
-        try
-        {
-            var companies = await companyService.GetAllAsync();
+        var companies = await companyService.GetAllAsync();
 
-            return Ok(new Response<List<CompanyViewModel>>
-            {
-                Status = 200,
-                Message = "success",
-                Data = companies
-            });
-        }
-        catch(NotFoundException ex)
+        return Ok(new Response<List<CompanyViewModel>>
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(new Response()
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+            Data = companies
+        });
     }
 }
