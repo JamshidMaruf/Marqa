@@ -24,3 +24,11 @@ public class PointSettingViewModel
     public string Description { get; set; }
     public PointHistoryOperation Operation { get; set; }
 }
+
+public class TokenModel
+{
+    public int PointSettingId { get; set; }
+    public int ActivationCount { get; set; }
+    public int Point { get; set; }
+    public DateTime ExpireAt { get; set; }
+}
