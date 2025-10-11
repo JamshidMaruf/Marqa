@@ -179,32 +179,13 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
+        var course = await courseService.GetAsync(id);
+        return Ok(new Response<CourseViewModel>
         {
-            var course = await courseService.GetAsync(id);
-            return Ok(new Response<CourseViewModel>
-            {
-                Status = 200,
-                Message = "success",
-                Data = course
-            });
-        }
-        catch(NotFoundException ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+            Data = course
+        });
     }
 
     [HttpGet]
