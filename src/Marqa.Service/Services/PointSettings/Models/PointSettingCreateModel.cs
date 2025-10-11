@@ -30,5 +30,5 @@ public class TokenModel
     public int PointSettingId { get; set; }
     public int ActivationCount { get; set; }
     public int Point { get; set; }
-    public DateTime ExpireAt { get; set; }
+    public int ExpirationTimeInHours { get; set; }
 }
