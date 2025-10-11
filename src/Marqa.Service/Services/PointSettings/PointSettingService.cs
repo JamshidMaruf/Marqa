@@ -1,9 +1,11 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.PointSettings.Models;
 using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.PointSettings;
 
@@ -92,12 +94,32 @@ public class PointSettingService(
         await pointSettingRepository.UpdateAsync(pointSetting);
     }
 
-    public Task<string> GenerateToken(TokenModel model)
+    public string GenerateToken(TokenModel model)
     {
-        throw new NotImplementedException();
+        var claims = new[] 
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, "user_id"),
+            new Claim("point_setting_id", $"{model.PointSettingId}"),
+            new Claim("point", $"{model.Point}"),
+            new Claim("activation_count", $"{model.ActivationCount}"),
+        };
+
+        var key = new SymmetricSecurityKey("4df48011-3c8c-4732-b21c-a5aedb29cad5"u8.ToArray());
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: "your_issuer",
+            audience: "your_audience",
+            claims: claims,
+            expires: DateTime.Now.AddHours(model.ExpirationTimeInHours),
+            signingCredentials: creds);
+
+        string encodedJwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return encodedJwt;
     }
 
-    public Task<TokenModel> DecodeToken(string token)
+    public TokenModel DecodeToken(string token)
     {
         throw new NotImplementedException();
     }

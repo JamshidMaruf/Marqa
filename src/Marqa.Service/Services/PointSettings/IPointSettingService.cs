@@ -11,6 +11,6 @@ public interface IPointSettingService
     Task<IEnumerable<PointSettingViewModel>> GetAllAsync(string search = null);
     Task ToggleAsync(int id);
     //Task SetOrRemovePointAsync(int studentId);
-    Task<string> GenerateToken(TokenModel model);
-    Task<TokenModel> DecodeToken(string token);
+    string GenerateToken(TokenModel model);
+    TokenModel DecodeToken(string token);
 }
