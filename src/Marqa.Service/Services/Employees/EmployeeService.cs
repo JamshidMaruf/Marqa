@@ -67,10 +67,23 @@ public class EmployeeService(
 
     public async Task DeleteAsync(int id)
     {
-        var existEmployee = await employeeRepository.SelectAsync(id)
-            ?? throw new NotFoundException($"Employee was not found");
+        var employeeForDeletion = await employeeRepository
+            .SelectAllAsQueryable()
+            .Include(e => e.Role)
+            .FirstOrDefaultAsync()
+            ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
-        await employeeRepository.DeleteAsync(existEmployee);
+        if(employeeForDeletion.Role.Name.ToLower() == "teacher")
+        {
+            var teacherSubject = await teacherSubjectRepository
+                .SelectAllAsQueryable()
+                .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
+                .FirstOrDefaultAsync(); // because a teacher can have only one subject which is one-to-many relationship i am using FirstOrDefault otherwise used ToList
+
+            await teacherSubjectRepository.DeleteAsync(teacherSubject);
+        }
+
+        await employeeRepository.DeleteAsync(employeeForDeletion);
     }
 
     public async Task<EmployeeViewModel> GetAsync(int id)
@@ -108,7 +121,7 @@ public class EmployeeService(
             .SelectAllAsQueryable()
             .Where(e => e.CompanyId == companyId && !e.IsDeleted);
 
-        if (string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
                 e.FirstName.Contains(search) ||
                 e.LastName.Contains(search) ||
@@ -223,15 +236,13 @@ public class EmployeeService(
         if (subjectId != null)
             teacherQuery = teacherQuery.Where(t => t.Subject.Id == subjectId);
 
-        var teachers = await teacherQuery.ToListAsync();
-
-        var teacherCourses = teachers
+        var teacherCourses = await teacherQuery
             .GroupJoin(
                 courseRepository.SelectAllAsQueryable()
                 .Include(c => c.Subject),
                 t => t.Id,
                 c => c.TeacherId,
-                (t, courses) => new TeacherViewModel // shu joyini optimizatsiya qilish kerak
+                (t, courses) => new TeacherViewModel 
                 {
                     Id = t.Id,
                     DateOfBirth = t.DateOfBirth,
@@ -250,9 +261,10 @@ public class EmployeeService(
                         Name = c.Name,
                         SubjectId = c.Subject.Id,
                         SubjectName = c.Subject.Name
-                    }).ToList()
+                    })
                 }
-            ).ToList();
+            )
+            .ToListAsync();
 
         return teacherCourses;
     }

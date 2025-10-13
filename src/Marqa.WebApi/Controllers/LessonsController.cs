@@ -47,12 +47,12 @@ public class LessonsController(ILessonService lessonService) : Controller
         }
     }
 
-    [HttpPatch]
-    public async Task<IActionResult> PatchAsync(int Id, string name)
+    [HttpPatch("{name:required}")]
+    public async Task<IActionResult> PatchAsync(int id, string name)
     {
         try
         {
-            await lessonService.ModifyAsync(Id, name);
+            await lessonService.ModifyAsync(id, name);
 
             return Ok(new Response
             {
