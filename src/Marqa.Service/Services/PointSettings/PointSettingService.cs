@@ -1,5 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+﻿using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
@@ -10,8 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace Marqa.Service.Services.PointSettings;
 
 public class PointSettingService(
-    IRepository<PointSetting> pointSettingRepository
-    /*,IRepository<Student> studentRepository*/) : IPointSettingService
+    IRepository<PointSetting> pointSettingRepository) : IPointSettingService
 {
     public async Task CreateAsync(PointSettingCreateModel model)
     {
@@ -96,31 +96,60 @@ public class PointSettingService(
 
     public string GenerateToken(TokenModel model)
     {
-        var claims = new[] 
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, "user_id"),
-            new Claim("point_setting_id", $"{model.PointSettingId}"),
-            new Claim("point", $"{model.Point}"),
-            new Claim("activation_count", $"{model.ActivationCount}"),
-        };
+        string key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
 
-        var key = new SymmetricSecurityKey("4df48011-3c8c-4732-b21c-a5aedb29cad5"u8.ToArray());
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var serializingOptions = new JsonSerializerOptions();
+        serializingOptions.WriteIndented = true;
 
-        var token = new JwtSecurityToken(
-            issuer: "your_issuer",
-            audience: "your_audience",
-            claims: claims,
-            expires: DateTime.Now.AddHours(model.ExpirationTimeInHours),
-            signingCredentials: creds);
+        string payloadJson = JsonSerializer.Serialize(model, serializingOptions);
+        byte[] payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
+        string payloadB64 = Base64UrlEncoder.Encode(payloadBytes);
+        
+        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(keyBytes);
+        var signature = hMACSHA3_512.ComputeHash(Encoding.UTF8.GetBytes(payloadB64));
+        var sigB64 = Base64UrlEncoder.Encode(signature);
 
-        string encodedJwt = new JwtSecurityTokenHandler().WriteToken(token);
+        string token = $"{sigB64}.{payloadB64}";
 
-        return encodedJwt;
+        return token;
     }
 
     public TokenModel DecodeToken(string token)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(token))
+            return null;
+
+        string[] parts = token.Split('.');
+
+        if(parts.Length != 2) return null;
+
+        var sigB64 = parts[0];
+        var payloadB64 = parts[1];
+
+        byte[] decodedSignature;
+        try
+        {
+            decodedSignature = Base64UrlEncoder.DecodeBytes(sigB64);
+        }
+        catch
+        {
+            return null;
+        }
+        byte[] decodedPayload;
+        try
+        {
+            decodedPayload = Base64UrlEncoder.DecodeBytes(payloadB64);
+        }
+        catch
+        {
+            return null;
+        }
+
+        var s = JsonSerializer.Deserialize<string>(decodedSignature);
+        var p = JsonSerializer.Deserialize<TokenModel>(decodedSignature);
+
+        return p;
     }
 }
+

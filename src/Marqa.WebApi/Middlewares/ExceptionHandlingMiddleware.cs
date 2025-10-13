@@ -1,4 +1,4 @@
-using Marqa.Service.Exceptions;
+﻿using Marqa.Service.Exceptions;
 using Marqa.WebApi.Models;
 
 namespace Marqa.WebApi.Middlewares;
