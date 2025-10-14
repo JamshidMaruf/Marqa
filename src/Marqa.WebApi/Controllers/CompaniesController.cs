@@ -1,6 +1,8 @@
 ﻿using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
+using Marqa.Service.Services.PointSettings.Models;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +10,7 @@ namespace Marqa.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(ICompanyService companyService) : ControllerBase
+public class CompaniesController(ICompanyService companyService, IAuthService authService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)

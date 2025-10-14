@@ -1,17 +1,7 @@
-﻿using System.Text;
+using System.Text;
 using Marqa.DataAccess.Contexts;
-using Marqa.DataAccess.Repositories;
 using Marqa.Service.Services.Auth;
-using Marqa.Service.Services.Companies;
-using Marqa.Service.Services.Courses;
-using Marqa.Service.Services.EmployeeRoles;
-using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.HomeTasks;
-using Marqa.Service.Services.Lessons;
-using Marqa.Service.Services.PointSettings;
-using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Subjects;
-using Marqa.WebApi.Middlewares;
+using Marqa.Service.Services.Messages;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -46,25 +36,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ICompanyService, CompanyService>();
-builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
-builder.Services.AddScoped<IHomeTaskService, HomeTaskService>();
-builder.Services.AddScoped<ILessonService, LessonService>();
-builder.Services.AddScoped<IStudentService, StudentService>();
-builder.Services.AddScoped<ISubjectService, SubjectService>();
-builder.Services.AddScoped<IPointSettingService,  PointSettingService>();
+builder.Services.AddScoped<ISmsService, SmsService>();
 
 var app = builder.Build();
 
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
