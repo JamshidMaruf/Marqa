@@ -95,7 +95,6 @@ public class PointSettingService(
         await pointSettingRepository.UpdateAsync(pointSetting);
     }
 
-
     public string GenerateToken(TokenModel model)
     {
         var serializingOptions = new JsonSerializerOptions();
