@@ -5,23 +5,24 @@ using Marqa.Service.Services.Product.Models;
 using Marqa.Service.Services.Product;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Marqa.Service.Services.Products;
 
 namespace Marqa.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class ProductsController : ControllerBase
+public class ProductsController(IProductService productService) : ControllerBase
 {
-    private readonly IProductService _productService;
+    private readonly IProductService productService;
     public ProductsController(IProductService productService)
     {
-        _productService = productService;
+        this.productService = productService;
     }
     [HttpPost]
     public async Task<ActionResult<ProductViewModel>> Create([FromBody] ProductCreateModel dto)
     {
         try
         {
-            var product = await _productService.CreateAsync(dto);
+            var product = await productService.CreateAsync(dto);
             return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
         }
         catch (InvalidOperationException ex)
@@ -32,7 +33,7 @@ public class ProductsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ProductViewModel>> Update(int id, [FromBody] ProductUpdateModel dto)
     {
-        var product = await _productService.UpdateAsync(id, dto);
+        var product = await productService.UpdateAsync(id, dto);
 
         if (product == null)
             return NotFound();
@@ -42,7 +43,7 @@ public class ProductsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        var result = await _productService.DeleteAsync(id);
+        var result = await productService.DeleteAsync(id);
 
         if (!result)
             return NotFound();
@@ -53,7 +54,7 @@ public class ProductsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductViewModel>> Get(int id)
     {
-        var product = await _productService.GetAsync(id);
+        var product = await productService.GetAsync(id);
 
         if (product == null)
             return NotFound();
@@ -64,7 +65,7 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAll([FromQuery] string search = null)
     {
-        var products = await _productService.GetAllAsync(search);
+        var products = await productService.GetAllAsync(search);
         return Ok(products);
     }
 }
