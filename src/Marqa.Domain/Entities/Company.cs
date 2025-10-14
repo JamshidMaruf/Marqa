@@ -4,4 +4,5 @@ public class Company : Auditable
 {
     public string Name { get; set; }
     public ICollection<Employee> Teachers { get; set; }
+    public ICollection<Product> Products { get; set; }
 }
