@@ -7,19 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Exams\**" />
-    <EmbeddedResource Remove="Services\Exams\**" />
-    <None Remove="Services\Exams\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Marqa.DataAccess\Marqa.DataAccess.csproj" />
     <ProjectReference Include="..\Marqa.Domain\Marqa.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
   </ItemGroup>
 
 </Project>

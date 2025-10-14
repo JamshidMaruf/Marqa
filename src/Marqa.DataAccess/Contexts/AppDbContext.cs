@@ -30,6 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<StudentHomeTaskFile> StudentHomeTaskFiles { get; set; }
     public DbSet<HomeTaskFile> HomeTaskFiles { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<PointSetting> PointSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

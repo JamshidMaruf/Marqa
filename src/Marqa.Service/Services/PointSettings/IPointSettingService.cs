@@ -1,6 +1,5 @@
 ﻿using Marqa.Service.Services.PointSettings.Models;
 
-
 namespace Marqa.Service.Services.PointSettings;
 public interface IPointSettingService
 {
