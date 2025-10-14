@@ -13,6 +13,7 @@ namespace Marqa.Service.Services.PointSettings;
 public class PointSettingService(
     IRepository<PointSetting> pointSettingRepository) : IPointSettingService
 {
+    private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
     public async Task CreateAsync(PointSettingCreateModel model)
     {
         await pointSettingRepository.InsertAsync(new PointSetting
@@ -94,20 +95,18 @@ public class PointSettingService(
         await pointSettingRepository.UpdateAsync(pointSetting);
     }
 
+
     public string GenerateToken(TokenModel model)
     {
-        string key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
         var serializingOptions = new JsonSerializerOptions();
         serializingOptions.WriteIndented = true;
 
         string payloadJson = JsonSerializer.Serialize(model, serializingOptions);
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
         string payloadB64 = Base64UrlEncoder.Encode(payloadBytes);
-        
-        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(keyBytes);
-        var signature = hMACSHA3_512.ComputeHash(Encoding.UTF8.GetBytes(payloadB64));
+
+        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(_key));
+        var signature = hMACSHA3_512.ComputeHash(payloadBytes);
         var sigB64 = Base64UrlEncoder.Encode(signature);
 
         string token = $"{sigB64}.{payloadB64}";
@@ -118,38 +117,35 @@ public class PointSettingService(
     public TokenModel DecodeToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
-            return null;
+            throw new ArgumentIsNotValidException("Token must be provided in order to decode it!");
 
         string[] parts = token.Split('.');
 
-        if(parts.Length != 2) return null;
+        if (parts.Length != 2)
+            throw new ArgumentIsNotValidException("Token is not in the correct format!");
 
         var sigB64 = parts[0];
         var payloadB64 = parts[1];
+        
+        // decoding signature and payload
+        byte[] decodedPayload = Base64UrlEncoder.DecodeBytes(payloadB64);
+        byte[] decodedSignature = Base64UrlEncoder.DecodeBytes(sigB64);
 
-        byte[] decodedSignature;
-        try
+        // hashing the encoded payload in order to compare with the hashed signature
+        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(_key));
+        byte[] expectedSignature = hMACSHA3_512.ComputeHash(decodedPayload);
+
+        // checking for decoded signature and the expected signature for validity
+        if (!Equals(decodedSignature.ToString(), expectedSignature.ToString()))
         {
-            decodedSignature = Base64UrlEncoder.DecodeBytes(sigB64);
-        }
-        catch
-        {
-            return null;
-        }
-        byte[] decodedPayload;
-        try
-        {
-            decodedPayload = Base64UrlEncoder.DecodeBytes(payloadB64);
-        }
-        catch
-        {
-            return null;
+            throw new NotMatchedException("Token was not matched!");
         }
 
-        var s = JsonSerializer.Deserialize<string>(decodedSignature);
-        var p = JsonSerializer.Deserialize<TokenModel>(decodedSignature);
+        // deserializing the decodedpayload and if failed throwing exception
+        TokenModel tokenModel = JsonSerializer.Deserialize<TokenModel>(decodedPayload)
+            ?? throw new ArgumentIsNotValidException("Could not deserialize the token!");
 
-        return p;
+        return tokenModel;
     }
 }
 
