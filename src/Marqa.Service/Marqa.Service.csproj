@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Services\Exams\**" />
-    <EmbeddedResource Remove="Services\Exams\**" />
-    <None Remove="Services\Exams\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Marqa.DataAccess\Marqa.DataAccess.csproj" />
     <ProjectReference Include="..\Marqa.Domain\Marqa.Domain.csproj" />
   </ItemGroup>
