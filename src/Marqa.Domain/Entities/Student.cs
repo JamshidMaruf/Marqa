@@ -15,7 +15,9 @@ public class Student : Auditable
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public int CompanyId { get; set; }
+
     public Company Company { get; set; }
     public StudentDetail StudentDetail { get; set; }    
     public ICollection<Course> Courses { get; set; }
+    public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
 }

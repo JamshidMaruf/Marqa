@@ -1,4 +1,4 @@
-using Marqa.Service.Exceptions;
+﻿using Marqa.Service.Exceptions;
 using Marqa.WebApi.Models;
 
 namespace Marqa.WebApi.Middlewares;
@@ -35,6 +35,14 @@ public class ExceptionHandlingMiddleware
             });
         }
         catch(ArgumentIsNotValidException ex)
+        {
+            await httpContext.Response.WriteAsJsonAsync(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
+        catch(NotMatchedException ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {

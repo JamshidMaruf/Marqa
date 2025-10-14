@@ -1,0 +1,73 @@
+﻿using Marqa.DataAccess.Repositories;
+using Marqa.Domain.Entities;
+using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Product.Models;
+using Marqa.Service.Services.Products;
+using Microsoft.EntityFrameworkCore;
+
+namespace Marqa.Service.Servcies.Products;
+
+public class ProductService(
+    IRepository<Product> productRepository,
+    IRepository<Company> companyRepository) : IProductService
+{
+    public async Task CreateAsync(ProductCreateModel model)
+    {
+        var companyExists = await companyRepository.SelectAsync(model.CompanyId)
+            ?? throw new InvalidOperationException($"Company with ID {model.CompanyId} does not exist");
+
+        var product = await productRepository
+            .InsertAsync(new Product
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                CompanyId = model.CompanyId
+            });
+    }
+
+    public async Task UpdateAsync(int id, ProductUpdateModel model)
+    {
+        var product = await productRepository.SelectAsync(id)
+            ?? throw new NotFoundException("This product is not found!");
+
+        product.Name = model.Name;
+        product.Description = model.Description;
+        product.Price = model.Price;
+
+        await productRepository.UpdateAsync(product);
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var result = await productRepository.SelectAsync(id)
+            ?? throw new NotFoundException("This product is not found!");
+
+         await productRepository.DeleteAsync(result);
+    }
+
+    public async Task<ProductViewModel> GetAsync(int id)
+    {
+        var product = await productRepository.SelectAsync(id)
+            ?? throw new NotFoundException("This product is not found!");
+
+        return new ProductViewModel
+        {
+            Id = product.Id,
+            CompanyId = product.CompanyId,
+            Name = product.Name,
+            Price = product.Price,
+        };
+    }
+
+    public async Task<List<ProductViewModel>> GetAllAsync(int companyId, string search = null)
+    {
+        var products = productRepository.SelectAllAsQueryable()
+            .Where(p => !p.IsDeleted)
+            ?? throw new NotFoundException("This product is not found!");
+
+
+    }
+
+}
+
