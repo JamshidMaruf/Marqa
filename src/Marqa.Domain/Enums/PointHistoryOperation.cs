@@ -2,6 +2,6 @@
 
 public enum PointHistoryOperation
 {
-    Minus,
-    Plus
+    Minus = -1,
+    Plus = 1
 }
