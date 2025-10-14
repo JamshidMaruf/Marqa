@@ -42,6 +42,14 @@ public class ExceptionHandlingMiddleware
                 Message = ex.Message
             });
         }
+        catch(NotMatchedException ex)
+        {
+            await httpContext.Response.WriteAsJsonAsync(new Response
+            {
+                Status = ex.StatusCode,
+                Message = ex.Message
+            });
+        }
         catch(Exception ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
