@@ -4,6 +4,7 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Service.Services.Lessons;
 
@@ -11,7 +12,8 @@ public class LessonService(
     IRepository<Lesson> lessonRepository,
     IRepository<LessonAttendance> lessonAttendanceRepository,
     IRepository<Student> studentRepository,
-    IRepository<Employee> teacherRepository)
+    IRepository<Employee> teacherRepository,
+    IRepository<Course> courseRepository)
     : ILessonService
 {
     public async Task UpdateAsync(int id, LessonUpdateModel model)
@@ -30,12 +32,13 @@ public class LessonService(
         await lessonRepository.UpdateAsync(lessonForUpdation);
     }
 
-    public async Task ModifyAsync(int id, string name)
+    public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
     {
         var lesson = await lessonRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         lesson.Name = name;
+        lesson.HomeTaskStatus = homeTaskStatus;
 
         await lessonRepository.UpdateAsync(lesson);
     }
@@ -51,7 +54,6 @@ public class LessonService(
         var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
-
 
         if (lessonAttendance != null)
         {
@@ -73,5 +75,24 @@ public class LessonService(
     public Task UploadLessonVideoAsync(int lessonId, object video)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<List<LessonViewModel>> GetAllByCourseIdAsync(int courseId)
+    {
+        _ = await courseRepository.SelectAsync(courseId)
+            ?? throw new NotFoundException($"No course was found with ID = {courseId}");
+
+        return await lessonRepository
+            .SelectAllAsQueryable()
+            .Where(lesson => lesson.CourseId == courseId) 
+            .Select(lesson => new LessonViewModel
+            {
+                Date = lesson.Date,
+                Id = lesson.Id,
+                Name = lesson.Name,
+                Number = lesson.Number,
+                HomeTaskStatus = lesson.HomeTaskStatus
+            })
+            .ToListAsync();
     }
 }
