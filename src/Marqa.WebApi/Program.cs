@@ -10,6 +10,7 @@ using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.PointSettings;
+using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.WebApi.Middlewares;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IPointSettingService,  PointSettingService>();
 builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 var app = builder.Build();
 
