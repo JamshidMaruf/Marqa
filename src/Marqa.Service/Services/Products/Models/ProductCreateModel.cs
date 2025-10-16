@@ -1,4 +1,4 @@
-﻿namespace Marqa.Service.Services.Product.Models
+﻿namespace Marqa.Service.Services.Products.Models
 {
     public class ProductCreateModel
     {
