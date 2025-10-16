@@ -1,3 +1,6 @@
+﻿using System.Runtime.InteropServices;
+using System;
+
 namespace Marqa.Domain.Entities;
 
 public class OTP : Auditable
