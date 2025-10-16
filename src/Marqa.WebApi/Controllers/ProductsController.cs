@@ -1,22 +1,12 @@
-﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.PointSettings;
-using Marqa.Service.Services.PointSettings.Models;
-using Marqa.Service.Services.Product.Models;
-using Marqa.Service.Services.Product;
-using Marqa.WebApi.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Marqa.Service.Services.Product.Models;
 using Marqa.Service.Services.Products;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController(IProductService productService) : ControllerBase
 {
-    private readonly IProductService productService;
-    public ProductsController(IProductService productService)
-    {
-        this.productService = productService;
-    }
     [HttpPost]
     public async Task<ActionResult<ProductViewModel>> Create([FromBody] ProductCreateModel dto)
     {
