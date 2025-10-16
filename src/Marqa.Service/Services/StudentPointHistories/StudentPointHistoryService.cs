@@ -67,7 +67,7 @@ public class StudentPointHistoryService(
         return studentPointsHistory;
     }
 
-    public async Task<int> GetAsync(int studentId)
+    public async Task<StudentPointSummModel> GetAsync(int studentId)
     {
         var studentPointsHistory = await studentPointHistoryRepository
             .SelectAllAsQueryable()
@@ -82,6 +82,9 @@ public class StudentPointHistoryService(
             .Where(s => s.Operation == PointHistoryOperation.Plus)
             .Select(s => s.GivenPoint).Sum();
 
-        return plus - minus;
+        return new StudentPointSummModel
+        {
+            Point = plus - minus,
+        };
     }
 }

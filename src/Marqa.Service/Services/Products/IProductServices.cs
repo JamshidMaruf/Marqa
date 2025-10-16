@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.Product.Models;
+﻿using Marqa.Service.Services.Products.Models;
 
 namespace Marqa.Service.Services.Products
 {

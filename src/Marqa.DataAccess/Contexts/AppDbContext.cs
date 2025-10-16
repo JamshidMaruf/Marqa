@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
     public DbSet<Lesson> Lessons { get; set; }
     public DbSet<LessonAttendance> LessonAttendances { get; set; }
     public DbSet<Student> Students { get; set; }
+    public DbSet<OTP> OTPs { get; set; }
     public DbSet<StudentCourse> StudentCourses { get; set; }
     public DbSet<StudentDetail> StudentDetails { get; set; }
     public DbSet<StudentExamResult> StudentExams { get; set; }
