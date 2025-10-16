@@ -27,7 +27,7 @@ public class StudentPoinHistoriesController(IStudentPointHistoryService studentP
     {
         var point = await studentPointHistoryService.GetAsync(studentId);
 
-        return Ok(new Response<StudentPointSummModel>
+        return Ok(new Response<int>
         {
             Status = 200,
             Message = "success",
