@@ -73,10 +73,10 @@ public class OrderService(
         {
             StudentId = student.Id,
             PreviousPoint = studentPointHistory.CurrentPoint,
-            Givenpoint = totalPrice,
+            GivenPoint = totalPrice,
             CurrentPoint = newCurrentPoint,
             Note = $"Spent {totalPrice} points for order #{order.Id}",
-            Opeartion = PointHistoryOperation.Minus
+            Operation = PointHistoryOperation.Minus
         };
 
         await pointHistoryRepository.InsertAsync(pointHistory);
