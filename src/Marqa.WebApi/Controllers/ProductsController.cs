@@ -5,6 +5,7 @@ using Marqa.Service.Services.Products.Models;
 using Marqa.Service.Services.Products;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Marqa.Service.Services.EmployeeRoles;
 
 namespace Marqa.WebApi.Controllers;
 [ApiController]
@@ -12,55 +13,65 @@ namespace Marqa.WebApi.Controllers;
 public class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<ProductViewModel>> Create([FromBody] ProductCreateModel model)
+    public async Task<IActionResult> Create([FromBody] ProductCreateModel model)
     {
-        try
+        await productService.CreateAsync(model);
+
+        return Ok(new Response
         {
-            var product = await productService.CreateAsync(model);
-            return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
-        }
-        catch (InvalidOperationException ex)
+            Status = 201,
+            Message = "success",
+        });
+    }
+
+    [HttpPut("update/{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] ProductUpdateModel dto)
+    {
+        await productService.UpdateAsync(id, dto);
+
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 201,
+            Message = "success"
+        });
     }
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ProductViewModel>> Update(int id, [FromBody] ProductUpdateModel dto)
+
+    [HttpDelete("delete/{id:int}")]
+    public async Task<IActionResult> Delete(int id)
     {
-        var product = await productService.UpdateAsync(id, dto);
+        await productService.DeleteAsync(id);
 
-        if (product == null)
-            return NotFound();
-
-        return Ok(product);
-    }
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await productService.DeleteAsync(id);
-
-        if (!result)
-            return NotFound();
-
-        return NoContent();
+        return Ok(new Response
+        {
+            Status = 201,
+            Message = "success"
+        });
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ProductViewModel>> Get(int id)
+    [HttpGet("getById/{id:int}")]
+    public async Task<IActionResult> GetAsync(int id)
     {
         var product = await productService.GetAsync(id);
 
-        if (product == null)
-            return NotFound();
-
-        return Ok(product);
+        return Ok(new Response<ProductViewModel>
+        {
+            Status = 200,
+            Message = "success",
+            Data = product,
+        });
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductViewModel>>> GetAll([FromQuery] string search = null)
+    [HttpGet("getAll/{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string search = null)
     {
-        var products = await productService.GetAllAsync(search);
-        return Ok(products);
+        var products = await productService.GetAllAsync(companyId, search);
+        
+        return Ok(new Response<List<ProductViewModel>>
+        {
+            Status = 200,
+            Message = "success",
+            Data = products,
+        });
     }
 }
 
