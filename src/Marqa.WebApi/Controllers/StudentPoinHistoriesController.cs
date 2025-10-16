@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.StudentPointHistories;
+﻿using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.StudentPointHistories.Models;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;

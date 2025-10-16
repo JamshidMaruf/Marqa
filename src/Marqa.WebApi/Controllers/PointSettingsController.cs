@@ -9,7 +9,7 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class PointSettingsController(IPointSettingService pointSettingService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(PointSettingCreateModel model)
     {
         await pointSettingService.CreateAsync(model);
@@ -21,7 +21,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
         });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] PointSettingUpdateModel model)
     {
         await pointSettingService.UpdateAsync(id, model);
@@ -33,7 +33,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
         });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await pointSettingService.DeleteAsync(id);
@@ -41,7 +41,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
         return Ok();
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var pointSetting = await pointSettingService.GetAsync(id);
@@ -54,7 +54,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
         });
     }
 
-    [HttpGet]
+    [HttpGet("getAll")]
     public async Task<IActionResult> GetAllAsync(string search)
     {
         var pointSettings = await pointSettingService.GetAllAsync(search);

@@ -1,5 +1,6 @@
 ﻿using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -8,73 +9,65 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class StudentsController(IStudentService studentService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(StudentCreateModel model)
     {
-        try
+        await studentService.CreateAsync(model);
+
+        return Ok(new Response
         {
-            await studentService.CreateAsync(model);
-            return Created();
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
     {
-        try
+        await studentService.UpdateAsync(id, model);
+
+        return Ok(new Response
         {
-            await studentService.UpdateAsync(id, model);
-            return Ok();
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
+        await studentService.DeleteAsync(id);
+
+        return Ok(new Response
         {
-            await studentService.DeleteAsync(id);
-            return Ok();
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
+        var student = await studentService.GetAsync(id);
+
+        return Ok(new Response<StudentViewModel>
         {
-            var student = await studentService.GetAsync(id);
-            return Ok(student);
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+            Data = student
+        });
     }
 
-    [HttpGet("course/{courseId:int}")]
+    [HttpGet("courseStudents/{courseId:int}")]
     public async Task<IActionResult> GetAllAsync(int courseId)
     {
-        try
+        var students = await studentService.GetAllByCourseAsync(courseId);
+       
+        return Ok(new Response<List<StudentViewModel>>
         {
-            var students = await studentService.GetAllByCourseAsync(courseId);
-            return Ok(students);
-        }
-        catch(Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+            Data = students,
+        });
     }
 }

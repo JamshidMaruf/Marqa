@@ -1,5 +1,6 @@
 ﻿using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.HomeTasks.Models;
+using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.WebApi.Controllers;
@@ -8,63 +9,52 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(HomeTaskCreateModel model)
     {
-        try
-        {
-            await homeTaskService.CreateAsync(model);
+        await homeTaskService.CreateAsync(model);
 
-            return Created();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] HomeTaskUpdateModel model)
     {
-        try
-        {
-            await homeTaskService.UpdateAsync(id, model);
+        await homeTaskService.UpdateAsync(id, model);
 
-            return Ok();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
-        {
-            await homeTaskService.DeleteAsync(id);
+        await homeTaskService.DeleteAsync(id);
 
-            return Ok();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
-        {
-            var homeTask = await homeTaskService.GetAsync(id);
+        var homeTask = await homeTaskService.GetAsync(id);
 
-            return Ok(homeTask);
-        }
-        catch (Exception ex)
+        return Ok(new Response<List<HomeTaskViewModel>>
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+            Data = homeTask,
+        });
     }
 }

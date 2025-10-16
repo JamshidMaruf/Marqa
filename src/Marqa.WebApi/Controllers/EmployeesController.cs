@@ -10,7 +10,7 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class EmployeesController(IEmployeeService employeeService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(EmployeeCreateModel model)
     {
 
@@ -24,7 +24,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] EmployeeUpdateModel model)
     {
         await employeeService.UpdateAsync(id, model);
@@ -36,7 +36,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await employeeService.DeleteAsync(id);
@@ -48,7 +48,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await employeeService.GetAsync(id);
