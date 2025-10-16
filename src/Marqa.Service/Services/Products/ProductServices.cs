@@ -1,7 +1,7 @@
 ﻿using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Product.Models;
+using Marqa.Service.Services.Products.Models;
 using Marqa.Service.Services.Products;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,10 +63,21 @@ public class ProductService(
     public async Task<List<ProductViewModel>> GetAllAsync(int companyId, string search = null)
     {
         var products = productRepository.SelectAllAsQueryable()
-            .Where(p => !p.IsDeleted)
+            .Where(p => !p.IsDeleted && p.CompanyId == companyId)
             ?? throw new NotFoundException("This product is not found!");
 
+        if (string.IsNullOrEmpty(search))
+            products = products.Where(p => p.Name.ToLower() == search.ToLower());
 
+        return await products.Select(p => new ProductViewModel
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            CompanyId = p.CompanyId,
+        })
+            .ToListAsync();
     }
 
 }
