@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Marqa.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class LessonsController(ILessonService lessonService) : Controller
+public class LessonsController(ILessonService lessonService, IWebHostEnvironment hostEnvironment) : Controller
 {
     [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] LessonUpdateModel model)
@@ -33,12 +33,23 @@ public class LessonsController(ILessonService lessonService) : Controller
             Message = "success",
         });
     }
-
-    [HttpPost("check-up")]
+   
+    [HttpPost("CheckUp")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {
         await lessonService.CheckUpAsync(model);
 
+        return Ok(new Response
+        {
+            Status = 200,
+            Message = "success",
+        });
+    }
+
+    [HttpPost("video-upload")]
+    public async Task<IActionResult> VideoUploadAsync(int lessonId, IFormFile video)
+    {
+        await lessonService.VideoUploadAsync(lessonId, video);
         return Ok(new Response
         {
             Status = 200,

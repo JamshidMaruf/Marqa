@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
-using Marqa.Service.Servcies.Products;
+using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Exams;
+using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.PointSettings;
@@ -58,6 +58,7 @@ builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
 builder.Services.AddScoped<IHomeTaskService, HomeTaskService>();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
@@ -68,6 +69,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
 
 var app = builder.Build();
+
+EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 
 app.UseSwagger();
 

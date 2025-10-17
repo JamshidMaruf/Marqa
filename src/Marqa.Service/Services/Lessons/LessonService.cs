@@ -2,7 +2,9 @@
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Files;
 using Marqa.Service.Services.Lessons.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Lessons;
@@ -11,8 +13,9 @@ public class LessonService(
     IRepository<Lesson> lessonRepository,
     IRepository<LessonAttendance> lessonAttendanceRepository,
     IRepository<Student> studentRepository,
-    IRepository<Employee> teacherRepository,
-    IRepository<Course> courseRepository)
+    IRepository<Employee> teacherRepository,  
+    IRepository<LessonVideo> lessonVideoRepository,
+    IFileService fileService)
     : ILessonService
 {
     public async Task UpdateAsync(int id, LessonUpdateModel model)
@@ -42,9 +45,29 @@ public class LessonService(
         await lessonRepository.UpdateAsync(lesson);
     }
 
+    public async Task VideoUploadAsync(int id, IFormFile video)
+    {
+        _ = await lessonRepository.SelectAsync(id)
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
+
+        var allowedExtensions = new string[]{".mp4", ".avi", ".mkv", ".mov"};
+        
+        if(!allowedExtensions.Contains(Path.GetExtension(video.FileName)))
+            throw new ArgumentIsNotValidException("Not supported video format");
+        
+        var result = await fileService.UploadAsync(video, "Files/Videos");
+
+        await lessonVideoRepository.InsertAsync(new LessonVideo
+        {
+            VideoName = result.FileName,
+            VideoPath = result.FilePath,
+            LessonId = id
+        });
+    }
+
     public async Task CheckUpAsync(LessonAttendanceModel model)
     {
-        var lesson = await lessonRepository.SelectAsync(model.LessonId)
+        _ = await lessonRepository.SelectAsync(model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
         _ = await studentRepository.SelectAsync(model.StudentId)
@@ -72,29 +95,5 @@ public class LessonService(
                 LateTimeInMinutes = model.LateTimeInMinutes
             });
         }
-    }
-
-    public Task UploadLessonVideoAsync(int lessonId, object video)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<List<LessonViewModel>> GetAllByCourseIdAsync(int courseId)
-    {
-        _ = await courseRepository.SelectAsync(courseId)
-            ?? throw new NotFoundException($"No course was found with ID = {courseId}");
-
-        return await lessonRepository
-            .SelectAllAsQueryable()
-            .Where(lesson => lesson.CourseId == courseId) 
-            .Select(lesson => new LessonViewModel
-            {
-                Date = lesson.Date,
-                Id = lesson.Id,
-                Name = lesson.Name,
-                Number = lesson.Number,
-                HomeTaskStatus = lesson.HomeTaskStatus
-            })
-            .ToListAsync();
     }
 }
