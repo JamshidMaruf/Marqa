@@ -34,12 +34,13 @@ public class LessonService(
         await lessonRepository.UpdateAsync(lessonForUpdation);
     }
 
-    public async Task ModifyAsync(int id, string name)
+    public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
     {
         var lesson = await lessonRepository.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         lesson.Name = name;
+        lesson.HomeTaskStatus = homeTaskStatus;
 
         await lessonRepository.UpdateAsync(lesson);
     }
@@ -76,6 +77,8 @@ public class LessonService(
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
+        if(!lesson.IsCompleted)
+            lesson.IsCompleted = true;
 
         if (lessonAttendance != null)
         {

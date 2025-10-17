@@ -1,4 +1,6 @@
-﻿namespace Marqa.Domain.Entities;
+﻿using Marqa.Domain.Enums;
+
+namespace Marqa.Domain.Entities;
 
 public class Lesson : Auditable
 {
@@ -8,6 +10,8 @@ public class Lesson : Auditable
     public TimeOnly EndTime { get; set; }
     public DateOnly Date { get; set; }
     public string Room { get; set; }
+    public HomeTaskStatus HomeTaskStatus { get; set; }
+    public bool IsCompleted { get; set; }
     public int CourseId { get; set; }
     public int TeacherId { get; set; }
 

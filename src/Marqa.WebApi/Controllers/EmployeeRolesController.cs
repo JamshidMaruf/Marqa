@@ -9,83 +9,65 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(EmployeeRoleCreateModel model)
     {
-        try
-        {
-            await employeeRoleService.CreateAsync(model);
+        await employeeRoleService.CreateAsync(model);
 
-            return Created();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] EmployeeRoleUpdateModel model)
     {
-        try
-        {
-            await employeeRoleService.UpdateAsync(id, model);
+        await employeeRoleService.UpdateAsync(id, model);
 
-            return Ok();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
-        {
-            await employeeRoleService.DeleteAsync(id);
+        await employeeRoleService.DeleteAsync(id);
 
-            return Ok();
-        }
-        catch (Exception ex)
+        return Ok(new Response
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
-        {
-            var company = await employeeRoleService.GetAsync(id);
+        var company = await employeeRoleService.GetAsync(id);
 
-            return Ok(company);
-        }
-        catch (Exception ex)
+        return Ok(new Response<EmployeeRoleViewModel>
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+            Data = company
+        });
     }
 
     [HttpGet("by{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(int? companyId)
     {
-        try
-        {
-            var companies = await employeeRoleService.GetAllAsync(companyId);
+        var companies = await employeeRoleService.GetAllAsync(companyId);
 
-            return Ok(new Response<List<EmployeeRoleViewModel>>
-            {
-                Status = 200,
-                Message = "success",
-                Data = companies
-            });
-        }
-        catch (Exception ex)
+        return Ok(new Response<List<EmployeeRoleViewModel>>
         {
-            return BadRequest(ex.Message);
-        }
+            Status = 200,
+            Message = "success",
+            Data = companies
+        });
     }
 }

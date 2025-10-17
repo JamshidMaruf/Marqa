@@ -11,231 +11,89 @@ namespace Marqa.WebApi.Controllers;
 public class SubjectsController(ISubjectService subjectService) : ControllerBase
 {
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(SubjectCreateModel model)
     {
-        try
-        {
-            await subjectService.CreateAsync(model);
+        await subjectService.CreateAsync(model);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (AlreadyExistException ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message,
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
     [HttpPost("attach-teacher")]
     public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
     {
-        try
-        {
-            await subjectService.AttachAsync(model);
+        await subjectService.AttachAsync(model);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] SubjectUpdateModel model)
     {
-        try
-        {
-            await subjectService.UpdateAsync(id, model);
+        await subjectService.UpdateAsync(id, model);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
-
+            Status = 200,
+            Message = "success",
+        });
     }
 
     [HttpDelete("detach-teacher")]
     public async Task<IActionResult> DeleteAsync(int teacherId, int subjectId)
     {
-        try
-        {
-            await subjectService.DetachAsync(teacherId, subjectId);
+        await subjectService.DetachAsync(teacherId, subjectId);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
-        {
-            await subjectService.DeleteAsync(id);
+        await subjectService.DeleteAsync(id);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        try
-        {
-            var subject = await subjectService.GetAsync(id);
+        var subject = await subjectService.GetAsync(id);
 
-            return Ok(new Response<SubjectViewModel>
-            {
-                Status = 200,
-                Message = "success",
-                Data = subject
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response<SubjectViewModel>
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+            Data = subject
+        });
     }
 
     [HttpGet("by{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
-        try
-        {
-            var subject = await subjectService.GetAllAsync(companyId);
+        var subjects = await subjectService.GetAllAsync(companyId);
 
-            return Ok(new Response<IEnumerable<SubjectViewModel>>
-            {
-                Status = 200,
-                Message = "success",
-                Data = subject
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response<IEnumerable<SubjectViewModel>>
         {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 500,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+            Data = subjects
+        });
     }
 }

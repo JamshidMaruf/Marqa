@@ -11,6 +11,9 @@ using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.PointSettings;
+using Marqa.Service.Services.Products;
+using Marqa.Service.Services.Ratings;
+using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.WebApi.Middlewares;
@@ -60,6 +63,10 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IPointSettingService,  PointSettingService>();
+builder.Services.AddScoped<IExamService, ExamService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
 
 var app = builder.Build();
 

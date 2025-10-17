@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Exceptions;
+﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.Lessons.Models;
 using Marqa.WebApi.Models;
@@ -9,103 +9,41 @@ namespace Marqa.WebApi.Controllers;
 [Route("api/[controller]")]
 public class LessonsController(ILessonService lessonService, IWebHostEnvironment hostEnvironment) : Controller
 {
-    [HttpPut("{id}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] LessonUpdateModel model)
     {
-        try
+        await lessonService.UpdateAsync(id, model);
+
+        return Ok(new Response
         {
-            await lessonService.UpdateAsync(id, model);
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch(AlreadyExistException ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = ex.StatusCode,
-                Message = ex.Message,
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new Response
-            {
-                Status = 404,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
     [HttpPatch("{name:required}")]
-    public async Task<IActionResult> PatchAsync(int id, string name)
+    public async Task<IActionResult> PatchAsync(int id, string name, HomeTaskStatus status)
     {
-        try
-        {
-            await lessonService.ModifyAsync(id, name);
 
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
+        await lessonService.ModifyAsync(id, name, status);
+
+        return Ok(new Response
         {
-            return NotFound(new Response
-            {
-                Status = 404,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
    
     [HttpPost("CheckUp")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {
-        try
+        await lessonService.CheckUpAsync(model);
+
+        return Ok(new Response
         {
-            await lessonService.CheckUpAsync(model);
-            return Ok(new Response
-            {
-                Status = 200,
-                Message = "success",
-            });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new Response
-            {
-                Status = 404,
-                Message = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new Response
-            {
-                Status = 400,
-                Message = ex.Message
-            });
-        }
+            Status = 200,
+            Message = "success",
+        });
     }
 
     [HttpPost("video-upload")]
