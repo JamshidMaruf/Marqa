@@ -2,6 +2,7 @@
 using Marqa.Service.Services.Products.Models;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Marqa.Service.Services.Products;
 
 namespace Marqa.WebApi.Controllers;
 [ApiController]

@@ -11,6 +11,7 @@ public class Lesson : Auditable
     public DateOnly Date { get; set; }
     public string Room { get; set; }
     public HomeTaskStatus HomeTaskStatus { get; set; }
+    public bool IsCompleted { get; set; }
     public int CourseId { get; set; }
     public int TeacherId { get; set; }
 

@@ -4,7 +4,6 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Lessons.Models;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Service.Services.Lessons;
 
@@ -54,6 +53,9 @@ public class LessonService(
         var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
+
+        if(!lesson.IsCompleted)
+            lesson.IsCompleted = true;
 
         if (lessonAttendance != null)
         {
