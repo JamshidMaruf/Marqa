@@ -54,6 +54,9 @@ public class LessonService(
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
+        if(!lesson.IsCompleted)
+            lesson.IsCompleted = true;
+
         if (lessonAttendance != null)
         {
             lessonAttendance.Status = model.Status;

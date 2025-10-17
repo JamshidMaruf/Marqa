@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Employees;
+﻿using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,15 +12,13 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     [HttpPost("create")]
     public async Task<IActionResult> PostAsync(EmployeeCreateModel model)
     {
-
         int id = await employeeService.CreateAsync(model);
 
         return Ok(new Response
         {
             Status = 201,
-            Message = $"success employeeId: {id}"
+            Message = "success"
         });
-
     }
 
     [HttpPut("update/{id:int}")]
@@ -77,7 +74,6 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     [HttpGet("teachers{id:int}")]
     public async Task<IActionResult> GetTeacherAsync(int id)
     {
-
         var result = await employeeService.GetTeacherAsync(id);
 
         return Ok(new Response<TeacherViewModel>
