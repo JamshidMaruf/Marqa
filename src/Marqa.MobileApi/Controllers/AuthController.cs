@@ -1,12 +1,14 @@
 using Marqa.MobileApi.Models;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Messages;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.MobileApi.Controllers;
 
 public class AuthController(IAuthService authService, ISmsService smsService, IConfiguration configuration) : BaseController
 {
+    [AllowAnonymous]
     [HttpPost("session")]
     public IActionResult CreateSessionAsync([FromBody] SessionModel model)
     {
@@ -27,7 +29,7 @@ public class AuthController(IAuthService authService, ISmsService smsService, IC
             Message = "Forbiden"
         });
     }
-
+    
     [HttpPost("otp/send")]
     public async Task<IActionResult> SentOTPAsync(string phone)
     {
@@ -40,6 +42,7 @@ public class AuthController(IAuthService authService, ISmsService smsService, IC
         });
     }
 
+    [HttpGet("otp/verify")]
     public async Task<IActionResult> VerifyOTPAsync(string phone, string code)
     {
         await smsService.VerifyOTPAsync(phone, code);
