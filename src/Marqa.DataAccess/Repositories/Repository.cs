@@ -1,4 +1,5 @@
-﻿using Marqa.DataAccess.Contexts;
+﻿using System.Linq.Expressions;
+using Marqa.DataAccess.Contexts;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,10 +37,19 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         await context.SaveChangesAsync();
     }
 
-    public async Task<TEntity> SelectAsync(int id)
+    public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null)
     {
-        return await context.Set<TEntity>()
-            .FirstOrDefaultAsync(entity => entity.Id == id && !entity.IsDeleted);
+        var query = context.Set<TEntity>().Where(predicate).AsQueryable();
+
+        if (includes != null)
+        {
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+        }
+        
+        return await query.FirstOrDefaultAsync(predicate);
     }
 
     public IQueryable<TEntity> SelectAllAsQueryable()
