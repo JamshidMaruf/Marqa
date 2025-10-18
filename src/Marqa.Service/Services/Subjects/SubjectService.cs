@@ -72,6 +72,8 @@ public class SubjectService(
         {
             Id = existSubject.Id,
             Name = existSubject.Name,
+            CompanyId = existSubject.CompanyId,
+            CompanyName = existSubject.CompanyName
         };
     }
 

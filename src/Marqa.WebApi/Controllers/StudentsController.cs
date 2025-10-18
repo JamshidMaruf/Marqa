@@ -61,7 +61,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     [HttpGet("courseStudents/{courseId:int}")]
     public async Task<IActionResult> GetAllAsync(int courseId)
     {
-        var students = await studentService.GetAllByCourseAsync(courseId);
+        var students = await studentService.GetAllByCourseIdAsync(courseId);
        
         return Ok(new Response<List<StudentViewModel>>
         {

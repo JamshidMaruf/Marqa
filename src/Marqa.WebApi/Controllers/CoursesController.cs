@@ -82,7 +82,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync([FromQuery] int companyId, [FromQuery] string search, [FromQuery] int? subjectId)
+    public async Task<IActionResult> GetAllAsync([FromQuery] int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
     {
         var courses = await courseService.GetAllAsync(companyId, search, subjectId);
 
