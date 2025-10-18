@@ -107,7 +107,7 @@ public class StudentService(IRepository<Company> companyRepository, IRepository<
         };
     }
 
-    public async Task<List<StudentViewModel>> GetAllByCourseAsync(int courseId)
+    public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
     {
         var courseStudents = await courseRepository
                 .SelectAllAsQueryable()

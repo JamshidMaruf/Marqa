@@ -39,7 +39,8 @@ public class CourseService(
             TeacherId = model.TeacherId,
             Status = model.Status,
             Description = model.Description,
-            MaxStudentCount = model.MaxStudentCount
+            MaxStudentCount = model.MaxStudentCount,
+            CompanyId = model.CompanyId
         });
 
         var weekDays = new List<DayOfWeek>();
@@ -70,8 +71,8 @@ public class CourseService(
         var existCourse = await courseRepository
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
-            .Include(c => c.Lessons)
-            .Include(c => c.CourseWeekdays)
+            .Include(c => c.Lessons.Where(l => !l.IsDeleted))
+            .Include(c => c.CourseWeekdays.Where(w => !w.IsDeleted))
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
@@ -142,12 +143,12 @@ public class CourseService(
             .Where(c => !c.IsDeleted)
             .Include(c => c.Subject)
             .Include(c => c.Teacher)
-            .Include(c => c.Lessons)
-            .Include(c => c.CourseWeekdays)
+            .Include(c => c.Lessons.Where(l => !l.IsDeleted))
+            .Include(c => c.CourseWeekdays.Where(cwd => !cwd.IsDeleted))
             .Include(c => c.Students)
             .Select(c => new CourseViewModel
             {
-                Id = id,
+                Id = c.Id,
                 Name = c.Name,
                 EndTime = c.EndTime,
                 LessonCount = c.Lessons.Count,
@@ -174,7 +175,7 @@ public class CourseService(
                     EndTime = cl.EndTime,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
-                }).ToList(),
+                }).OrderBy(l => l.Date).ToList(),
             })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
@@ -230,7 +231,7 @@ public class CourseService(
                     EndTime = cl.EndTime,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
-                }).ToList(),
+                }).OrderBy(l => l.Date).ToList(),
             })
             .ToListAsync();
     }

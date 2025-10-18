@@ -67,7 +67,7 @@ public class LessonService(
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
     {
-        _ = await lessonRepository.SelectAsync(model.LessonId)
+        var lesson = await lessonRepository.SelectAsync(model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
         _ = await studentRepository.SelectAsync(model.StudentId)

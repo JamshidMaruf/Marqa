@@ -2,11 +2,13 @@
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
 using Marqa.Service.Helpers;
+using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
+using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
