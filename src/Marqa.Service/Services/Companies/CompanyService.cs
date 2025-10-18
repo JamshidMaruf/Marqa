@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Companies.Models;
@@ -6,28 +7,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Companies;
 
-public class CompanyService(IRepository<Company> companyRepository) : ICompanyService
+public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 {
     public async Task CreateAsync(CompanyCreateModel model)
     {
-        var existCompany = await companyRepository
-            .SelectAllAsQueryable()
-            .FirstOrDefaultAsync(c => c.Name == model.Name);
-
-        await companyRepository.InsertAsync(new Company
+        await unitOfWork.Companies.InsertAsync(new Company
         {
             Name = model.Name,
         });
+
+        await unitOfWork.SaveAsync();
+        
+        unitOfWork.Dispose();
     }
 
     public async Task UpdateAsync(int id, CompanyUpdateModel model)
     {
-        var existCompany = await companyRepository.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
         existCompany.Name = model.Name;
 
-        await companyRepository.UpdateAsync(existCompany);
+        await unitOfWork.Companies.UpdateAsync(existCompany);
+
+        await unitOfWork.SaveAsync();
+
+        unitOfWork.Dispose();
     }
 
     public async Task DeleteAsync(int id)
