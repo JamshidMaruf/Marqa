@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Students.Models;
@@ -7,40 +8,54 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Students;
 
-public class StudentService(IRepository<Company> companyRepository, IRepository<Student> studentRepository, IRepository<StudentDetail> studentDetailRepository
-    , IRepository<Course> courseRepository, IRepository<StudentCourse> studentCourseRepository) : IStudentService
+public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 {
     public async Task CreateAsync(StudentCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(model.CompanyId)
+        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        var student = new Student
+        await unitOfWork.BeginTransactionAsync();
+
+        try
         {
-            // Access ID ni generate qilish kerak. ID: <5 digits>
-            CompanyId = model.CompanyId,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            DateOfBirth = model.DateOfBirth,
-            Gender = model.Gender,
-            Phone = model.Phone,
-            Email = model.Email,
-             StudentDetail=new StudentDetail
-             {
-                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
-                 FatherLastName = model.StudentDetailCreateModel.FatherLastName,
-                 FatherPhone = model.StudentDetailCreateModel.FatherPhone,
-                 MotherFirstName = model.StudentDetailCreateModel.MotherFirstName,
-                 MotherLastName = model.StudentDetailCreateModel.MotherLastName,
-                 MotherPhone = model.StudentDetailCreateModel.MotherPhone,
-                 GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
-                 GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
-                 GuardianPhone = model.StudentDetailCreateModel.GuardianPhone
-             }
-        };
+            var createdStudent = await unitOfWork.Students.InsertAsync(new Student()
+            {
+                // Access ID ni generate qilish kerak. ID: <5 digits>
+                CompanyId = model.CompanyId,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                Phone = model.Phone,
+                Email = model.Email,
+            });
 
-        await studentRepository.InsertAsync(student);
+            await unitOfWork.SaveAsync();
 
+
+            await unitOfWork.StudentDetails.InsertAsync(new StudentDetail
+            {
+                StudentId = createdStudent.Id,
+                FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
+                FatherLastName = model.StudentDetailCreateModel.FatherLastName,
+                FatherPhone = model.StudentDetailCreateModel.FatherPhone,
+                MotherFirstName = model.StudentDetailCreateModel.MotherFirstName,
+                MotherLastName = model.StudentDetailCreateModel.MotherLastName,
+                MotherPhone = model.StudentDetailCreateModel.MotherPhone,
+                GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
+                GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
+                GuardianPhone = model.StudentDetailCreateModel.GuardianPhone
+            });
+
+            await unitOfWork.SaveAsync();
+
+            await unitOfWork.BeginCommitAsync();
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+        }
     }
 
     public async Task UpdateAsync(int id, StudentUpdateModel model)
@@ -70,17 +85,16 @@ public class StudentService(IRepository<Company> companyRepository, IRepository<
 
     public async Task DeleteAsync(int id)
     {
-        var existStudent = await studentRepository.SelectAsync(id)
+        var existStudent = await studentRepository.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Student is not found");
 
         await studentRepository.DeleteAsync(existStudent);
     }
 
-    public async Task<StudentViewModel> GetAsync(int id)
+    public async Task<StudentViewModel> GetAsync(int id, string name)
     {
-        var existStudent = await studentRepository.SelectAllAsQueryable()
-            .Include(s => s.StudentDetail)
-            .FirstOrDefaultAsync(s => s.Id == id)
+        var existStudent = await studentRepository
+            .SelectAsync(predicate: t => t.Id == id,  includes: new[] { "StudentDetail" })
             ?? throw new NotFoundException($"Student is not found");
 
         return new StudentViewModel
