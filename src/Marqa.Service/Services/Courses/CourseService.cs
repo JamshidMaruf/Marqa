@@ -19,13 +19,13 @@ public class CourseService(
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(model.CompanyId)
+        _ = await companyRepository.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        _ = await subjectRepository.SelectAsync(model.SubjectId)
+        _ = await subjectRepository.SelectAsync(c => c.Id == model.SubjectId)
             ?? throw new NotFoundException("Subject not found");
 
-        _ = await teacherRepository.SelectAsync(model.TeacherId)
+        _ = await teacherRepository.SelectAsync(t => t.Id == model.TeacherId)
             ?? throw new NotFoundException("Teacher not found");
 
         var createdCourse = await courseRepository.InsertAsync(new Course
@@ -138,6 +138,7 @@ public class CourseService(
 
     public async Task<CourseViewModel> GetAsync(int id)
     {
+
         var existCourse = await courseRepository
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
@@ -238,10 +239,10 @@ public class CourseService(
 
     public async Task AttachStudentAsync(int courseId, int studentId)
     {
-        _ = await courseRepository.SelectAsync(courseId)
+        _ = await courseRepository.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
         
-        _ = await studentRepository.SelectAsync(studentId)
+        _ = await studentRepository.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
         await studentCourseRepository.InsertAsync(new StudentCourse() { CourseId = courseId, StudentId = studentId });
@@ -249,10 +250,10 @@ public class CourseService(
 
     public async Task DetachStudentAsync(int courseId, int studentId)
     {
-        _ = await courseRepository.SelectAsync(courseId)
+        _ = await courseRepository.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
         
-        _ = await studentRepository.SelectAsync(studentId)
+        _ = await studentRepository.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
         var studentCourse = await studentCourseRepository.SelectAllAsQueryable()

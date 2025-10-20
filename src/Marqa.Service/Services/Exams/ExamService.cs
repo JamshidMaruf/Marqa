@@ -99,7 +99,7 @@ public class ExamService(
             ?? throw new NotFoundException("Exam not found");
     }
 
-    public async Task<StudentExamResultView> GetExamResultByStudentIdAsync(int studentid)
+    public async Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid)
     {
         return await studentExamResultRepository.SelectAllAsQueryable()
             .Include(r => r.Student)
@@ -126,8 +126,7 @@ public class ExamService(
                     StartTime = r.Exam.StartTime,
                     EndTime = r.Exam.EndTime
                 }
-            }).FirstOrDefaultAsync()
-            ?? throw new NotFoundException("Exam result not found");
+            }).ToListAsync();
     }
 
     public async Task ScoreExam(StudentExamResultCreate model)

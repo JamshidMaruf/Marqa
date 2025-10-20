@@ -17,10 +17,10 @@ public class EmployeeService(
 {
     public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(model.CompanyId)
+        _ = await companyRepository.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
 
-        _ = await employeeRoleRepository.SelectAsync(model.RoleId)
+        _ = await employeeRoleRepository.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         var createdEmp = await employeeRepository.InsertAsync(new Employee
@@ -45,10 +45,10 @@ public class EmployeeService(
 
     public async Task UpdateAsync(int id, EmployeeUpdateModel model)
     {
-        var existTeacher = await employeeRepository.SelectAsync(id)
+        var existTeacher = await employeeRepository.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
         
-        _ = await employeeRoleRepository.SelectAsync(model.RoleId)
+        _ = await employeeRoleRepository.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         existTeacher.FirstName = model.FirstName;

@@ -13,7 +13,7 @@ public class EmployeeRoleService(
 {
     public async Task CreateAsync(EmployeeRoleCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(model.CompanyId)
+        _ = await companyRepository.SelectAsync(c => c.Id == model.CompanyId)
           ?? throw new NotFoundException("Company not found");
 
         var existRole = await employeeRoleRepository.SelectAllAsQueryable()
@@ -32,7 +32,7 @@ public class EmployeeRoleService(
 
     public async Task DeleteAsync(int id)
     {
-        var existRole = await employeeRoleRepository.SelectAsync(id)
+        var existRole = await employeeRoleRepository.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException("Role not found");
 
         await employeeRoleRepository.DeleteAsync(existRole);
@@ -81,7 +81,7 @@ public class EmployeeRoleService(
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
-        var existEmployeeRole = await employeeRoleRepository.SelectAsync(id)
+        var existEmployeeRole = await employeeRoleRepository.SelectAsync(e => e.Id == id)
              ?? throw new NotFoundException("Role not found");
 
         var existRole = await employeeRoleRepository.SelectAllAsQueryable()

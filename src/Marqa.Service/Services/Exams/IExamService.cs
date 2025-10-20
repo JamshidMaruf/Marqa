@@ -11,5 +11,5 @@ public interface IExamService
 
     Task ScoreExam(StudentExamResultCreate model);
     Task UpdateExamScore(int examresultid, StudentExamResultUpdate model);
-    Task<StudentExamResultView> GetExamResultByStudentIdAsync(int studentid);
+    Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid);
 }
