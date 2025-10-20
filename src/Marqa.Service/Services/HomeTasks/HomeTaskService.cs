@@ -17,7 +17,7 @@ public class HomeTaskService(
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
-        var existLesson = await lessonRepository.SelectAsync(model.LessonId)
+        var existLesson = await lessonRepository.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
 
         await homeTaskRepository.InsertAsync(new HomeTask
@@ -32,7 +32,7 @@ public class HomeTaskService(
 
     public async Task UpdateAsync(int id, HomeTaskUpdateModel model)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(id)
+        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
         existHomeTask.Deadline = model.Deadline;
@@ -43,7 +43,7 @@ public class HomeTaskService(
 
     public async Task DeleteAsync(int id)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(id)
+        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
         await homeTaskRepository.DeleteAsync(existHomeTask);
@@ -69,10 +69,10 @@ public class HomeTaskService(
 
     public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(model.HomeTaskId)
+        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == model.HomeTaskId)
             ?? throw new NotFoundException("Homa task not found!");
 
-        var existStudent = await studentRepository.SelectAsync(model.StudentId)
+        var existStudent = await studentRepository.SelectAsync(h => h.Id == model.HomeTaskId)
             ?? throw new NotFoundException("Student not found!");
 
         if (existHomeTask.Deadline < DateTime.Now)
@@ -91,7 +91,7 @@ public class HomeTaskService(
 
     public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
     {
-        var existHomeTaskUpload = await studentHomeTaskRepository.SelectAsync(model.StudentHomeTaskId)
+        var existHomeTaskUpload = await studentHomeTaskRepository.SelectAsync(h => h.Id == model.StudentHomeTaskId)
             ?? throw new NotFoundException("No completed home task found!");
 
         await studentHomeTaskFeedbackRepository
