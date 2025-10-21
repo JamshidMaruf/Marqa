@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class Banner:Auditable
+public class Banner : Auditable
 {
     public string Title { get; set; }
 
