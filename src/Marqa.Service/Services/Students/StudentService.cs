@@ -62,7 +62,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
     // keyin bu methodni transaction bilan update qilish kere huddi create kabi!
     public async Task UpdateAsync(int id, StudentUpdateModel model)
     {
-        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
+        var existStudent = await unitOfWork.Students.SelectAsync(id)
             ?? throw new NotFoundException($"Student is not found");
 
         existStudent.FirstName = model.FirstName;
@@ -173,11 +173,6 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
     }
 
     public Task<List<Account>> GetAccountsAsync(int studentId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<StudentViewModel> GetAsync(int id)
     {
         throw new NotImplementedException();
     }

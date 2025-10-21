@@ -12,7 +12,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     // transaction qo'shilsin insertla kop
     public async Task CreateAsync(OrderCreateModel model)  
     {
-        var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
+        var student = await unitOfWork.Students.SelectAsync(model.StudentId)
             ?? throw new NotFoundException($"Student not found (ID: {model.StudentId})");
 
         var studentPointHistory = await unitOfWork.StudentPointHistories
@@ -27,7 +27,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         foreach (var item in model.Items)
         {
-            var product = await unitOfWork.Products.SelectAsync(p => p.Id == item.ProductId)
+            var product = await unitOfWork.Products.SelectAsync(item.ProductId)
                 ?? throw new NotFoundException($"Product not found (ID: {item.ProductId})");
 
             if (item.Count <= 0)
@@ -79,7 +79,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task UpdateStatusAsync(int id, OrderStatus newStatus)
     {
-        var existOrder = await unitOfWork.Orders.SelectAsync(o => o.Id == id)
+        var existOrder = await unitOfWork.Orders.SelectAsync(id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
         existOrder.Status = newStatus;
@@ -88,7 +88,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task DeleteAsync(int id)
     {
-        var existOrder = await unitOfWork.Orders.SelectAsync(o => o.Id == id)
+        var existOrder = await unitOfWork.Orders.SelectAsync(id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
         
         // orderni ozidan orderitemlarni include qilingani optimalroq bo'ladi

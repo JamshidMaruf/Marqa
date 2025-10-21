@@ -27,7 +27,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 
     public async Task UpdateAsync(int id, PointSettingUpdateModel model)
     {
-        var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No point_setting was found with ID {id}");
 
         pointSetting.Name = model.Name;
@@ -40,7 +40,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 
     public async Task DeleteAsync(int id)
     {
-        var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No poinit_setting was found with ID = {id}");
 
         await unitOfWork.PointSettings.DeleteAsync(pointSetting);
@@ -48,7 +48,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 
     public async Task<PointSettingViewModel> GetAsync(int id)
     {
-        var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id);
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id);
 
         return new PointSettingViewModel
         {
@@ -84,7 +84,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 
     public async Task ToggleAsync(int id)
     {
-        var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No point_setting was found with Id = {id}");
 
         if (pointSetting.IsEnabled)

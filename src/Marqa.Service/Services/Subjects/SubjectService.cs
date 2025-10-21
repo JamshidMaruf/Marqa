@@ -20,7 +20,7 @@ public class SubjectService(
         if (alreadyExistSubject != null)
             throw new AlreadyExistException("This subject already exist!");
        
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
+        _ = await unitOfWork.Companies.SelectAsync(model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
         await unitOfWork.Subjects.InsertAsync(new Subject
@@ -45,7 +45,7 @@ public class SubjectService(
 
     public async Task DeleteAsync(int id)
     {
-        var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
+        var existSubject = await unitOfWork.Subjects.SelectAsync(id)
             ?? throw new NotFoundException("Subjet was not found");
 
         await unitOfWork.Subjects.DeleteAsync(existSubject);
@@ -93,10 +93,10 @@ public class SubjectService(
 
     public async Task AttachAsync(TeacherSubjectCreateModel model)
     {
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Id == model.TeacherId)
+        _ = await unitOfWork.Employees.SelectAsync(model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}.");
 
-        _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == model.SubjectId)
+        _ = await unitOfWork.Subjects.SelectAsync(model.SubjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
         await unitOfWork.TeacherSubjects.InsertAsync(new TeacherSubject

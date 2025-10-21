@@ -15,7 +15,7 @@ public class StudentPointHistoryService(
 {
     public async Task AddPointAsync(StudentPointAddModel model)
     {
-        var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
+        var student = await unitOfWork.Students.SelectAsync(model.StudentId)
             ?? throw new NotFoundException("This student is not found!");
 
         var summ = await GetAsync(model.StudentId);
