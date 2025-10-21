@@ -16,10 +16,10 @@ public class LessonService(
 {
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
-        var lessonForUpdation = await unitOfWork.Lessons.SelectAsync(id)
+        var lessonForUpdation = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        _ = await unitOfWork.Employees.SelectAsync(model.TeacherId)
+        _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
 
         lessonForUpdation.StartTime = model.StartTime;
@@ -32,7 +32,7 @@ public class LessonService(
 
     public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
     {
-        var lesson = await unitOfWork.Lessons.SelectAsync(id)
+        var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         lesson.Name = name;
@@ -43,7 +43,7 @@ public class LessonService(
 
     public async Task VideoUploadAsync(int id, IFormFile video)
     {
-        _ = await unitOfWork.Lessons.SelectAsync(id)
+        _ = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         var allowedExtensions = new string[]{".mp4", ".avi", ".mkv", ".mov"};
@@ -63,10 +63,10 @@ public class LessonService(
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
     {
-        var lesson = await unitOfWork.Lessons.SelectAsync(model.LessonId)
+        var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
-        _ = await unitOfWork.Students.SelectAsync(model.StudentId)
+        _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
         var lessonAttendance = await unitOfWork.LessonAttendances.SelectAllAsQueryable()
