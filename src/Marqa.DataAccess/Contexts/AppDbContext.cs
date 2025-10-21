@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.EntityConfigurations;
+﻿using Marqa.DataAccess.Extensions;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,8 +39,9 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new CourseConfiguration());
-        modelBuilder.ApplyConfiguration(new StudentConfiguration());
-        modelBuilder.ApplyConfiguration(new StudentDetailConfiguration());
+        modelBuilder.ApplyGlobalConfiguration();
+        // I found out that this is the better approach than manually adding entity-specific configurations!
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
+
