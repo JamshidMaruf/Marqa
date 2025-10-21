@@ -37,15 +37,15 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 
     public async Task DeleteAsync(int id)
     {
-        var existCompany = await companyRepository.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(id)
             ?? throw new NotFoundException("Company is not found");
 
-        await companyRepository.DeleteAsync(existCompany);
+        await unitOfWork.Companies.DeleteAsync(existCompany);
     }
 
     public async Task<CompanyViewModel> GetAsync(int id)
     {
-        var existCompany = await companyRepository.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(id)
             ?? throw new NotFoundException("Company is not found");
 
         return new CompanyViewModel
@@ -57,7 +57,7 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 
     public async Task<List<CompanyViewModel>> GetAllAsync()
     {
-        return await companyRepository.SelectAllAsQueryable()
+        return await unitOfWork.Companies.SelectAllAsQueryable()
             .Where(t => !t.IsDeleted)
             .Select(c => new CompanyViewModel
             {

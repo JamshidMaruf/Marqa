@@ -1,24 +1,21 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Exams.Models;
 using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Exams;
-public class ExamService(
-    IRepository<Exam> examRepositry,
-    IRepository<StudentExamResult> studentExamResultRepository)
-    : IExamService
+public class ExamService(IUnitOfWork unitOfWork) : IExamService
 {
     public async Task CreateExamAsync(ExamCreateModel model)
     {
-        var existExam =  await examRepositry.SelectAllAsQueryable()
+        var existExam =  await unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefaultAsync(e => ((e.StartTime < model.StartTime && model.StartTime > e.EndTime)
             || (e.StartTime < model.EndTime && model.EndTime > e.EndTime))
             && e.CourseId == model.CourseId);
         if (existExam != null)
             throw new AlreadyExistException("Exam already exist for this period");
 
-        await examRepositry.InsertAsync(new Exam
+        await unitOfWork.Exams.InsertAsync(new Exam
         {
             CourseId = model.CourseId,
             EndTime = model.EndTime,
@@ -28,14 +25,15 @@ public class ExamService(
     }
     public async Task UpdateExamAsync(int examId, ExamUpdateModel model)
     {
-        var existExam = examRepositry.SelectAllAsQueryable()
+        var existExam = unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefault(e => e.Id == examId)
             ?? throw new NotFoundException("Exam not found");
 
-        var existExamDate = await examRepositry.SelectAllAsQueryable()
+        var existExamDate = await unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefaultAsync(e => ((e.StartTime < model.StartTime && model.StartTime > e.EndTime)
             || (e.StartTime < model.EndTime && model.EndTime > e.EndTime))
             && e.CourseId == model.CourseId);
+        
         if (existExamDate != null)
             throw new AlreadyExistException("Exam already exist for this period");
 
@@ -43,20 +41,21 @@ public class ExamService(
         existExam.EndTime = model.EndTime;
         existExam.StartTime = model.StartTime;
         existExam.Title = model.Title;
-        await examRepositry.UpdateAsync(existExam);
+        
+        await unitOfWork.Exams.UpdateAsync(existExam);
     }
 
     public async Task DeleteExamAsync(int examId)
     {
-        var existExam = examRepositry.SelectAllAsQueryable()
+        var existExam = unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefault(e => e.Id == examId) 
             ?? throw new NotFoundException("Exam not found");
-        await examRepositry.DeleteAsync(existExam);
+        await unitOfWork.Exams.DeleteAsync(existExam);
     }
 
     public async Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid)
     {
-        var exams = examRepositry.SelectAllAsQueryable();
+        var exams =unitOfWork.Exams.SelectAllAsQueryable();
         if (!string.IsNullOrWhiteSpace(search))
             exams = exams.Where(exams => exams.Title.Contains(search));
         if (courseid.HasValue)
@@ -80,7 +79,7 @@ public class ExamService(
 
     public async Task<ExamViewModel> GetExamByIdAsync(int examId)
     {
-        return await examRepositry.SelectAllAsQueryable()
+        return await unitOfWork.Exams.SelectAllAsQueryable()
             .Include(e => e.Course)
             .Where(e => e.Id == examId)
             .Select(e => new ExamViewModel
@@ -101,7 +100,7 @@ public class ExamService(
 
     public async Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid)
     {
-        return await studentExamResultRepository.SelectAllAsQueryable()
+        return await unitOfWork.StudentExamResults.SelectAllAsQueryable()
             .Include(r => r.Student)
             .Include(r => r.Exam)
             .Where(r => r.StudentId == studentid)
@@ -131,11 +130,13 @@ public class ExamService(
 
     public async Task ScoreExam(StudentExamResultCreate model)
     {
-        var existExamResult = await studentExamResultRepository.SelectAllAsQueryable()
+        var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
             .FirstOrDefaultAsync(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId);
+        
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
-        await studentExamResultRepository.InsertAsync(new StudentExamResult
+        
+        await unitOfWork.StudentExamResults.InsertAsync(new StudentExamResult
         {
             StudentId = model.StudentId,
             ExamId = model.ExamId,
@@ -146,12 +147,13 @@ public class ExamService(
 
     public async Task UpdateExamScore(int examresultid, StudentExamResultUpdate model)
     {
-        var existExamResult = await studentExamResultRepository.SelectAllAsQueryable()
+        var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
             .FirstOrDefaultAsync(r => r.Id == examresultid)
             ?? throw new NotFoundException("Exam result not found");
 
         existExamResult.Score = model.Score;
         existExamResult.TeacherFeedback = model.TeacherFeedback;
-        await studentExamResultRepository.UpdateAsync(existExamResult);
+        
+        await unitOfWork.StudentExamResults.UpdateAsync(existExamResult);
     }
 }

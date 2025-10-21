@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.PointSettings.Models;
@@ -10,13 +11,12 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.PointSettings;
 
-public class PointSettingService(
-    IRepository<PointSetting> pointSettingRepository) : IPointSettingService
+public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 {
     private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
     public async Task CreateAsync(PointSettingCreateModel model)
     {
-        await pointSettingRepository.InsertAsync(new PointSetting
+        await unitOfWork.PointSettings.InsertAsync(new PointSetting
         {
             Name = model.Name,
             Point = model.Point,
@@ -27,7 +27,7 @@ public class PointSettingService(
 
     public async Task UpdateAsync(int id, PointSettingUpdateModel model)
     {
-        var pointSetting = await pointSettingRepository.SelectAsync(id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No point_setting was found with ID {id}");
 
         pointSetting.Name = model.Name;
@@ -35,20 +35,20 @@ public class PointSettingService(
         pointSetting.Description = model.Description;
         pointSetting.Operation = model.Operation;
 
-        await pointSettingRepository.UpdateAsync(pointSetting);
+        await unitOfWork.PointSettings.UpdateAsync(pointSetting);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var pointSetting = await pointSettingRepository.SelectAsync(id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No poinit_setting was found with ID = {id}");
 
-        await pointSettingRepository.DeleteAsync(pointSetting);
+        await unitOfWork.PointSettings.DeleteAsync(pointSetting);
     }
 
     public async Task<PointSettingViewModel> GetAsync(int id)
     {
-        var pointSetting = await pointSettingRepository.SelectAsync(id);
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id);
 
         return new PointSettingViewModel
         {
@@ -61,7 +61,7 @@ public class PointSettingService(
 
     public async Task<IEnumerable<PointSettingViewModel>> GetAllAsync(string search = null)
     {
-        var pointQuery = pointSettingRepository
+        var pointQuery = unitOfWork.PointSettings
             .SelectAllAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -84,7 +84,7 @@ public class PointSettingService(
 
     public async Task ToggleAsync(int id)
     {
-        var pointSetting = await pointSettingRepository.SelectAsync(id)
+        var pointSetting = await unitOfWork.PointSettings.SelectAsync(id)
             ?? throw new NotFoundException($"No point_setting was found with Id = {id}");
 
         if (pointSetting.IsEnabled)
@@ -92,7 +92,7 @@ public class PointSettingService(
         else
             pointSetting.IsEnabled = true;
 
-        await pointSettingRepository.UpdateAsync(pointSetting);
+        await unitOfWork.PointSettings.UpdateAsync(pointSetting);
     }
 
 

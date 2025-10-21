@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -7,20 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.HomeTasks;
 
-public class HomeTaskService(
-    IRepository<Lesson> lessonRepository, 
-    IRepository<HomeTask> homeTaskRepository,
-    IRepository<Student> studentRepository,
-    IRepository<StudentHomeTask> studentHomeTaskRepository,
-    IRepository<StudentHomeTaskFeedback> studentHomeTaskFeedbackRepository
-    ) : IHomeTaskService
+public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
-        var existLesson = await lessonRepository.SelectAsync(l => l.Id == model.LessonId)
+        var existLesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
 
-        await homeTaskRepository.InsertAsync(new HomeTask
+        await unitOfWork.HomeTasks.InsertAsync(new HomeTask
         {
             LessonId = model.LessonId,
             Deadline = model.Deadline,
@@ -32,26 +26,26 @@ public class HomeTaskService(
 
     public async Task UpdateAsync(int id, HomeTaskUpdateModel model)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == id)
+        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
         existHomeTask.Deadline = model.Deadline;
         existHomeTask.Description = model.Description;
 
-        await homeTaskRepository.UpdateAsync(existHomeTask);
+        await unitOfWork.HomeTasks.UpdateAsync(existHomeTask);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == id)
+        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
-        await homeTaskRepository.DeleteAsync(existHomeTask);
+        await unitOfWork.HomeTasks.DeleteAsync(existHomeTask);
     }
 
     public async Task<List<HomeTaskViewModel>> GetAsync(int lessonId)
     {
-        var existHomeTask = homeTaskRepository.SelectAllAsQueryable()
+        var existHomeTask = unitOfWork.HomeTasks.SelectAllAsQueryable()
             .Where(ht => ht.LessonId == lessonId && !ht.IsDeleted);
 
         if (existHomeTask == null)
@@ -69,16 +63,16 @@ public class HomeTaskService(
 
     public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
     {
-        var existHomeTask = await homeTaskRepository.SelectAsync(h => h.Id == model.HomeTaskId)
+        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == model.HomeTaskId)
             ?? throw new NotFoundException("Homa task not found!");
 
-        var existStudent = await studentRepository.SelectAsync(h => h.Id == model.HomeTaskId)
+        var existStudent = await unitOfWork.Students.SelectAsync(h => h.Id == model.HomeTaskId)
             ?? throw new NotFoundException("Student not found!");
 
         if (existHomeTask.Deadline < DateTime.Now)
             throw new Exception("Homework time is over!");
 
-        var createUpload = await studentHomeTaskRepository
+        var createUpload = await unitOfWork.StudentHomeTasks
             .InsertAsync(new StudentHomeTask
             {
                 HomeTaskId = model.HomeTaskId,
@@ -91,10 +85,10 @@ public class HomeTaskService(
 
     public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
     {
-        var existHomeTaskUpload = await studentHomeTaskRepository.SelectAsync(h => h.Id == model.StudentHomeTaskId)
+        var existHomeTaskUpload = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
             ?? throw new NotFoundException("No completed home task found!");
 
-        await studentHomeTaskFeedbackRepository
+        await unitOfWork.StudentHomeTaskFeedbacks
             .InsertAsync(new StudentHomeTaskFeedback
             {
                 StudentHomeTaskId = model.StudentHomeTaskId,

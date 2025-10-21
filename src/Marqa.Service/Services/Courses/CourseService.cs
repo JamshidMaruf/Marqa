@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Courses.Models;
@@ -6,29 +6,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
-public class CourseService(
-    IRepository<Lesson> lessonRepository,
-    IRepository<Course> courseRepository,
-    IRepository<Subject> subjectRepository,
-    IRepository<Student> studentRepository,
-    IRepository<Employee> teacherRepository,
-    IRepository<Company> companyRepository,
-    IRepository<StudentCourse> studentCourseRepository,
-    IRepository<CourseWeekday> courseWeekdayRepository)
+public class CourseService(IUnitOfWork unitOfWork)
     : ICourseService
 {
+    // transaction bilan optimal usulda insert qilish kerak
     public async Task CreateAsync(CourseCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(c => c.Id == model.CompanyId)
+        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
-        _ = await subjectRepository.SelectAsync(c => c.Id == model.SubjectId)
+        _ = await unitOfWork.Subjects.SelectAsync(c => c.Id == model.SubjectId)
             ?? throw new NotFoundException("Subject not found");
 
-        _ = await teacherRepository.SelectAsync(t => t.Id == model.TeacherId)
+        _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
             ?? throw new NotFoundException("Teacher not found");
 
-        var createdCourse = await courseRepository.InsertAsync(new Course
+        var createdCourse = await unitOfWork.Courses.InsertAsync(new Course
         {
             Name = model.Name,
             SubjectId = model.SubjectId,
@@ -46,7 +39,7 @@ public class CourseService(
         var weekDays = new List<DayOfWeek>();
         foreach(var weekDay in model.Weekdays)
         {
-            await courseWeekdayRepository.InsertAsync(new CourseWeekday
+            await unitOfWork.CourseWeekdays.InsertAsync(new CourseWeekday
             {
                 Weekday = weekDay,
                 CourseId = createdCourse.Id
@@ -66,9 +59,10 @@ public class CourseService(
             weekDays);
     }
 
+    // transaction bilan optimal usulda insert qilish kerak
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
-        var existCourse = await courseRepository
+        var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
             .Include(c => c.Lessons.Where(l => !l.IsDeleted))
@@ -86,15 +80,15 @@ public class CourseService(
 
         // Delete lessons
         foreach (var lesson in existCourse.Lessons)
-            await lessonRepository.DeleteAsync(lesson);
+            await unitOfWork.Lessons.DeleteAsync(lesson);
 
         // Delete course weekdays
         foreach(var weekday in existCourse.CourseWeekdays)
-            await courseWeekdayRepository.DeleteAsync(weekday);
+            await unitOfWork.CourseWeekdays.DeleteAsync(weekday);
 
         // Create course's weekdays
         foreach (var weekDay in model.Weekdays)
-            await courseWeekdayRepository.InsertAsync(new CourseWeekday
+            await unitOfWork.CourseWeekdays.InsertAsync(new CourseWeekday
             {
                 CourseId = id,
                 Weekday = weekDay,
@@ -111,12 +105,12 @@ public class CourseService(
             model.TeacherId,
             model.Weekdays);
 
-        await courseRepository.UpdateAsync(existCourse);
+        await unitOfWork.Courses.UpdateAsync(existCourse);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var existCourse = await courseRepository
+        var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
             .Include(c => c.Lessons)
@@ -126,20 +120,20 @@ public class CourseService(
 
         // Delete lessons
         foreach (var lesson in existCourse.Lessons)
-            await lessonRepository.DeleteAsync(lesson);
+            await unitOfWork.Lessons.DeleteAsync(lesson);
 
         // Delete course's weekdays
         foreach (var weekday in existCourse.CourseWeekdays)
-            await courseWeekdayRepository.DeleteAsync(weekday);
+            await unitOfWork.CourseWeekdays.DeleteAsync(weekday);
 
         // Delete course
-        await courseRepository.DeleteAsync(existCourse);
+        await unitOfWork.Courses.DeleteAsync(existCourse);
     }
 
     public async Task<CourseViewModel> GetAsync(int id)
     {
 
-        var existCourse = await courseRepository
+        var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
             .Include(c => c.Subject)
@@ -186,7 +180,7 @@ public class CourseService(
 
     public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
     {
-        var query = courseRepository
+        var query = unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => c.CompanyId == companyId && !c.IsDeleted)
             .Include(c => c.Subject)
@@ -239,28 +233,28 @@ public class CourseService(
 
     public async Task AttachStudentAsync(int courseId, int studentId)
     {
-        _ = await courseRepository.SelectAsync(c => c.Id == courseId)
+        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
         
-        _ = await studentRepository.SelectAsync(s => s.Id == studentId)
+        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        await studentCourseRepository.InsertAsync(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        await unitOfWork.StudentCourses.InsertAsync(new StudentCourse() { CourseId = courseId, StudentId = studentId });
     }
 
     public async Task DetachStudentAsync(int courseId, int studentId)
     {
-        _ = await courseRepository.SelectAsync(c => c.Id == courseId)
+        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
         
-        _ = await studentRepository.SelectAsync(s => s.Id == studentId)
+        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        var studentCourse = await studentCourseRepository.SelectAllAsQueryable()
+        var studentCourse = await unitOfWork.StudentCourses.SelectAllAsQueryable()
             .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
 
         if (studentCourse is not null)
-            await studentCourseRepository.DeleteAsync(studentCourse);
+            await unitOfWork.StudentCourses.DeleteAsync(studentCourse);
     }
 
     private async Task GenerateLessonAsync(
@@ -274,7 +268,7 @@ public class CourseService(
         List<DayOfWeek> weekDays)
     {
         // First Lesson
-        await lessonRepository.InsertAsync(new Lesson
+        await unitOfWork.Lessons.InsertAsync(new Lesson
         {
             CourseId = courseId,
             StartTime = startTime,
@@ -294,7 +288,7 @@ public class CourseService(
 
             if (weekDays.Contains(currentDate.DayOfWeek))
             {
-                await lessonRepository.InsertAsync(new Lesson
+                await unitOfWork.Lessons.InsertAsync(new Lesson
                 {
                     CourseId = courseId,
                     StartTime = startTime,

@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -7,20 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Orders;
 
-public class OrderService(
-    IRepository<Order> orderRepository,
-    IRepository<OrderItem> orderItemRepository,
-    IRepository<Product> productRepository,
-    IRepository<Student> studentRepository,
-    IRepository<StudentPointHistory> pointHistoryRepository
-) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
+    // transaction qo'shilsin insertla kop
     public async Task CreateAsync(OrderCreateModel model)  
     {
-        var student = await studentRepository.SelectAsync(model.StudentId)
+        var student = await unitOfWork.Students.SelectAsync(model.StudentId)
             ?? throw new NotFoundException($"Student not found (ID: {model.StudentId})");
 
-        var studentPointHistory = await pointHistoryRepository
+        var studentPointHistory = await unitOfWork.StudentPointHistories
             .SelectAllAsQueryable()
             .Where(p => p.StudentId == student.Id)
             .OrderByDescending(p => p.CreatedAt)
@@ -32,7 +27,7 @@ public class OrderService(
 
         foreach (var item in model.Items)
         {
-            var product = await productRepository.SelectAsync(item.ProductId)
+            var product = await unitOfWork.Products.SelectAsync(item.ProductId)
                 ?? throw new NotFoundException($"Product not found (ID: {item.ProductId})");
 
             if (item.Count <= 0)
@@ -59,12 +54,12 @@ public class OrderService(
             TotalPrice = totalPrice,
         };
 
-        await orderRepository.InsertAsync(order);
+        await unitOfWork.Orders.InsertAsync(order);
 
         foreach (var orderItem in orderItems)
         {
             orderItem.OrderId = order.Id;
-            await orderItemRepository.InsertAsync(orderItem);
+            await unitOfWork.OrderItems.InsertAsync(orderItem);
         }
 
         var newCurrentPoint = studentPointHistory.CurrentPoint - totalPrice;
@@ -79,44 +74,47 @@ public class OrderService(
             Operation = PointHistoryOperation.Minus
         };
 
-        await pointHistoryRepository.InsertAsync(pointHistory);
+        await unitOfWork.StudentPointHistories.InsertAsync(pointHistory);
     }
 
     public async Task UpdateStatusAsync(int id, OrderStatus newStatus)
     {
-        var existOrder = await orderRepository.SelectAsync(id)
+        var existOrder = await unitOfWork.Orders.SelectAsync(id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
         existOrder.Status = newStatus;
-        await orderRepository.UpdateAsync(existOrder);
+        await unitOfWork.Orders.UpdateAsync(existOrder);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var existOrder = await orderRepository.SelectAsync(id)
+        var existOrder = await unitOfWork.Orders.SelectAsync(id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
-
-        var orderItems = await orderItemRepository
+        
+        // orderni ozidan orderitemlarni include qilingani optimalroq bo'ladi
+        var orderItems = await unitOfWork.OrderItems
             .SelectAllAsQueryable()
             .Where(i => i.OrderId == id)
             .ToListAsync();
 
         foreach (var item in orderItems)
         {
-            await orderItemRepository.DeleteAsync(item);
+            await unitOfWork.OrderItems.DeleteAsync(item);
         }
 
-        await orderRepository.DeleteAsync(existOrder);
+        await unitOfWork.Orders.DeleteAsync(existOrder);
     }
 
     public async Task<OrderViewModel> GetAsync(int id)
     {
-        var order = await orderRepository.SelectAllAsQueryable()
+        // student include qilish keregi yoq studentId alohida property 
+        var order = await unitOfWork.Orders.SelectAllAsQueryable()
             .Include(o => o.Student)
             .FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
-        var items = await orderItemRepository.SelectAllAsQueryable()
+        // orderItem order bilan birga include qilingan holda ob kelingani optimalroq 
+        var items = await unitOfWork.OrderItems.SelectAllAsQueryable()
             .Include(i => i.Product) 
             .Where(i => i.OrderId == order.Id)
             .ToListAsync();
@@ -139,7 +137,8 @@ public class OrderService(
 
     public async Task<List<OrderViewModel>> GetAllAsync()
     {
-        var orders = await orderRepository.SelectAllAsQueryable()
+        // student include qilish keremas
+        var orders = await unitOfWork.Orders.SelectAllAsQueryable()
             .Include(o => o.Student)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
