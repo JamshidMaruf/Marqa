@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Helpers;
 using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
@@ -53,6 +54,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();

@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Subjects.Models;
@@ -7,14 +8,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Subjects;
 
 public class SubjectService(
-    IRepository<TeacherSubject> teacherSubjectRepository,
-    IRepository<Employee> teacherRepository,
-    IRepository<Subject> subjectRepository,
-    IRepository<Company> companyRepository) : ISubjectService
+    IUnitOfWork unitOfWork) : ISubjectService
 {
     public async Task CreateAsync(SubjectCreateModel model)
     {
-        var alreadyExistSubject = await subjectRepository
+        var alreadyExistSubject = await unitOfWork.Subjects
             .SelectAllAsQueryable()
             .Where(s => !s.IsDeleted)
             .FirstOrDefaultAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
@@ -22,10 +20,10 @@ public class SubjectService(
         if (alreadyExistSubject != null)
             throw new AlreadyExistException("This subject already exist!");
        
-        _ = await companyRepository.SelectAsync(model.CompanyId)
+        _ = await unitOfWork.Companies.SelectAsync(model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
-        await subjectRepository.InsertAsync(new Subject
+        await unitOfWork.Subjects.InsertAsync(new Subject
         {
             CompanyId = model.CompanyId,
             Name = model.Name,
@@ -34,7 +32,7 @@ public class SubjectService(
 
     public async Task UpdateAsync(int id, SubjectUpdateModel model)
     {
-        var existSubject = await subjectRepository
+        var existSubject = await unitOfWork.Subjects
             .SelectAllAsQueryable()
             .Where(s => !s.IsDeleted)
             .FirstOrDefaultAsync(s => s.Id == id)
@@ -42,20 +40,20 @@ public class SubjectService(
        
         existSubject.Name = model.Name;
 
-        await subjectRepository.UpdateAsync(existSubject);
+        await unitOfWork.Subjects.UpdateAsync(existSubject);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var existSubject = await subjectRepository.SelectAsync(id)
+        var existSubject = await unitOfWork.Subjects.SelectAsync(id)
             ?? throw new NotFoundException("Subjet was not found");
 
-        await subjectRepository.DeleteAsync(existSubject);
+        await unitOfWork.Subjects.DeleteAsync(existSubject);
     }
 
     public async Task<SubjectViewModel> GetAsync(int id)
     {
-        var existSubject =  await subjectRepository
+        var existSubject =  await unitOfWork.Subjects
             .SelectAllAsQueryable()
             .Include(s => s.Company)
             .Where(s => s.Id == id && !s.IsDeleted)
@@ -79,7 +77,7 @@ public class SubjectService(
 
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
     {
-        return await subjectRepository
+        return await unitOfWork.Subjects
             .SelectAllAsQueryable()
             .Include(s => s.Company)
             .Where(s => s.CompanyId == companyId && !s.IsDeleted)
@@ -95,13 +93,13 @@ public class SubjectService(
 
     public async Task AttachAsync(TeacherSubjectCreateModel model)
     {
-        _ = await teacherRepository.SelectAsync(model.TeacherId)
+        _ = await unitOfWork.Employees.SelectAsync(model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}.");
 
-        _ = await subjectRepository.SelectAsync(model.SubjectId)
+        _ = await unitOfWork.Subjects.SelectAsync(model.SubjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
-        await teacherSubjectRepository.InsertAsync(new TeacherSubject
+        await unitOfWork.TeacherSubjects.InsertAsync(new TeacherSubject
         {
             TeacherId = model.TeacherId,
             SubjectId = model.SubjectId
@@ -110,12 +108,12 @@ public class SubjectService(
 
     public async Task DetachAsync(int teacherId, int subjectId)
     {
-        var teacherSubject = teacherSubjectRepository
+        var teacherSubject = unitOfWork.TeacherSubjects
             .SelectAllAsQueryable()
             .Where(ts => ts.TeacherId == teacherId && ts.SubjectId == subjectId) 
             .FirstOrDefault()
             ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        await teacherSubjectRepository.DeleteAsync(teacherSubject);
+        await unitOfWork.TeacherSubjects.DeleteAsync(teacherSubject);
     }
 }

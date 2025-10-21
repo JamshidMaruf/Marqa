@@ -58,9 +58,11 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         }
     }
 
+    // bu methodda ishkal chiqadi studentDetails include qilinmagan
+    // keyin bu methodni transaction bilan update qilish kere huddi create kabi!
     public async Task UpdateAsync(int id, StudentUpdateModel model)
     {
-        var existStudent = await studentRepository.SelectAsync(id)
+        var existStudent = await unitOfWork.Students.SelectAsync(id)
             ?? throw new NotFoundException($"Student is not found");
 
         existStudent.FirstName = model.FirstName;
@@ -69,8 +71,8 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         existStudent.DateOfBirth = model.DateOfBirth;
         existStudent.Phone = model.Phone;
         existStudent.Email = model.Email;
-        existStudent.StudentDetail.FatherFirstName=model.StudentDetailUpdateModel.FatherFirstName;
-        existStudent.StudentDetail.FatherLastName= model.StudentDetailUpdateModel.FatherLastName;
+        existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
+        existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
         existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
         existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
         existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
@@ -79,21 +81,23 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
         existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
 
-        await studentRepository.UpdateAsync(existStudent);
-
+        await unitOfWork.Students.UpdateAsync(existStudent);
     }
 
+    //student ochib  ketsa uni related entitylari 
+    // ya'ni hozirgi holatda studentDetails ham ochirilishi kere
+    // shu methodni ozida include qilib olib delete qilinsin
     public async Task DeleteAsync(int id)
     {
-        var existStudent = await studentRepository.SelectAsync(s => s.Id == id)
+        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Student is not found");
 
-        await studentRepository.DeleteAsync(existStudent);
+        await unitOfWork.Students.DeleteAsync(existStudent);
     }
 
     public async Task<StudentViewModel> GetAsync(int id, string name)
     {
-        var existStudent = await studentRepository
+        var existStudent = await unitOfWork.Students
             .SelectAsync(predicate: t => t.Id == id,  includes: new[] { "StudentDetail" })
             ?? throw new NotFoundException($"Student is not found");
 
@@ -123,7 +127,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
     public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
     {
-        var courseStudents = await courseRepository
+        var courseStudents = await unitOfWork.Courses
                 .SelectAllAsQueryable()
                 .Where(c => c.Id == courseId && !c.IsDeleted)
                 .Include(c => c.Students)

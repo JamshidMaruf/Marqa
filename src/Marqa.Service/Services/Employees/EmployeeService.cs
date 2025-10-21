@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
@@ -7,23 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
 
-public class EmployeeService(
-    IRepository<Company> companyRepository,
-    IRepository<Employee> employeeRepository,
-    IRepository<TeacherSubject> teacherSubjectRepository,
-    IRepository<Course> courseRepository,
-    IRepository<EmployeeRole> employeeRoleRepository)
+public class EmployeeService(IUnitOfWork unitOfWork)
     : IEmployeeService
 {
     public async Task<int> CreateAsync(EmployeeCreateModel model)
     {
-        _ = await companyRepository.SelectAsync(c => c.Id == model.CompanyId)
+        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
 
-        _ = await employeeRoleRepository.SelectAsync(e => e.Id == model.RoleId)
+        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        var createdEmp = await employeeRepository.InsertAsync(new Employee
+        var createdEmp = await unitOfWork.Employees.InsertAsync(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -45,10 +40,10 @@ public class EmployeeService(
 
     public async Task UpdateAsync(int id, EmployeeUpdateModel model)
     {
-        var existTeacher = await employeeRepository.SelectAsync(e => e.Id == id)
+        var existTeacher = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
         
-        _ = await employeeRoleRepository.SelectAsync(e => e.Id == model.RoleId)
+        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         existTeacher.FirstName = model.FirstName;
@@ -62,12 +57,12 @@ public class EmployeeService(
         existTeacher.Specialization = model.Specialization;
         existTeacher.RoleId = model.RoleId;
 
-        await employeeRepository.UpdateAsync(existTeacher);
+        await unitOfWork.Employees.UpdateAsync(existTeacher);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var employeeForDeletion = await employeeRepository
+        var employeeForDeletion = await unitOfWork.Employees
             .SelectAllAsQueryable()
             .Include(e => e.Role)
             .FirstOrDefaultAsync()
@@ -75,20 +70,20 @@ public class EmployeeService(
 
         if(employeeForDeletion.Role.Name.ToLower() == "teacher")
         {
-            var teacherSubject = await teacherSubjectRepository
+            var teacherSubject = await unitOfWork.TeacherSubjects
                 .SelectAllAsQueryable()
                 .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
-                .FirstOrDefaultAsync(); // because a teacher can have only one subject which is one-to-many relationship i am using FirstOrDefault otherwise used ToList
+                .FirstOrDefaultAsync(); 
 
-            await teacherSubjectRepository.DeleteAsync(teacherSubject);
+            await unitOfWork.TeacherSubjects.DeleteAsync(teacherSubject);
         }
 
-        await employeeRepository.DeleteAsync(employeeForDeletion);
+        await unitOfWork.Employees.DeleteAsync(employeeForDeletion);
     }
 
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
-        return await employeeRepository
+        return await unitOfWork.Employees
             .SelectAllAsQueryable()
             .Include(e => e.Role)
             .Select(e => new EmployeeViewModel
@@ -117,7 +112,7 @@ public class EmployeeService(
 
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
-        var employees = employeeRepository
+        var employees = unitOfWork.Employees
             .SelectAllAsQueryable()
             .Where(e => e.CompanyId == companyId && !e.IsDeleted);
 
@@ -153,7 +148,7 @@ public class EmployeeService(
 
     public async Task<TeacherViewModel> GetTeacherAsync(int id)
     {
-        var teacher = await teacherSubjectRepository
+        var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable()
            .Where(ts => ts.TeacherId == id && !ts.IsDeleted)
            .Include(ts => ts.Teacher)
@@ -179,7 +174,7 @@ public class EmployeeService(
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
-        var courses = await courseRepository.SelectAllAsQueryable()
+        var courses = await unitOfWork.Courses.SelectAllAsQueryable()
             .Include(c => c.Subject)
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
@@ -198,7 +193,7 @@ public class EmployeeService(
 
     public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
     {
-        var teacherQuery = teacherSubjectRepository
+        var teacherQuery = unitOfWork.TeacherSubjects
             .SelectAllAsQueryable()
             .Include(ts => ts.Teacher)
             .Include(ts => ts.Subject)
@@ -238,7 +233,7 @@ public class EmployeeService(
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
-                courseRepository.SelectAllAsQueryable()
+                unitOfWork.Courses.SelectAllAsQueryable()
                 .Include(c => c.Subject),
                 t => t.Id,
                 c => c.TeacherId,

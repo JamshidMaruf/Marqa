@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Subjects;
+﻿using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Subjects.Models;
 using Marqa.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;

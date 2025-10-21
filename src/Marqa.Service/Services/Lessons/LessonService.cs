@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -10,20 +11,15 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Lessons;
 
 public class LessonService(
-    IRepository<Lesson> lessonRepository,
-    IRepository<LessonAttendance> lessonAttendanceRepository,
-    IRepository<Student> studentRepository,
-    IRepository<Employee> teacherRepository,  
-    IRepository<LessonVideo> lessonVideoRepository,
-    IFileService fileService)
-    : ILessonService
+    IUnitOfWork unitOfWork, 
+    IFileService fileService) : ILessonService
 {
     public async Task UpdateAsync(int id, LessonUpdateModel model)
     {
-        var lessonForUpdation = await lessonRepository.SelectAsync(id)
+        var lessonForUpdation = await unitOfWork.Lessons.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        _ = await teacherRepository.SelectAsync(model.TeacherId)
+        _ = await unitOfWork.Employees.SelectAsync(model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
 
         lessonForUpdation.StartTime = model.StartTime;
@@ -31,23 +27,23 @@ public class LessonService(
         lessonForUpdation.Date = model.Date;
         lessonForUpdation.TeacherId = model.TeacherId;
 
-        await lessonRepository.UpdateAsync(lessonForUpdation);
+        await unitOfWork.Lessons.UpdateAsync(lessonForUpdation);
     }
 
     public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
     {
-        var lesson = await lessonRepository.SelectAsync(id)
+        var lesson = await unitOfWork.Lessons.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         lesson.Name = name;
         lesson.HomeTaskStatus = homeTaskStatus;
 
-        await lessonRepository.UpdateAsync(lesson);
+        await unitOfWork.Lessons.UpdateAsync(lesson);
     }
 
     public async Task VideoUploadAsync(int id, IFormFile video)
     {
-        _ = await lessonRepository.SelectAsync(id)
+        _ = await unitOfWork.Lessons.SelectAsync(id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         var allowedExtensions = new string[]{".mp4", ".avi", ".mkv", ".mov"};
@@ -57,7 +53,7 @@ public class LessonService(
         
         var result = await fileService.UploadAsync(video, "Files/Videos");
 
-        await lessonVideoRepository.InsertAsync(new LessonVideo
+        await unitOfWork.LessonVideos.InsertAsync(new LessonVideo
         {
             VideoName = result.FileName,
             VideoPath = result.FilePath,
@@ -67,13 +63,13 @@ public class LessonService(
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
     {
-        var lesson = await lessonRepository.SelectAsync(model.LessonId)
+        var lesson = await unitOfWork.Lessons.SelectAsync(model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
-        _ = await studentRepository.SelectAsync(model.StudentId)
+        _ = await unitOfWork.Students.SelectAsync(model.StudentId)
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
-        var lessonAttendance = await lessonAttendanceRepository.SelectAllAsQueryable()
+        var lessonAttendance = await unitOfWork.LessonAttendances.SelectAllAsQueryable()
             .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
@@ -87,7 +83,7 @@ public class LessonService(
         }
         else
         {
-            await lessonAttendanceRepository.InsertAsync(new LessonAttendance
+            await unitOfWork.LessonAttendances.InsertAsync(new LessonAttendance
             {
                 LessonId = model.LessonId,
                 StudentId = model.StudentId,

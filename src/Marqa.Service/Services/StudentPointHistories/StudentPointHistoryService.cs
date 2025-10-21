@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Data.Common;
+using System.Reflection;
 using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -9,19 +11,18 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.StudentPointHistories;
 
 public class StudentPointHistoryService(
-    IRepository<StudentPointHistory> studentPointHistoryRepository,
-    IRepository<Student> studentRepository) : IStudentPointHistoryService
+    IUnitOfWork unitOfWork) : IStudentPointHistoryService
 {
     public async Task AddPointAsync(StudentPointAddModel model)
     {
-        var student = await studentRepository.SelectAsync(model.StudentId)
+        var student = await unitOfWork.Students.SelectAsync(model.StudentId)
             ?? throw new NotFoundException("This student is not found!");
 
         var summ = await GetAsync(model.StudentId);
 
         if (model.Operation == PointHistoryOperation.Minus)
         {
-            var createPoint = await studentPointHistoryRepository
+            var createPoint = await unitOfWork.StudentPointHistories
                 .InsertAsync(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
@@ -34,7 +35,7 @@ public class StudentPointHistoryService(
         }
         else if (model.Operation == PointHistoryOperation.Plus)
         {
-            var createPoint = await studentPointHistoryRepository
+            var createPoint = await unitOfWork.StudentPointHistories
                 .InsertAsync(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
@@ -49,7 +50,7 @@ public class StudentPointHistoryService(
 
     public async Task<List<StudentPointHistoryViewModel>> GetAllAsync(int studentId)
     {
-        var studentPointsHistory = await studentPointHistoryRepository
+        var studentPointsHistory = await unitOfWork.StudentPointHistories
            .SelectAllAsQueryable()
            .Where(t => t.StudentId == studentId)
            .Select(s => new StudentPointHistoryViewModel
@@ -69,7 +70,7 @@ public class StudentPointHistoryService(
 
     public async Task<int> GetAsync(int studentId)
     {
-        var studentPointsHistory = await studentPointHistoryRepository
+        var studentPointsHistory = await unitOfWork.StudentPointHistories
             .SelectAllAsQueryable()
             .Where(t => t.StudentId == studentId)
             .ToListAsync();

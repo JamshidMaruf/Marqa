@@ -20,7 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<OTP> OTPs { get; set; }
     public DbSet<StudentCourse> StudentCourses { get; set; }
     public DbSet<StudentDetail> StudentDetails { get; set; }
-    public DbSet<StudentExamResult> StudentExams { get; set; }
+    public DbSet<StudentExamResult> StudentExamResults { get; set; }
     public DbSet<Subject> Subjects { get; set; }
     public DbSet<CourseWeekday> CourseWeekdays { get; set; }
     public DbSet<StudentHomeTask> StudentHomeTasks { get; set; }
@@ -32,6 +32,10 @@ public class AppDbContext : DbContext
     public DbSet<HomeTaskFile> HomeTaskFiles { get; set; }
     public DbSet<StudentPointHistory> StudentPointHistories { get; set; }
     public DbSet<PointSystemSetting> PointSystemSettings { get; set; }
+    public DbSet<PointSetting> PointSettings { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

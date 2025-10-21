@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Services.Ratings.Models;
 using Marqa.Service.Services.StudentPointHistories;
@@ -6,9 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Ratings;
 
-public class RatingService(IStudentPointHistoryService pointHistoryService,
-    IRepository<Student> studentRepository,
-    IRepository<Course> courseRepository) : IRatingService
+public class RatingService(IUnitOfWork unitOfWork,
+    IStudentPointHistoryService pointHistoryService) : IRatingService
 {
     public async Task<Rating> GetStudentRatingAsync(int studentId)
     {
@@ -17,7 +17,7 @@ public class RatingService(IStudentPointHistoryService pointHistoryService,
     }
     public async Task<IEnumerable<Rating>> GetAllStudentRatingsAsync()
     {
-        var students = studentRepository.SelectAllAsQueryable()
+        var students = unitOfWork.Students.SelectAllAsQueryable()
             .Where(s => s.Courses.Any(c => Convert.ToDateTime(c.EndTime) < DateTime.UtcNow));
         var ratings = new List<Rating>();
         foreach (var student in students)
@@ -25,7 +25,7 @@ public class RatingService(IStudentPointHistoryService pointHistoryService,
             ratings.Add(new Rating
             {
                 CourseId = student.Courses.FirstOrDefault(c => Convert.ToDateTime(c.EndTime) < DateTime.UtcNow).Id,
-                Course = await courseRepository.SelectAllAsQueryable()
+                Course = await unitOfWork.Courses.SelectAllAsQueryable()
                     .Where(c => c.Id == student.Courses.FirstOrDefault(c => Convert.ToDateTime(c.EndTime) < DateTime.UtcNow).Id)
                     .Select(c => new Rating.CourseInfo
                     {
@@ -48,7 +48,7 @@ public class RatingService(IStudentPointHistoryService pointHistoryService,
     }
     public async Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId)
     {
-        var students = studentRepository.SelectAllAsQueryable()
+        var students = unitOfWork.Students.SelectAllAsQueryable()
             .Where(s => s.Courses.Any(c => c.Id == courseId));
         var ratings = new List<Rating>();
         foreach (var student in students)
@@ -56,7 +56,7 @@ public class RatingService(IStudentPointHistoryService pointHistoryService,
             ratings.Add(new Rating
             {
                 CourseId = courseId,
-                Course = await courseRepository.SelectAllAsQueryable()
+                Course = await unitOfWork.Courses.SelectAllAsQueryable()
                     .Where(c => c.Id == courseId)
                     .Select(c => new Rating.CourseInfo
                     {
