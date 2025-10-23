@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marqa.DataAccess.Extensions;
 public static class ModelBuilderExtensions
 {
-    public static void ApplyGlobalConfiguration(this ModelBuilder modelBuilder)
+    public static void ApplyGlobalConfigurations(this ModelBuilder modelBuilder)
     {
         foreach (var property in modelBuilder.Model.GetEntityTypes()
         .SelectMany(t => t.GetProperties())

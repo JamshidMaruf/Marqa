@@ -9,7 +9,6 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
-    // transaction qo'shilsin insertla kop
     public async Task CreateAsync(OrderCreateModel model)  
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)

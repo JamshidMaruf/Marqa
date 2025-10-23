@@ -11,6 +11,7 @@ public class StudentHomeTask : Auditable
     public DateTime UploadedAt { get; set; }
     public StudentHomeTaskStatus Status { get; set; } = StudentHomeTaskStatus.none;
 
+    public Student Student { get; set; }
     public StudentHomeTaskFile StudentHomeTaskFile { get; set; }
     public StudentHomeTaskFeedback StudentHomeTaskFeedback { get; set; }
 }

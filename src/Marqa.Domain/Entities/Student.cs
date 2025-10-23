@@ -17,5 +17,6 @@ public class Student : Auditable
     public Company Company { get; set; }
     public StudentDetail StudentDetail { get; set; }    
     public ICollection<Course> Courses { get; set; }
+    public ICollection<StudentHomeTask> StudentHomeTasks { get; set; }
     public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
 }

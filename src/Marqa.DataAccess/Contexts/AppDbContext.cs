@@ -39,7 +39,7 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyGlobalConfiguration();
+        modelBuilder.ApplyGlobalConfigurations();
         // I found out that this is the better approach than manually adding entity-specific configurations!
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
