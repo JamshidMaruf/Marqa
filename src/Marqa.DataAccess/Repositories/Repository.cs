@@ -39,7 +39,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
     public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null)
     {
-        var query = context.Set<TEntity>().Where(predicate).AsQueryable();
+        IQueryable<TEntity> query = context.Set<TEntity>();
 
         if (includes != null)
         {
@@ -48,9 +48,10 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
                 query = query.Include(include);
             }
         }
-        
+
         return await query.FirstOrDefaultAsync(predicate);
     }
+
 
     public IQueryable<TEntity> SelectAllAsQueryable()
     {
