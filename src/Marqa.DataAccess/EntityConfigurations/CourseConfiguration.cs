@@ -25,13 +25,13 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.HasOne(c => c.Subject)
             .WithMany()
             .HasForeignKey(c => c.SubjectId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
         builder.HasOne(c => c.Teacher)
             .WithMany()
             .HasForeignKey(c => c.TeacherId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
         builder.HasMany(c => c.CourseWeekdays)
