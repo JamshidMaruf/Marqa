@@ -4,13 +4,14 @@ using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Messages.Models;
+using Marqa.Service.Services.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Marqa.Service.Services.Messages;
 
-public class SmsService(IConfiguration configuration, IRepository<OTP> otpRepository) : ISmsService
+public class SmsService(IConfiguration configuration, IRepository<OTP> otpRepository, ISettingService settingService) : ISmsService
 {
     public async Task SendOTPAsync(string phone)
     {
@@ -50,15 +51,17 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
         var code = random.Next(100000, 1000000).ToString();
         return code;
     }
-
+    
     private async Task<string> LoginAsync()
     {
-        var url = "https://notify.eskiz.uz/api/auth/login";
+        var settings = await settingService.GetByCategoryAsync("Eskiz");
+        
+        var url = settings["Eskiz.LoginUrl"];
         var httpClient = new HttpClient();
 
         var payload = new SmsPostModel()
         {
-            Email = configuration["Eskiz:Email"], SecretKey = configuration["Eskiz:SecretKey"],
+            Email = settings["Eskiz.Email"], SecretKey = settings["Eskiz.SecretKey"],
         };
         
         var json = JsonConvert.SerializeObject(payload);
@@ -77,15 +80,17 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
 
     private async Task SendMessageAsync(string phone, string otp)
     {
+        var settings = await settingService.GetByCategoryAsync("Eskiz");
+
         var token = await LoginAsync();
 
-        var url = "https://notify.eskiz.uz/api/message/sms/send";
+        var url = settings["Eskiz.SendMessageUrl"];
         
         var payload = new SendMessageModel
         {
             Phone = phone,
             Message = otp,
-            From = configuration["Eskiz:From"],
+            From = settings["Eskiz.From"],
         };
         
         var json = JsonConvert.SerializeObject(payload);

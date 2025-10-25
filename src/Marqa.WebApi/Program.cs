@@ -16,6 +16,7 @@ using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Ratings;
+using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
@@ -71,6 +72,9 @@ builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
+
+builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
 
 var app = builder.Build();
 
