@@ -15,13 +15,11 @@ public static class ModelBuilderExtensions
             property.SetScale(3);
         }
 
-
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType == typeof(string)))
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(255);
-
 
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
@@ -35,7 +33,6 @@ public static class ModelBuilderExtensions
             if (converter != null)
                 property.SetValueConverter(converter);
         }
-
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
@@ -54,4 +51,3 @@ public static class ModelBuilderExtensions
         }
     }
 }
-

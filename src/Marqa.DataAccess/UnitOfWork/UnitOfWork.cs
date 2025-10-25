@@ -35,6 +35,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Product> Products { get; } = new Repository<Product>(context);
     public IRepository<Order> Orders { get; } = new Repository<Order>(context);
     public IRepository<OrderItem> OrderItems { get; } = new Repository<OrderItem>(context);
+    public IRepository<Setting> Settings { get; } = new Repository<Setting>(context);
 
     public async Task SaveAsync()
     {
