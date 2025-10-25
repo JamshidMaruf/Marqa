@@ -7,7 +7,10 @@ namespace Marqa.DataAccess.EntityConfigurations;
 public class StudentHomeTaskFeedbackConfiguration : IEntityTypeConfiguration<StudentHomeTaskFeedback>
 {
     public void Configure(EntityTypeBuilder<StudentHomeTaskFeedback> builder)
-    {   
+    {
+        builder.Property(p => p.FeedBack)
+            .HasMaxLength(4000);
+
         builder.HasOne(f => f.StudentHomeTask)
             .WithOne(sht => sht.StudentHomeTaskFeedback)
             .HasForeignKey<StudentHomeTaskFeedback>(f => f.StudentHomeTaskId)
@@ -21,3 +24,4 @@ public class StudentHomeTaskFeedbackConfiguration : IEntityTypeConfiguration<Stu
             .IsRequired();
     }
 }
+

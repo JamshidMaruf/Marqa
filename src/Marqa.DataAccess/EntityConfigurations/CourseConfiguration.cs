@@ -9,7 +9,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
     public void Configure(EntityTypeBuilder<Course> builder)
     {
         builder.Property(p => p.Description)
-            .HasColumnType("text");  
+            .HasMaxLength(5000);  
         
         builder.HasOne(c => c.Company)
             .WithMany()

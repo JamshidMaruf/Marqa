@@ -17,7 +17,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
         builder.HasOne(l => l.Teacher)
             .WithMany()
             .HasForeignKey(l => l.TeacherId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
         builder.HasMany(l => l.Files)

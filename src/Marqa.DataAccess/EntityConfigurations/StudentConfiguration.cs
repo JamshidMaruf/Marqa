@@ -8,6 +8,9 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> builder)
     {
+        builder.Property(p => p.PasswordHash)
+            .HasMaxLength(400);
+
         builder.HasOne(s => s.Company)
             .WithMany()
             .HasForeignKey(s => s.CompanyId)
@@ -20,14 +23,10 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
 
-        // xato bu relationshipni togirlash esdan chiqmasin
-        builder.HasMany(s => s.Courses)
-            .WithMany(c => c.Students);
-
         builder.HasMany(s => s.StudentPointHistories)
             .WithOne(sph => sph.Student)
             .HasForeignKey(sph => sph.StudentId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
     }
 }

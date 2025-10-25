@@ -18,7 +18,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         {
             LessonId = model.LessonId,
             Deadline = model.Deadline,
-            Description = model.Description,
+            Description = model.Description
         });
         
         // Send Notification

@@ -9,4 +9,5 @@ public class Exam : Auditable
 
     // Navigation
     public Course Course { get; set; }
+    public ICollection<StudentExamResult> ExamResults { get; set; }
 }

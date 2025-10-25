@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Reflection;
-using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;

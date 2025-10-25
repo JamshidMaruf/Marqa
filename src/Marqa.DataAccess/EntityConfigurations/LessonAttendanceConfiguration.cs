@@ -25,7 +25,7 @@ public class LessonAttendanceConfiguration : IEntityTypeConfiguration<LessonAtte
         builder.HasOne(la => la.Student)
             .WithMany()
             .HasForeignKey(la => la.StudentId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
     }
 }

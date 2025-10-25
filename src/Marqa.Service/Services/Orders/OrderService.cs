@@ -38,7 +38,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             orderItems.Add(new OrderItem
             {
                 ProductId = item.ProductId,
-                Count = item.Count,
+                Quantity = item.Count,
                 InlinePrice = inlinePrice
             });
         }
@@ -128,7 +128,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product.Name, 
-                Count=i.Count,
+                Count = i.Quantity,
                 InlinePrice = i.InlinePrice
             }).ToList()
         };
