@@ -15,7 +15,6 @@ public static class ModelBuilderExtensions
             property.SetScale(3);
         }
 
-
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType == typeof(string)))
@@ -29,7 +28,6 @@ public static class ModelBuilderExtensions
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(2048);
 
-
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType.IsEnum))
@@ -42,7 +40,6 @@ public static class ModelBuilderExtensions
             if (converter != null)
                 property.SetValueConverter(converter);
         }
-
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
@@ -61,4 +58,3 @@ public static class ModelBuilderExtensions
         }
     }
 }
-

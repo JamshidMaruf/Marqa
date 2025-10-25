@@ -37,7 +37,7 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 
     public async Task DeleteAsync(int id)
     {
-        var existCompany = await unitOfWork.Companies.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
         await unitOfWork.Companies.DeleteAsync(existCompany);
@@ -45,7 +45,7 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 
     public async Task<CompanyViewModel> GetAsync(int id)
     {
-        var existCompany = await unitOfWork.Companies.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
         return new CompanyViewModel
