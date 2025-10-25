@@ -9,7 +9,6 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
-    // transaction qo'shilsin insertla kop
     public async Task CreateAsync(OrderCreateModel model)  
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
@@ -39,7 +38,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             orderItems.Add(new OrderItem
             {
                 ProductId = item.ProductId,
-                Count = item.Count,
+                Quantity = item.Count,
                 InlinePrice = inlinePrice
             });
         }
@@ -129,7 +128,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product.Name, 
-                Count=i.Count,
+                Count = i.Quantity,
                 InlinePrice = i.InlinePrice
             }).ToList()
         };

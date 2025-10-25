@@ -15,7 +15,10 @@ public class Student : Auditable
     public int CompanyId { get; set; }
 
     public Company Company { get; set; }
-    public StudentDetail StudentDetail { get; set; }    
-    public ICollection<Course> Courses { get; set; }
+    public StudentDetail StudentDetail { get; set; }
+    public ICollection<StudentCourse> StudentCourses { get; set; }
+    public ICollection<StudentHomeTask> StudentHomeTasks { get; set; }
     public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
+    public ICollection<Order> Orders { get; set; }
+    public ICollection<StudentExamResult> ExamResults { get; set; }
 }

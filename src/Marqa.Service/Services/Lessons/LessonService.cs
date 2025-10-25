@@ -55,8 +55,8 @@ public class LessonService(
 
         await unitOfWork.LessonVideos.InsertAsync(new LessonVideo
         {
-            VideoName = result.FileName,
-            VideoPath = result.FilePath,
+            FileName = result.FileName,
+            FilePath = result.FilePath,
             LessonId = id
         });
     }

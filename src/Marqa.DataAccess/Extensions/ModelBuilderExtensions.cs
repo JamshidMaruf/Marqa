@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marqa.DataAccess.Extensions;
 public static class ModelBuilderExtensions
 {
-    public static void ApplyGlobalConfiguration(this ModelBuilder modelBuilder)
+    public static void ApplyGlobalConfigurations(this ModelBuilder modelBuilder)
     {
         foreach (var property in modelBuilder.Model.GetEntityTypes()
         .SelectMany(t => t.GetProperties())
@@ -20,6 +20,13 @@ public static class ModelBuilderExtensions
                 .Where(p => p.ClrType == typeof(string)))
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(255);
+        
+        
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.PropertyInfo.Name == "FilePath" || p.PropertyInfo.Name == "FileName")
+            if (property.GetMaxLength() == null)
+                property.SetMaxLength(2048);
 
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())

@@ -2,7 +2,7 @@
 
 namespace Marqa.Domain.Entities;
 
-public class Order:Auditable
+public class Order : Auditable
 {
     public int StudentId { get; set; }
     public int TotalPrice { get; set; }

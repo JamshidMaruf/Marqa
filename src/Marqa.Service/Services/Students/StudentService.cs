@@ -59,7 +59,6 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
     }
 
     // bu methodda ishkal chiqadi studentDetails include qilinmagan
-    // keyin bu methodni transaction bilan update qilish kere huddi create kabi!
     public async Task UpdateAsync(int id, StudentUpdateModel model)
     {
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)

@@ -607,13 +607,11 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW() AT TIME ZONE 'UTC'");
 
-                    b.Property<string>("VideoName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                    b.Property<string>("FileName")
+                        .HasColumnType("text");
 
-                    b.Property<string>("VideoPath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                    b.Property<string>("FilePath")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
