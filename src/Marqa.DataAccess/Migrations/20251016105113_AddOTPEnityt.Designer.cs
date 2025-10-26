@@ -531,10 +531,10 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("VideoName")
+                    b.Property<string>("FileName")
                         .HasColumnType("text");
 
-                    b.Property<string>("VideoPath")
+                    b.Property<string>("FilePath")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -667,7 +667,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentCourses");
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>

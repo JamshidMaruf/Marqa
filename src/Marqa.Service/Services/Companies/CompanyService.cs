@@ -11,14 +11,12 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 {
     public async Task CreateAsync(CompanyCreateModel model)
     {
-        await unitOfWork.Companies.InsertAsync(new Company
+        unitOfWork.Companies.Insert(new Company
         {
             Name = model.Name,
         });
 
         await unitOfWork.SaveAsync();
-        
-        unitOfWork.Dispose();
     }
 
     public async Task UpdateAsync(int id, CompanyUpdateModel model)
@@ -28,24 +26,24 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
 
         existCompany.Name = model.Name;
 
-        await unitOfWork.Companies.UpdateAsync(existCompany);
+        unitOfWork.Companies.Update(existCompany);
 
         await unitOfWork.SaveAsync();
-
-        unitOfWork.Dispose();
     }
 
     public async Task DeleteAsync(int id)
     {
-        var existCompany = await unitOfWork.Companies.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
-        await unitOfWork.Companies.DeleteAsync(existCompany);
+        unitOfWork.Companies.Delete(existCompany);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<CompanyViewModel> GetAsync(int id)
     {
-        var existCompany = await unitOfWork.Companies.SelectAsync(id)
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
         return new CompanyViewModel

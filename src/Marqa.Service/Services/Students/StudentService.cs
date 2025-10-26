@@ -19,7 +19,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         try
         {
-            var createdStudent = await unitOfWork.Students.InsertAsync(new Student()
+            var createdStudent = new Student()
             {
                 CompanyId = model.CompanyId,
                 FirstName = model.FirstName,
@@ -28,12 +28,14 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
-            });
+            };
+            
+            unitOfWork.Students.Insert(createdStudent);
 
             await unitOfWork.SaveAsync();
 
 
-            await unitOfWork.StudentDetails.InsertAsync(new StudentDetail
+            unitOfWork.StudentDetails.Insert(new StudentDetail
             {
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
@@ -49,7 +51,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
             await unitOfWork.SaveAsync();
 
-            await unitOfWork.BeginCommitAsync();
+            await unitOfWork.CommitAsync();
         }
         catch
         {

@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Reflection;
-using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -22,8 +19,8 @@ public class StudentPointHistoryService(
 
         if (model.Operation == PointHistoryOperation.Minus)
         {
-            var createPoint = await unitOfWork.StudentPointHistories
-                .InsertAsync(new StudentPointHistory
+             unitOfWork.StudentPointHistories
+                .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
                     GivenPoint = model.Point,
@@ -35,8 +32,8 @@ public class StudentPointHistoryService(
         }
         else if (model.Operation == PointHistoryOperation.Plus)
         {
-            var createPoint = await unitOfWork.StudentPointHistories
-                .InsertAsync(new StudentPointHistory
+             unitOfWork.StudentPointHistories
+                .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
                     GivenPoint = model.Point,
@@ -46,6 +43,8 @@ public class StudentPointHistoryService(
                     CurrentPoint = summ + model.Point,
                 });
         }
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<List<StudentPointHistoryViewModel>> GetAllAsync(int studentId)

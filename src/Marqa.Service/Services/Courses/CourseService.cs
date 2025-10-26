@@ -9,7 +9,6 @@ namespace Marqa.Service.Services.Courses;
 public class CourseService(IUnitOfWork unitOfWork)
     : ICourseService
 {
-    // transaction bilan optimal usulda insert qilish kerak
     public async Task CreateAsync(CourseCreateModel model)
     {
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
@@ -21,45 +20,66 @@ public class CourseService(IUnitOfWork unitOfWork)
         _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
             ?? throw new NotFoundException("Teacher not found");
 
-        var createdCourse = await unitOfWork.Courses.InsertAsync(new Course
+        try
         {
-            Name = model.Name,
-            SubjectId = model.SubjectId,
-            EndTime = model.EndTime,
-            LessonCount = model.LessonCount,
-            StartDate = model.StartDate,
-            StartTime = model.StartTime,
-            TeacherId = model.TeacherId,
-            Status = model.Status,
-            Description = model.Description,
-            MaxStudentCount = model.MaxStudentCount,
-            CompanyId = model.CompanyId
-        });
+            await unitOfWork.BeginTransactionAsync();
 
-        var weekDays = new List<DayOfWeek>();
-        foreach(var weekDay in model.Weekdays)
-        {
-            await unitOfWork.CourseWeekdays.InsertAsync(new CourseWeekday
+            Course createdCourse = new Course
             {
-                Weekday = weekDay,
-                CourseId = createdCourse.Id
-            });
+                Name = model.Name,
+                SubjectId = model.SubjectId,
+                EndTime = model.EndTime,
+                LessonCount = model.LessonCount,
+                StartDate = model.StartDate,
+                StartTime = model.StartTime,
+                TeacherId = model.TeacherId,
+                Status = model.Status,
+                Description = model.Description,
+                MaxStudentCount = model.MaxStudentCount,
+                CompanyId = model.CompanyId
+            };
 
-            weekDays.Add(weekDay);
+            unitOfWork.Courses.Insert(createdCourse);
+            await unitOfWork.SaveAsync();
+
+
+            var weekDays = new List<DayOfWeek>();
+            var courseWeekDays = new List<CourseWeekday>();
+
+            foreach (var weekDay in model.Weekdays)
+            {
+                courseWeekDays.Add(new CourseWeekday
+                {
+                    Weekday = weekDay,
+                    CourseId = createdCourse.Id
+                });
+
+                weekDays.Add(weekDay);
+            }
+
+            await unitOfWork.CourseWeekdays.InsertRangeAsync(courseWeekDays);
+            await unitOfWork.SaveAsync();
+
+
+            await GenerateLessonAsync(
+                createdCourse.Id,
+                model.StartDate,
+                model.StartTime,
+                model.EndTime,
+                model.Room,
+                model.LessonCount,
+                model.TeacherId,
+                weekDays);
+            await unitOfWork.SaveAsync();
+
+            await unitOfWork.CommitAsync();
         }
-
-        await GenerateLessonAsync(
-            createdCourse.Id,
-            model.StartDate,
-            model.StartTime,
-            model.EndTime,
-            model.Room,
-            model.LessonCount,
-            model.TeacherId,
-            weekDays);
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+        }
     }
 
-    // transaction bilan optimal usulda insert qilish kerak
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
         var existCourse = await unitOfWork.Courses
@@ -76,36 +96,54 @@ public class CourseService(IUnitOfWork unitOfWork)
         existCourse.StartDate = model.StartDate;
         existCourse.Status = model.Status;
         existCourse.MaxStudentCount = model.MaxStudentCount;
-        existCourse.Description = model.Description;   
+        existCourse.Description = model.Description;
 
-        // Delete lessons
-        foreach (var lesson in existCourse.Lessons)
-            await unitOfWork.Lessons.DeleteAsync(lesson);
+        try
+        {
+            await unitOfWork.BeginTransactionAsync();
 
-        // Delete course weekdays
-        foreach(var weekday in existCourse.CourseWeekdays)
-            await unitOfWork.CourseWeekdays.DeleteAsync(weekday);
+            foreach (var lesson in existCourse.Lessons)
+                unitOfWork.Lessons.Delete(lesson);
+            
+            await unitOfWork.SaveAsync();
+            
 
-        // Create course's weekdays
-        foreach (var weekDay in model.Weekdays)
-            await unitOfWork.CourseWeekdays.InsertAsync(new CourseWeekday
-            {
-                CourseId = id,
-                Weekday = weekDay,
-            });
+            foreach (var weekday in existCourse.CourseWeekdays)
+                unitOfWork.CourseWeekdays.Delete(weekday);
 
-        // Generate lessons
-        await GenerateLessonAsync(
-            existCourse.Id,
-            model.StartDate,
-            model.StartTime,
-            model.EndTime,
-            model.Room,
-            model.LessonCount,
-            model.TeacherId,
-            model.Weekdays);
+            await unitOfWork.SaveAsync();
 
-        await unitOfWork.Courses.UpdateAsync(existCourse);
+
+            foreach (var weekDay in model.Weekdays)
+                unitOfWork.CourseWeekdays.Insert(new CourseWeekday
+                {
+                    CourseId = id,
+                    Weekday = weekDay,
+                });
+
+            await unitOfWork.SaveAsync();
+
+
+            await GenerateLessonAsync(
+               existCourse.Id,
+               model.StartDate,
+               model.StartTime,
+               model.EndTime,
+               model.Room,
+               model.LessonCount,
+               model.TeacherId,
+               model.Weekdays);
+            await unitOfWork.SaveAsync();
+
+            unitOfWork.Courses.Update(existCourse);            
+            await unitOfWork.SaveAsync();
+
+            await unitOfWork.CommitAsync();
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+        }
     }
 
     public async Task DeleteAsync(int id)
@@ -117,30 +155,28 @@ public class CourseService(IUnitOfWork unitOfWork)
             .Include(c => c.CourseWeekdays)
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-
-        // Delete lessons
+        
         foreach (var lesson in existCourse.Lessons)
-            await unitOfWork.Lessons.DeleteAsync(lesson);
+             unitOfWork.Lessons.Delete(lesson);
 
-        // Delete course's weekdays
         foreach (var weekday in existCourse.CourseWeekdays)
-            await unitOfWork.CourseWeekdays.DeleteAsync(weekday);
+             unitOfWork.CourseWeekdays.Delete(weekday);
 
-        // Delete course
-        await unitOfWork.Courses.DeleteAsync(existCourse);
+         unitOfWork.Courses.Delete(existCourse);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<CourseViewModel> GetAsync(int id)
     {
-
-        var existCourse = await unitOfWork.Courses
+        return await unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
             .Include(c => c.Subject)
             .Include(c => c.Teacher)
             .Include(c => c.Lessons.Where(l => !l.IsDeleted))
             .Include(c => c.CourseWeekdays.Where(cwd => !cwd.IsDeleted))
-            .Include(c => c.Students)
+            .Include(c => c.StudentCourses)
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -150,7 +186,7 @@ public class CourseService(IUnitOfWork unitOfWork)
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
                 Status = c.Status,
-                AvailableStudentCount = c.Students.Count,
+                AvailableStudentCount = c.StudentCourses.Count,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -174,8 +210,6 @@ public class CourseService(IUnitOfWork unitOfWork)
             })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-
-        return existCourse;
     }
 
     public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
@@ -186,14 +220,14 @@ public class CourseService(IUnitOfWork unitOfWork)
             .Include(c => c.Subject)
             .Include(c => c.Teacher)
             .Include(c => c.Lessons)
-            .Include(c => c.Students)
+            .Include(c => c.StudentCourses)
             .Include(c => c.CourseWeekdays)
             .AsQueryable();
 
-        if(!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
 
-        if(subjectId != null)
+        if (subjectId != null)
             query = query.Where(t => t.SubjectId == subjectId);
 
         return await query
@@ -206,7 +240,7 @@ public class CourseService(IUnitOfWork unitOfWork)
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
                 Status = c.Status,
-                AvailableStudentCount = c.Students.Count,
+                AvailableStudentCount = c.StudentCourses.Count,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -235,18 +269,20 @@ public class CourseService(IUnitOfWork unitOfWork)
     {
         _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
-        
+
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        await unitOfWork.StudentCourses.InsertAsync(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DetachStudentAsync(int courseId, int studentId)
     {
         _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
-        
+
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
@@ -254,11 +290,13 @@ public class CourseService(IUnitOfWork unitOfWork)
             .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
 
         if (studentCourse is not null)
-            await unitOfWork.StudentCourses.DeleteAsync(studentCourse);
+            unitOfWork.StudentCourses.Delete(studentCourse);
+
+        await unitOfWork.SaveAsync();
     }
 
     private async Task GenerateLessonAsync(
-        int courseId, 
+        int courseId,
         DateOnly startDate,
         TimeOnly startTime,
         TimeOnly endTime,
@@ -267,40 +305,47 @@ public class CourseService(IUnitOfWork unitOfWork)
         int teacherId,
         List<DayOfWeek> weekDays)
     {
-        // First Lesson
-        await unitOfWork.Lessons.InsertAsync(new Lesson
+        List<Lesson> lessons = new List<Lesson>
         {
-            CourseId = courseId,
-            StartTime = startTime,
-            EndTime = endTime,
-            Room = room,
-            Number = 1,
-            Date = startDate,
-            TeacherId = teacherId       
-        });
+            new Lesson
+            {
+                CourseId = courseId,
+                StartTime = startTime,
+                EndTime = endTime,
+                Room = room,
+                Number = 1,
+                Date = startDate,
+                TeacherId = teacherId
+            }
+        };
 
         var count = 2;
         var currentDate = startDate;
 
-        while (count <= lessonCount)
+        await Task.Run(() =>
         {
-            currentDate = currentDate.AddDays(1);
-
-            if (weekDays.Contains(currentDate.DayOfWeek))
+            while (count <= lessonCount)
             {
-                await unitOfWork.Lessons.InsertAsync(new Lesson
-                {
-                    CourseId = courseId,
-                    StartTime = startTime,
-                    EndTime = endTime,
-                    Room = room,
-                    Number = count,
-                    Date = currentDate,
-                    TeacherId = teacherId
-                });
+                currentDate = currentDate.AddDays(1);
 
-                count++;
+                if (weekDays.Contains(currentDate.DayOfWeek))
+                {
+                    lessons.Add(new Lesson
+                    {
+                        CourseId = courseId,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        Room = room,
+                        Number = count,
+                        Date = currentDate,
+                        TeacherId = teacherId
+                    });
+
+                    count++;
+                }
             }
-        }
+        });
+
+        await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
 }

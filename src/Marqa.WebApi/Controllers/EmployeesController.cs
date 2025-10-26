@@ -12,7 +12,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     [HttpPost("create")]
     public async Task<IActionResult> PostAsync(EmployeeCreateModel model)
     {
-        int id = await employeeService.CreateAsync(model);
+        await employeeService.CreateAsync(model);
 
         return Ok(new Response
         {
