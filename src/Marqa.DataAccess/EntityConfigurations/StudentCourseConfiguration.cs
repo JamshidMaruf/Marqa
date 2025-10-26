@@ -13,7 +13,7 @@ public class StudentCourseConfiguration : IEntityTypeConfiguration<StudentCourse
         builder.HasKey(sc => new { sc.StudentId, sc.CourseId });
         
         builder.HasOne(sc => sc.Student)
-            .WithMany(s => s.StudentCourses)
+            .WithMany(s => s.Courses)
             .HasForeignKey(sc => sc.StudentId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();

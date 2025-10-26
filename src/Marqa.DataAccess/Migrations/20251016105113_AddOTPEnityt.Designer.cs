@@ -667,7 +667,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentCourses");
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>

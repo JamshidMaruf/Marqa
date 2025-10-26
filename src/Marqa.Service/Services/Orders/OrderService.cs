@@ -9,6 +9,7 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
+    // think about applying transaction!
     public async Task CreateAsync(OrderCreateModel model)  
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
@@ -53,13 +54,17 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             TotalPrice = totalPrice,
         };
 
-        await unitOfWork.Orders.Insert(order);
+        unitOfWork.Orders.Insert(order);
+
+        await unitOfWork.SaveAsync();
 
         foreach (var orderItem in orderItems)
         {
             orderItem.OrderId = order.Id;
-            await unitOfWork.OrderItems.Insert(orderItem);
+            unitOfWork.OrderItems.Insert(orderItem);
         }
+
+        await unitOfWork.SaveAsync();
 
         var newCurrentPoint = studentPointHistory.CurrentPoint - totalPrice;
 
@@ -73,7 +78,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             Operation = PointHistoryOperation.Minus
         };
 
-        await unitOfWork.StudentPointHistories.Insert(pointHistory);
+        unitOfWork.StudentPointHistories.Insert(pointHistory);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateStatusAsync(int id, OrderStatus newStatus)
@@ -82,7 +89,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
         existOrder.Status = newStatus;
-        await unitOfWork.Orders.Update(existOrder);
+        unitOfWork.Orders.Update(existOrder);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -98,10 +107,12 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         foreach (var item in orderItems)
         {
-            await unitOfWork.OrderItems.Delete(item);
+            unitOfWork.OrderItems.Delete(item);
         }
 
-        await unitOfWork.Orders.Delete(existOrder);
+        unitOfWork.Orders.Delete(existOrder);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<OrderViewModel> GetAsync(int id)

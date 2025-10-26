@@ -1,5 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -27,7 +26,9 @@ public class LessonService(
         lessonForUpdation.Date = model.Date;
         lessonForUpdation.TeacherId = model.TeacherId;
 
-        await unitOfWork.Lessons.Update(lessonForUpdation);
+        unitOfWork.Lessons.Update(lessonForUpdation);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
@@ -38,7 +39,9 @@ public class LessonService(
         lesson.Name = name;
         lesson.HomeTaskStatus = homeTaskStatus;
 
-        await unitOfWork.Lessons.Update(lesson);
+        unitOfWork.Lessons.Update(lesson);
+        
+        await unitOfWork.SaveAsync();
     }
 
     public async Task VideoUploadAsync(int id, IFormFile video)
@@ -53,12 +56,14 @@ public class LessonService(
         
         var result = await fileService.UploadAsync(video, "Files/Videos");
 
-        await unitOfWork.LessonVideos.Insert(new LessonVideo
+        unitOfWork.LessonVideos.Insert(new LessonVideo
         {
             FileName = result.FileName,
             FilePath = result.FilePath,
             LessonId = id
         });
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task CheckUpAsync(LessonAttendanceModel model)
@@ -83,13 +88,15 @@ public class LessonService(
         }
         else
         {
-            await unitOfWork.LessonAttendances.Insert(new LessonAttendance
+            unitOfWork.LessonAttendances.Insert(new LessonAttendance
             {
                 LessonId = model.LessonId,
                 StudentId = model.StudentId,
                 Status = model.Status,
                 LateTimeInMinutes = model.LateTimeInMinutes
             });
+
+            await unitOfWork.SaveAsync();
         }
     }
 }

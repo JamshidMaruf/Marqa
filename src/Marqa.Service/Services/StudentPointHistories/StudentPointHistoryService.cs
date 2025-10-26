@@ -19,7 +19,7 @@ public class StudentPointHistoryService(
 
         if (model.Operation == PointHistoryOperation.Minus)
         {
-            var createPoint = await unitOfWork.StudentPointHistories
+             unitOfWork.StudentPointHistories
                 .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
@@ -32,7 +32,7 @@ public class StudentPointHistoryService(
         }
         else if (model.Operation == PointHistoryOperation.Plus)
         {
-            var createPoint = await unitOfWork.StudentPointHistories
+             unitOfWork.StudentPointHistories
                 .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
@@ -43,6 +43,8 @@ public class StudentPointHistoryService(
                     CurrentPoint = summ + model.Point,
                 });
         }
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<List<StudentPointHistoryViewModel>> GetAllAsync(int studentId)

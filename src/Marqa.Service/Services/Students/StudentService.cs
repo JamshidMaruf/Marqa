@@ -19,7 +19,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         try
         {
-            var createdStudent = await unitOfWork.Students.Insert(new Student()
+            var createdStudent = new Student()
             {
                 // Access ID ni generate qilish kerak. ID: <5 digits>
                 CompanyId = model.CompanyId,
@@ -29,12 +29,14 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
-            });
+            };
+            
+            unitOfWork.Students.Insert(createdStudent);
 
             await unitOfWork.SaveAsync();
 
 
-            await unitOfWork.StudentDetails.Insert(new StudentDetail
+            unitOfWork.StudentDetails.Insert(new StudentDetail
             {
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
@@ -80,7 +82,9 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
         existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
 
-        await unitOfWork.Students.Update(existStudent);
+        unitOfWork.Students.Update(existStudent);
+
+        await unitOfWork.SaveAsync();
     }
 
     //student ochib  ketsa uni related entitylari 
@@ -91,7 +95,9 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Student is not found");
 
-        await unitOfWork.Students.Delete(existStudent);
+        unitOfWork.Students.Delete(existStudent);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<StudentViewModel> GetAsync(int id, string name)
