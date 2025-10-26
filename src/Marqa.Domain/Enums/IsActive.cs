@@ -2,7 +2,7 @@
 
 public enum IsActive
 {
-    Active,
-    Inactive,
+    Active=1,
+    Inactive=2
 }
 
