@@ -1,4 +1,4 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
@@ -17,7 +17,7 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
     {
         var otp = GenerateSixDigitNumber();
 
-        await otpRepository.InsertAsync(new OTP
+        await otpRepository.Insert(new OTP
         {
             PhoneNumber = phone, 
             Code = otp,

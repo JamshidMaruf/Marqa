@@ -16,7 +16,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
             ?? throw new InvalidOperationException($"Company with ID {model.CompanyId} does not exist");
 
         var product = await unitOfWork.Products
-            .InsertAsync(new Product
+            .Insert(new Product
             {
                 Name = model.Name,
                 Description = model.Description,
@@ -34,7 +34,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         product.Description = model.Description;
         product.Price = model.Price;
 
-        await unitOfWork.Products.UpdateAsync(product);
+        await unitOfWork.Products.Update(product);
     }
 
     public async Task DeleteAsync(int id)
@@ -42,7 +42,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         var result = await unitOfWork.Products.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException("This product is not found!");
 
-         await unitOfWork.Products.DeleteAsync(result);
+         await unitOfWork.Products.Delete(result);
     }
 
     public async Task<ProductViewModel> GetAsync(int id)

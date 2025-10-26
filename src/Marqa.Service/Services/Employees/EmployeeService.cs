@@ -18,7 +18,7 @@ public class EmployeeService(IUnitOfWork unitOfWork)
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        var createdEmp = await unitOfWork.Employees.InsertAsync(new Employee
+        var createdEmp = await unitOfWork.Employees.Insert(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -57,7 +57,7 @@ public class EmployeeService(IUnitOfWork unitOfWork)
         existTeacher.Specialization = model.Specialization;
         existTeacher.RoleId = model.RoleId;
 
-        await unitOfWork.Employees.UpdateAsync(existTeacher);
+        await unitOfWork.Employees.Update(existTeacher);
     }
 
     public async Task DeleteAsync(int id)
@@ -75,10 +75,10 @@ public class EmployeeService(IUnitOfWork unitOfWork)
                 .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
                 .FirstOrDefaultAsync(); 
 
-            await unitOfWork.TeacherSubjects.DeleteAsync(teacherSubject);
+            await unitOfWork.TeacherSubjects.Delete(teacherSubject);
         }
 
-        await unitOfWork.Employees.DeleteAsync(employeeForDeletion);
+        await unitOfWork.Employees.Delete(employeeForDeletion);
     }
 
     public async Task<EmployeeViewModel> GetAsync(int id)

@@ -27,7 +27,7 @@ public class LessonService(
         lessonForUpdation.Date = model.Date;
         lessonForUpdation.TeacherId = model.TeacherId;
 
-        await unitOfWork.Lessons.UpdateAsync(lessonForUpdation);
+        await unitOfWork.Lessons.Update(lessonForUpdation);
     }
 
     public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
@@ -38,7 +38,7 @@ public class LessonService(
         lesson.Name = name;
         lesson.HomeTaskStatus = homeTaskStatus;
 
-        await unitOfWork.Lessons.UpdateAsync(lesson);
+        await unitOfWork.Lessons.Update(lesson);
     }
 
     public async Task VideoUploadAsync(int id, IFormFile video)
@@ -53,7 +53,7 @@ public class LessonService(
         
         var result = await fileService.UploadAsync(video, "Files/Videos");
 
-        await unitOfWork.LessonVideos.InsertAsync(new LessonVideo
+        await unitOfWork.LessonVideos.Insert(new LessonVideo
         {
             FileName = result.FileName,
             FilePath = result.FilePath,
@@ -83,7 +83,7 @@ public class LessonService(
         }
         else
         {
-            await unitOfWork.LessonAttendances.InsertAsync(new LessonAttendance
+            await unitOfWork.LessonAttendances.Insert(new LessonAttendance
             {
                 LessonId = model.LessonId,
                 StudentId = model.StudentId,
