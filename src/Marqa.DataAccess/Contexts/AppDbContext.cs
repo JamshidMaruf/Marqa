@@ -30,6 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<StudentHomeTaskFeedback> StudentHomeTaskFeedbacks { get; set; }
     public DbSet<StudentHomeTaskFile> StudentHomeTaskFiles { get; set; }
     public DbSet<HomeTaskFile> HomeTaskFiles { get; set; }
+    public DbSet<Banner> Banners { get; set; }
     public DbSet<StudentPointHistory> StudentPointHistories { get; set; }
     public DbSet<PointSystemSetting> PointSystemSettings { get; set; }
     public DbSet<PointSetting> PointSettings { get; set; }
