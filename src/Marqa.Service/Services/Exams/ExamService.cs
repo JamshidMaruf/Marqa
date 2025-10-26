@@ -15,13 +15,15 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         if (existExam != null)
             throw new AlreadyExistException("Exam already exist for this period");
 
-        await unitOfWork.Exams.Insert(new Exam
+        unitOfWork.Exams.Insert(new Exam
         {
             CourseId = model.CourseId,
             EndTime = model.EndTime,
             StartTime = model.StartTime,
             Title = model.Title
         });
+
+        await unitOfWork.SaveAsync();
     }
     public async Task UpdateExamAsync(int examId, ExamUpdateModel model)
     {
@@ -42,7 +44,9 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         existExam.StartTime = model.StartTime;
         existExam.Title = model.Title;
         
-        await unitOfWork.Exams.Update(existExam);
+        unitOfWork.Exams.Update(existExam);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteExamAsync(int examId)
@@ -50,7 +54,10 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         var existExam = unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefault(e => e.Id == examId) 
             ?? throw new NotFoundException("Exam not found");
-        await unitOfWork.Exams.Delete(existExam);
+       
+        unitOfWork.Exams.Delete(existExam);
+        
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid)
@@ -136,13 +143,15 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
         
-        await unitOfWork.StudentExamResults.Insert(new StudentExamResult
+        unitOfWork.StudentExamResults.Insert(new StudentExamResult
         {
             StudentId = model.StudentId,
             ExamId = model.ExamId,
             Score = model.Score,
             TeacherFeedback = model.TeacherFeedback
         });
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateExamScore(int examresultid, StudentExamResultUpdate model)
@@ -154,6 +163,8 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         existExamResult.Score = model.Score;
         existExamResult.TeacherFeedback = model.TeacherFeedback;
         
-        await unitOfWork.StudentExamResults.Update(existExamResult);
+        unitOfWork.StudentExamResults.Update(existExamResult);
+
+        await unitOfWork.SaveAsync();
     }
 }

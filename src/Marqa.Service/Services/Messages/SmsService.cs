@@ -17,7 +17,7 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
     {
         var otp = GenerateSixDigitNumber();
 
-        await otpRepository.Insert(new OTP
+        otpRepository.Insert(new OTP
         {
             PhoneNumber = phone, 
             Code = otp,

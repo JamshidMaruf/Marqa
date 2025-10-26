@@ -382,7 +382,7 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "UpdatedAt",
-                table: "StudentCourses",
+                table: "Courses",
                 type: "timestamp with time zone",
                 nullable: false,
                 defaultValueSql: "NOW() AT TIME ZONE 'UTC'",
@@ -391,7 +391,7 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "CreatedAt",
-                table: "StudentCourses",
+                table: "Courses",
                 type: "timestamp with time zone",
                 nullable: false,
                 defaultValueSql: "NOW() AT TIME ZONE 'UTC'",
@@ -1567,7 +1567,7 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "UpdatedAt",
-                table: "StudentCourses",
+                table: "Courses",
                 type: "timestamp with time zone",
                 nullable: false,
                 oldClrType: typeof(DateTime),
@@ -1576,7 +1576,7 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "CreatedAt",
-                table: "StudentCourses",
+                table: "Courses",
                 type: "timestamp with time zone",
                 nullable: false,
                 oldClrType: typeof(DateTime),

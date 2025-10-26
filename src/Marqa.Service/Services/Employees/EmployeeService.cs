@@ -10,7 +10,7 @@ namespace Marqa.Service.Services.Employees;
 public class EmployeeService(IUnitOfWork unitOfWork)
     : IEmployeeService
 {
-    public async Task<int> CreateAsync(EmployeeCreateModel model)
+    public async Task CreateAsync(EmployeeCreateModel model)
     {
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
@@ -18,7 +18,7 @@ public class EmployeeService(IUnitOfWork unitOfWork)
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        var createdEmp = await unitOfWork.Employees.Insert(new Employee
+        unitOfWork.Employees.Insert(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -35,7 +35,7 @@ public class EmployeeService(IUnitOfWork unitOfWork)
             RoleId = model.RoleId
         });
 
-        return createdEmp.Id;
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateAsync(int id, EmployeeUpdateModel model)
@@ -57,7 +57,9 @@ public class EmployeeService(IUnitOfWork unitOfWork)
         existTeacher.Specialization = model.Specialization;
         existTeacher.RoleId = model.RoleId;
 
-        await unitOfWork.Employees.Update(existTeacher);
+        unitOfWork.Employees.Update(existTeacher);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -75,10 +77,12 @@ public class EmployeeService(IUnitOfWork unitOfWork)
                 .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
                 .FirstOrDefaultAsync(); 
 
-            await unitOfWork.TeacherSubjects.Delete(teacherSubject);
+            unitOfWork.TeacherSubjects.Delete(teacherSubject);
         }
 
-        await unitOfWork.Employees.Delete(employeeForDeletion);
+        unitOfWork.Employees.Delete(employeeForDeletion);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<EmployeeViewModel> GetAsync(int id)

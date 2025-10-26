@@ -14,13 +14,14 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         var existLesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
 
-        await unitOfWork.HomeTasks.Insert(new HomeTask
+        unitOfWork.HomeTasks.Insert(new HomeTask
         {
             LessonId = model.LessonId,
             Deadline = model.Deadline,
             Description = model.Description
         });
-        
+
+        await unitOfWork.SaveAsync();
         // Send Notification
     }
 
@@ -32,7 +33,9 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         existHomeTask.Deadline = model.Deadline;
         existHomeTask.Description = model.Description;
 
-        await unitOfWork.HomeTasks.Update(existHomeTask);
+        unitOfWork.HomeTasks.Update(existHomeTask);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -40,7 +43,9 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
-        await unitOfWork.HomeTasks.Delete(existHomeTask);
+        unitOfWork.HomeTasks.Delete(existHomeTask);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<List<HomeTaskViewModel>> GetAsync(int lessonId)
@@ -58,7 +63,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
             Deadline = homeTask.Deadline,
             Description = homeTask.Description,
         })
-            .ToListAsync();
+        .ToListAsync();
     }
 
     public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
@@ -72,7 +77,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         if (existHomeTask.Deadline < DateTime.Now)
             throw new Exception("Homework time is over!");
 
-        var createUpload = await unitOfWork.StudentHomeTasks
+         unitOfWork.StudentHomeTasks
             .Insert(new StudentHomeTask
             {
                 HomeTaskId = model.HomeTaskId,
@@ -81,6 +86,8 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
                 UploadedAt = DateTime.Now,
                 Status = StudentHomeTaskStatus.accepted,
             });
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
@@ -88,7 +95,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         var existHomeTaskUpload = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
             ?? throw new NotFoundException("No completed home task found!");
 
-        await unitOfWork.StudentHomeTaskFeedbacks
+        unitOfWork.StudentHomeTaskFeedbacks
             .Insert(new StudentHomeTaskFeedback
             {
                 StudentHomeTaskId = model.StudentHomeTaskId,
@@ -96,8 +103,11 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
                 FeedBack = model.FeedBack
             });
 
+        await unitOfWork.SaveAsync();
+
         existHomeTaskUpload.Score = model.Score;
         
+        await unitOfWork.SaveAsync();
         // Send notification
     }
 }

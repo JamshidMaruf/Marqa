@@ -23,11 +23,13 @@ public class SubjectService(
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
-        await unitOfWork.Subjects.Insert(new Subject
+        unitOfWork.Subjects.Insert(new Subject
         {
             CompanyId = model.CompanyId,
             Name = model.Name,
         });
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateAsync(int id, SubjectUpdateModel model)
@@ -40,7 +42,9 @@ public class SubjectService(
        
         existSubject.Name = model.Name;
 
-        await unitOfWork.Subjects.Update(existSubject);
+        unitOfWork.Subjects.Update(existSubject);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -48,7 +52,9 @@ public class SubjectService(
         var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
 
-        await unitOfWork.Subjects.Delete(existSubject);
+        unitOfWork.Subjects.Delete(existSubject);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<SubjectViewModel> GetAsync(int id)
@@ -99,11 +105,13 @@ public class SubjectService(
         _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == model.SubjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
-        await unitOfWork.TeacherSubjects.Insert(new TeacherSubject
+        unitOfWork.TeacherSubjects.Insert(new TeacherSubject
         {
             TeacherId = model.TeacherId,
             SubjectId = model.SubjectId
         });
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DetachAsync(int teacherId, int subjectId)
@@ -114,6 +122,8 @@ public class SubjectService(
             .FirstOrDefault()
             ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        await unitOfWork.TeacherSubjects.Delete(teacherSubject);
+        unitOfWork.TeacherSubjects.Delete(teacherSubject);
+
+        await unitOfWork.SaveAsync();
     }
 }
