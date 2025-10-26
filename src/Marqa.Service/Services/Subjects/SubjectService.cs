@@ -23,7 +23,7 @@ public class SubjectService(
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
-        await unitOfWork.Subjects.InsertAsync(new Subject
+        await unitOfWork.Subjects.Insert(new Subject
         {
             CompanyId = model.CompanyId,
             Name = model.Name,
@@ -40,7 +40,7 @@ public class SubjectService(
        
         existSubject.Name = model.Name;
 
-        await unitOfWork.Subjects.UpdateAsync(existSubject);
+        await unitOfWork.Subjects.Update(existSubject);
     }
 
     public async Task DeleteAsync(int id)
@@ -48,7 +48,7 @@ public class SubjectService(
         var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
 
-        await unitOfWork.Subjects.DeleteAsync(existSubject);
+        await unitOfWork.Subjects.Delete(existSubject);
     }
 
     public async Task<SubjectViewModel> GetAsync(int id)
@@ -99,7 +99,7 @@ public class SubjectService(
         _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == model.SubjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
-        await unitOfWork.TeacherSubjects.InsertAsync(new TeacherSubject
+        await unitOfWork.TeacherSubjects.Insert(new TeacherSubject
         {
             TeacherId = model.TeacherId,
             SubjectId = model.SubjectId
@@ -114,6 +114,6 @@ public class SubjectService(
             .FirstOrDefault()
             ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        await unitOfWork.TeacherSubjects.DeleteAsync(teacherSubject);
+        await unitOfWork.TeacherSubjects.Delete(teacherSubject);
     }
 }

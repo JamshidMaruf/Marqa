@@ -19,7 +19,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         try
         {
-            var createdStudent = await unitOfWork.Students.InsertAsync(new Student()
+            var createdStudent = await unitOfWork.Students.Insert(new Student()
             {
                 // Access ID ni generate qilish kerak. ID: <5 digits>
                 CompanyId = model.CompanyId,
@@ -34,7 +34,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             await unitOfWork.SaveAsync();
 
 
-            await unitOfWork.StudentDetails.InsertAsync(new StudentDetail
+            await unitOfWork.StudentDetails.Insert(new StudentDetail
             {
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
@@ -50,7 +50,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
             await unitOfWork.SaveAsync();
 
-            await unitOfWork.BeginCommitAsync();
+            await unitOfWork.CommitAsync();
         }
         catch
         {
@@ -80,7 +80,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
         existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
 
-        await unitOfWork.Students.UpdateAsync(existStudent);
+        await unitOfWork.Students.Update(existStudent);
     }
 
     //student ochib  ketsa uni related entitylari 
@@ -91,7 +91,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException($"Student is not found");
 
-        await unitOfWork.Students.DeleteAsync(existStudent);
+        await unitOfWork.Students.Delete(existStudent);
     }
 
     public async Task<StudentViewModel> GetAsync(int id, string name)

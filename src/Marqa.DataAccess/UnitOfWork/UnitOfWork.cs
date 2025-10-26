@@ -47,7 +47,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
         await context.Database.BeginTransactionAsync();
     }
 
-    public async Task BeginCommitAsync()
+    public async Task CommitAsync()
     {
         await context.Database.CommitTransactionAsync();
     }

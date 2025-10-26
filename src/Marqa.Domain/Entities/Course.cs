@@ -14,8 +14,8 @@ public class Course : Auditable
     public int MaxStudentCount { get; set; }
     public string Description { get; set; }
     public int CompanyId { get; set; }
-    public int? SubjectId { get; set; }
-    public int? TeacherId { get; set; }
+    public int SubjectId { get; set; }
+    public int TeacherId { get; set; }
 
     // Navigation
     public Company Company { get; set; }

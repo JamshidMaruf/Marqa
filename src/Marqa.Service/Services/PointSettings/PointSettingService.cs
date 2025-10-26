@@ -15,7 +15,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
     private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
     public async Task CreateAsync(PointSettingCreateModel model)
     {
-        await unitOfWork.PointSettings.InsertAsync(new PointSetting
+        await unitOfWork.PointSettings.Insert(new PointSetting
         {
             Name = model.Name,
             Point = model.Point,
@@ -34,7 +34,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
         pointSetting.Description = model.Description;
         pointSetting.Operation = model.Operation;
 
-        await unitOfWork.PointSettings.UpdateAsync(pointSetting);
+        await unitOfWork.PointSettings.Update(pointSetting);
     }
 
     public async Task DeleteAsync(int id)
@@ -42,7 +42,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
         var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException($"No poinit_setting was found with ID = {id}");
 
-        await unitOfWork.PointSettings.DeleteAsync(pointSetting);
+        await unitOfWork.PointSettings.Delete(pointSetting);
     }
 
     public async Task<PointSettingViewModel> GetAsync(int id)
@@ -91,7 +91,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
         else
             pointSetting.IsEnabled = true;
 
-        await unitOfWork.PointSettings.UpdateAsync(pointSetting);
+        await unitOfWork.PointSettings.Update(pointSetting);
     }
 
 

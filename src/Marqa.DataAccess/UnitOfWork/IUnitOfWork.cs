@@ -66,6 +66,6 @@ public interface IUnitOfWork : IDisposable
 
     Task SaveAsync();
     Task BeginTransactionAsync();
-    Task BeginCommitAsync();
+    Task CommitAsync();
     Task RollbackTransactionAsync();
 }

@@ -20,7 +20,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork) : IEmployeeRoleService
         if (existRole != null)
             throw new AlreadyExistException("This role already exists");
 
-        await unitOfWork.EmployeeRoles.InsertAsync(new EmployeeRole
+        await unitOfWork.EmployeeRoles.Insert(new EmployeeRole
         {
             Name = model.Name,
             CompanyId = model.CompanyId,
@@ -32,7 +32,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork) : IEmployeeRoleService
         var existRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException("Role not found");
 
-        await unitOfWork.EmployeeRoles.DeleteAsync(existRole);
+        await unitOfWork.EmployeeRoles.Delete(existRole);
     }
 
     public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId)
@@ -90,6 +90,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork) : IEmployeeRoleService
 
         existEmployeeRole.Name = model.Name;
         existEmployeeRole.CompanyId = model.CompanyId;
-        await unitOfWork.EmployeeRoles.UpdateAsync(existEmployeeRole);
+        await unitOfWork.EmployeeRoles.Update(existEmployeeRole);
     }
 }

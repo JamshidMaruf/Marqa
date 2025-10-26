@@ -53,12 +53,12 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             TotalPrice = totalPrice,
         };
 
-        await unitOfWork.Orders.InsertAsync(order);
+        await unitOfWork.Orders.Insert(order);
 
         foreach (var orderItem in orderItems)
         {
             orderItem.OrderId = order.Id;
-            await unitOfWork.OrderItems.InsertAsync(orderItem);
+            await unitOfWork.OrderItems.Insert(orderItem);
         }
 
         var newCurrentPoint = studentPointHistory.CurrentPoint - totalPrice;
@@ -73,7 +73,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             Operation = PointHistoryOperation.Minus
         };
 
-        await unitOfWork.StudentPointHistories.InsertAsync(pointHistory);
+        await unitOfWork.StudentPointHistories.Insert(pointHistory);
     }
 
     public async Task UpdateStatusAsync(int id, OrderStatus newStatus)
@@ -82,7 +82,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
         existOrder.Status = newStatus;
-        await unitOfWork.Orders.UpdateAsync(existOrder);
+        await unitOfWork.Orders.Update(existOrder);
     }
 
     public async Task DeleteAsync(int id)
@@ -98,10 +98,10 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         foreach (var item in orderItems)
         {
-            await unitOfWork.OrderItems.DeleteAsync(item);
+            await unitOfWork.OrderItems.Delete(item);
         }
 
-        await unitOfWork.Orders.DeleteAsync(existOrder);
+        await unitOfWork.Orders.Delete(existOrder);
     }
 
     public async Task<OrderViewModel> GetAsync(int id)

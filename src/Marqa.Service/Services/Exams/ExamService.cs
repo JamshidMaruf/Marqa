@@ -15,7 +15,7 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         if (existExam != null)
             throw new AlreadyExistException("Exam already exist for this period");
 
-        await unitOfWork.Exams.InsertAsync(new Exam
+        await unitOfWork.Exams.Insert(new Exam
         {
             CourseId = model.CourseId,
             EndTime = model.EndTime,
@@ -42,7 +42,7 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         existExam.StartTime = model.StartTime;
         existExam.Title = model.Title;
         
-        await unitOfWork.Exams.UpdateAsync(existExam);
+        await unitOfWork.Exams.Update(existExam);
     }
 
     public async Task DeleteExamAsync(int examId)
@@ -50,7 +50,7 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         var existExam = unitOfWork.Exams.SelectAllAsQueryable()
             .FirstOrDefault(e => e.Id == examId) 
             ?? throw new NotFoundException("Exam not found");
-        await unitOfWork.Exams.DeleteAsync(existExam);
+        await unitOfWork.Exams.Delete(existExam);
     }
 
     public async Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid)
@@ -136,7 +136,7 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
         
-        await unitOfWork.StudentExamResults.InsertAsync(new StudentExamResult
+        await unitOfWork.StudentExamResults.Insert(new StudentExamResult
         {
             StudentId = model.StudentId,
             ExamId = model.ExamId,
@@ -154,6 +154,6 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         existExamResult.Score = model.Score;
         existExamResult.TeacherFeedback = model.TeacherFeedback;
         
-        await unitOfWork.StudentExamResults.UpdateAsync(existExamResult);
+        await unitOfWork.StudentExamResults.Update(existExamResult);
     }
 }

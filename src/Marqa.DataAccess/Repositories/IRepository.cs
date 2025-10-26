@@ -5,9 +5,15 @@ namespace Marqa.DataAccess.Repositories;
 
 public interface IRepository<TEntity> where TEntity : Auditable
 {
-    Task<TEntity> InsertAsync(TEntity entity);
-    Task UpdateAsync(TEntity entity);
-    Task DeleteAsync(TEntity entity);
+    void Insert(TEntity entity);
+
+    Task InsertRangeAsync(IEnumerable<TEntity> entities);
+    
+    void Update(TEntity entity);
+    
+    void Delete(TEntity entity);
+    
     Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null);
+    
     IQueryable<TEntity> SelectAllAsQueryable(); 
 }

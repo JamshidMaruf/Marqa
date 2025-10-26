@@ -20,7 +20,7 @@ public class StudentPointHistoryService(
         if (model.Operation == PointHistoryOperation.Minus)
         {
             var createPoint = await unitOfWork.StudentPointHistories
-                .InsertAsync(new StudentPointHistory
+                .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
                     GivenPoint = model.Point,
@@ -33,7 +33,7 @@ public class StudentPointHistoryService(
         else if (model.Operation == PointHistoryOperation.Plus)
         {
             var createPoint = await unitOfWork.StudentPointHistories
-                .InsertAsync(new StudentPointHistory
+                .Insert(new StudentPointHistory
                 {
                     StudentId = model.StudentId,
                     GivenPoint = model.Point,

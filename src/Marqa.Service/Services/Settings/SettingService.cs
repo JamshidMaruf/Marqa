@@ -1,4 +1,4 @@
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Settings.Models;
@@ -12,7 +12,7 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
     {
         string value = model.IsEncrypted ? encryptionService.Encrypt(model.Value) : model.Value;
         
-        await unitOfWork.Settings.InsertAsync(new Setting()
+        await unitOfWork.Settings.Insert(new Setting()
         {
             Key = model.Key,
             Value = value,
@@ -28,7 +28,7 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
         var setting = await unitOfWork.Settings.SelectAsync(s => s.Key == key)
             ?? throw new NotFoundException("Setting not found");
 
-        await unitOfWork.Settings.DeleteAsync(setting);
+        await unitOfWork.Settings.Delete(setting);
         
         await unitOfWork.SaveAsync();
     }

@@ -14,7 +14,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         var existLesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException("Lesson is not found");
 
-        await unitOfWork.HomeTasks.InsertAsync(new HomeTask
+        await unitOfWork.HomeTasks.Insert(new HomeTask
         {
             LessonId = model.LessonId,
             Deadline = model.Deadline,
@@ -32,7 +32,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         existHomeTask.Deadline = model.Deadline;
         existHomeTask.Description = model.Description;
 
-        await unitOfWork.HomeTasks.UpdateAsync(existHomeTask);
+        await unitOfWork.HomeTasks.Update(existHomeTask);
     }
 
     public async Task DeleteAsync(int id)
@@ -40,7 +40,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
             ?? throw new NotFoundException("Home task is not found");
 
-        await unitOfWork.HomeTasks.DeleteAsync(existHomeTask);
+        await unitOfWork.HomeTasks.Delete(existHomeTask);
     }
 
     public async Task<List<HomeTaskViewModel>> GetAsync(int lessonId)
@@ -73,7 +73,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
             throw new Exception("Homework time is over!");
 
         var createUpload = await unitOfWork.StudentHomeTasks
-            .InsertAsync(new StudentHomeTask
+            .Insert(new StudentHomeTask
             {
                 HomeTaskId = model.HomeTaskId,
                 StudentId = model.StudentId,
@@ -89,7 +89,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
             ?? throw new NotFoundException("No completed home task found!");
 
         await unitOfWork.StudentHomeTaskFeedbacks
-            .InsertAsync(new StudentHomeTaskFeedback
+            .Insert(new StudentHomeTaskFeedback
             {
                 StudentHomeTaskId = model.StudentHomeTaskId,
                 TeacherId = model.TeacherId,
