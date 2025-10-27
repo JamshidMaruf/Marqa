@@ -4,7 +4,7 @@ namespace Marqa.Service.Services.Employees;
 
 public interface IEmployeeService
 {
-    Task<int> CreateAsync(EmployeeCreateModel model);
+    Task CreateAsync(EmployeeCreateModel model);
     Task UpdateAsync(int id, EmployeeUpdateModel model);
     Task DeleteAsync(int id);
     Task<EmployeeViewModel> GetAsync(int id);

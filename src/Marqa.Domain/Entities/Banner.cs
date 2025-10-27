@@ -2,6 +2,7 @@
 
 public class Banner : Auditable
 {
+    public int CompanyId { get; set; }
     public string Title { get; set; }
 
     public string Description { get; set; }

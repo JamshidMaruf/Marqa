@@ -9,7 +9,7 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
-    // transaction qo'shilsin insertla kop
+    // think about applying transaction!
     public async Task CreateAsync(OrderCreateModel model)  
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
@@ -39,7 +39,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             orderItems.Add(new OrderItem
             {
                 ProductId = item.ProductId,
-                Count = item.Count,
+                Quantity = item.Count,
                 InlinePrice = inlinePrice
             });
         }
@@ -54,13 +54,17 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             TotalPrice = totalPrice,
         };
 
-        await unitOfWork.Orders.InsertAsync(order);
+        unitOfWork.Orders.Insert(order);
+
+        await unitOfWork.SaveAsync();
 
         foreach (var orderItem in orderItems)
         {
             orderItem.OrderId = order.Id;
-            await unitOfWork.OrderItems.InsertAsync(orderItem);
+            unitOfWork.OrderItems.Insert(orderItem);
         }
+
+        await unitOfWork.SaveAsync();
 
         var newCurrentPoint = studentPointHistory.CurrentPoint - totalPrice;
 
@@ -74,7 +78,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             Operation = PointHistoryOperation.Minus
         };
 
-        await unitOfWork.StudentPointHistories.InsertAsync(pointHistory);
+        unitOfWork.StudentPointHistories.Insert(pointHistory);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateStatusAsync(int id, OrderStatus newStatus)
@@ -83,7 +89,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             ?? throw new NotFoundException($"Order not found (ID: {id})");
 
         existOrder.Status = newStatus;
-        await unitOfWork.Orders.UpdateAsync(existOrder);
+        unitOfWork.Orders.Update(existOrder);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -99,10 +107,12 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
         foreach (var item in orderItems)
         {
-            await unitOfWork.OrderItems.DeleteAsync(item);
+            unitOfWork.OrderItems.Delete(item);
         }
 
-        await unitOfWork.Orders.DeleteAsync(existOrder);
+        unitOfWork.Orders.Delete(existOrder);
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<OrderViewModel> GetAsync(int id)
@@ -129,7 +139,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             {
                 ProductId = i.ProductId,
                 ProductName = i.Product.Name, 
-                Count=i.Count,
+                Count = i.Quantity,
                 InlinePrice = i.InlinePrice
             }).ToList()
         };

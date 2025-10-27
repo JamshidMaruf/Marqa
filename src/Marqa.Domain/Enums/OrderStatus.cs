@@ -2,7 +2,7 @@
 
 public enum OrderStatus
 {
-    inProccess,
-    ready,
-    given
+    InProcess,
+    Ready,
+    Given
 }

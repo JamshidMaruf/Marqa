@@ -1,6 +1,4 @@
-﻿using Marqa.Domain.Enums;
-
-namespace Marqa.Service.Services.Banners.Models;
+﻿ namespace Marqa.Service.Services.Banners.Models;
 
 public class BannerCreateModel
 {
@@ -10,7 +8,7 @@ public class BannerCreateModel
     public string ImageUrl { get; set; }
     public string LinkUrl { get; set; }
     public int DisplayOrder { get; set; }
-    public IsActive IsActive { get; set; }
+    public bool IsActive { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 }

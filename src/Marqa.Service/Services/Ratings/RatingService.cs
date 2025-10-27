@@ -1,6 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Ratings.Models;
 using Marqa.Service.Services.StudentPointHistories;
 using Microsoft.EntityFrameworkCore;

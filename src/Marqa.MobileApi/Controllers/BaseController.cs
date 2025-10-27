@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.MobileApi.Controllers;
@@ -8,5 +8,5 @@ namespace Marqa.MobileApi.Controllers;
 [Authorize(Roles = "Teacher")]
 public class BaseController : ControllerBase
 {
-    
+
 }

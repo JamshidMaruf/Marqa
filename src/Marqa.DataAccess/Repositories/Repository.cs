@@ -7,39 +7,46 @@ namespace Marqa.DataAccess.Repositories;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditable
 {
-    private readonly AppDbContext context;
+    private readonly AppDbContext _context;
     public Repository(AppDbContext context)
     {
-        this.context = context;
-        context.Set<TEntity>();
+        this._context = context;
+        _context.Set<TEntity>();
     }
     
-    public async Task<TEntity> InsertAsync(TEntity entity)
+    public void Insert(TEntity entity)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        var createdEntity = (await context.AddAsync(entity)).Entity;
-        await context.SaveChangesAsync();
-        return createdEntity;
+        _context.Add(entity);
     }
 
-    public async Task UpdateAsync(TEntity entity)
+    public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
+    {
+        await entities.AsQueryable().ForEachAsync(entity =>
+        {
+            entity.CreatedAt = DateTime.UtcNow;
+            _context.Add(entity);
+        });
+    }
+
+    public void Update(TEntity entity)
     {
         entity.UpdatedAt = DateTime.UtcNow;
-        context.Update(entity);
-        await context.SaveChangesAsync();
+        _context.Update(entity);
     }
    
-    public async Task DeleteAsync(TEntity entity)
+    public void Delete(TEntity entity)
     {
         entity.DeletedAt = DateTime.UtcNow;
         entity.IsDeleted = true;
-        context.Update(entity);
-        await context.SaveChangesAsync();
+        _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
+        _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true; 
     }
 
     public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null)
     {
         IQueryable<TEntity> query = context.Set<TEntity>();
+        var query = _context.Set<TEntity>().Where(predicate).AsQueryable();
 
         if (includes != null)
         {
@@ -55,6 +62,8 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
     public IQueryable<TEntity> SelectAllAsQueryable()
     {
-        return context.Set<TEntity>().AsQueryable();
+        return _context.Set<TEntity>().AsQueryable();
     }
+
+
 }

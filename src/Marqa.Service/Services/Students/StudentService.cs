@@ -19,9 +19,8 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         try
         {
-            var createdStudent = await unitOfWork.Students.InsertAsync(new Student()
+            var createdStudent = new Student()
             {
-                // Access ID ni generate qilish kerak. ID: <5 digits>
                 CompanyId = model.CompanyId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -29,12 +28,14 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
-            });
+            };
+            
+            unitOfWork.Students.Insert(createdStudent);
 
             await unitOfWork.SaveAsync();
 
 
-            await unitOfWork.StudentDetails.InsertAsync(new StudentDetail
+            unitOfWork.StudentDetails.Insert(new StudentDetail
             {
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
@@ -50,55 +51,76 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
             await unitOfWork.SaveAsync();
 
+            await unitOfWork.CommitAsync();
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+    }
+
+    // StudentDetails include qilingan va transaction bilan update qilish
+    public async Task UpdateAsync(int id, StudentUpdateModel model)
+    {
+        await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            var existStudent = await unitOfWork.Students
+                .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
+                ?? throw new NotFoundException($"Student is not found");
+
+            existStudent.FirstName = model.FirstName;
+            existStudent.LastName = model.LastName;
+            existStudent.Gender = model.Gender;
+            existStudent.DateOfBirth = model.DateOfBirth;
+            existStudent.Phone = model.Phone;
+            existStudent.Email = model.Email;
+
+            existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
+            existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
+            existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
+            existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
+            existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
+            existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
+            existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
+            existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
+            existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
+
+            await unitOfWork.Students.UpdateAsync(existStudent);
+            await unitOfWork.SaveAsync();
+
             await unitOfWork.BeginCommitAsync();
         }
         catch
         {
             await unitOfWork.RollbackTransactionAsync();
+            throw;
         }
     }
 
-    // bu methodda ishkal chiqadi studentDetails include qilinmagan
-    // keyin bu methodni transaction bilan update qilish kere huddi create kabi!
-    public async Task UpdateAsync(int id, StudentUpdateModel model)
-    {
-        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
-            ?? throw new NotFoundException($"Student is not found");
-
-        existStudent.FirstName = model.FirstName;
-        existStudent.LastName = model.LastName;
-        existStudent.Gender = model.Gender;
-        existStudent.DateOfBirth = model.DateOfBirth;
-        existStudent.Phone = model.Phone;
-        existStudent.Email = model.Email;
-        existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
-        existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
-        existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
-        existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
-        existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
-        existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
-        existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
-        existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
-        existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
-
-        await unitOfWork.Students.UpdateAsync(existStudent);
-    }
-
-    //student ochib  ketsa uni related entitylari 
-    // ya'ni hozirgi holatda studentDetails ham ochirilishi kere
-    // shu methodni ozida include qilib olib delete qilinsin
+    // StudentDetail bilan birga o'chirish (include qilingan)
     public async Task DeleteAsync(int id)
     {
-        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == id)
+        var existStudent = await unitOfWork.Students
+            .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
             ?? throw new NotFoundException($"Student is not found");
 
+        // Agar StudentDetail mavjud bo'lsa, uni ham o'chirish
+        if (existStudent.StudentDetail != null)
+        {
+            await unitOfWork.StudentDetails.DeleteAsync(existStudent.StudentDetail);
+        }
+
         await unitOfWork.Students.DeleteAsync(existStudent);
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<StudentViewModel> GetAsync(int id, string name)
     {
         var existStudent = await unitOfWork.Students
-            .SelectAsync(predicate: t => t.Id == id,  includes: new[] { "StudentDetail" })
+            .SelectAsync(predicate: t => t.Id == id, includes: new[] { "StudentDetail" })
             ?? throw new NotFoundException($"Student is not found");
 
         return new StudentViewModel
