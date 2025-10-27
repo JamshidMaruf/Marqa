@@ -11,5 +11,5 @@ public interface IRatingService
     Task<Rating> GetStudentRatingAsync(int studentId);
     Task<IEnumerable<Rating>> GetAllStudentRatingsAsync();
     Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId);
+    Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId);
 }
-

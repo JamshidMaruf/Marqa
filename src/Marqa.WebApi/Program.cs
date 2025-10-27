@@ -65,11 +65,11 @@ builder.Services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
 builder.Services.AddScoped<IHomeTaskService, HomeTaskService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
-builder.Services.AddScoped<IStudentService, StudentService>();
+//builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IPointSettingService,  PointSettingService>();
 builder.Services.AddScoped<IExamService, ExamService>();
-builder.Services.AddScoped<IRatingService, RatingService>();
+//builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
 

@@ -11,4 +11,5 @@ public interface ICourseService
     Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId);
     Task AttachStudentAsync(int courseId, int studentId);
     Task DetachStudentAsync(int courseId, int studentId);
+    Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId);
 }

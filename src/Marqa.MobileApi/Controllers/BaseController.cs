@@ -5,7 +5,7 @@ namespace Marqa.MobileApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Teacher")]
+//[Authorize]
 public class BaseController : ControllerBase
 {
 

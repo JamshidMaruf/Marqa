@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Marqa.Service.Services.Messages;
 
-public class SmsService(IConfiguration configuration, IRepository<OTP> otpRepository, ISettingService settingService) : ISmsService
+public class SmsService(IRepository<OTP> otpRepository, ISettingService settingService) : ISmsService
 {
     public async Task SendOTPAsync(string phone)
     {
@@ -27,7 +27,7 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
         await SendMessageAsync(phone, otp);
     }
 
-    public async Task<bool> VerifyOTPAsync(string phone, string code)
+    public async Task VerifyOTPAsync(string phone, string code)
     {
         var isVerified = await otpRepository
             .SelectAllAsQueryable()
@@ -41,8 +41,6 @@ public class SmsService(IConfiguration configuration, IRepository<OTP> otpReposi
 
         if (!isVerified)
             throw new ArgumentIsNotValidException("OTP incorrect");
-
-        return isVerified;
     }
 
     private string GenerateSixDigitNumber()
