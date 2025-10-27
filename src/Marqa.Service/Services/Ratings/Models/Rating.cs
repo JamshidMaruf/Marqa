@@ -4,7 +4,8 @@ public class Rating
 {
     public int StudentId { get; set; }
     public int CourseId { get; set; }
-    public string StudentName { get; set; }
+    public string StudentFirstName { get; set; }
+    public string StudentLastName { get; set; }
     public int TotalPoints { get; set; }
     public int Rank { get; set; }
 
