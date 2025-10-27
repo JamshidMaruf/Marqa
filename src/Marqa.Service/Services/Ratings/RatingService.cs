@@ -76,7 +76,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         return ratings.OrderBy(r => r.Rank);
     }
 
-    public Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId)
+    public async Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId)
     {
         var students = unitOfWork.Students.SelectAllAsQueryable()
             .Where(s => s.Courses.Any(c => c.CompanyId == companyId));
@@ -94,10 +94,12 @@ public class RatingService(IUnitOfWork unitOfWork,
         var rank = 1;
         foreach (var rating in ratings.OrderByDescending(r => r.TotalPoints))
         {
+            if (ratings.Count() == 3)
+                break;
             rating.Rank = rank;
             rank++;
         }
-        return Task.FromResult(ratings.OrderBy(r => r.Rank).ToList());
+        return ratings.OrderBy(r => r.TotalPoints).ToList();
     }
 }
 
