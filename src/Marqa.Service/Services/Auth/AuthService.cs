@@ -1,33 +1,67 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.Auth;
 
-public class AuthService(IConfiguration configuration) : IAuthService
+public class AuthService(ISettingService settingService, IEncryptionService encryptionService) : IAuthService
 {
-    public string GenerateToken(int entityId, string entityType, string subject)
+    public async Task<string> GenerateToken(string app)
     {
+        var configuration = await settingService.GetByCategoryAsync("JWT");
         var claims = new[]
         {
-            new Claim("EntityId", entityId.ToString()),
-            new Claim("EntityType", entityType),
-            new Claim("Subject", subject),
+            new Claim("App", app),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT.Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: configuration["JWT:Issuer"],
-            audience: configuration["JWT:Audience"],
+            issuer: configuration["JWT.Issuer"],
+            audience: configuration["JWT.Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT:ExpiresInMinutes"])),
+            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.ExpiresInMinutes"])),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    public async Task<string> GenerateAppToken(string appId, string secretKey)
+    {
+        var configuration = await settingService.GetByCategoryAsync("JWT");
+        var appSettings = await settingService.GetByCategoryAsync("App");
+        
+        if(appSettings.ContainsValue(appId) && appSettings.ContainsValue(secretKey))
+        {
+            var decryptedApp = encryptionService.Decrypt(secretKey);
+            
+            var claims = new[]
+            {
+                new Claim("AppId", appId),
+                new Claim("SecretKey", secretKey),
+                new Claim("App", decryptedApp),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT.Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["JWT.Issuer"],
+                audience: configuration["JWT.Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.ExpiresInMinutes"])),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        throw new NotFoundException("AppId or SecretKey is incorrect!");
     }
 }

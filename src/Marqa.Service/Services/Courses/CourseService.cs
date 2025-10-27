@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
-public class CourseService(IUnitOfWork unitOfWork)
-    : ICourseService
+public class CourseService(IUnitOfWork unitOfWork) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
@@ -293,6 +292,11 @@ public class CourseService(IUnitOfWork unitOfWork)
             unitOfWork.StudentCourses.Delete(studentCourse);
 
         await unitOfWork.SaveAsync();
+    }
+
+    public Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
+    {
+        throw new NotImplementedException();
     }
 
     private async Task GenerateLessonAsync(

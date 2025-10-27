@@ -4,5 +4,6 @@ namespace Marqa.Service.Services.Auth;
 
 public interface IAuthService
 {
-    string GenerateToken(int entityId, string entityType, string subject);
+    Task<string> GenerateToken(string app);
+    Task<string> GenerateAppToken(string appId, string secretKey);
 }

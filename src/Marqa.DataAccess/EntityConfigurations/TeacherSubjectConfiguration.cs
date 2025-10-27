@@ -25,4 +25,3 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
             .IsRequired();
     }
 }
-
