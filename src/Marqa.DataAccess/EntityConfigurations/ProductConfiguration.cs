@@ -8,6 +8,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
+        builder.HasKey("Id");
         builder.Property(p => p.Description)
             .HasMaxLength(1000);
 
