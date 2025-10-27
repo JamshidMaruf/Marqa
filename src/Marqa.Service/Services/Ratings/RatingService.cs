@@ -100,7 +100,7 @@ public class RatingService(IUnitOfWork unitOfWork,
             rating.Rank = rank;
             rank++;
         }
-        return ratings.OrderBy(r => r.TotalPoints).ToList();
+        return ratings.OrderBy(r => r.TotalPoints).Take(3).ToList();
     }
 }
 
