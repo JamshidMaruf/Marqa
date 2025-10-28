@@ -12,10 +12,7 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.ApplyGlobalConfigurations();
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
+        
         var entityAssembly = typeof(Auditable).Assembly;
         var entityTypes = entityAssembly
             .GetTypes()
@@ -23,6 +20,9 @@ public class AppDbContext : DbContext
 
         foreach (var type in entityTypes)
             modelBuilder.Entity(type);
+
+        modelBuilder.ApplyGlobalConfigurations();
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
 

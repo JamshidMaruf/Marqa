@@ -21,6 +21,6 @@ public class HomeTaskConfiguration : IEntityTypeConfiguration<HomeTask>
             .WithOne(h => h.HomeTask)
             .HasForeignKey<HomeTaskFile>(hf => hf.HomeTaskId)
             .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false);
+            .IsRequired();
     }
 }

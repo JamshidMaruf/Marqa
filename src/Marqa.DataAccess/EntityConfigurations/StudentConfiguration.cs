@@ -22,11 +22,5 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
             .HasForeignKey<StudentDetail>(sd => sd.StudentId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
-        builder.HasMany(s => s.StudentPointHistories)
-            .WithOne(sph => sph.Student)
-            .HasForeignKey(sph => sph.StudentId)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
     }
 }

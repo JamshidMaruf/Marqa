@@ -8,6 +8,8 @@ public class EmployeeRoleConfiguration : IEntityTypeConfiguration<EmployeeRole>
 {
     public void Configure(EntityTypeBuilder<EmployeeRole> builder)
     {
+        builder.HasIndex(er => new { er.CompanyId, er.Name }).IsUnique();
+
         builder.HasOne(e => e.Company)
             .WithMany(c => c.Roles)
             .HasForeignKey(e => e.CompanyId)
