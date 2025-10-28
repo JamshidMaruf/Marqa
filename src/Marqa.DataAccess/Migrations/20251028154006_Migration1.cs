@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class ss : Migration
+    public partial class Migration1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -640,7 +640,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentCourses",
+                name: "Marqa.Domain.Entities.StudentCourses",
                 columns: table => new
                 {
                     StudentId = table.Column<int>(type: "integer", nullable: false),
@@ -652,15 +652,15 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentCourses", x => new { x.StudentId, x.CourseId });
+                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentCourses", x => new { x.StudentId, x.CourseId });
                     table.ForeignKey(
-                        name: "FK_StudentCourses_Marqa.Domain.Entities.Courses_CourseId",
+                        name: "FK_Marqa.Domain.Entities.StudentCourses_Marqa.Domain.Entities.~",
                         column: x => x.CourseId,
                         principalTable: "Marqa.Domain.Entities.Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StudentCourses_Marqa.Domain.Entities.Students_StudentId",
+                        name: "FK_Marqa.Domain.Entities.StudentCourses_Marqa.Domain.Entities~1",
                         column: x => x.StudentId,
                         principalTable: "Marqa.Domain.Entities.Students",
                         principalColumn: "Id",
@@ -830,6 +830,17 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Companies",
+                columns: new[] { "Id", "CreatedAt", "DeletedAt", "IsDeleted", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Result School", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Cambridge school", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Pdp Academy", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Najot Ta'lim", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Marqa.Domain.Entities.Settings",
                 columns: new[] { "Id", "Category", "CreatedAt", "DeletedAt", "Key", "UpdatedAt", "Value" },
                 values: new object[,]
@@ -860,6 +871,116 @@ namespace Marqa.DataAccess.Migrations
                     { 13, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "TeacherApp.AppId", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "bb52e3fd30f84ece8bd3db686b701104" },
                     { 14, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ParentApp.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "LHpMHeBIvvjxBmZOUDqg1A==" },
                     { 15, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "ParentApp.AppId", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "71286a64bc1b4c41beadbed6c0c973ec" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.EmployeeRoles",
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "IsDeleted", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Teacher", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Teacher", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Teacher", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Teacher", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.Students",
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "DateOfBirth", "DeletedAt", "Email", "FirstName", "Gender", "IsDeleted", "LastName", "PasswordHash", "Phone", "ProfilePicture", "StudentAccessId", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2006, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "zzz777@gmail.com", "Zokirjon", 1, false, "Tulqunov", "hashlangan password", "+998900000000", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "dilya003@gmail.com", "Dilmurod", 1, false, "Jabborov", "hashlangan password", "+998975771111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Xasanchik007@gmail.com", "Xasanxon", 1, false, "Savriddinov", "hashlangan password", "+998944441111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "murodxon1@gmail.com", "Murodjon", 1, false, "Sharobiddinov", "hashlangan password", "+998933331111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.Subjects",
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "IsDeleted", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "backend development", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "Mobile Delevopment", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "English", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "English", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.Employees",
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "DateOfBirth", "DeletedAt", "Email", "FirstName", "Gender", "Info", "IsDeleted", "JoiningDate", "LastName", "PasswordHash", "Phone", "RoleId", "Specialization", "Status", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "wonderboy3@gmail.com", "Jamshid", 1, "ajoyib", false, new DateOnly(2020, 8, 8), "Ho'jaqulov", "hashlangan password", "+998975777552", 1, "Software engineering", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "KarimBoy@gmail.com", "Muhammad Karim", 1, "MVP", false, new DateOnly(2020, 8, 8), "To'xtaboyev", "hashlangan password", "+998975771111", 1, "Computer Science", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Abdumalik", 1, "Niner", false, new DateOnly(2021, 8, 8), "Abdulvohidov", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Pismadonchi", 1, "Niner", false, new DateOnly(2021, 8, 8), "Palonchiyev", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.Courses",
+                columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "Description", "EndTime", "IsDeleted", "LessonCount", "MaxStudentCount", "Name", "StartDate", "StartTime", "Status", "SubjectId", "TeacherId", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Zo'r kurs", new TimeOnly(18, 0, 0), false, 72, 24, ".Net C#", new DateOnly(2025, 10, 1), new TimeOnly(15, 0, 0), 1, 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "hali bunaqasi bo'lmagan", new TimeOnly(18, 0, 0), false, 80, 20, "Flutter butcamp", new DateOnly(2025, 11, 1), new TimeOnly(15, 0, 0), 2, 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Zo'r kurs", new TimeOnly(18, 0, 0), false, 72, 24, "Intensive Ielts 1", new DateOnly(2025, 10, 1), new TimeOnly(15, 0, 0), 1, 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Zo'r kurs", new TimeOnly(13, 0, 0), false, 72, 24, "General English", new DateOnly(2025, 11, 1), new TimeOnly(11, 0, 0), 2, 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.TeacherSubjects",
+                columns: new[] { "SubjectId", "TeacherId", "CreatedAt", "DeletedAt", "IsDeleted", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.Lessons",
+                columns: new[] { "Id", "CourseId", "CreatedAt", "Date", "DeletedAt", "EndTime", "HomeTaskStatus", "IsCompleted", "IsDeleted", "Name", "Number", "Room", "StartTime", "TeacherId", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2025, 10, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeOnly(18, 0, 0), 0, false, false, "", 1, "uber", new TimeOnly(15, 0, 0), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2025, 10, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeOnly(18, 0, 0), 1, false, false, "", 1, "yandex", new TimeOnly(15, 0, 0), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2025, 10, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeOnly(18, 0, 0), 1, false, false, "", 1, "uber", new TimeOnly(15, 0, 0), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2025, 10, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeOnly(18, 0, 0), 0, false, false, "", 1, "uber", new TimeOnly(15, 0, 0), 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.StudentCourses",
+                columns: new[] { "CourseId", "StudentId", "CreatedAt", "DeletedAt", "IsDeleted", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.HomeTasks",
+                columns: new[] { "Id", "CreatedAt", "Deadline", "DeletedAt", "Description", "IsDeleted", "LessonId", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 3, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 5, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 7, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 10, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Marqa.Domain.Entities.LessonAttendances",
+                columns: new[] { "LessonId", "StudentId", "CreatedAt", "DeletedAt", "IsDeleted", "LateTimeInMinutes", "Status", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 0, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 1, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 10, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), false, 0, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -971,6 +1092,11 @@ namespace Marqa.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Marqa.Domain.Entities.StudentCourses_CourseId",
+                table: "Marqa.Domain.Entities.StudentCourses",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Marqa.Domain.Entities.StudentDetails_StudentId",
                 table: "Marqa.Domain.Entities.StudentDetails",
                 column: "StudentId",
@@ -1026,11 +1152,6 @@ namespace Marqa.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudentCourses_CourseId",
-                table: "StudentCourses",
-                column: "CourseId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_StudentPointHistories_StudentId",
                 table: "StudentPointHistories",
                 column: "StudentId");
@@ -1073,6 +1194,9 @@ namespace Marqa.DataAccess.Migrations
                 name: "Marqa.Domain.Entities.Settings");
 
             migrationBuilder.DropTable(
+                name: "Marqa.Domain.Entities.StudentCourses");
+
+            migrationBuilder.DropTable(
                 name: "Marqa.Domain.Entities.StudentDetails");
 
             migrationBuilder.DropTable(
@@ -1086,9 +1210,6 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Marqa.Domain.Entities.TeacherSubjects");
-
-            migrationBuilder.DropTable(
-                name: "StudentCourses");
 
             migrationBuilder.DropTable(
                 name: "StudentPointHistories");

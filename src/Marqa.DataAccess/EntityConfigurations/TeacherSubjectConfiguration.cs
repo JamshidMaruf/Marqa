@@ -1,4 +1,5 @@
 ﻿using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,5 +24,32 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
             .HasForeignKey<TeacherSubject>(ts => ts.TeacherId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
+
+        builder.HasData(new List<TeacherSubject>
+        {
+            new()
+            {
+                TeacherId = 1,
+                SubjectId = 1
+            },
+            new()
+            {
+                Id = 2,
+                TeacherId = 2,
+                SubjectId = 2
+            },
+            new()
+            {
+                Id = 3,
+                TeacherId = 3,
+                SubjectId = 1
+            },
+            new()
+            {
+                Id = 4,
+                TeacherId = 4,
+                SubjectId = 1
+            }
+        });
     }
 }
