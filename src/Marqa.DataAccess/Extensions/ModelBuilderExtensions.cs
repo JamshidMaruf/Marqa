@@ -1,6 +1,4 @@
-﻿using Marqa.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.DataAccess.Extensions;
 public static class ModelBuilderExtensions
