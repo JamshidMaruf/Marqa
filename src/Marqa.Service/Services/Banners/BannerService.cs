@@ -151,4 +151,9 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             
         }).ToList();
     }
+
+    public Task<List<MainPageBannerViewModel>> GetActiveAsync()
+    {
+        throw new NotImplementedException();
+    }
 }

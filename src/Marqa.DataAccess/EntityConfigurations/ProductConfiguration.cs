@@ -8,7 +8,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.HasKey("Id");
+        builder.HasIndex(t => t.Name).IsUnique(false);
+
         builder.Property(p => p.Description)
             .HasMaxLength(1000);
 
@@ -17,7 +18,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.CompanyId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
     }
 }
 
