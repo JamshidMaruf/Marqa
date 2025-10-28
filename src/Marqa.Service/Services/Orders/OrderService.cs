@@ -9,8 +9,8 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
-    // think about applying transaction!
-    public async Task CreateAsync(OrderCreateModel model)  
+    // TODO: Transaction qo'llash haqida o'ylab ko'rish kerak
+    public async Task CreateAsync(OrderCreateModel model)
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException($"Student not found (ID: {model.StudentId})");
@@ -96,16 +96,14 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task DeleteAsync(int id)
     {
-        var existOrder = await unitOfWork.Orders.SelectAsync(o => o.Id == id)
-            ?? throw new NotFoundException($"Order not found (ID: {id})");
-        
-        // orderni ozidan orderitemlarni include qilingani optimalroq bo'ladi
-        var orderItems = await unitOfWork.OrderItems
+        // Order'ni OrderItem'lar bilan birga Include qilish
+        var existOrder = await unitOfWork.Orders
             .SelectAllAsQueryable()
-            .Where(i => i.OrderId == id)
-            .ToListAsync();
+            .Include(o => o.OrderItems)
+            .FirstOrDefaultAsync(o => o.Id == id)
+            ?? throw new NotFoundException($"Order not found (ID: {id})");
 
-        foreach (var item in orderItems)
+        foreach (var item in existOrder.OrderItems)
         {
             unitOfWork.OrderItems.Delete(item);
         }
@@ -117,17 +115,13 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<OrderViewModel> GetAsync(int id)
     {
-        // student include qilish keregi yoq studentId alohida property 
-        var order = await unitOfWork.Orders.SelectAllAsQueryable()
-            .Include(o => o.Student)
+        // Order'ni OrderItem va Product bilan birga Include qilish
+        var order = await unitOfWork.Orders
+            .SelectAllAsQueryable()
+            .Include(o => o.OrderItems)
+                .ThenInclude(i => i.Product)
             .FirstOrDefaultAsync(o => o.Id == id)
             ?? throw new NotFoundException($"Order not found (ID: {id})");
-
-        // orderItem order bilan birga include qilingan holda ob kelingani optimalroq 
-        var items = await unitOfWork.OrderItems.SelectAllAsQueryable()
-            .Include(i => i.Product) 
-            .Where(i => i.OrderId == order.Id)
-            .ToListAsync();
 
         return new OrderViewModel
         {
@@ -135,10 +129,10 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             StudentId = order.StudentId,
             TotalPrice = order.TotalPrice,
             Status = order.Status,
-            Items = items.Select(i => new OrderItemViewModel
+            Items = order.OrderItems.Select(i => new OrderItemViewModel
             {
                 ProductId = i.ProductId,
-                ProductName = i.Product.Name, 
+                ProductName = i.Product.Name,
                 Count = i.Quantity,
                 InlinePrice = i.InlinePrice
             }).ToList()
@@ -147,9 +141,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<List<OrderViewModel>> GetAllAsync()
     {
-        // student include qilish keremas
-        var orders = await unitOfWork.Orders.SelectAllAsQueryable()
-            .Include(o => o.Student)
+        // Student Include qilmasdan faqat Order ma'lumotlarini olish
+        var orders = await unitOfWork.Orders
+            .SelectAllAsQueryable()
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
 
