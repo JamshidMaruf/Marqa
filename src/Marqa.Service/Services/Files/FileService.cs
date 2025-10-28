@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.Files;
 
-public class FileService() : IFileService
+public class FileService : IFileService
 {
     public async Task<(string FileName, string FilePath)> UploadAsync(IFormFile file, string folder)
     {
