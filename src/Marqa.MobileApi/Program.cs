@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
@@ -7,7 +7,9 @@ using Marqa.MobileApi.Middlewares;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Messages;
 using Marqa.Service.Services.Settings;
+using Marqa.WebApi.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -62,6 +64,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
         };
     });
+
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new RouteTokenTransformerConvention(
+        new LowerCaseControllerName()));
+});
 
 builder.Services.AddAuthorization();
 
