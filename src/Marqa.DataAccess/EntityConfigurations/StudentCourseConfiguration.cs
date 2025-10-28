@@ -8,8 +8,6 @@ public class StudentCourseConfiguration : IEntityTypeConfiguration<StudentCourse
 {
     public void Configure(EntityTypeBuilder<StudentCourse> builder)
     {
-        builder.ToTable("StudentCourses");
-
         builder.Ignore(la => la.Id);
 
         builder.HasKey(sc => new { sc.StudentId, sc.CourseId });
