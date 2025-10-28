@@ -10,6 +10,7 @@ public class Student : Auditable
     public string Phone { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
+    public string ProfilePicture { get; set; }
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public int CompanyId { get; set; }
