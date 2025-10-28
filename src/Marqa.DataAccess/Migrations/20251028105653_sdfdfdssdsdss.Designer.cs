@@ -3,6 +3,7 @@ using System;
 using Marqa.DataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251028105653_sdfdfdssdsdss")]
+    partial class sdfdfdssdsdss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,7 +107,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Marqa.Domain.Entities.Companys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Course", b =>
@@ -170,7 +173,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Marqa.Domain.Entities.Courses", (string)null);
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.CourseWeekday", b =>
@@ -278,7 +281,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Marqa.Domain.Entities.Employees", (string)null);
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.EmployeeRole", b =>
@@ -310,8 +313,9 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId", "Name")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("Name", "CompanyId");
 
                     b.ToTable("Marqa.Domain.Entities.EmployeeRoles", (string)null);
                 });
@@ -415,7 +419,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("HomeTaskId")
+                    b.Property<int?>("HomeTaskId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -845,8 +849,6 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.HasIndex("Name");
-
                     b.ToTable("Marqa.Domain.Entities.Products", (string)null);
                 });
 
@@ -1128,13 +1130,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("ProfilePicture")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("ProfilePicture")
-                        .HasColumnType("text");
-
                     b.Property<string>("StudentAccessId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -1173,7 +1168,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("StudentCourses", (string)null);
+                    b.ToTable("Marqa.Domain.Entities.StudentCourses", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>
@@ -1454,7 +1449,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentPointHistories", (string)null);
+                    b.ToTable("Marqa.Domain.Entities.StudentPointHistorys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Subject", b =>
@@ -1614,8 +1609,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasOne("Marqa.Domain.Entities.HomeTask", "HomeTask")
                         .WithOne("HomeTaskFile")
                         .HasForeignKey("Marqa.Domain.Entities.HomeTaskFile", "HomeTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("HomeTask");
                 });
@@ -1806,8 +1800,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.StudentHomeTaskFeedback", "TeacherId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_Marqa.Domai~1");
+                        .IsRequired();
 
                     b.Navigation("StudentHomeTask");
 
@@ -1859,8 +1852,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.TeacherSubject", "TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.TeacherSubjects_Marqa.Domain.Entitie~1");
+                        .IsRequired();
 
                     b.Navigation("Subject");
 

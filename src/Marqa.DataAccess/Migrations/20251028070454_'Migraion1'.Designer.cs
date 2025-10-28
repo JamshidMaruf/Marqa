@@ -3,6 +3,7 @@ using System;
 using Marqa.DataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251028070454_'Migraion1'")]
+    partial class Migraion1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,8 +43,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("integer");
@@ -50,8 +52,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ImageUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -60,22 +61,20 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("LinkUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.Banners", (string)null);
+                    b.ToTable("Banner");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Company", b =>
@@ -96,15 +95,14 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Course", b =>
@@ -141,8 +139,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
@@ -170,7 +167,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Marqa.Domain.Entities.Courses", (string)null);
+                    b.ToTable("Course");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.CourseWeekday", b =>
@@ -203,7 +200,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Marqa.Domain.Entities.CourseWeekdays", (string)null);
+                    b.ToTable("CourseWeekday");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Employee", b =>
@@ -227,12 +224,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
@@ -248,23 +243,19 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("LastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Specialization")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -278,7 +269,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Marqa.Domain.Entities.Employees", (string)null);
+                    b.ToTable("Employee");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.EmployeeRole", b =>
@@ -302,18 +293,16 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId", "Name")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
 
-                    b.ToTable("Marqa.Domain.Entities.EmployeeRoles", (string)null);
+                    b.ToTable("EmployeeRole");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Exam", b =>
@@ -343,8 +332,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -353,7 +341,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Marqa.Domain.Entities.Exams", (string)null);
+                    b.ToTable("Exam");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.HomeTask", b =>
@@ -390,7 +378,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.HomeTasks", (string)null);
+                    b.ToTable("HomeTask");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.HomeTaskFile", b =>
@@ -408,14 +396,12 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FileName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FilePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
-                    b.Property<int>("HomeTaskId")
+                    b.Property<int?>("HomeTaskId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
@@ -429,7 +415,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("HomeTaskId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.HomeTaskFiles", (string)null);
+                    b.ToTable("HomeTaskFile");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Lesson", b =>
@@ -465,15 +451,13 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Number")
                         .HasColumnType("integer");
 
                     b.Property<string>("Room")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
@@ -490,7 +474,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Marqa.Domain.Entities.Lessons", (string)null);
+                    b.ToTable("Lesson");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.LessonAttendance", b =>
@@ -525,7 +509,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonAttendances", (string)null);
+                    b.ToTable("LessonAttendance");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.LessonFile", b =>
@@ -543,12 +527,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FileName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FilePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -563,7 +545,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonFiles", (string)null);
+                    b.ToTable("LessonFile");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.LessonVideo", b =>
@@ -581,12 +563,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FileName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FilePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -601,7 +581,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonVideos", (string)null);
+                    b.ToTable("LessonVideo");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.OTP", b =>
@@ -613,8 +593,7 @@ namespace Marqa.DataAccess.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -632,15 +611,14 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("PhoneNumber")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.OTPs", (string)null);
+                    b.ToTable("OTP");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Order", b =>
@@ -676,7 +654,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.Orders", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.OrderItem", b =>
@@ -717,7 +695,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Marqa.Domain.Entities.OrderItems", (string)null);
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.PointSetting", b =>
@@ -735,8 +713,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -745,8 +722,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Operation")
                         .HasColumnType("integer");
@@ -755,15 +731,14 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("QrCode")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.PointSettings", (string)null);
+                    b.ToTable("PointSetting");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.PointSystemSetting", b =>
@@ -790,8 +765,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Operation")
                         .HasColumnType("integer");
@@ -804,7 +778,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.PointSystemSettings", (string)null);
+                    b.ToTable("PointSystemSetting");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Product", b =>
@@ -832,8 +806,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Price")
                         .HasColumnType("integer");
@@ -845,9 +818,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.HasIndex("Name");
-
-                    b.ToTable("Marqa.Domain.Entities.Products", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Setting", b =>
@@ -860,8 +831,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -881,23 +851,21 @@ namespace Marqa.DataAccess.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.Settings", (string)null);
+                    b.ToTable("Setting");
 
                     b.HasData(
                         new
@@ -1103,12 +1071,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
@@ -1117,27 +1083,20 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(400)
                         .HasColumnType("character varying(400)");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("ProfilePicture")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("text");
 
                     b.Property<string>("StudentAccessId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1146,7 +1105,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Marqa.Domain.Entities.Students", (string)null);
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentCourse", b =>
@@ -1173,7 +1132,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("StudentCourses", (string)null);
+                    b.ToTable("StudentCourse");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>
@@ -1191,43 +1150,34 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FatherFirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FatherLastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FatherPhone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("GuardianFirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("GuardianLastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("GuardianPhone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("MotherFirstName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MotherLastName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("MotherPhone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
@@ -1240,7 +1190,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("StudentId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentDetails", (string)null);
+                    b.ToTable("StudentDetail");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentExamResult", b =>
@@ -1282,7 +1232,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.StudentExamResults", (string)null);
+                    b.ToTable("StudentExamResult");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTask", b =>
@@ -1303,8 +1253,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Info")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1328,7 +1277,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTasks", (string)null);
+                    b.ToTable("StudentHomeTask");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskFeedback", b =>
@@ -1369,7 +1318,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("TeacherId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTaskFeedbacks", (string)null);
+                    b.ToTable("StudentHomeTaskFeedback");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskFile", b =>
@@ -1387,12 +1336,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FileName")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FilePath")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1408,7 +1355,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("StudentHomeTaskId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTaskFiles", (string)null);
+                    b.ToTable("StudentHomeTaskFile");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentPointHistory", b =>
@@ -1435,8 +1382,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Note")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Operation")
                         .HasColumnType("integer");
@@ -1454,7 +1400,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentPointHistories", (string)null);
+                    b.ToTable("StudentPointHistory");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Subject", b =>
@@ -1478,8 +1424,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1488,7 +1433,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Marqa.Domain.Entities.Subjects", (string)null);
+                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.TeacherSubject", b =>
@@ -1516,7 +1461,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("TeacherId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.TeacherSubjects", (string)null);
+                    b.ToTable("TeacherSubject");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Course", b =>
@@ -1614,8 +1559,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasOne("Marqa.Domain.Entities.HomeTask", "HomeTask")
                         .WithOne("HomeTaskFile")
                         .HasForeignKey("Marqa.Domain.Entities.HomeTaskFile", "HomeTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("HomeTask");
                 });
@@ -1651,8 +1595,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.LessonAttendances_Marqa.Domain.Entit~1");
+                        .IsRequired();
 
                     b.Navigation("Lesson");
 
@@ -1775,8 +1718,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithMany("ExamResults")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentExamResults_Marqa.Domain.Enti~1");
+                        .IsRequired();
 
                     b.Navigation("Exam");
 
@@ -1806,8 +1748,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.StudentHomeTaskFeedback", "TeacherId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_Marqa.Domai~1");
+                        .IsRequired();
 
                     b.Navigation("StudentHomeTask");
 
@@ -1859,8 +1800,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.TeacherSubject", "TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.TeacherSubjects_Marqa.Domain.Entitie~1");
+                        .IsRequired();
 
                     b.Navigation("Subject");
 

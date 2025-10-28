@@ -1,7 +1,6 @@
 ﻿using Marqa.MobileApi.Models;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Messages;
-using Marqa.Service.Services.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

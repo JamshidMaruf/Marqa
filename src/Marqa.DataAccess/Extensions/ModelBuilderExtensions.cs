@@ -29,6 +29,6 @@ public static class ModelBuilderExtensions
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.PropertyInfo.Name == "FilePath" || p.PropertyInfo.Name == "FileName"))
             if (property.GetMaxLength() == null)
-                property.SetMaxLength(2048);
+                property.SetMaxLength(2048);     
     }
 }
