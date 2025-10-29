@@ -6,7 +6,7 @@ public class EmployeeUpdateModel
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public DateTime DateOfBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public string Phone { get; set; }

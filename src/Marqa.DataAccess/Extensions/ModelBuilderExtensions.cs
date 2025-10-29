@@ -6,7 +6,7 @@ public static class ModelBuilderExtensions
     public static void ApplyGlobalConfigurations(this ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            modelBuilder.Entity(entity.Name).ToTable(entity.Name + "s");
+            modelBuilder.Entity(entity.ClrType).ToTable(entity.ClrType.Name + "s");
 
         foreach (var property in modelBuilder.Model.GetEntityTypes()
         .SelectMany(t => t.GetProperties())

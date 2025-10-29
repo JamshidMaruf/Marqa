@@ -9,30 +9,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration1 : Migration
+    public partial class Updated3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Companies",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Companies", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Banners",
+                name: "Banners",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -53,11 +36,28 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Banners", x => x.Id);
+                    table.PrimaryKey("PK_Banners", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.OTPs",
+                name: "Companies",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Companies", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OTPs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -73,11 +73,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.OTPs", x => x.Id);
+                    table.PrimaryKey("PK_OTPs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.PointSettings",
+                name: "PointSettings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -95,11 +95,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.PointSettings", x => x.Id);
+                    table.PrimaryKey("PK_PointSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.PointSystemSettings",
+                name: "PointSystemSettings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -116,11 +116,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.PointSystemSettings", x => x.Id);
+                    table.PrimaryKey("PK_PointSystemSettings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Settings",
+                name: "Settings",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -136,11 +136,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Settings", x => x.Id);
+                    table.PrimaryKey("PK_Settings", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.EmployeeRoles",
+                name: "EmployeeRoles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -154,9 +154,9 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.EmployeeRoles", x => x.Id);
+                    table.PrimaryKey("PK_EmployeeRoles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.EmployeeRoles_Companies_CompanyId",
+                        name: "FK_EmployeeRoles_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
@@ -164,7 +164,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Products",
+                name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -180,9 +180,9 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Products", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Products_Companies_CompanyId",
+                        name: "FK_Products_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
@@ -190,7 +190,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Students",
+                name: "Students",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -202,7 +202,7 @@ namespace Marqa.DataAccess.Migrations
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     PasswordHash = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
                     ProfilePicture = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -212,9 +212,9 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Students", x => x.Id);
+                    table.PrimaryKey("PK_Students", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Students_Companies_CompanyId",
+                        name: "FK_Students_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
@@ -222,7 +222,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Subjects",
+                name: "Subjects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -236,9 +236,9 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Subjects", x => x.Id);
+                    table.PrimaryKey("PK_Subjects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Subjects_Companies_CompanyId",
+                        name: "FK_Subjects_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
@@ -246,7 +246,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Employees",
+                name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -256,7 +256,7 @@ namespace Marqa.DataAccess.Migrations
                     Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     JoiningDate = table.Column<DateOnly>(type: "date", nullable: false),
@@ -271,22 +271,22 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Employees", x => x.Id);
+                    table.PrimaryKey("PK_Employees", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Employees_Companies_CompanyId",
+                        name: "FK_Employees_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Employees_Marqa.Domain.Entities.Emplo~",
+                        name: "FK_Employees_EmployeeRoles_RoleId",
                         column: x => x.RoleId,
-                        principalTable: "Marqa.Domain.Entities.EmployeeRoles",
+                        principalTable: "EmployeeRoles",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Orders",
+                name: "Orders",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -301,16 +301,16 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Orders", x => x.Id);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Orders_Marqa.Domain.Entities.Students~",
+                        name: "FK_Orders_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentDetails",
+                name: "StudentDetails",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -332,17 +332,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentDetails", x => x.Id);
+                    table.PrimaryKey("PK_StudentDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentDetails_Marqa.Domain.Entities.~",
+                        name: "FK_StudentDetails_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentHomeTasks",
+                name: "StudentHomeTasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -360,11 +360,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentHomeTasks", x => x.Id);
+                    table.PrimaryKey("PK_StudentHomeTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentHomeTasks_Marqa.Domain.Entitie~",
+                        name: "FK_StudentHomeTasks_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -390,14 +390,14 @@ namespace Marqa.DataAccess.Migrations
                 {
                     table.PrimaryKey("PK_StudentPointHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudentPointHistories_Marqa.Domain.Entities.Students_Studen~",
+                        name: "FK_StudentPointHistories_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Courses",
+                name: "Courses",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -420,27 +420,27 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Courses", x => x.Id);
+                    table.PrimaryKey("PK_Courses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Courses_Companies_CompanyId",
+                        name: "FK_Courses_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Courses_Marqa.Domain.Entities.Employe~",
+                        name: "FK_Courses_Employees_TeacherId",
                         column: x => x.TeacherId,
-                        principalTable: "Marqa.Domain.Entities.Employees",
+                        principalTable: "Employees",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Courses_Marqa.Domain.Entities.Subject~",
+                        name: "FK_Courses_Subjects_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Marqa.Domain.Entities.Subjects",
+                        principalTable: "Subjects",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.TeacherSubjects",
+                name: "TeacherSubjects",
                 columns: table => new
                 {
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
@@ -452,23 +452,23 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.TeacherSubjects", x => new { x.SubjectId, x.TeacherId });
+                    table.PrimaryKey("PK_TeacherSubjects", x => new { x.SubjectId, x.TeacherId });
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.TeacherSubjects_Marqa.Domain.Entities~",
-                        column: x => x.SubjectId,
-                        principalTable: "Marqa.Domain.Entities.Subjects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.TeacherSubjects_Marqa.Domain.Entitie~1",
+                        name: "FK_TeacherSubjects_Employees_TeacherId",
                         column: x => x.TeacherId,
-                        principalTable: "Marqa.Domain.Entities.Employees",
+                        principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TeacherSubjects_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.OrderItems",
+                name: "OrderItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -484,22 +484,22 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.OrderItems", x => x.Id);
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.OrderItems_Marqa.Domain.Entities.Orde~",
+                        name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
-                        principalTable: "Marqa.Domain.Entities.Orders",
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.OrderItems_Marqa.Domain.Entities.Prod~",
+                        name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
-                        principalTable: "Marqa.Domain.Entities.Products",
+                        principalTable: "Products",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentHomeTaskFeedbacks",
+                name: "StudentHomeTaskFeedbacks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -514,21 +514,21 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks", x => x.Id);
+                    table.PrimaryKey("PK_StudentHomeTaskFeedbacks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_Marqa.Domain~",
-                        column: x => x.StudentHomeTaskId,
-                        principalTable: "Marqa.Domain.Entities.StudentHomeTasks",
+                        name: "FK_StudentHomeTaskFeedbacks_Employees_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Employees",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_Marqa.Domai~1",
-                        column: x => x.TeacherId,
-                        principalTable: "Marqa.Domain.Entities.Employees",
+                        name: "FK_StudentHomeTaskFeedbacks_StudentHomeTasks_StudentHomeTaskId",
+                        column: x => x.StudentHomeTaskId,
+                        principalTable: "StudentHomeTasks",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentHomeTaskFiles",
+                name: "StudentHomeTaskFiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -543,17 +543,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentHomeTaskFiles", x => x.Id);
+                    table.PrimaryKey("PK_StudentHomeTaskFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentHomeTaskFiles_Marqa.Domain.Ent~",
+                        name: "FK_StudentHomeTaskFiles_StudentHomeTasks_StudentHomeTaskId",
                         column: x => x.StudentHomeTaskId,
-                        principalTable: "Marqa.Domain.Entities.StudentHomeTasks",
+                        principalTable: "StudentHomeTasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.CourseWeekdays",
+                name: "CourseWeekdays",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -567,17 +567,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.CourseWeekdays", x => x.Id);
+                    table.PrimaryKey("PK_CourseWeekdays", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.CourseWeekdays_Marqa.Domain.Entities.~",
+                        name: "FK_CourseWeekdays_Courses_CourseId",
                         column: x => x.CourseId,
-                        principalTable: "Marqa.Domain.Entities.Courses",
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Exams",
+                name: "Exams",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -593,17 +593,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Exams", x => x.Id);
+                    table.PrimaryKey("PK_Exams", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Exams_Marqa.Domain.Entities.Courses_C~",
+                        name: "FK_Exams_Courses_CourseId",
                         column: x => x.CourseId,
-                        principalTable: "Marqa.Domain.Entities.Courses",
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.Lessons",
+                name: "Lessons",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -625,22 +625,22 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.Lessons", x => x.Id);
+                    table.PrimaryKey("PK_Lessons", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Lessons_Marqa.Domain.Entities.Courses~",
+                        name: "FK_Lessons_Courses_CourseId",
                         column: x => x.CourseId,
-                        principalTable: "Marqa.Domain.Entities.Courses",
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.Lessons_Marqa.Domain.Entities.Employe~",
+                        name: "FK_Lessons_Employees_TeacherId",
                         column: x => x.TeacherId,
-                        principalTable: "Marqa.Domain.Entities.Employees",
+                        principalTable: "Employees",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentCourses",
+                name: "StudentCourses",
                 columns: table => new
                 {
                     StudentId = table.Column<int>(type: "integer", nullable: false),
@@ -652,23 +652,23 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentCourses", x => new { x.StudentId, x.CourseId });
+                    table.PrimaryKey("PK_StudentCourses", x => new { x.StudentId, x.CourseId });
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentCourses_Marqa.Domain.Entities.~",
+                        name: "FK_StudentCourses_Courses_CourseId",
                         column: x => x.CourseId,
-                        principalTable: "Marqa.Domain.Entities.Courses",
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentCourses_Marqa.Domain.Entities~1",
+                        name: "FK_StudentCourses_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.StudentExamResults",
+                name: "StudentExamResults",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -684,23 +684,23 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.StudentExamResults", x => x.Id);
+                    table.PrimaryKey("PK_StudentExamResults", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentExamResults_Marqa.Domain.Entit~",
+                        name: "FK_StudentExamResults_Exams_ExamId",
                         column: x => x.ExamId,
-                        principalTable: "Marqa.Domain.Entities.Exams",
+                        principalTable: "Exams",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.StudentExamResults_Marqa.Domain.Enti~1",
+                        name: "FK_StudentExamResults_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.HomeTasks",
+                name: "HomeTasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -715,17 +715,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.HomeTasks", x => x.Id);
+                    table.PrimaryKey("PK_HomeTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.HomeTasks_Marqa.Domain.Entities.Lesso~",
+                        name: "FK_HomeTasks_Lessons_LessonId",
                         column: x => x.LessonId,
-                        principalTable: "Marqa.Domain.Entities.Lessons",
+                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.LessonAttendances",
+                name: "LessonAttendances",
                 columns: table => new
                 {
                     LessonId = table.Column<int>(type: "integer", nullable: false),
@@ -739,23 +739,23 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.LessonAttendances", x => new { x.StudentId, x.LessonId });
+                    table.PrimaryKey("PK_LessonAttendances", x => new { x.StudentId, x.LessonId });
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.LessonAttendances_Marqa.Domain.Entiti~",
+                        name: "FK_LessonAttendances_Lessons_LessonId",
                         column: x => x.LessonId,
-                        principalTable: "Marqa.Domain.Entities.Lessons",
+                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.LessonAttendances_Marqa.Domain.Entit~1",
+                        name: "FK_LessonAttendances_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Marqa.Domain.Entities.Students",
+                        principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.LessonFiles",
+                name: "LessonFiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -770,17 +770,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.LessonFiles", x => x.Id);
+                    table.PrimaryKey("PK_LessonFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.LessonFiles_Marqa.Domain.Entities.Les~",
+                        name: "FK_LessonFiles_Lessons_LessonId",
                         column: x => x.LessonId,
-                        principalTable: "Marqa.Domain.Entities.Lessons",
+                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.LessonVideos",
+                name: "LessonVideos",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -795,17 +795,17 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.LessonVideos", x => x.Id);
+                    table.PrimaryKey("PK_LessonVideos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.LessonVideos_Marqa.Domain.Entities.Le~",
+                        name: "FK_LessonVideos_Lessons_LessonId",
                         column: x => x.LessonId,
-                        principalTable: "Marqa.Domain.Entities.Lessons",
+                        principalTable: "Lessons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marqa.Domain.Entities.HomeTaskFiles",
+                name: "HomeTaskFiles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -820,11 +820,11 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marqa.Domain.Entities.HomeTaskFiles", x => x.Id);
+                    table.PrimaryKey("PK_HomeTaskFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Marqa.Domain.Entities.HomeTaskFiles_Marqa.Domain.Entities.H~",
+                        name: "FK_HomeTaskFiles_HomeTasks_HomeTaskId",
                         column: x => x.HomeTaskId,
-                        principalTable: "Marqa.Domain.Entities.HomeTasks",
+                        principalTable: "HomeTasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -841,7 +841,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Settings",
+                table: "Settings",
                 columns: new[] { "Id", "Category", "CreatedAt", "DeletedAt", "Key", "UpdatedAt", "Value" },
                 values: new object[,]
                 {
@@ -853,12 +853,12 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Settings",
+                table: "Settings",
                 columns: new[] { "Id", "Category", "CreatedAt", "DeletedAt", "IsEncrypted", "Key", "UpdatedAt", "Value" },
                 values: new object[] { 6, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), true, "Eskiz.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "kWq42ByF3HK+8IL9H6qlL4LVzwTS5VF9dfd41ePZ9T2khUGm9AO6ju1aRVIvnCUr" });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Settings",
+                table: "Settings",
                 columns: new[] { "Id", "Category", "CreatedAt", "DeletedAt", "Key", "UpdatedAt", "Value" },
                 values: new object[,]
                 {
@@ -874,7 +874,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.EmployeeRoles",
+                table: "EmployeeRoles",
                 columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "IsDeleted", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -885,18 +885,18 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Students",
+                table: "Students",
                 columns: new[] { "Id", "CompanyId", "CreatedAt", "DateOfBirth", "DeletedAt", "Email", "FirstName", "Gender", "IsDeleted", "LastName", "PasswordHash", "Phone", "ProfilePicture", "StudentAccessId", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2006, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "zzz777@gmail.com", "Zokirjon", 1, false, "Tulqunov", "hashlangan password", "+998900000000", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "dilya003@gmail.com", "Dilmurod", 1, false, "Jabborov", "hashlangan password", "+998975771111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Xasanchik007@gmail.com", "Xasanxon", 1, false, "Savriddinov", "hashlangan password", "+998944441111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "murodxon1@gmail.com", "Murodjon", 1, false, "Sharobiddinov", "hashlangan password", "+998933331111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2006, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "zzz777@gmail.com", "Zokirjon", 1, false, "Tulqunov", "hashlangan password", "+998900000000", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(1999, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "dilya003@gmail.com", "Dilmurod", 1, false, "Jabborov", "hashlangan password", "+998975771111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2002, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Xasanchik007@gmail.com", "Xasanxon", 1, false, "Savriddinov", "hashlangan password", "+998944441111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2002, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "murodxon1@gmail.com", "Murodjon", 1, false, "Sharobiddinov", "hashlangan password", "+998933331111", null, null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Subjects",
+                table: "Subjects",
                 columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "IsDeleted", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -907,18 +907,18 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Employees",
+                table: "Employees",
                 columns: new[] { "Id", "CompanyId", "CreatedAt", "DateOfBirth", "DeletedAt", "Email", "FirstName", "Gender", "Info", "IsDeleted", "JoiningDate", "LastName", "PasswordHash", "Phone", "RoleId", "Specialization", "Status", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "wonderboy3@gmail.com", "Jamshid", 1, "ajoyib", false, new DateOnly(2020, 8, 8), "Ho'jaqulov", "hashlangan password", "+998975777552", 1, "Software engineering", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "KarimBoy@gmail.com", "Muhammad Karim", 1, "MVP", false, new DateOnly(2020, 8, 8), "To'xtaboyev", "hashlangan password", "+998975771111", 1, "Computer Science", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Abdumalik", 1, "Niner", false, new DateOnly(2021, 8, 8), "Abdulvohidov", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Pismadonchi", 1, "Niner", false, new DateOnly(2021, 8, 8), "Palonchiyev", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2001, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "wonderboy3@gmail.com", "Jamshid", 1, "ajoyib", false, new DateOnly(2020, 8, 8), "Ho'jaqulov", "hashlangan password", "+998975777552", 1, "Software engineering", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(1999, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "KarimBoy@gmail.com", "Muhammad Karim", 1, "MVP", false, new DateOnly(2020, 8, 8), "To'xtaboyev", "hashlangan password", "+998975771111", 1, "Computer Science", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2002, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Abdumalik", 1, "Niner", false, new DateOnly(2021, 8, 8), "Abdulvohidov", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateOnly(2002, 1, 1), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "AbdumalikA@gmail.com", "Pismadonchi", 1, "Niner", false, new DateOnly(2021, 8, 8), "Palonchiyev", "hashlangan password", "+998922221111", 1, "Teaching English", 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Courses",
+                table: "Courses",
                 columns: new[] { "Id", "CompanyId", "CreatedAt", "DeletedAt", "Description", "EndTime", "IsDeleted", "LessonCount", "MaxStudentCount", "Name", "StartDate", "StartTime", "Status", "SubjectId", "TeacherId", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -929,7 +929,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.TeacherSubjects",
+                table: "TeacherSubjects",
                 columns: new[] { "SubjectId", "TeacherId", "CreatedAt", "DeletedAt", "IsDeleted", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -940,7 +940,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.Lessons",
+                table: "Lessons",
                 columns: new[] { "Id", "CourseId", "CreatedAt", "Date", "DeletedAt", "EndTime", "HomeTaskStatus", "IsCompleted", "IsDeleted", "Name", "Number", "Room", "StartTime", "TeacherId", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -951,7 +951,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.StudentCourses",
+                table: "StudentCourses",
                 columns: new[] { "CourseId", "StudentId", "CreatedAt", "DeletedAt", "IsDeleted", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -962,18 +962,18 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.HomeTasks",
+                table: "HomeTasks",
                 columns: new[] { "Id", "CreatedAt", "Deadline", "DeletedAt", "Description", "IsDeleted", "LessonId", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 3, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 5, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 7, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
-                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 10, 15, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
+                    { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 3, 15, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 5, 15, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 7, 15, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 3, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) },
+                    { 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 10, 15, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Description", false, 4, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified) }
                 });
 
             migrationBuilder.InsertData(
-                table: "Marqa.Domain.Entities.LessonAttendances",
+                table: "LessonAttendances",
                 columns: new[] { "LessonId", "StudentId", "CreatedAt", "DeletedAt", "IsDeleted", "LateTimeInMinutes", "Status", "UpdatedAt" },
                 values: new object[,]
                 {
@@ -984,268 +984,268 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Courses_CompanyId",
-                table: "Marqa.Domain.Entities.Courses",
+                name: "IX_Courses_CompanyId",
+                table: "Courses",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Courses_SubjectId",
-                table: "Marqa.Domain.Entities.Courses",
+                name: "IX_Courses_SubjectId",
+                table: "Courses",
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Courses_TeacherId",
-                table: "Marqa.Domain.Entities.Courses",
+                name: "IX_Courses_TeacherId",
+                table: "Courses",
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.CourseWeekdays_CourseId",
-                table: "Marqa.Domain.Entities.CourseWeekdays",
+                name: "IX_CourseWeekdays_CourseId",
+                table: "CourseWeekdays",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.EmployeeRoles_CompanyId_Name",
-                table: "Marqa.Domain.Entities.EmployeeRoles",
+                name: "IX_EmployeeRoles_CompanyId_Name",
+                table: "EmployeeRoles",
                 columns: new[] { "CompanyId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Employees_CompanyId",
-                table: "Marqa.Domain.Entities.Employees",
+                name: "IX_Employees_CompanyId",
+                table: "Employees",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Employees_RoleId",
-                table: "Marqa.Domain.Entities.Employees",
+                name: "IX_Employees_RoleId",
+                table: "Employees",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Exams_CourseId",
-                table: "Marqa.Domain.Entities.Exams",
+                name: "IX_Exams_CourseId",
+                table: "Exams",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.HomeTaskFiles_HomeTaskId",
-                table: "Marqa.Domain.Entities.HomeTaskFiles",
+                name: "IX_HomeTaskFiles_HomeTaskId",
+                table: "HomeTaskFiles",
                 column: "HomeTaskId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.HomeTasks_LessonId",
-                table: "Marqa.Domain.Entities.HomeTasks",
+                name: "IX_HomeTasks_LessonId",
+                table: "HomeTasks",
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.LessonAttendances_LessonId",
-                table: "Marqa.Domain.Entities.LessonAttendances",
+                name: "IX_LessonAttendances_LessonId",
+                table: "LessonAttendances",
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.LessonFiles_LessonId",
-                table: "Marqa.Domain.Entities.LessonFiles",
+                name: "IX_LessonFiles_LessonId",
+                table: "LessonFiles",
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Lessons_CourseId",
-                table: "Marqa.Domain.Entities.Lessons",
+                name: "IX_Lessons_CourseId",
+                table: "Lessons",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Lessons_TeacherId",
-                table: "Marqa.Domain.Entities.Lessons",
+                name: "IX_Lessons_TeacherId",
+                table: "Lessons",
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.LessonVideos_LessonId",
-                table: "Marqa.Domain.Entities.LessonVideos",
+                name: "IX_LessonVideos_LessonId",
+                table: "LessonVideos",
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.OrderItems_OrderId",
-                table: "Marqa.Domain.Entities.OrderItems",
+                name: "IX_OrderItems_OrderId",
+                table: "OrderItems",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.OrderItems_ProductId",
-                table: "Marqa.Domain.Entities.OrderItems",
+                name: "IX_OrderItems_ProductId",
+                table: "OrderItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Orders_StudentId",
-                table: "Marqa.Domain.Entities.Orders",
+                name: "IX_Orders_StudentId",
+                table: "Orders",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Products_CompanyId",
-                table: "Marqa.Domain.Entities.Products",
+                name: "IX_Products_CompanyId",
+                table: "Products",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Products_Name",
-                table: "Marqa.Domain.Entities.Products",
+                name: "IX_Products_Name",
+                table: "Products",
                 column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Settings_Key",
-                table: "Marqa.Domain.Entities.Settings",
+                name: "IX_Settings_Key",
+                table: "Settings",
                 column: "Key",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentCourses_CourseId",
-                table: "Marqa.Domain.Entities.StudentCourses",
+                name: "IX_StudentCourses_CourseId",
+                table: "StudentCourses",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentDetails_StudentId",
-                table: "Marqa.Domain.Entities.StudentDetails",
+                name: "IX_StudentDetails_StudentId",
+                table: "StudentDetails",
                 column: "StudentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentExamResults_ExamId",
-                table: "Marqa.Domain.Entities.StudentExamResults",
+                name: "IX_StudentExamResults_ExamId",
+                table: "StudentExamResults",
                 column: "ExamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentExamResults_StudentId",
-                table: "Marqa.Domain.Entities.StudentExamResults",
+                name: "IX_StudentExamResults_StudentId",
+                table: "StudentExamResults",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_StudentHomeT~",
-                table: "Marqa.Domain.Entities.StudentHomeTaskFeedbacks",
+                name: "IX_StudentHomeTaskFeedbacks_StudentHomeTaskId",
+                table: "StudentHomeTaskFeedbacks",
                 column: "StudentHomeTaskId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_TeacherId",
-                table: "Marqa.Domain.Entities.StudentHomeTaskFeedbacks",
+                name: "IX_StudentHomeTaskFeedbacks_TeacherId",
+                table: "StudentHomeTaskFeedbacks",
                 column: "TeacherId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentHomeTaskFiles_StudentHomeTaskId",
-                table: "Marqa.Domain.Entities.StudentHomeTaskFiles",
+                name: "IX_StudentHomeTaskFiles_StudentHomeTaskId",
+                table: "StudentHomeTaskFiles",
                 column: "StudentHomeTaskId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.StudentHomeTasks_StudentId",
-                table: "Marqa.Domain.Entities.StudentHomeTasks",
+                name: "IX_StudentHomeTasks_StudentId",
+                table: "StudentHomeTasks",
                 column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Students_CompanyId",
-                table: "Marqa.Domain.Entities.Students",
-                column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.Subjects_CompanyId",
-                table: "Marqa.Domain.Entities.Subjects",
-                column: "CompanyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Marqa.Domain.Entities.TeacherSubjects_TeacherId",
-                table: "Marqa.Domain.Entities.TeacherSubjects",
-                column: "TeacherId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentPointHistories_StudentId",
                 table: "StudentPointHistories",
                 column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_CompanyId",
+                table: "Students",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subjects_CompanyId",
+                table: "Subjects",
+                column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeacherSubjects_TeacherId",
+                table: "TeacherSubjects",
+                column: "TeacherId",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Banners");
+                name: "Banners");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.CourseWeekdays");
+                name: "CourseWeekdays");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.HomeTaskFiles");
+                name: "HomeTaskFiles");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.LessonAttendances");
+                name: "LessonAttendances");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.LessonFiles");
+                name: "LessonFiles");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.LessonVideos");
+                name: "LessonVideos");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.OrderItems");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.OTPs");
+                name: "OTPs");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.PointSettings");
+                name: "PointSettings");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.PointSystemSettings");
+                name: "PointSystemSettings");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Settings");
+                name: "Settings");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentCourses");
+                name: "StudentCourses");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentDetails");
+                name: "StudentDetails");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentExamResults");
+                name: "StudentExamResults");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentHomeTaskFeedbacks");
+                name: "StudentHomeTaskFeedbacks");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentHomeTaskFiles");
-
-            migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.TeacherSubjects");
+                name: "StudentHomeTaskFiles");
 
             migrationBuilder.DropTable(
                 name: "StudentPointHistories");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.HomeTasks");
+                name: "TeacherSubjects");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Orders");
+                name: "HomeTasks");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Products");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Exams");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.StudentHomeTasks");
+                name: "Exams");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Lessons");
+                name: "StudentHomeTasks");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Students");
+                name: "Lessons");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Courses");
+                name: "Students");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Employees");
+                name: "Courses");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.Subjects");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Marqa.Domain.Entities.EmployeeRoles");
+                name: "Subjects");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeRoles");
 
             migrationBuilder.DropTable(
                 name: "Companies");
