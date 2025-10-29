@@ -15,16 +15,15 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        Expression<Func<Auditable, bool>> filterExpr = bm => !bm.IsDeleted;
-        foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (mutableEntityType.ClrType.IsAssignableTo(typeof(Auditable)))
+            if (typeof(Auditable).IsAssignableFrom(entityType.ClrType))
             {
-                var parameter = Expression.Parameter(mutableEntityType.ClrType);
-                var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
-                var lambdaExpression = Expression.Lambda(body, parameter);
-
-                mutableEntityType.SetQueryFilter(lambdaExpression);
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+                var prop = Expression.Property(parameter, nameof(Auditable.IsDeleted));
+                var condition = Expression.Equal(prop, Expression.Constant(false));
+                var lambda = Expression.Lambda(condition, parameter);
+                entityType.SetQueryFilter(lambda);
             }
         }
 
@@ -40,4 +39,3 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
-

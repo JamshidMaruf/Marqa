@@ -31,7 +31,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
                 FirstName = "Jamshid",
                 LastName = "Ho'jaqulov",
                 Status = EmployeeStatus.Active,
-                CompanyId = 4,
+                CompanyId = 3,
                 DateOfBirth = new DateOnly(2001,01,01),
                 Email = "wonderboy3@gmail.com",
                 Gender = Gender.Male,  
