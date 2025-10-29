@@ -9,7 +9,7 @@ public class Employee : Auditable
     public string Phone { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
-    public DateTime DateOfBirth { get; set; }
+    public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }

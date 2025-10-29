@@ -30,28 +30,28 @@ public class HomeTaskConfiguration : IEntityTypeConfiguration<HomeTask>
             {
                 Id = 1,
                 LessonId = 1,
-                Deadline = new DateTime(2025,11,03,15,00,00),
+                Deadline = new DateTime(2025,11,03,15,00,00, DateTimeKind.Utc),
                 Description = "Description",
             },
             new()
             {
                 Id = 2,
                 LessonId = 2,
-                Deadline = new DateTime(2025,11,05,15,00,00),
+                Deadline = new DateTime(2025,11,05,15,00,00, DateTimeKind.Utc),
                 Description = "Description",
             },
             new()
             {
                 Id = 3,
                 LessonId = 3,
-                Deadline = new DateTime(2025,11,07,15,00,00),
+                Deadline = new DateTime(2025,11,07,15,00,00, DateTimeKind.Utc),
                 Description = "Description",
             },
             new()
             {
                 Id = 4,
                 LessonId = 4,
-                Deadline = new DateTime(2025,11,10,15,00,00),
+                Deadline = new DateTime(2025,11,10,15,00,00, DateTimeKind.Utc),
                 Description = "Description",
             }
         });

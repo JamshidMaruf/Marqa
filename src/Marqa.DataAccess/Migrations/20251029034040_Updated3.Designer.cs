@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251028154006_Migration1")]
-    partial class Migration1
+    [Migration("20251029034040_Updated3")]
+    partial class Updated3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,7 +78,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.Banners", (string)null);
+                    b.ToTable("Banners", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Company", b =>
@@ -211,7 +211,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Marqa.Domain.Entities.Courses", (string)null);
+                    b.ToTable("Courses", (string)null);
 
                     b.HasData(
                         new
@@ -322,7 +322,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Marqa.Domain.Entities.CourseWeekdays", (string)null);
+                    b.ToTable("CourseWeekdays", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Employee", b =>
@@ -339,8 +339,8 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -397,7 +397,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Marqa.Domain.Entities.Employees", (string)null);
+                    b.ToTable("Employees", (string)null);
 
                     b.HasData(
                         new
@@ -405,7 +405,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 1,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2001, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "wonderboy3@gmail.com",
                             FirstName = "Jamshid",
@@ -426,7 +426,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 2,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(1999, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "KarimBoy@gmail.com",
                             FirstName = "Muhammad Karim",
@@ -447,7 +447,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 3,
                             CompanyId = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2002, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "AbdumalikA@gmail.com",
                             FirstName = "Abdumalik",
@@ -468,7 +468,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 4,
                             CompanyId = 2,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2002, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "AbdumalikA@gmail.com",
                             FirstName = "Pismadonchi",
@@ -518,7 +518,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("CompanyId", "Name")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.EmployeeRoles", (string)null);
+                    b.ToTable("EmployeeRoles", (string)null);
 
                     b.HasData(
                         new
@@ -600,7 +600,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Marqa.Domain.Entities.Exams", (string)null);
+                    b.ToTable("Exams", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.HomeTask", b =>
@@ -637,14 +637,14 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.HomeTasks", (string)null);
+                    b.ToTable("HomeTasks", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deadline = new DateTime(2025, 11, 3, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deadline = new DateTime(2025, 11, 3, 15, 0, 0, 0, DateTimeKind.Utc),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description",
                             IsDeleted = false,
@@ -655,7 +655,7 @@ namespace Marqa.DataAccess.Migrations
                         {
                             Id = 2,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deadline = new DateTime(2025, 11, 5, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deadline = new DateTime(2025, 11, 5, 15, 0, 0, 0, DateTimeKind.Utc),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description",
                             IsDeleted = false,
@@ -666,7 +666,7 @@ namespace Marqa.DataAccess.Migrations
                         {
                             Id = 3,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deadline = new DateTime(2025, 11, 7, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deadline = new DateTime(2025, 11, 7, 15, 0, 0, 0, DateTimeKind.Utc),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description",
                             IsDeleted = false,
@@ -677,7 +677,7 @@ namespace Marqa.DataAccess.Migrations
                         {
                             Id = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Deadline = new DateTime(2025, 11, 10, 15, 0, 0, 0, DateTimeKind.Unspecified),
+                            Deadline = new DateTime(2025, 11, 10, 15, 0, 0, 0, DateTimeKind.Utc),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Description",
                             IsDeleted = false,
@@ -722,7 +722,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("HomeTaskId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.HomeTaskFiles", (string)null);
+                    b.ToTable("HomeTaskFiles", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Lesson", b =>
@@ -783,7 +783,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Marqa.Domain.Entities.Lessons", (string)null);
+                    b.ToTable("Lessons", (string)null);
 
                     b.HasData(
                         new
@@ -892,7 +892,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonAttendances", (string)null);
+                    b.ToTable("LessonAttendances", (string)null);
 
                     b.HasData(
                         new
@@ -976,7 +976,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonFiles", (string)null);
+                    b.ToTable("LessonFiles", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.LessonVideo", b =>
@@ -1014,7 +1014,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("Marqa.Domain.Entities.LessonVideos", (string)null);
+                    b.ToTable("LessonVideos", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.OTP", b =>
@@ -1053,7 +1053,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.OTPs", (string)null);
+                    b.ToTable("OTPs", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Order", b =>
@@ -1089,7 +1089,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.Orders", (string)null);
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.OrderItem", b =>
@@ -1130,7 +1130,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Marqa.Domain.Entities.OrderItems", (string)null);
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.PointSetting", b =>
@@ -1176,7 +1176,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.PointSettings", (string)null);
+                    b.ToTable("PointSettings", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.PointSystemSetting", b =>
@@ -1217,7 +1217,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Marqa.Domain.Entities.PointSystemSettings", (string)null);
+                    b.ToTable("PointSystemSettings", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Product", b =>
@@ -1260,7 +1260,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("Name");
 
-                    b.ToTable("Marqa.Domain.Entities.Products", (string)null);
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Setting", b =>
@@ -1310,7 +1310,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.Settings", (string)null);
+                    b.ToTable("Settings", (string)null);
 
                     b.HasData(
                         new
@@ -1509,8 +1509,8 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1556,7 +1556,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Marqa.Domain.Entities.Students", (string)null);
+                    b.ToTable("Students", (string)null);
 
                     b.HasData(
                         new
@@ -1564,7 +1564,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 1,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2006, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2006, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "zzz777@gmail.com",
                             FirstName = "Zokirjon",
@@ -1580,7 +1580,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 2,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(1999, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(1999, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "dilya003@gmail.com",
                             FirstName = "Dilmurod",
@@ -1596,7 +1596,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 3,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2002, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "Xasanchik007@gmail.com",
                             FirstName = "Xasanxon",
@@ -1612,7 +1612,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 4,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            DateOfBirth = new DateTime(2002, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfBirth = new DateOnly(2002, 1, 1),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "murodxon1@gmail.com",
                             FirstName = "Murodjon",
@@ -1649,7 +1649,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Marqa.Domain.Entities.StudentCourses", (string)null);
+                    b.ToTable("StudentCourses", (string)null);
 
                     b.HasData(
                         new
@@ -1754,7 +1754,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("StudentId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentDetails", (string)null);
+                    b.ToTable("StudentDetails", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentExamResult", b =>
@@ -1796,7 +1796,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.StudentExamResults", (string)null);
+                    b.ToTable("StudentExamResults", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTask", b =>
@@ -1842,7 +1842,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTasks", (string)null);
+                    b.ToTable("StudentHomeTasks", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskFeedback", b =>
@@ -1883,7 +1883,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("TeacherId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTaskFeedbacks", (string)null);
+                    b.ToTable("StudentHomeTaskFeedbacks", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentHomeTaskFile", b =>
@@ -1922,7 +1922,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("StudentHomeTaskId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.StudentHomeTaskFiles", (string)null);
+                    b.ToTable("StudentHomeTaskFiles", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentPointHistory", b =>
@@ -2002,7 +2002,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Marqa.Domain.Entities.Subjects", (string)null);
+                    b.ToTable("Subjects", (string)null);
 
                     b.HasData(
                         new
@@ -2072,7 +2072,7 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("TeacherId")
                         .IsUnique();
 
-                    b.ToTable("Marqa.Domain.Entities.TeacherSubjects", (string)null);
+                    b.ToTable("TeacherSubjects", (string)null);
 
                     b.HasData(
                         new
@@ -2245,8 +2245,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.LessonAttendances_Marqa.Domain.Entit~1");
+                        .IsRequired();
 
                     b.Navigation("Lesson");
 
@@ -2339,8 +2338,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithMany("Courses")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentCourses_Marqa.Domain.Entities~1");
+                        .IsRequired();
 
                     b.Navigation("Course");
 
@@ -2370,8 +2368,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithMany("ExamResults")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentExamResults_Marqa.Domain.Enti~1");
+                        .IsRequired();
 
                     b.Navigation("Exam");
 
@@ -2401,8 +2398,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.StudentHomeTaskFeedback", "TeacherId")
                         .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.StudentHomeTaskFeedbacks_Marqa.Domai~1");
+                        .IsRequired();
 
                     b.Navigation("StudentHomeTask");
 
@@ -2454,8 +2450,7 @@ namespace Marqa.DataAccess.Migrations
                         .WithOne()
                         .HasForeignKey("Marqa.Domain.Entities.TeacherSubject", "TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_Marqa.Domain.Entities.TeacherSubjects_Marqa.Domain.Entitie~1");
+                        .IsRequired();
 
                     b.Navigation("Subject");
 
