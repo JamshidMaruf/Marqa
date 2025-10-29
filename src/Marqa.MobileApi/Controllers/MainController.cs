@@ -43,7 +43,3 @@ public class MainController(ICourseService courseService, IBannerService bannerS
         });
     }
 }
-public class MainController(IRatingService ratingService) : BaseController
-{
-    public async Task<IActionResult> GetRatingAsync
-}

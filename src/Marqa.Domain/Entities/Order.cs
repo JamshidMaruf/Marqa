@@ -7,7 +7,7 @@ public class Order : Auditable
     public int StudentId { get; set; }
     public int TotalPrice { get; set; }
     public OrderStatus Status { get; set; }
-
+    public string Number { get; set; }
     public Student Student { get; set; }
     public ICollection<OrderItem> OrderItems { get; set; }
 }

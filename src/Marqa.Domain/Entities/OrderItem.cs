@@ -3,6 +3,7 @@
 public class OrderItem : Auditable
 {
     public int Quantity { get; set; }
+    public int Price {  get; set; }
     public int InlinePrice {  get; set; }
     public int OrderId {  get; set; }
     public Order Order { get; set; }

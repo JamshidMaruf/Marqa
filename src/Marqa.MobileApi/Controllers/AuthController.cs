@@ -35,9 +35,9 @@ public class AuthController(IAuthService authService, ISmsService smsService) : 
     [HttpGet("otp/verify")]
     public async Task<IActionResult> VerifyOTPAsync(string phone, string code)
     {
-        await smsService.VerifyOTPAsync(phone, code);
+        var result = await smsService.VerifyOTPAsync(phone, code);
         var app = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "App")?.Value;
-        var token = await authService.GenerateToken(app);
+        var token = await authService.GenerateToken(app, result.EntityId, result.EntityType);
 
         return Ok(new Response<string>
         {

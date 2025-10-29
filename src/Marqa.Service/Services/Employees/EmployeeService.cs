@@ -7,8 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
 
-public class EmployeeService(IUnitOfWork unitOfWork)
-    : IEmployeeService
+public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
 {
     public async Task CreateAsync(EmployeeCreateModel model)
     {
@@ -112,6 +111,11 @@ public class EmployeeService(IUnitOfWork unitOfWork)
             })
             .FirstOrDefaultAsync(e => e.Id == id)
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
+    }
+
+    public Task<EmployeeViewModel> GetByPhoneAsync(string phone)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)

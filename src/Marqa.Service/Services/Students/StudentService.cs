@@ -62,7 +62,6 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         }
     }
 
-    // StudentDetails include qilingan va transaction bilan update qilish
     public async Task UpdateAsync(int id, StudentUpdateModel model)
     {
         await unitOfWork.BeginTransactionAsync();
@@ -103,7 +102,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         }
     }
 
-    // StudentDetail bilan birga o'chirish (include qilingan)
+    
     public async Task DeleteAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -120,7 +119,17 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<StudentViewModel> GetAsync(int id, string name)
+    public Task<StudentViewModel> GetByPhoneAsync(string phone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<StudentDetailViewModel> GetStudentParentByPhoneAsync(string phone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<StudentViewModel> GetAsync(int id)
     {
         var existStudent = await unitOfWork.Students
             .SelectAsync(predicate: t => t.Id == id, includes: new[] { "StudentDetail" })
@@ -235,25 +244,5 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         await unitOfWork.SaveAsync();
 
         return relativePath;
-    }
-
-    public Task SendOTPAsync(string phone)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<(int StudentId, bool IsVerified)> VerifyOTPAsync(string phone, int otpCode)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<List<Account>> GetAccountsAsync(int studentId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<StudentViewModel> GetAsync(int id)
-    {
-        throw new NotImplementedException();
     }
 }

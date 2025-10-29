@@ -3,6 +3,7 @@ using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.Lessons.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.MobileApi.Controllers;
