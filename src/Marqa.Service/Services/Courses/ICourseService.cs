@@ -12,4 +12,5 @@ public interface ICourseService
     Task AttachStudentAsync(int courseId, int studentId);
     Task DetachStudentAsync(int courseId, int studentId);
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId);
+    Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId);
 }

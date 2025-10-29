@@ -1,4 +1,4 @@
-namespace Marqa.Service.Services.Courses.Models;
+﻿namespace Marqa.Service.Services.Courses.Models;
 
 public class MainPageCourseViewModel
 {

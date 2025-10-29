@@ -1,5 +1,5 @@
 ﻿using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Services.Ratings.Models;
 using Marqa.Service.Services.StudentPointHistories;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +45,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         }
         return ratings.OrderBy(r => r.Rank);
     }
+
     public async Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId)
     {
         var students = unitOfWork.Students.SelectAllAsQueryable()
@@ -101,6 +102,11 @@ public class RatingService(IUnitOfWork unitOfWork,
             rank++;
         }
         return ratings.OrderBy(r => r.TotalPoints).Take(3).ToList();
+    }
+
+    public async Task<List<RatingPageRatingResult>> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
+    {
+
     }
 }
 

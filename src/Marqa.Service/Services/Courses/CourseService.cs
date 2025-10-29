@@ -352,4 +352,17 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
+
+    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
+    {
+        return unitOfWork.StudentCourses.SelectAllAsQueryable()
+            .Include(sc => sc.Course)
+            .Where(sc => sc.StudentId == studentId)
+            .Select(sc => new CoursePageCourseViewModel
+            {
+                Id = sc.CourseId,
+                Name = sc.Course.Name
+            })
+            .ToListAsync();
+    }
 }

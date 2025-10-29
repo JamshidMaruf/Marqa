@@ -1,4 +1,4 @@
-using Marqa.MobileApi.Models;
+﻿using Marqa.MobileApi.Models;
 using Marqa.Service.Services.Banners.Models;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
@@ -42,4 +42,8 @@ public class MainController(ICourseService courseService, IBannerService bannerS
             Data = await ratingService.GetMainPageRatingResultAsync(companyId)
         });
     }
+}
+public class MainController(IRatingService ratingService) : BaseController
+{
+    public async Task<IActionResult> GetRatingAsync
 }
