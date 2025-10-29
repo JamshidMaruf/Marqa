@@ -99,4 +99,19 @@ public class LessonService(
             await unitOfWork.SaveAsync();
         }
     }
+
+    public Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId)
+    {
+        return unitOfWork.Lessons.SelectAllAsQueryable()
+            .Where(l => l.CourseId == courseId)
+            .Select(l => new LessonViewModel
+            {
+                Id = l.Id,
+                Name = l.Name,
+                Date = l.Date,
+                Number = l.Number,
+                HomeTaskStatus = l.HomeTaskStatus
+            })
+            .ToListAsync();
+    }
 }

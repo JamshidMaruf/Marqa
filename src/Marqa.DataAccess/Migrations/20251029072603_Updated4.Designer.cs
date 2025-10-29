@@ -3,6 +3,7 @@ using System;
 using Marqa.DataAccess.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251029072603_Updated4")]
+    partial class Updated4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,6 +185,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("Room")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
@@ -223,6 +230,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = ".Net C#",
+                            Room = "Uber",
                             StartDate = new DateOnly(2025, 10, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 1,
@@ -242,6 +250,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 80,
                             MaxStudentCount = 20,
                             Name = "Flutter butcamp",
+                            Room = "Uber",
                             StartDate = new DateOnly(2025, 11, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 2,
@@ -261,6 +270,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = "Intensive Ielts 1",
+                            Room = "Uber",
                             StartDate = new DateOnly(2025, 10, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 1,
@@ -280,6 +290,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = "General English",
+                            Room = "Uber",
                             StartDate = new DateOnly(2025, 11, 1),
                             StartTime = new TimeOnly(11, 0, 0),
                             Status = 2,

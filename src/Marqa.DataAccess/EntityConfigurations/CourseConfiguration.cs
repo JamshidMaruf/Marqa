@@ -85,7 +85,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
                 MaxStudentCount = 24,
                 Status = CourseStatus.Active,
                 CompanyId = 2,
-                SubjectId = 1,
+                SubjectId = 4,
                 TeacherId = 3
             },
             new()
@@ -100,7 +100,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
                 MaxStudentCount = 24,
                 Status = CourseStatus.Upcoming,
                 CompanyId = 1,
-                SubjectId = 1,
+                SubjectId = 3,
                 TeacherId = 4
             }
         });
