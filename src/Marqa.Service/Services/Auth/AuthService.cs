@@ -10,12 +10,14 @@ namespace Marqa.Service.Services.Auth;
 
 public class AuthService(ISettingService settingService, IEncryptionService encryptionService) : IAuthService
 {
-    public async Task<string> GenerateToken(string app)
+    public async Task<string> GenerateToken(string app, int entityId, string entityType)
     {
         var configuration = await settingService.GetByCategoryAsync("JWT");
         var claims = new[]
         {
-            new Claim("App", app),
+            new Claim("EntityId", entityId.ToString()),
+            new Claim("EntityType", entityType),
+            new Claim(ClaimTypes.Role, app),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
@@ -56,7 +58,7 @@ public class AuthService(ISettingService settingService, IEncryptionService encr
                 issuer: configuration["JWT.Issuer"],
                 audience: configuration["JWT.Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.ExpiresInMinutes"])),
+                expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.Expires"])),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

@@ -3,15 +3,20 @@ using System.Text;
 using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Messages.Models;
 using Marqa.Service.Services.Settings;
+using Marqa.Service.Services.Students;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Marqa.Service.Services.Messages;
 
-public class SmsService(IRepository<OTP> otpRepository, ISettingService settingService) : ISmsService
+public class SmsService(
+    IRepository<OTP> otpRepository,
+    ISettingService settingService, 
+    IStudentService studentService,
+    IEmployeeService employeeService) : ISmsService
 {
     public async Task SendOTPAsync(string phone)
     {
@@ -27,8 +32,13 @@ public class SmsService(IRepository<OTP> otpRepository, ISettingService settingS
         await SendMessageAsync(phone, otp);
     }
 
-    public async Task VerifyOTPAsync(string phone, string code)
+    public async Task<(int EntityId, string EntityType)> VerifyOTPAsync(string phone, string code)
     {
+        var entity = await GetEntity(phone);
+
+        if (entity.Id == 0)
+            throw new NotFoundException("This phone number does not exist");
+        
         var isVerified = await otpRepository
             .SelectAllAsQueryable()
             .Where(t =>
@@ -41,6 +51,36 @@ public class SmsService(IRepository<OTP> otpRepository, ISettingService settingS
 
         if (!isVerified)
             throw new ArgumentIsNotValidException("OTP incorrect");
+        
+        return (entity.Id, entity.Type);
+    }
+
+    private async Task<(int Id, string Type)> GetEntity(string phone)
+    {
+        int entityId = 0;
+        string entityType = "";
+        
+        var student = await studentService.GetByPhoneAsync(phone);
+        var teacher = await employeeService.GetByPhoneAsync(phone);
+        var parent = await studentService.GetStudentParentByPhoneAsync(phone);
+        
+        if (student != null)
+        {
+            entityId = student.Id;
+            entityType = "Student";
+        }
+        else if (teacher != null)
+        {
+            entityId = teacher.Id;
+            entityType = "Teacher";
+        }
+        else if (parent != null)
+        {
+            entityId = parent.Id;
+            entityType = "Parent";
+        }
+        
+        return (entityId, entityType);
     }
 
     private string GenerateSixDigitNumber()

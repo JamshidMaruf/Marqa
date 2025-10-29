@@ -5,9 +5,12 @@ namespace Marqa.Service.Services.Orders;
 
 public interface IOrderService
 {
-    Task CreateAsync(OrderCreateModel model);
-    Task UpdateStatusAsync(int id, OrderStatus newStatus);
-    Task DeleteAsync(int id);
-    Task<OrderViewModel> GetAsync(int id);
-    Task<List<OrderViewModel>> GetAllAsync();
+    Task CreateBasketAsync(int studentId);
+    Task CreateBasketItemAsync(BasketItemCreateModel model);
+    Task DeleteBasketItemAsync(BasketItemDeleteModel model);
+    Task<BasketViewModel> GetBasketByStudentIdAsync(int studentId);
+    Task CheckoutAsync(int basketId);
+    Task<OrderViewModel> GetOrderByIdAsync(int id);
+    Task<List<OrderViewModel>> GetOrdersByStudentIdAsync(int studentId);
+    Task UpdateStatusAsync(int orderId, OrderStatus newStatus);
 }
