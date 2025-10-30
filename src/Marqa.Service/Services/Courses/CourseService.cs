@@ -294,9 +294,20 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
         await unitOfWork.SaveAsync();
     }
 
-    public Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
+    public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
     {
-        throw new NotImplementedException();
+        return await unitOfWork.StudentCourses.SelectAllAsQueryable()
+            .Where(c => c.StudentId == studentId)
+            .Include(c => c.Course)
+            .ThenInclude(c => c.Lessons)
+            .Select(c => new MainPageCourseViewModel
+            {
+                CourseId = c.CourseId,
+                LessonNumber = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).Number,
+                CourseName = c.Course.Name,
+                HomeTaskStatus = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).HomeTaskStatus,
+            })
+            .ToListAsync();
     }
 
     private async Task GenerateLessonAsync(

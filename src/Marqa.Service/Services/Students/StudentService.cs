@@ -1,5 +1,4 @@
-﻿using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Students.Models;
