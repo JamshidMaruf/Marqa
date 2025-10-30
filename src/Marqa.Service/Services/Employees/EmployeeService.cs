@@ -113,9 +113,11 @@ public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
 
-    public Task<EmployeeViewModel> GetByPhoneAsync(string phone)
+    public async Task<int?> GetByPhoneAsync(string phone)
     {
-        throw new NotImplementedException();
+        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
+
+        return employee?.Id;
     }
 
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)

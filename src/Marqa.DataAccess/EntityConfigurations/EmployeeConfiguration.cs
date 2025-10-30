@@ -9,6 +9,8 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
+        builder.HasIndex(t => t.Phone).IsUnique();
+
         builder.Property(p => p.Info)
             .HasMaxLength(4000);
 

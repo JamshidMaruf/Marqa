@@ -119,14 +119,24 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         await unitOfWork.SaveAsync();
     }
 
-    public Task<StudentViewModel> GetByPhoneAsync(string phone)
+    public async Task<int?> GetByPhoneAsync(string phone)
     {
-        throw new NotImplementedException();
+        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
+
+        return employee?.Id;
     }
 
-    public Task<StudentDetailViewModel> GetStudentParentByPhoneAsync(string phone)
+    public async Task<int?> GetStudentParentByPhoneAsync(string phone)
     {
-        throw new NotImplementedException();
+        var studentDetail = await unitOfWork.StudentDetails
+            .SelectAsync(sd => sd.FatherPhone == phone ||
+                        sd.MotherPhone == phone ||
+                        sd.GuardianPhone == phone);
+
+        if(studentDetail == null)
+            return null;
+        else
+            return studentDetail.Id;
     }
 
     public async Task<StudentViewModel> GetAsync(int id)
