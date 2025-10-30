@@ -17,6 +17,9 @@ public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId)
+            ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+
         unitOfWork.Employees.Insert(new Employee
         {
             CompanyId = model.CompanyId,
@@ -37,13 +40,17 @@ public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
         await unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateAsync(int id, EmployeeUpdateModel model)
+    public async Task UpdateAsync(int id, int companyId, EmployeeUpdateModel model)
     {
         var existTeacher = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
         
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
+
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == companyId)
+            ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+
 
         existTeacher.FirstName = model.FirstName;
         existTeacher.LastName = model.LastName;

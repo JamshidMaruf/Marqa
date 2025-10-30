@@ -22,9 +22,9 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     }
 
     [HttpPut("update/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
+    public async Task<IActionResult> PutAsync(int id, int companyId, [FromBody] StudentUpdateModel model)
     {
-        await studentService.UpdateAsync(id, model);
+        await studentService.UpdateAsync(id, companyId, model);
 
         return Ok(new Response
         {
@@ -62,7 +62,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     public async Task<IActionResult> GetAllAsync(int courseId)
     {
         var students = await studentService.GetAllByCourseIdAsync(courseId);
-       
+
         return Ok(new Response<List<StudentViewModel>>
         {
             Status = 200,

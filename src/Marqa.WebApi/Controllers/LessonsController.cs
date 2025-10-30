@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Marqa.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
-public class LessonsController(ILessonService lessonService, IWebHostEnvironment hostEnvironment) : Controller
+public class LessonsController(ILessonService lessonService) : Controller
 {
     [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] LessonUpdateModel model)

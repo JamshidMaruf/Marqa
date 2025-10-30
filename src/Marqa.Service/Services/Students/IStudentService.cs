@@ -11,7 +11,7 @@ public interface IStudentService
     /// <param name="model"></param>
     /// <returns></returns>
     Task CreateAsync(StudentCreateModel model);
-    Task UpdateAsync(int id, StudentUpdateModel model);
+    Task UpdateAsync(int id, int companyId, StudentUpdateModel model);
     Task DeleteAsync(int id);
     
     /// <summary>

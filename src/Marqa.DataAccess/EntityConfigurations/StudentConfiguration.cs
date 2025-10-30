@@ -9,7 +9,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> builder)
     {
-        builder.HasIndex(t => t.Phone).IsUnique();
+        builder.HasIndex(s => new { s.Phone, s.CompanyId }).IsUnique();
 
         builder.Property(p => p.PasswordHash)
             .HasMaxLength(400);
