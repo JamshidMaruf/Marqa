@@ -17,6 +17,17 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
+        _ = await unitOfWork.Students
+            .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId)
+           ?? throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
+        
+        _ = await unitOfWork.StudentDetails
+            .SelectAsync(e => (e.FatherPhone == model.StudentDetailCreateModel.FatherPhone ||
+             e.MotherPhone == model.StudentDetailCreateModel.MotherPhone ||
+             e.GuardianPhone == model.StudentDetailCreateModel.GuardianPhone) 
+             && e.CompanyId == model.CompanyId)
+           ?? throw new AlreadyExistException($"this phone {model.Phone} already exists");
+
         await unitOfWork.BeginTransactionAsync();
 
         try
@@ -62,7 +73,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         }
     }
 
-    public async Task UpdateAsync(int id, StudentUpdateModel model)
+    public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
     {
         await unitOfWork.BeginTransactionAsync();
 
@@ -71,6 +82,17 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             var existStudent = await unitOfWork.Students
                 .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
                 ?? throw new NotFoundException($"Student is not found");
+
+            _ = await unitOfWork.Students
+                    .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == companyId)
+                   ?? throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
+
+            _ = await unitOfWork.StudentDetails
+                .SelectAsync(e => (e.FatherPhone == model.StudentDetailUpdateModel.FatherPhone ||
+                 e.MotherPhone == model.StudentDetailUpdateModel.MotherPhone ||
+                 e.GuardianPhone == model.StudentDetailUpdateModel.GuardianPhone)
+                 && e.CompanyId == companyId)
+               ?? throw new AlreadyExistException($"this phone {model.Phone} already exists");
 
             existStudent.FirstName = model.FirstName;
             existStudent.LastName = model.LastName;
@@ -119,14 +141,24 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         await unitOfWork.SaveAsync();
     }
 
-    public Task<StudentViewModel> GetByPhoneAsync(string phone)
+    public async Task<int?> GetByPhoneAsync(string phone)
     {
-        throw new NotImplementedException();
+        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
+
+        return employee?.Id;
     }
 
-    public Task<StudentDetailViewModel> GetStudentParentByPhoneAsync(string phone)
+    public async Task<int?> GetStudentParentByPhoneAsync(string phone)
     {
-        throw new NotImplementedException();
+        var studentDetail = await unitOfWork.StudentDetails
+            .SelectAsync(sd => sd.FatherPhone == phone ||
+                        sd.MotherPhone == phone ||
+                        sd.GuardianPhone == phone);
+
+        if(studentDetail == null)
+            return null;
+        else
+            return studentDetail.Id;
     }
 
     public async Task<StudentViewModel> GetAsync(int id)

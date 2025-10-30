@@ -11,7 +11,7 @@ public interface IStudentService
     /// <param name="model"></param>
     /// <returns></returns>
     Task CreateAsync(StudentCreateModel model);
-    Task UpdateAsync(int id, StudentUpdateModel model);
+    Task UpdateAsync(int id, int companyId, StudentUpdateModel model);
     Task DeleteAsync(int id);
     
     /// <summary>
@@ -20,13 +20,13 @@ public interface IStudentService
     /// <param name="id"></param>
     /// <returns></returns>
     Task<StudentViewModel> GetAsync(int id);
-    
+
     /// <summary>
     /// StudentDetail bilan birga o'chirish (include qilingan)
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="NotFoundException"></exception>
-    Task<StudentViewModel> GetByPhoneAsync(string phone);
-    Task<StudentDetailViewModel> GetStudentParentByPhoneAsync(string phone);
+    Task<int?> GetByPhoneAsync(string phone);
+    Task<int?> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
 }

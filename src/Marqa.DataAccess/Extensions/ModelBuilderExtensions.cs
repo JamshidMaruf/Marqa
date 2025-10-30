@@ -25,7 +25,7 @@ public static class ModelBuilderExtensions
         
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
-                .Where(p => p.PropertyInfo.Name == "FilePath" || p.PropertyInfo.Name == "FileName"))
+                .Where(p => p.PropertyInfo.Name.EndsWith("FilePath") || p.PropertyInfo.Name.EndsWith("FileName")))
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(2048);     
     }
