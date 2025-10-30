@@ -1,6 +1,7 @@
 ﻿using Marqa.DataAccess.Contexts;
 using Marqa.MobileApi.Extensions;
 using Marqa.MobileApi.Middlewares;
+using Marqa.Service.Services.Messages;
 using Marqa.WebApi.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
