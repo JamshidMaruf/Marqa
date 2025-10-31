@@ -4,5 +4,6 @@ public class BasketItemCreateModel
 {
     public int ProductId { get; set; }
     public int Quantity { get; set; }
+    public int InlinePrice { get; set; }
     public int BasketId { get; set; }
 }

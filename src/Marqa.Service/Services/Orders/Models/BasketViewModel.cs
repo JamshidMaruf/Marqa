@@ -4,6 +4,7 @@ public class BasketViewModel
 {
     public int Id { get; set; }
     public int TotalPrice { get; set; }
+    public List<ItemIfo> Items { get; set; }
     public class ItemIfo
     {
         public int ProductId { get; set; }

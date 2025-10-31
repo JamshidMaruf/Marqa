@@ -63,6 +63,8 @@ public interface IUnitOfWork : IDisposable
 
     IRepository<OrderItem> OrderItems { get; }
     IRepository<Setting> Settings { get; }
+    IRepository<Basket> Baskets { get; }
+    IRepository<BasketItem> BasketItems { get; }
 
     Task SaveAsync();
     Task BeginTransactionAsync();
