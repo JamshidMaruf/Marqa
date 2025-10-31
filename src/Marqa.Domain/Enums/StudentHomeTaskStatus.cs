@@ -2,8 +2,8 @@ namespace Marqa.Domain.Enums;
 
 public enum StudentHomeTaskStatus
 {
-    none = 0,
-    accepted = 1,
-    rejected = 2
+    Pending = 1,
+    Evaluated = 2,
+    Rejected = 3
 }
 

@@ -14,10 +14,11 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.Set<TEntity>();
     }
     
-    public void Insert(TEntity entity)
+    public TEntity Insert(TEntity entity)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        _context.Add(entity);
+        var createdEnity = (_context.Add(entity)).Entity;
+        return createdEnity;
     }
 
     public async Task InsertRangeAsync(IEnumerable<TEntity> entities)

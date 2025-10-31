@@ -9,29 +9,133 @@ namespace Marqa.Service.Services.Orders;
 
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
-    public Task CreateBasketAsync(int studentId)
+    public async Task CreateBasketAsync(int studentId)
     {
-        throw new NotImplementedException();
+        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
+            ?? throw new NotFoundException("Student not found");
+        
+        unitOfWork.Baskets.Insert(new Basket
+        {
+            StudentId = studentId   
+        });
+
+        await unitOfWork.SaveAsync();
     }
 
-    public Task CreateBasketItemAsync(BasketItemCreateModel model)
+    public async Task CreateBasketItemAsync(BasketItemCreateModel model)
     {
-        throw new NotImplementedException();
+        var basket = await unitOfWork.Baskets.SelectAsync(b => b.Id == model.BasketId)
+            ?? throw new NotFoundException("Basket not found");
+
+        var existBasketItem = await unitOfWork.BasketItems.SelectAsync(b =>
+            b.BasketId == model.BasketId &&
+            b.ProductId == model.ProductId);
+
+        if (existBasketItem != null)
+        {
+            existBasketItem.Quantity += model.Quantity;
+            unitOfWork.BasketItems.Update(existBasketItem);
+            
+            basket.TotalPrice += model.InlinePrice;
+            unitOfWork.Baskets.Update(basket);
+        }
+        else
+        {
+            unitOfWork.BasketItems.Insert(new BasketItem()
+            {
+                BasketId = model.BasketId,
+                ProductId = model.ProductId,
+                Quantity = model.Quantity,
+                InlinePrice = model.InlinePrice
+            });
+
+            basket.TotalPrice += model.InlinePrice;
+            unitOfWork.Baskets.Update(basket);
+        }
+        
+        await unitOfWork.SaveAsync();
     }
 
-    public Task DeleteBasketItemAsync(BasketItemDeleteModel model)
+    public async Task DeleteBasketItemAsync(BasketItemDeleteModel model)
     {
-        throw new NotImplementedException();
+        var basket = await unitOfWork.Baskets.SelectAsync(
+                predicate: b => b.Id == model.BasketId, 
+                includes: new []{ "BasketItems" })
+            ?? throw new NotFoundException("Basket not found");
+
+        var basketItem = basket.BasketItems.FirstOrDefault(b => b.ProductId == model.ProductId);
+        
+        if (basketItem != null)
+        {
+            if (basketItem.Quantity == model.Quantity)
+            {
+                unitOfWork.BasketItems.Delete(basketItem);
+
+                basket.TotalPrice -= model.InlinePrice;
+                unitOfWork.Baskets.Update(basket);
+            }
+            else if(basketItem.Quantity > model.Quantity)
+            {
+                basketItem.Quantity -= model.Quantity;
+                unitOfWork.BasketItems.Update(basketItem);
+                
+                basket.TotalPrice -= model.InlinePrice;
+                unitOfWork.Baskets.Update(basket);
+            }
+            
+            await unitOfWork.SaveAsync();
+        }
     }
 
-    public Task<BasketViewModel> GetBasketByStudentIdAsync(int studentId)
+    public async Task<BasketViewModel> GetBasketByStudentIdAsync(int studentId)
     {
-        throw new NotImplementedException();
+        var basket = await unitOfWork.Baskets.SelectAsync(
+            predicate: b => b.StudentId == studentId,
+            includes: new[] { "BasketItems" })
+            ?? throw new NotFoundException("Basket not found");
+
+        return new BasketViewModel
+        {
+            Id = basket.Id,
+            TotalPrice = basket.TotalPrice,
+            Items = basket.BasketItems.Select(bi => new BasketViewModel.ItemIfo
+            {
+                ProductId = bi.ProductId,
+                Quantity = bi.Quantity,
+                InlinePrice = bi.InlinePrice
+            }).ToList()
+        };
     }
 
-    public Task CheckoutAsync(int basketId)
+    public async Task CheckoutAsync(int basketId)
     {
-        throw new NotImplementedException();
+        var basket = await unitOfWork.Baskets.SelectAsync(
+                         predicate: b => b.Id == basketId, 
+                         includes: new []{ "BasketItems" })
+                     ?? throw new NotFoundException("Basket not found");
+        
+        
+        var createdOrder = await unitOfWork.Orders.Insert(new Order
+        {
+            StudentId = basket.StudentId,
+            TotalPrice = basket.TotalPrice,
+            Status = OrderStatus.InProcess,
+            Number = GenerateOrderNumber(),
+        });
+        
+        await unitOfWork.SaveAsync();
+
+        var orderItems = basket.BasketItems.Select(bi => new OrderItem
+        {
+            ProductId = bi.ProductId, 
+            Quantity = bi.Quantity, 
+            InlinePrice = bi.InlinePrice,
+            OrderId = createdOrder.Id
+        });
+
+        await unitOfWork.OrderItems.InsertRangeAsync(orderItems);
+
+        await unitOfWork.SaveAsync();
     }
 
     public Task<OrderViewModel> GetOrderByIdAsync(int id)
@@ -44,8 +148,18 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         throw new NotImplementedException();
     }
 
-    public Task UpdateStatusAsync(int orderId, OrderStatus newStatus)
+    public async Task UpdateStatusAsync(int orderId, OrderStatus newStatus)
     {
-        throw new NotImplementedException();
+        var order = await unitOfWork.Orders.SelectAsync(t => t.Id == orderId)
+            ?? throw new NotFoundException("Order not found");
+        
+        order.Status = newStatus;
+        unitOfWork.Orders.Update(order);
+        await unitOfWork.SaveAsync();
+    }
+
+    private string GenerateOrderNumber()
+    {
+        return "";
     }
 }
