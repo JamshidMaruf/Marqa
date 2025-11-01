@@ -1,11 +1,11 @@
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Orders;
 
 public class OrderViewModel
 {
     public int Id { get; set; }
-    public string Number { get; set; }
+    public long Number { get; set; }
     public int TotalPrice { get; set; }
     public OrderStatus Status { get; set; }
     public List<ItemInfo> OrderItems { get; set; }

@@ -120,7 +120,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             StudentId = basket.StudentId,
             TotalPrice = basket.TotalPrice,
             Status = OrderStatus.InProcess,
-            Number = GenerateOrderNumber(),
+            Number = GenerateOrderNumber().Result,
         });
         
         await unitOfWork.SaveAsync();
@@ -205,8 +205,20 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         await unitOfWork.SaveAsync();
     }
 
-    private string GenerateOrderNumber()
+    private async Task<long> GenerateOrderNumber()
     {
-        return "";
+        var orders = await unitOfWork.Orders
+            .SelectAllAsQueryable()
+            .OrderByDescending(o => o.Number)
+            .Select(o => new
+            {
+                Number = o.Number
+            })
+            .ToListAsync();
+
+        if (orders.Count == 0)
+            return 00000001;
+        else
+            return orders[0].Number + 1;
     }
 }
