@@ -45,7 +45,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         });
     }
 
-    [HttpGet("get/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await employeeService.GetAsync(id);
@@ -58,7 +58,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         });
     }
 
-    [HttpGet("by{companyId:int}")]
+    [HttpGet()]
     public async Task<IActionResult> GetAllAsync(int companyId, string search = null)
     {
         var result = await employeeService.GetAllAsync(companyId, search);
