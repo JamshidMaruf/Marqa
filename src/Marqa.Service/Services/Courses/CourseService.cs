@@ -19,9 +19,9 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
         _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
             ?? throw new NotFoundException("Teacher not found");
 
+        var transaction = await unitOfWork.BeginTransactionAsync();
         try
         {
-            await unitOfWork.BeginTransactionAsync();
 
             Course createdCourse = new Course
             {
@@ -71,11 +71,11 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
                 weekDays);
             await unitOfWork.SaveAsync();
 
-            await unitOfWork.CommitAsync();
+            await transaction.CommitAsync();
         }
         catch
         {
-            await unitOfWork.RollbackTransactionAsync();
+            await transaction.RollbackAsync();
         }
     }
 
@@ -97,9 +97,9 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
         existCourse.MaxStudentCount = model.MaxStudentCount;
         existCourse.Description = model.Description;
 
+        var transaction = await unitOfWork.BeginTransactionAsync();
         try
         {
-            await unitOfWork.BeginTransactionAsync();
 
             foreach (var lesson in existCourse.Lessons)
                 unitOfWork.Lessons.Delete(lesson);
@@ -137,11 +137,11 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
             unitOfWork.Courses.Update(existCourse);            
             await unitOfWork.SaveAsync();
 
-            await unitOfWork.CommitAsync();
+            await transaction.CommitAsync();
         }
         catch
         {
-            await unitOfWork.RollbackTransactionAsync();
+            await transaction.RollbackAsync();
         }
     }
 

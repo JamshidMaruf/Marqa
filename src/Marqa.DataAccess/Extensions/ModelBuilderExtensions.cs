@@ -21,12 +21,12 @@ public static class ModelBuilderExtensions
                 .Where(p => p.ClrType == typeof(string)))
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(255);
-        
-        
+
+
         foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
-                .Where(p => p.PropertyInfo.Name.EndsWith("FilePath") || p.PropertyInfo.Name.EndsWith("FileName")))
+                .Where(p => p.GetColumnName() == "FilePath" || p.GetColumnName() == "FileName"))
             if (property.GetMaxLength() == null)
-                property.SetMaxLength(2048);     
+                property.SetMaxLength(2048);
     }
 }

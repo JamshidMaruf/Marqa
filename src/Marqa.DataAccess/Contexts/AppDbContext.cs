@@ -2,7 +2,6 @@
 using Marqa.DataAccess.Extensions;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Marqa.DataAccess.Contexts;
 
@@ -14,6 +13,7 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
