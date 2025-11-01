@@ -27,7 +27,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
              && e.CompanyId == model.CompanyId)
            ?? throw new AlreadyExistException($"this phone {model.Phone} already exists");
 
-        await unitOfWork.BeginTransactionAsync();
+        var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
@@ -63,18 +63,18 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
             await unitOfWork.SaveAsync();
 
-            await unitOfWork.CommitAsync();
+            await transaction.CommitAsync();
         }
         catch
         {
-            await unitOfWork.RollbackTransactionAsync();
+            await transaction.RollbackAsync();
             throw;
         }
     }
 
     public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
     {
-        await unitOfWork.BeginTransactionAsync();
+        var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
@@ -114,11 +114,11 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             await unitOfWork.SaveAsync();
 
 
-            await unitOfWork.CommitAsync();
+            await transaction.CommitAsync();
         }
         catch
         {
-            await unitOfWork.RollbackTransactionAsync();
+            await transaction.RollbackAsync();
             throw;
         }
     }
@@ -130,7 +130,6 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
             ?? throw new NotFoundException($"Student is not found");
 
-        // Agar StudentDetail mavjud bo'lsa, uni ham o'chirish
         if (existStudent.StudentDetail != null)
         {
             unitOfWork.StudentDetails.Delete(existStudent.StudentDetail);

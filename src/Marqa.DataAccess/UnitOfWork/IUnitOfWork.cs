@@ -1,5 +1,7 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using System.Threading.Tasks;
+using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Marqa.DataAccess.UnitOfWork;
 
@@ -45,8 +47,6 @@ public interface IUnitOfWork : IDisposable
    
     IRepository<LessonVideo> LessonVideos { get; } 
    
-    IRepository<StudentHomeTaskFeedback> StudentHomeTaskFeedbacks { get; }
-   
     IRepository<StudentHomeTaskFile> StudentHomeTaskFiles { get; } 
    
     IRepository<HomeTaskFile> HomeTaskFiles { get; } 
@@ -62,12 +62,13 @@ public interface IUnitOfWork : IDisposable
     IRepository<Order> Orders { get; }
 
     IRepository<OrderItem> OrderItems { get; }
+   
     IRepository<Setting> Settings { get; }
+    
     IRepository<Basket> Baskets { get; }
+    
     IRepository<BasketItem> BasketItems { get; }
 
     Task SaveAsync();
-    Task BeginTransactionAsync();
-    Task CommitAsync();
-    Task RollbackTransactionAsync();
+    Task<IDbContextTransaction> BeginTransactionAsync();
 }

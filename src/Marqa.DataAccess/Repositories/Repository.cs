@@ -17,8 +17,8 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
     public TEntity Insert(TEntity entity)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        var createdEnity = (_context.Add(entity)).Entity;
-        return createdEnity;
+        _context.Add(entity);      
+        return entity;
     }
 
     public async Task InsertRangeAsync(IEnumerable<TEntity> entities)

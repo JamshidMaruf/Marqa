@@ -49,7 +49,7 @@ public class LessonService(
         _ = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        var allowedExtensions = new string[]{".mp4", ".avi", ".mkv", ".mov"};
+        var allowedExtensions = new string[]{ ".mp4", ".avi", ".mkv", ".mov", ".flv" };
         
         if(!allowedExtensions.Contains(Path.GetExtension(video.FileName)))
             throw new ArgumentIsNotValidException("Not supported video format");
