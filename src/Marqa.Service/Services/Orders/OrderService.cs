@@ -115,7 +115,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
                      ?? throw new NotFoundException("Basket not found");
         
         
-        var createdOrder = await unitOfWork.Orders.Insert(new Order
+        var createdOrder = unitOfWork.Orders.Insert(new Order
         {
             StudentId = basket.StudentId,
             TotalPrice = basket.TotalPrice,
@@ -138,14 +138,61 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         await unitOfWork.SaveAsync();
     }
 
-    public Task<OrderViewModel> GetOrderByIdAsync(int id)
+    public async Task<OrderViewModel> GetOrderByIdAsync(int id)
     {
-        throw new NotImplementedException();
+        var order = await unitOfWork.Orders.SelectAllAsQueryable()
+            .Include(o => o.OrderItems)
+            .ThenInclude(ot => ot.Product)
+            .FirstOrDefaultAsync(o => o.Id == id)
+            ?? throw new NotFoundException($"No order was found with ID = {id}");
+
+        return new OrderViewModel
+        {
+            Id = order.Id,
+            Number = order.Number,
+            TotalPrice = order.TotalPrice,
+            Status = order.Status,
+            OrderItems = order.OrderItems.Select(ot => new OrderViewModel.ItemInfo
+            {
+                ProductId = ot.Product.Id,
+                ProductName = ot.Product.Name,
+                ProductImageName = ot.Product.ImageName,
+                ProductImagePage = ot.Product.ImagePage,
+                ProductImageExtension = ot.Product.ImageExtension,
+                ProductDescription = ot.Product.Description,
+                Quantity = ot.Quantity,
+                Price = ot.Price,
+                InlinePrice = ot.InlinePrice
+            }).ToList()
+        };
     }
 
-    public Task<List<OrderViewModel>> GetOrdersByStudentIdAsync(int studentId)
+    public async Task<List<OrderViewModel>> GetOrdersByStudentIdAsync(int studentId)
     {
-        throw new NotImplementedException();
+        var orders = await unitOfWork.Orders.SelectAllAsQueryable()
+            .Include(o => o.OrderItems)
+            .ThenInclude(ot => ot.Product)
+            .ToListAsync();
+
+        return orders.Select(order => new OrderViewModel
+        {
+            Id = order.Id,
+            Number = order.Number,
+            TotalPrice = order.TotalPrice,
+            Status = order.Status,
+            OrderItems = order.OrderItems.Select(ot => new OrderViewModel.ItemInfo
+            {
+                ProductId = ot.Product.Id,
+                ProductName = ot.Product.Name,
+                ProductImageName = ot.Product.ImageName,
+                ProductImagePage = ot.Product.ImagePage,
+                ProductImageExtension = ot.Product.ImageExtension,
+                ProductDescription = ot.Product.Description,
+                Quantity = ot.Quantity,
+                Price = ot.Price,
+                InlinePrice = ot.InlinePrice
+            }).ToList()
+        }).ToList();
     }
 
     public async Task UpdateStatusAsync(int orderId, OrderStatus newStatus)
