@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.MobileApi.Controllers;
 
-public class CourseController(ICourseService courseService, ILessonService lessonService) : BaseController
+public class CourseController(ICourseService courseService, ILessonService lessonService, ILogger<CourseController> logger) : BaseController
 {
     [HttpGet("{studentId:int}")]
     public async Task<IActionResult> GetByStudentIdAsync(int studentId)
     {
+        logger.LogInformation("Getting courses for student {studentId}", studentId);
+        
         return Ok(new Response<List<CoursePageCourseViewModel>>
         {
             StatusCode = 200,

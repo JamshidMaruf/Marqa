@@ -6,10 +6,12 @@ namespace Marqa.MobileApi.Middlewares;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate next;
+    private readonly ILogger<ExceptionHandlingMiddleware> logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         this.next = next;
+        this.logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
@@ -47,8 +49,10 @@ public class ExceptionHandlingMiddleware
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
                 StatusCode = 500,
-                Message = ex.Message
+                Message = "Server error occured",
             });
+            
+            logger.LogError(ex, ex.Message);
         }
     }
 }

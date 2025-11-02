@@ -66,48 +66,48 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         .ToListAsync();
     }
 
-    public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
-    {
-        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == model.HomeTaskId)
-            ?? throw new NotFoundException("Homa task not found!");
-
-        var existStudent = await unitOfWork.Students.SelectAsync(h => h.Id == model.HomeTaskId)
-            ?? throw new NotFoundException("Student not found!");
-
-        if (existHomeTask.Deadline < DateTime.Now)
-            throw new Exception("Homework time is over!");
-
-         unitOfWork.StudentHomeTasks
-            .Insert(new StudentHomeTask
-            {
-                HomeTaskId = model.HomeTaskId,
-                StudentId = model.StudentId,
-                Info = model.Info,
-                UploadedAt = DateTime.Now,
-                Status = StudentHomeTaskStatus.accepted,
-            });
-
-        await unitOfWork.SaveAsync();
-    }
-
-    public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
-    {
-        var existHomeTaskUpload = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
-            ?? throw new NotFoundException("No completed home task found!");
-
-        unitOfWork.StudentHomeTaskFeedbacks
-            .Insert(new StudentHomeTaskFeedback
-            {
-                StudentHomeTaskId = model.StudentHomeTaskId,
-                TeacherId = model.TeacherId,
-                FeedBack = model.FeedBack
-            });
-
-        await unitOfWork.SaveAsync();
-
-        existHomeTaskUpload.Score = model.Score;
-        
-        await unitOfWork.SaveAsync();
-        // Send notification
-    }
+    // public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
+    // {
+    //     var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == model.HomeTaskId)
+    //         ?? throw new NotFoundException("Homa task not found!");
+    //
+    //     var existStudent = await unitOfWork.Students.SelectAsync(h => h.Id == model.HomeTaskId)
+    //         ?? throw new NotFoundException("Student not found!");
+    //
+    //     if (existHomeTask.Deadline < DateTime.Now)
+    //         throw new Exception("Homework time is over!");
+    //
+    //      unitOfWork.StudentHomeTasks
+    //         .Insert(new StudentHomeTask
+    //         {
+    //             HomeTaskId = model.HomeTaskId,
+    //             StudentId = model.StudentId,
+    //             Info = model.Info,
+    //             UploadedAt = DateTime.Now,
+    //             Status = StudentHomeTaskStatus.accepted,
+    //         });
+    //
+    //     await unitOfWork.SaveAsync();
+    // }
+    //
+    // public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
+    // {
+    //     var existHomeTaskUpload = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
+    //         ?? throw new NotFoundException("No completed home task found!");
+    //
+    //     unitOfWork.StudentHomeTaskFeedbacks
+    //         .Insert(new StudentHomeTaskFeedback
+    //         {
+    //             StudentHomeTaskId = model.StudentHomeTaskId,
+    //             TeacherId = model.TeacherId,
+    //             FeedBack = model.FeedBack
+    //         });
+    //
+    //     await unitOfWork.SaveAsync();
+    //
+    //     existHomeTaskUpload.Score = model.Score;
+    //     
+    //     await unitOfWork.SaveAsync();
+    //     // Send notification
+    // }
 }
