@@ -41,6 +41,10 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     public IRepository<BasketItem> BasketItems { get; } = new Repository<BasketItem>(context);
 
+    public IRepository<ExamSetting> ExamSettings { get; } = new Repository<ExamSetting>(context);
+
+    public IRepository<ExamSettingItem> ExamSettingItems { get; } = new Repository<ExamSettingItem>(context);
+
     public async Task SaveAsync()
     {
         await context.SaveChangesAsync();
