@@ -18,13 +18,11 @@ public class ExamCreateModel
         public string CertificateFileName { get; set; }
         public string CertificateFilePath { get; set; }
         public string CertificateFileExtension { get; set; }
-        public int ExamId { get; set; }
-        public ICollection<ExamSettingItemData> Items { get; set; }
+        public IEnumerable<ExamSettingItemData> Items { get; set; }
     }
 
     public class ExamSettingItemData
     {
-        public int ExamSettingId { get; set; }
         public float Score { get; set; }
         public int GivenPoints { get; set; }
     }

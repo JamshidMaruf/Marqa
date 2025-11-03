@@ -33,6 +33,7 @@ public static class ServicesExtension
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICourseService, CourseService>();
@@ -49,7 +50,6 @@ public static class ServicesExtension
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<ISettingService, SettingService>();
     }
 
     public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
