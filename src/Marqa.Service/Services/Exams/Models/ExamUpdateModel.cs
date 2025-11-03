@@ -6,9 +6,9 @@ public class ExamUpdateModel
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public string Title { get; set; }
-    public ExamSettingData ExamSetting { get; set; }
+    public ExamSettingUpdateData ExamSetting { get; set; }
 
-    public class ExamSettingData
+    public class ExamSettingUpdateData
     {
         public float MinScore { get; set; }
         public float MaxScore { get; set; }
@@ -16,10 +16,10 @@ public class ExamUpdateModel
         public string CertificateFileName { get; set; }
         public string CertificateFilePath { get; set; }
         public string CertificateFileExtension { get; set; }
-        public ICollection<ExamSettingItemData> Items { get; set; }
+        public IEnumerable<ExamSettingItemUpdateData> Items { get; set; }
     }
 
-    public class ExamSettingItemData
+    public class ExamSettingItemUpdateData
     {
         public float Score { get; set; }
         public int GivenPoints { get; set; }

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Servcies.Products;
@@ -23,7 +23,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace Marqa.MobileApi.Extensions;
+namespace Marqa.Mobile.Student.Api.Extensions;
+
 
 public static class ServicesExtension
 {
@@ -32,6 +33,7 @@ public static class ServicesExtension
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICourseService, CourseService>();
@@ -42,23 +44,22 @@ public static class ServicesExtension
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<ISubjectService, SubjectService>();
-        services.AddScoped<IPointSettingService,  PointSettingService>();
+        services.AddScoped<IPointSettingService, PointSettingService>();
         services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IRatingService, RatingService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<ISettingService, SettingService>();
     }
-    
+
     public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
     {
         var serviceProvider = services.BuildServiceProvider();
-       
+
         var settingService = serviceProvider.GetService<ISettingService>();
-        
+
         var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
-        
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

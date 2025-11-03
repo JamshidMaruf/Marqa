@@ -1,4 +1,4 @@
-﻿using Marqa.MobileApi.Models;
+﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Banners.Models;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
@@ -6,7 +6,7 @@ using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Ratings.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.MobileApi.Controllers;
+namespace Marqa.Mobile.Student.Api.Controllers;
 
 public class MainController(ICourseService courseService, IBannerService bannerService, IRatingService ratingService) : BaseController
 {
@@ -20,7 +20,7 @@ public class MainController(ICourseService courseService, IBannerService bannerS
             Data = await courseService.GetCoursesByStudentIdAsync(studentId)
         });
     }
-    
+
     [HttpGet("banners/{companyId:int}")]
     public async Task<IActionResult> GetBannersAsync(int companyId)
     {
@@ -31,7 +31,7 @@ public class MainController(ICourseService courseService, IBannerService bannerS
             Data = await bannerService.GetByCompanyIdAsync(companyId)
         });
     }
-    
+
     [HttpGet("rating/{companyId:int}")]
     public async Task<IActionResult> GetRatingAsync(int companyId)
     {

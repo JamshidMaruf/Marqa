@@ -1,12 +1,11 @@
-﻿using Marqa.MobileApi.Models;
+﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.Lessons.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.MobileApi.Controllers;
+namespace Marqa.Mobile.Student.Api.Controllers;
 
 public class CourseController(ICourseService courseService, ILessonService lessonService, ILogger<CourseController> logger) : BaseController
 {
@@ -14,7 +13,7 @@ public class CourseController(ICourseService courseService, ILessonService lesso
     public async Task<IActionResult> GetByStudentIdAsync(int studentId)
     {
         logger.LogInformation("Getting courses for student {studentId}", studentId);
-        
+
         return Ok(new Response<List<CoursePageCourseViewModel>>
         {
             StatusCode = 200,

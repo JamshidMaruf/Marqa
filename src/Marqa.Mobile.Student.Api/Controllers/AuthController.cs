@@ -1,10 +1,10 @@
-﻿using Marqa.MobileApi.Models;
+﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.MobileApi.Controllers;
+namespace Marqa.Mobile.Student.Api.Controllers;
 
 public class AuthController(IAuthService authService, ISmsService smsService) : BaseController
 {
@@ -19,7 +19,7 @@ public class AuthController(IAuthService authService, ISmsService smsService) : 
             Data = await authService.GenerateAppToken(model.AppId, model.SecretKey)
         });
     }
-    
+
     [HttpPost("otp/send")]
     public async Task<IActionResult> SentOTPAsync(string phone)
     {

@@ -1,4 +1,4 @@
-namespace Marqa.MobileApi.Models;
+﻿namespace Marqa.Mobile.Student.Api.Models;
 
 public class Response<TModel>
 {

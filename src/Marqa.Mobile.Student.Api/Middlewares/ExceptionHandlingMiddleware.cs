@@ -1,7 +1,8 @@
+﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Exceptions;
-using Marqa.MobileApi.Models;
 
-namespace Marqa.MobileApi.Middlewares;
+namespace Marqa.Mobile.Student.Api.Middlewares;
+
 
 public class ExceptionHandlingMiddleware
 {
@@ -20,7 +21,7 @@ public class ExceptionHandlingMiddleware
         {
             await next.Invoke(httpContext);
         }
-        catch(NotFoundException ex)
+        catch (NotFoundException ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
@@ -28,7 +29,7 @@ public class ExceptionHandlingMiddleware
                 Message = ex.Message
             });
         }
-        catch(AlreadyExistException ex)
+        catch (AlreadyExistException ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
@@ -36,7 +37,7 @@ public class ExceptionHandlingMiddleware
                 Message = ex.Message
             });
         }
-        catch(ArgumentIsNotValidException ex)
+        catch (ArgumentIsNotValidException ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
@@ -44,14 +45,14 @@ public class ExceptionHandlingMiddleware
                 Message = ex.Message
             });
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
                 StatusCode = 500,
                 Message = "Server error occured",
             });
-            
+
             logger.LogError(ex, ex.Message);
         }
     }
