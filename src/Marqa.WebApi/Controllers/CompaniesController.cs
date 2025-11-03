@@ -10,11 +10,13 @@ namespace Marqa.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(ICompanyService companyService, IAuthService authService) : ControllerBase
+public class CompaniesController(ICompanyService companyService, IAuthService authService, ILogger logger) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)
     {
+        logger.LogInformation("Creating new company");
+        
         await companyService.CreateAsync(model);
 
         return Ok(new Response

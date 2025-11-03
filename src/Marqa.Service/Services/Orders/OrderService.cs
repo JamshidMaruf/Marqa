@@ -214,11 +214,11 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             {
                 Number = o.Number
             })
-            .ToListAsync();
+            .FirstOrDefaultAsync();
 
-        if (orders.Count == 0)
+        if (orders == null)
             return 00000001;
         else
-            return orders[0].Number + 1;
+            return orders.Number + 1;
     }
 }
