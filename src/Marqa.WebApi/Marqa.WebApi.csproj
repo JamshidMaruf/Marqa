@@ -27,4 +27,10 @@
     <ProjectReference Include="..\Marqa.Service\Marqa.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Files\File\" />
+    <Folder Include="wwwroot\Files\Images\" />
+    <Folder Include="wwwroot\Files\Videos\" />
+  </ItemGroup>
+
 </Project>
