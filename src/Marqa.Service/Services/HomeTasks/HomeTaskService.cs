@@ -2,12 +2,14 @@
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.HomeTasks;
 
-public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
+public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) : IHomeTaskService
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
@@ -25,6 +27,43 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         // Send Notification
     }
 
+    public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
+    {
+        _ = await unitOfWork.HomeTasks.SelectAsync(l => l.Id == homeTaskId)
+            ?? throw new NotFoundException($"Hometask was not found with this ID = {homeTaskId}");
+
+        string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
+
+        string[] fileExtensions = {".mp3", ".wav", ".ogg", ".m4a", ".flac",
+            ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt",
+            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"
+};
+        if (imageExtensions.Contains(Path.GetExtension(file.FileName)))
+        {
+            var result = await fileService.UploadAsync(file, "Files/Images");
+
+            unitOfWork.HomeTaskFiles.Insert(new HomeTaskFile
+            {
+                FileName = result.FileName,
+                FilePath = result.FilePath,
+                HomeTaskId = homeTaskId
+            });
+        }
+        else if (fileExtensions.Contains(Path.GetExtension(file.FileName)))
+        {
+            var result = await fileService.UploadAsync(file, "Files/File");
+
+            unitOfWork.HomeTaskFiles.Insert(new HomeTaskFile
+            {
+                FileName = result.FileName,
+                FilePath = result.FilePath,
+                HomeTaskId = homeTaskId
+            });
+        }
+
+        await unitOfWork.SaveAsync();
+    }
+
     public async Task UpdateAsync(int id, HomeTaskUpdateModel model)
     {
         var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
@@ -40,8 +79,13 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
 
     public async Task DeleteAsync(int id)
     {
-        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id)
+        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id, new[] { "HomeTaskFile" })
             ?? throw new NotFoundException("Home task is not found");
+
+        if (existHomeTask.HomeTaskFile != null)
+        {
+            unitOfWork.HomeTaskFiles.Delete(existHomeTask.HomeTaskFile);
+        }
 
         unitOfWork.HomeTasks.Delete(existHomeTask);
 
@@ -66,48 +110,79 @@ public class HomeTaskService(IUnitOfWork unitOfWork) : IHomeTaskService
         .ToListAsync();
     }
 
-    // public async Task StudentHomeTaskUploadAsync(HomeTaskUploadCreateModel model)
-    // {
-    //     var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == model.HomeTaskId)
-    //         ?? throw new NotFoundException("Homa task not found!");
-    //
-    //     var existStudent = await unitOfWork.Students.SelectAsync(h => h.Id == model.HomeTaskId)
-    //         ?? throw new NotFoundException("Student not found!");
-    //
-    //     if (existHomeTask.Deadline < DateTime.Now)
-    //         throw new Exception("Homework time is over!");
-    //
-    //      unitOfWork.StudentHomeTasks
-    //         .Insert(new StudentHomeTask
-    //         {
-    //             HomeTaskId = model.HomeTaskId,
-    //             StudentId = model.StudentId,
-    //             Info = model.Info,
-    //             UploadedAt = DateTime.Now,
-    //             Status = StudentHomeTaskStatus.accepted,
-    //         });
-    //
-    //     await unitOfWork.SaveAsync();
-    // }
-    //
-    // public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
-    // {
-    //     var existHomeTaskUpload = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
-    //         ?? throw new NotFoundException("No completed home task found!");
-    //
-    //     unitOfWork.StudentHomeTaskFeedbacks
-    //         .Insert(new StudentHomeTaskFeedback
-    //         {
-    //             StudentHomeTaskId = model.StudentHomeTaskId,
-    //             TeacherId = model.TeacherId,
-    //             FeedBack = model.FeedBack
-    //         });
-    //
-    //     await unitOfWork.SaveAsync();
-    //
-    //     existHomeTaskUpload.Score = model.Score;
-    //     
-    //     await unitOfWork.SaveAsync();
-    //     // Send notification
-    // }
+    public async Task StudentHomeTaskCreateAsync(StudentHomeTaskCreateModel model)
+    {
+        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == model.HomeTaskId)
+            ?? throw new NotFoundException("Homa task not found!");
+
+        var existStudent = await unitOfWork.Students.SelectAsync(h => h.Id == model.HomeTaskId)
+            ?? throw new NotFoundException("Student not found!");
+
+        if (existHomeTask.Deadline < DateTime.Now)
+            throw new Exception("Homework time is over!");
+
+        unitOfWork.StudentHomeTasks
+           .Insert(new StudentHomeTask
+           {
+               HomeTaskId = model.HomeTaskId,
+               StudentId = model.StudentId,
+               UploadedAt = DateTime.Now,
+               Status = StudentHomeTaskStatus.Pending,
+           });
+
+        await unitOfWork.SaveAsync();
+    }
+
+    public async Task UploadStudentHomeTaskFileAsync(int studentHomeTaskId, IFormFile file)
+    {
+        _ = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == studentHomeTaskId)
+            ?? throw new NotFoundException($"Student hometask was not found with this ID = {studentHomeTaskId}!");
+
+        string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
+
+        string[] fileExtensions = {".mp3", ".wav", ".ogg", ".m4a", ".flac",
+            ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt",
+            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"
+};
+        if (imageExtensions.Contains(Path.GetExtension(file.FileName)))
+        {
+            var result = await fileService.UploadAsync(file, "Files/Images");
+
+            unitOfWork.StudentHomeTaskFiles.Insert(new StudentHomeTaskFile
+            {
+                FileName = result.FileName,
+                FilePath = result.FilePath,
+                StudentHomeTaskId = studentHomeTaskId,
+                
+            });
+        }
+        else if (fileExtensions.Contains(Path.GetExtension(file.FileName)))
+        {
+            var result = await fileService.UploadAsync(file, "Files/File");
+
+            unitOfWork.StudentHomeTaskFiles.Insert(new StudentHomeTaskFile
+            {
+                FileName = result.FileName,
+                FilePath = result.FilePath,
+                StudentHomeTaskId = studentHomeTaskId,
+            });
+        }
+
+        await unitOfWork.SaveAsync();
+    }
+
+    public async Task HomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
+    {
+        var existStudentHomeTask = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == model.StudentHomeTaskId)
+            ?? throw new NotFoundException("No completed home task found!");
+
+        existStudentHomeTask.Score = model.Score;
+        existStudentHomeTask.Status = model.Status;
+        existStudentHomeTask.Feedback = model.FeedBack;
+
+        unitOfWork.StudentHomeTasks.Update(existStudentHomeTask);
+
+        await unitOfWork.SaveAsync();
+        // Send notification
+    }
 }

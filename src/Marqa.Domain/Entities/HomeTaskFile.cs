@@ -6,5 +6,6 @@ public class HomeTaskFile : Auditable
     public string FilePath { get; set; }
     public string FileExtension { get; set; }
     public int HomeTaskId { get; set; }
+
     public HomeTask HomeTask { get; set; }
 }

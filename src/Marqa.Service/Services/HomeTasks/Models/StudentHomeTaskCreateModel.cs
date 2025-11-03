@@ -1,7 +1,7 @@
 ﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.HomeTasks.Models;
-public class HomeTaskUploadCreateModel
+public class StudentHomeTaskCreateModel
 {
     public int StudentId { get; set; }
     public int HomeTaskId { get; set; }
