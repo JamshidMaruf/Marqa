@@ -1,4 +1,6 @@
-﻿namespace Marqa.Service.Services.HomeTasks.Models;
+﻿using Marqa.Domain.Enums;
+
+namespace Marqa.Service.Services.HomeTasks.Models;
 
 public class HomeTaskAssessmentModel
 {
@@ -6,4 +8,5 @@ public class HomeTaskAssessmentModel
     public int TeacherId { get; set; }
     public int Score { get; set; }
     public string FeedBack { get; set; }
+    public StudentHomeTaskStatus Status { get; set; }
 }

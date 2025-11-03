@@ -6,5 +6,6 @@ public class StudentHomeTaskFile : Auditable
     public string FilePath { get; set; }
     public string FilePathExtension { get; set; }
     public int StudentHomeTaskId { get; set; }
+
     public StudentHomeTask StudentHomeTask { get; set; }
 }

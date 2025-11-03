@@ -123,7 +123,6 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         }
     }
 
-    
     public async Task DeleteAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -226,6 +225,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         return students;
     }
+
     public async Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture)
     {
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
