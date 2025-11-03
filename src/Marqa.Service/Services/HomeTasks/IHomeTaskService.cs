@@ -6,7 +6,7 @@ namespace Marqa.Service.Services.HomeTasks;
 public interface IHomeTaskService
 {
     Task CreateAsync(HomeTaskCreateModel model);
-    Task UploadHomeTaskFile(int homeTaskId, IFormFile file);
+    Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file);
     Task UpdateAsync(int id, HomeTaskUpdateModel model);
     Task DeleteAsync(int id);
     Task<List<HomeTaskViewModel>> GetAsync(int lessonId);

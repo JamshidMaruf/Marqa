@@ -57,4 +57,52 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
             Data = homeTask,
         });
     }
+
+    [HttpPost("file-upload")]
+    public async Task<IActionResult> UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
+    {
+        await homeTaskService.UploadHomeTaskFileAsync(homeTaskId, file);
+
+        return Ok(new Response
+        {
+            Status = 200,
+            Message = "success",
+        });
+    }
+
+    [HttpPost("student-home-task")]
+    public async Task<IActionResult> StudentHomeTaskCreateAsync(StudentHomeTaskCreateModel model)
+    {
+        await homeTaskService.StudentHomeTaskCreateAsync(model);
+
+        return Ok(new Response
+        {
+            Status = 200,
+            Message = "success",
+        });
+    }
+
+    [HttpPost("student-file-upload")]
+    public async Task<IActionResult> StudentHomeTaskFileUploadAsync(int homeTaskId, IFormFile file)
+    {
+        await homeTaskService.UploadStudentHomeTaskFileAsync(homeTaskId, file);
+
+        return Ok(new Response
+        {
+            Status = 200,
+            Message = "success",
+        });
+    }
+
+    [HttpPut("student-hometask-assessment")]
+    public async Task<IActionResult> StudentHomeTaskAssessmentAsync(HomeTaskAssessmentModel model)
+    {
+        await homeTaskService.HomeTaskAssessmentAsync(model);
+
+        return Ok(new Response
+        {
+            Status = 200,
+            Message = "success",
+        });
+    }
 }

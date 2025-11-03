@@ -50,6 +50,7 @@ public class LessonsController(ILessonService lessonService) : Controller
     public async Task<IActionResult> VideoUploadAsync(int lessonId, IFormFile video)
     {
         await lessonService.VideoUploadAsync(lessonId, video);
+
         return Ok(new Response
         {
             Status = 200,

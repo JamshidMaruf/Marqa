@@ -27,7 +27,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
         // Send Notification
     }
 
-    public async Task UploadHomeTaskFile(int homeTaskId, IFormFile file)
+    public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
     {
         _ = await unitOfWork.HomeTasks.SelectAsync(l => l.Id == homeTaskId)
             ?? throw new NotFoundException($"Hometask was not found with this ID = {homeTaskId}");
