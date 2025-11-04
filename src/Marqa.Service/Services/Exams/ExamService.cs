@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Tracing;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.Tracing;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
@@ -12,13 +13,14 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
     {
         var existExam = await unitOfWork.Exams
             .SelectAllAsQueryable()
-            .FirstOrDefaultAsync(e => e.CourseId == model.CourseId && (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
-        ;
+            .FirstOrDefaultAsync(e =>
+            e.CourseId == model.CourseId &&
+            (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
 
         if (existExam != null)
             throw new AlreadyExistException($"Exam already exist for this course between this time frame");
 
-        var transaction = await unitOfWork.BeginTransactionAsync();
+        await using var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
@@ -55,10 +57,10 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
             await unitOfWork.SaveAsync();
             await transaction.CommitAsync();
         }
-        catch (Exception ex)
+        catch
         {
             await transaction.RollbackAsync();
-            throw new Exception(ex.Message);
+            throw;
         }
     }
     public async Task UpdateExamAsync(int examId, ExamUpdateModel model)
@@ -72,10 +74,14 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
 
         var existExamDate = await unitOfWork.Exams
             .SelectAllAsQueryable()
-            .FirstOrDefaultAsync(e => e.CourseId == model.CourseId && (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
+            .FirstOrDefaultAsync(e =>
+            e.CourseId == model.CourseId &&
+            (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
 
         if (existExamDate != null && existExamDate.Id != examId)
             throw new AlreadyExistException($"Exam already exist for this course between this time frame");
+
+        unitOfWork.ExamSettingItems.RemoveRange(examForUpdation.ExamSetting.Items);
 
         examForUpdation.CourseId = model.CourseId;
         examForUpdation.EndTime = model.EndTime;
@@ -88,18 +94,39 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
         examForUpdation.ExamSetting.CertificateFilePath = model.ExamSetting.CertificateFilePath;
         examForUpdation.ExamSetting.CertificateFileExtension = model.ExamSetting.CertificateFileExtension;
 
-        //chala: itemlani alohida methodda birma-bir update qilish keremi yoki birgami
+        await unitOfWork.ExamSettingItems.InsertRangeAsync(model.ExamSetting.Items.Select(item => new ExamSettingItem
+        {
+            ExamSettingId = examForUpdation.ExamSetting.Id,
+            Score = item.Score,
+            GivenPoints = item.GivenPoints
+        }));
+
         await unitOfWork.SaveAsync();
     }
-    
-    // hali update qilinmagan
+
+
     public async Task DeleteExamAsync(int examId)
     {
-        var existExam = unitOfWork.Exams.SelectAllAsQueryable()
-            .FirstOrDefault(e => e.Id == examId)
+        var exam = await unitOfWork.Exams
+            .SelectAllAsQueryable()
+            .Include(e => e.ExamResults)
+            .Include(e => e.ExamSetting)
+            .ThenInclude(es => es.Items)
+            .FirstOrDefaultAsync(e => e.Id == examId)
             ?? throw new NotFoundException("Exam not found");
 
-        unitOfWork.Exams.Delete(existExam);
+        if (exam.ExamSetting != null)
+        {
+            foreach (var item in exam.ExamSetting.Items)
+                unitOfWork.ExamSettingItems.MarkAsDeleted(item);
+
+            unitOfWork.ExamSettings.MarkAsDeleted(exam.ExamSetting);
+        }
+
+        foreach (var item in exam.ExamResults)
+            unitOfWork.StudentExamResults.MarkAsDeleted(item);
+
+        unitOfWork.Exams.MarkAsDeleted(exam);
 
         await unitOfWork.SaveAsync();
     }

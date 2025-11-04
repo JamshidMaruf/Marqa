@@ -131,10 +131,10 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
         if (existStudent.StudentDetail != null)
         {
-            unitOfWork.StudentDetails.Delete(existStudent.StudentDetail);
+            unitOfWork.StudentDetails.MarkAsDeleted(existStudent.StudentDetail);
         }
 
-        unitOfWork.Students.Delete(existStudent);
+        unitOfWork.Students.MarkAsDeleted(existStudent);
         await unitOfWork.SaveAsync();
     }
 

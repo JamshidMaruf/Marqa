@@ -13,6 +13,7 @@ namespace Marqa.Service.Services.PointSettings;
 public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 {
     private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+    
     public async Task CreateAsync(PointSettingCreateModel model)
     {
         unitOfWork.PointSettings.Insert(new PointSetting
@@ -46,7 +47,7 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
         var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException($"No poinit_setting was found with ID = {id}");
 
-        unitOfWork.PointSettings.Delete(pointSetting);
+        unitOfWork.PointSettings.MarkAsDeleted(pointSetting);
 
         await unitOfWork.SaveAsync();
     }

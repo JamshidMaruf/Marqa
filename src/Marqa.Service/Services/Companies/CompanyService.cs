@@ -36,7 +36,7 @@ public class CompanyService(IUnitOfWork unitOfWork) : ICompanyService
         var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
-        unitOfWork.Companies.Delete(existCompany);
+        unitOfWork.Companies.MarkAsDeleted(existCompany);
 
         await unitOfWork.SaveAsync();
     }

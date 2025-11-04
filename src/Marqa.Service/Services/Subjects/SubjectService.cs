@@ -52,7 +52,7 @@ public class SubjectService(
         var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
 
-        unitOfWork.Subjects.Delete(existSubject);
+        unitOfWork.Subjects.MarkAsDeleted(existSubject);
 
         await unitOfWork.SaveAsync();
     }
@@ -122,7 +122,7 @@ public class SubjectService(
             .FirstOrDefault()
             ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
-        unitOfWork.TeacherSubjects.Delete(teacherSubject);
+        unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
 
         await unitOfWork.SaveAsync();
     }
