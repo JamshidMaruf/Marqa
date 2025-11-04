@@ -36,12 +36,22 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.Update(entity);
     }
    
-    public void Delete(TEntity entity)
+    public void MarkAsDeleted(TEntity entity)
     {
         entity.DeletedAt = DateTime.UtcNow;
         entity.IsDeleted = true;
         _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
         _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true; 
+    }
+
+    public void Remove(TEntity entity)
+    {
+        _context.Remove(entity);
+    }
+
+    public void RemoveRange(IEnumerable<TEntity> entities)
+    {
+        _context.RemoveRange(entities);
     }
 
     public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null)
@@ -63,6 +73,4 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
     {
         return _context.Set<TEntity>().AsQueryable();
     }
-
-
 }

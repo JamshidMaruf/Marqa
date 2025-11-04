@@ -84,10 +84,10 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
         if (existHomeTask.HomeTaskFile != null)
         {
-            unitOfWork.HomeTaskFiles.Delete(existHomeTask.HomeTaskFile);
+            unitOfWork.HomeTaskFiles.MarkAsDeleted(existHomeTask.HomeTaskFile);
         }
 
-        unitOfWork.HomeTasks.Delete(existHomeTask);
+        unitOfWork.HomeTasks.MarkAsDeleted(existHomeTask);
 
         await unitOfWork.SaveAsync();
     }

@@ -46,7 +46,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
         var result = await unitOfWork.Products.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException("This product is not found!");
 
-         unitOfWork.Products.Delete(result);
+         unitOfWork.Products.MarkAsDeleted(result);
 
         await unitOfWork.SaveAsync();
     }

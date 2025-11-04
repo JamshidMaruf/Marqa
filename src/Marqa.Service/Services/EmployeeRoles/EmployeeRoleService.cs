@@ -34,7 +34,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork) : IEmployeeRoleService
         var existRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException("Role not found");
 
-        unitOfWork.EmployeeRoles.Delete(existRole);
+        unitOfWork.EmployeeRoles.MarkAsDeleted(existRole);
         
         await unitOfWork.SaveAsync();
     }

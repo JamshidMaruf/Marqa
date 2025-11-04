@@ -83,10 +83,10 @@ public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
                 .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
                 .FirstOrDefaultAsync(); 
 
-            unitOfWork.TeacherSubjects.Delete(teacherSubject);
+            unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
         }
 
-        unitOfWork.Employees.Delete(employeeForDeletion);
+        unitOfWork.Employees.MarkAsDeleted(employeeForDeletion);
 
         await unitOfWork.SaveAsync();
     }

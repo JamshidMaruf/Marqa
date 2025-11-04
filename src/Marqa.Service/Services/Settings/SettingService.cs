@@ -28,7 +28,7 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
         var setting = await unitOfWork.Settings.SelectAsync(s => s.Key == key)
             ?? throw new NotFoundException("Setting not found");
 
-        unitOfWork.Settings.Delete(setting);
+        unitOfWork.Settings.MarkAsDeleted(setting);
         
         await unitOfWork.SaveAsync();
     }

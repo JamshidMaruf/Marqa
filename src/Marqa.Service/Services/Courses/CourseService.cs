@@ -102,13 +102,13 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
         {
 
             foreach (var lesson in existCourse.Lessons)
-                unitOfWork.Lessons.Delete(lesson);
+                unitOfWork.Lessons.MarkAsDeleted(lesson);
             
             await unitOfWork.SaveAsync();
             
 
             foreach (var weekday in existCourse.CourseWeekdays)
-                unitOfWork.CourseWeekdays.Delete(weekday);
+                unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
 
             await unitOfWork.SaveAsync();
 
@@ -156,12 +156,12 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
         foreach (var lesson in existCourse.Lessons)
-             unitOfWork.Lessons.Delete(lesson);
+             unitOfWork.Lessons.MarkAsDeleted(lesson);
 
         foreach (var weekday in existCourse.CourseWeekdays)
-             unitOfWork.CourseWeekdays.Delete(weekday);
+             unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
 
-         unitOfWork.Courses.Delete(existCourse);
+         unitOfWork.Courses.MarkAsDeleted(existCourse);
 
         await unitOfWork.SaveAsync();
     }
@@ -289,7 +289,7 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
             .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
 
         if (studentCourse is not null)
-            unitOfWork.StudentCourses.Delete(studentCourse);
+            unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
 
         await unitOfWork.SaveAsync();
     }

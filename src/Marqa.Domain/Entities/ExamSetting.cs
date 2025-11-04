@@ -1,6 +1,6 @@
 ﻿namespace Marqa.Domain.Entities;
 
-public class    ExamSetting : Auditable
+public class ExamSetting : Auditable
 {
     public int ExamId { get; set; }
     public float MinScore { get; set; }

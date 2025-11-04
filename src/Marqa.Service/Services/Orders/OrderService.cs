@@ -69,7 +69,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         {
             if (basketItem.Quantity == model.Quantity)
             {
-                unitOfWork.BasketItems.Delete(basketItem);
+                unitOfWork.BasketItems.MarkAsDeleted(basketItem);
 
                 basket.TotalPrice -= model.InlinePrice;
                 unitOfWork.Baskets.Update(basket);
