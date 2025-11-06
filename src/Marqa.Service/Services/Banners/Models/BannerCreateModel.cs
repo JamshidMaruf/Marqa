@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Marqa.Service.Services.Banners.Models;
+﻿namespace Marqa.Service.Services.Banners.Models;
 
 public class BannerCreateModel
 {
     public int CompanyId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
-    public IFormFile Image { get; set; }
     public string LinkUrl { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }

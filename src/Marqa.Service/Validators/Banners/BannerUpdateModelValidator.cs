@@ -3,14 +3,12 @@ using Marqa.Service.Services.Banners.Models;
 
 namespace Marqa.Service.Validators.Banners;
 
-public class BannerCreateModelValidator : AbstractValidator<BannerCreateModel>
-{
-    public BannerCreateModelValidator()
-    {
-        RuleFor(x => x.CompanyId)
-             .GreaterThan(0)
-             .WithMessage("Company ID must be greater than 0");
+namespace Marqa.Service.Validators.Banners;
 
+public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
+{
+    public BannerUpdateModelValidator()
+    {
         RuleFor(x => x.Title)
             .NotEmpty()
             .WithMessage("Title is required")

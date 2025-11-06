@@ -1,61 +1,85 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Banners.Models;
+using Marqa.Service.Services.Files;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-public class BannerService(IUnitOfWork unitOfWork) : IBannerService
+namespace Marqa.Service.Services.Banners;
+
+public class BannerService(
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
+    IValidator<BannerCreateModel> createValidator,
+    IValidator<BannerUpdateModel> updateValidator) : IBannerService
 {
     public async Task CreateAsync(BannerCreateModel model)
     {
-        // Validation: StartDate EndDate dan kichik bo'lishi kerak
-        if (model.StartDate >= model.EndDate)
-            throw new ArgumentException("Start date must be earlier than end date");
+        var validationResult = await createValidator.ValidateAsync(model);
+        if (!validationResult.IsValid)
+            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
 
-        // buyerda image url emas image ni ozi keladi uni wwwroot ga upload qilib 
-        // keyin qaytgan url filenamelarni saqlab qoyish kerak
-        // hometask servicedam namuna osez boladi
+        unitOfWork.Banners.Insert(new Banner
+        {
+            Title = model.Title,
+            Description = model.Description,
+            LinkUrl = model.LinkUrl,
+            DisplayOrder = model.DisplayOrder,
+            IsActive = model.IsActive,
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            CompanyId = model.CompanyId
+        });
 
-        //unitOfWork.Banners.Insert(new Banner
-        //{
-        //    Title = model.Title,
-        //    Description = model.Description,
-        //    ImageUrl = model.ImageUrl,
-        //    LinkUrl = model.LinkUrl,
-        //    DisplayOrder = model.DisplayOrder,
-        //    IsActive = model.IsActive,
-        //    StartDate = model.StartDate,
-        //    EndDate = model.EndDate
-        //});
+        await unitOfWork.SaveAsync();
+    }
 
+    public async Task UploadBannerImageAsync(int bannerId, IFormFile file)
+    {
+        var existBanner = await unitOfWork.Banners
+            .SelectAllAsQueryable()
+            .Where(b => !b.IsDeleted)
+            .FirstOrDefaultAsync(b => b.Id == bannerId)
+            ?? throw new NotFoundException($"Banner was not found with this ID = {bannerId}");
+
+        string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
+
+        var fileExtension = Path.GetExtension(file.FileName).ToLower();
+
+        if (!imageExtensions.Contains(fileExtension))
+            throw new ArgumentException("Only image files are allowed for banner");
+
+        var result = await fileService.UploadAsync(file, "Files/Images");
+
+        existBanner.FileName = result.FileName;
+        existBanner.FilePath = result.FilePath;
+        existBanner.FileExtension = fileExtension;
+
+        unitOfWork.Banners.Update(existBanner);
         await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateAsync(int id, BannerUpdateModel model)
     {
+        var validationResult = await updateValidator.ValidateAsync(model);
+        if (!validationResult.IsValid)
+            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
+
         var existBanner = await unitOfWork.Banners
             .SelectAllAsQueryable()
             .Where(b => !b.IsDeleted)
             .FirstOrDefaultAsync(b => b.Id == id)
             ?? throw new NotFoundException("Banner was not found");
 
-        // Validation
-        if (model.StartDate >= model.EndDate)
-            throw new ArgumentException("Start date must be earlier than end date");
-        
-        // buyerda image url emas image ni ozi keladi uni wwwroot ga upload qilib 
-        // keyin qaytgan url filenamelarni saqlab qoyish kerak
-        // hometask servicedam namuna osez boladi
-
-        //existBanner.Title = model.Title;
-        //existBanner.Description = model.Description;
-        //existBanner.ImageUrl = model.ImageUrl;
-        //existBanner.LinkUrl = model.LinkUrl;
-        //existBanner.DisplayOrder = model.DisplayOrder;
-        //existBanner.IsActive = model.IsActive;
-        //existBanner.StartDate = model.StartDate;
-        //existBanner.EndDate = model.EndDate;
+        existBanner.Title = model.Title;
+        existBanner.Description = model.Description;
+        existBanner.LinkUrl = model.LinkUrl;
+        existBanner.DisplayOrder = model.DisplayOrder;
+        existBanner.IsActive = model.IsActive;
+        existBanner.StartDate = model.StartDate;
+        existBanner.EndDate = model.EndDate;
 
         unitOfWork.Banners.Update(existBanner);
         await unitOfWork.SaveAsync();
@@ -81,7 +105,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                //ImageUrl = b.ImageUrl,
+                ImageUrl = b.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -100,7 +124,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-               // ImageUrl = b.ImageUrl,
+                ImageUrl = b.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -121,7 +145,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-               // ImageUrl = b.ImageUrl,
+                ImageUrl = b.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -131,32 +155,26 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
     public async Task ToggleActiveAsync(int id)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted)
-            .FirstOrDefaultAsync(b => b.Id == id)
-            ?? throw new NotFoundException("Banner was not found");
+         .SelectAsync(b => b.Id == id && !b.IsDeleted)
+         ?? throw new NotFoundException("Banner was not found");
 
         existBanner.IsActive = !existBanner.IsActive;
-
-        unitOfWork.Banners.Update(existBanner);
         await unitOfWork.SaveAsync();
     }
 
     public async Task<List<MainPageBannerViewModel>> GetByCompanyIdAsync(int companyId)
     {
-        var banners = await unitOfWork.Banners
+        return await unitOfWork.Banners
             .SelectAllAsQueryable()
-            .Where(b => b.CompanyId == companyId && b.IsActive)
+            .Where(b => b.CompanyId == companyId && b.IsActive && !b.IsDeleted)
             .OrderBy(b => b.CreatedAt)
+            .Select(b => new MainPageBannerViewModel
+            {
+                Id = b.Id,
+                ImageUrl = b.FilePath,
+                LinkUrl = b.LinkUrl,
+                DisplayOrder = b.DisplayOrder,
+            })
             .ToListAsync();
-
-        return banners.Select(b => new MainPageBannerViewModel
-        {
-            Id = b.Id,
-            //ImageUrl = b.ImageUrl,
-            LinkUrl = b.LinkUrl,
-            DisplayOrder = b.DisplayOrder,
-
-        }).ToList();
     }
 }
