@@ -29,6 +29,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Marqa.Service.Validators.EmployeeRoles;
+using Marqa.Service.Services.EmployeeRoles.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +87,8 @@ builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
 builder.Services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
+builder.Services.AddScoped<IValidator<EmployeeRoleCreateModel>, EmployeeRoleCreateModelValidator>();
+builder.Services.AddScoped<IValidator<EmployeeRoleUpdateModel>, EmployeeRoleUpdateModelValidator>();
 
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
