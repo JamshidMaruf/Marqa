@@ -1,9 +1,11 @@
-﻿namespace Marqa.Service.Services.Banners.Models;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Marqa.Service.Services.Banners.Models;
 public class BannerUpdateModel
 {
     public string Title { get; set; }
     public string Description { get; set; }
-    public string ImageUrl { get; set; }
+    public IFormFile Image { get; set; }
     public string LinkUrl { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }
