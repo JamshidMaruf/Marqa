@@ -1,0 +1,6 @@
+@Marqa.Student.WebApi_HostAddress = http://localhost:5147
+
+GET {{Marqa.Student.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
