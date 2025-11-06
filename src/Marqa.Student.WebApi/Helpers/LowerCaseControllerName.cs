@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Marqa.Admin.WebApi.Extensions;
+namespace Marqa.Student.WebApi.Extensions;
 
 public class LowerCaseControllerName : IOutboundParameterTransformer
 {

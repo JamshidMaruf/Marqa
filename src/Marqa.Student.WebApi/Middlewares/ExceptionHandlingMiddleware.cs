@@ -1,7 +1,7 @@
 ﻿using Marqa.Service.Exceptions;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Student.WebApi.Models;
 
-namespace Marqa.Admin.WebApi.Middlewares;
+namespace Marqa.Student.WebApi.Middlewares;
 
 public class ExceptionHandlingMiddleware
 {
