@@ -1,7 +1,7 @@
-using Marqa.Service.Services.Banners.Models;
+﻿using Marqa.Service.Services.Banners.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.WebApi.Controllers;
+namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

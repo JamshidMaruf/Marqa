@@ -1,4 +1,4 @@
-﻿namespace Marqa.WebApi.Models;
+﻿namespace Marqa.Admin.WebApi.Models;
 
 public class Response<TModel>
 {

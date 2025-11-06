@@ -3,10 +3,10 @@ using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Service.Services.PointSettings.Models;
-using Marqa.WebApi.Models;
+using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.WebApi.Controllers;
+namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

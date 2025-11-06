@@ -1,10 +1,10 @@
 ﻿using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.WebApi.Models;
+using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.WebApi.Controllers;
+namespace Marqa.Admin.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class CoursesController(ICourseService courseService) : ControllerBase

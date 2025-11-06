@@ -1,9 +1,9 @@
 ﻿using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.HomeTasks.Models;
-using Marqa.WebApi.Models;
+using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.WebApi.Controllers;
+namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

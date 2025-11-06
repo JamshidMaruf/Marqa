@@ -1,10 +1,10 @@
 ﻿using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Products.Models;
-using Marqa.WebApi.Models;
+using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 
-namespace Marqa.WebApi.Controllers;
+namespace Marqa.Admin.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController(IProductService productService) : ControllerBase
