@@ -81,7 +81,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.ImageUrl,
+                //ImageUrl = b.ImageUrl,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -100,7 +100,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.ImageUrl,
+               // ImageUrl = b.ImageUrl,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -121,7 +121,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.ImageUrl,
+               // ImageUrl = b.ImageUrl,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -153,7 +153,7 @@ public class BannerService(IUnitOfWork unitOfWork) : IBannerService
         return banners.Select(b => new MainPageBannerViewModel
         {
             Id = b.Id,
-            ImageUrl = b.ImageUrl,
+            //ImageUrl = b.ImageUrl,
             LinkUrl = b.LinkUrl,
             DisplayOrder = b.DisplayOrder,
 
