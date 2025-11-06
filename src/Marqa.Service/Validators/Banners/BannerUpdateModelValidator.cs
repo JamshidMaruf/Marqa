@@ -3,8 +3,6 @@ using Marqa.Service.Services.Banners.Models;
 
 namespace Marqa.Service.Validators.Banners;
 
-namespace Marqa.Service.Validators.Banners;
-
 public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
 {
     public BannerUpdateModelValidator()
@@ -13,7 +11,7 @@ public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
             .NotEmpty()
             .WithMessage("Title is required")
             .MaximumLength(255)
-            .WithMessage("Title must not exceed 200 characters");
+            .WithMessage("Title must not exceed 255 characters");
 
         RuleFor(x => x.Description)
             .NotEmpty()

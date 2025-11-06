@@ -108,7 +108,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     {
         var students = await GetMainPageRatingResultAsync(companyId);
 
-
+        return new List<RatingPageRatingResult>();
     }
 }
 
