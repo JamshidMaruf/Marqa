@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Auth;
