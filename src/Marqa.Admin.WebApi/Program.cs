@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using FluentValidation;
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
@@ -6,6 +7,7 @@ using Marqa.Service.Helpers;
 using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
+using Marqa.Service.Services.Companies.Models;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
@@ -20,8 +22,14 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
+<<<<<<< HEAD:src/Marqa.Admin.WebApi/Program.cs
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.Admin.WebApi.Middlewares;
+=======
+using Marqa.Service.Validators.Companies;
+using Marqa.WebApi.Extensions;
+using Marqa.WebApi.Middlewares;
+>>>>>>> 0e3c1ebd18db4d924eb51794b21f7f9601fcafc3:src/Marqa.WebApi/Program.cs
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +89,7 @@ builder.Services.AddScoped<IExamService, ExamService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
+builder.Services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
 
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();

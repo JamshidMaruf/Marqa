@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Servcies.Products;
@@ -19,6 +20,7 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
+using Marqa.Service.Validators.Companies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -50,6 +52,7 @@ public static class ServicesExtension
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
+        services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
     public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)

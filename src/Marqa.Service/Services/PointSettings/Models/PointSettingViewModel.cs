@@ -1,7 +1,8 @@
 ﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.PointSettings.Models;
-public class PointSettingCreateModel
+
+public class PointSettingViewModel
 {
     public int Point { get; set; }
     public string Name { get; set; }
