@@ -22,14 +22,9 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
-<<<<<<< HEAD:src/Marqa.Admin.WebApi/Program.cs
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.Admin.WebApi.Middlewares;
-=======
 using Marqa.Service.Validators.Companies;
-using Marqa.WebApi.Extensions;
-using Marqa.WebApi.Middlewares;
->>>>>>> 0e3c1ebd18db4d924eb51794b21f7f9601fcafc3:src/Marqa.WebApi/Program.cs
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
