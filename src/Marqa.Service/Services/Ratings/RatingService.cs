@@ -90,7 +90,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                 StudentId = student.Id,
                 StudentFirstName = student.FirstName,
                 StudentLastName = student.LastName,
-                TotalPoints = pointHistoryService.GetAsync(student.Id).Result,
+                TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
         var rank = 1;
@@ -104,9 +104,11 @@ public class RatingService(IUnitOfWork unitOfWork,
         return ratings.OrderBy(r => r.TotalPoints).Take(3).ToList();
     }
 
-    public Task<List<RatingPageRatingResult>> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
+    public async Task<List<RatingPageRatingResult>> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
     {
-        throw new NotImplementedException();
+        var students = await GetMainPageRatingResultAsync(companyId);
+
+
     }
 }
 
