@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
@@ -10,12 +11,19 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.PointSettings;
 
-public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
+public class PointSettingService(IUnitOfWork unitOfWork, 
+    IValidator<PointSettingCreateModel> pointSettingCreateValidator,
+    IValidator<PointSettingUpdateModel> pointSettingUpdateValidator) : IPointSettingService
 {
     private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
     
     public async Task CreateAsync(PointSettingCreateModel model)
     {
+        var validatorResult = await pointSettingCreateValidator.ValidateAsync(model);
+        
+        if(!validatorResult.IsValid)
+            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+
         unitOfWork.PointSettings.Insert(new PointSetting
         {
             Name = model.Name,
@@ -29,6 +37,11 @@ public class PointSettingService(IUnitOfWork unitOfWork) : IPointSettingService
 
     public async Task UpdateAsync(int id, PointSettingUpdateModel model)
     {
+        var validatorResult = await pointSettingUpdateValidator.ValidateAsync(model);
+
+        if(!validatorResult.IsValid)
+            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+
         var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException($"No point_setting was found with ID {id}");
 

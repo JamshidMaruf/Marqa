@@ -1,5 +1,4 @@
-﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Courses.Models;
 
@@ -10,7 +9,7 @@ public class CourseCreateModel
     public int SubjectId { get; set; } 
     public int TeacherId { get; set; }
     public int CompanyId { get; set; } 
-    public int LessonCount { get; set; } 
+    public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }

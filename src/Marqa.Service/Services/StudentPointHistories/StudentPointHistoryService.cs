@@ -1,4 +1,5 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -8,10 +9,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.StudentPointHistories;
 
 public class StudentPointHistoryService(
-    IUnitOfWork unitOfWork) : IStudentPointHistoryService
+    IUnitOfWork unitOfWork,
+    IValidator<StudentPointAddModel> pointAddValidator) : IStudentPointHistoryService
 {
     public async Task AddPointAsync(StudentPointAddModel model)
     {
+        var validatorResult = await pointAddValidator.ValidateAsync(model);
+
+        if (!validatorResult.IsValid)
+            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException("This student is not found!");
 
