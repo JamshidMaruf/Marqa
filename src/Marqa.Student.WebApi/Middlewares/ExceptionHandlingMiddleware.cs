@@ -6,10 +6,11 @@ namespace Marqa.Student.WebApi.Middlewares;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate next;
-
-    public ExceptionHandlingMiddleware(RequestDelegate next)
+    private readonly ILogger<ExceptionHandlingMiddleware> logger;
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         this.next = next;
+        this.logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
@@ -57,6 +58,7 @@ public class ExceptionHandlingMiddleware
                 Status = 500,
                 Message = ex.Message
             });
+            logger.LogError(ex, ex.Message);
         }
     }
 }

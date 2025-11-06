@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using FluentValidation;
+using Marqa.Admin.WebApi.Extensions;
+using Marqa.Admin.WebApi.Middlewares;
 using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
@@ -7,9 +9,9 @@ using Marqa.Service.Helpers;
 using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
-using Marqa.Service.Services.Companies.Models;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
+using Marqa.Service.Services.EmployeeRoles.Models;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
@@ -22,17 +24,19 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
-using Marqa.Admin.WebApi.Extensions;
-using Marqa.Admin.WebApi.Middlewares;
 using Marqa.Service.Validators.Companies;
+using Marqa.Service.Validators.EmployeeRoles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Marqa.Service.Validators.EmployeeRoles;
-using Marqa.Service.Services.EmployeeRoles.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddLogging();
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
 
