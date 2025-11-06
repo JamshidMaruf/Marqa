@@ -3,6 +3,7 @@ using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Settings;
+using Marqa.Service.Validators.Companies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -18,6 +19,7 @@ public static class ServicesExtension
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
+        services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
     public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
