@@ -1,15 +1,24 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Validators.Courses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
-public class CourseService(IUnitOfWork unitOfWork) : ICourseService
+public class CourseService(IUnitOfWork unitOfWork, 
+    IValidator<CourseCreateModel> courseCreateValidator,
+    IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
+        var validationResult = await courseCreateValidator.ValidateAsync(model);
+
+        if (!validationResult.IsValid)
+            throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
+
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
 
@@ -81,6 +90,11 @@ public class CourseService(IUnitOfWork unitOfWork) : ICourseService
 
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
+        var validatorResult = await courseUpdateValidator.ValidateAsync(model);
+
+        if(!validatorResult.IsValid)
+            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()
             .Where(c => !c.IsDeleted)
