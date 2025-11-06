@@ -31,8 +31,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Marqa.Service.Validators.EmployeeRoles;
 using Marqa.Service.Services.EmployeeRoles.Models;
-using Marqa.Service.Services.Products.Models;
-using Marqa.Service.Validators.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,9 +89,6 @@ builder.Services.AddScoped<IStudentPointHistoryService, StudentPointHistoryServi
 builder.Services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
 builder.Services.AddScoped<IValidator<EmployeeRoleCreateModel>, EmployeeRoleCreateModelValidator>();
 builder.Services.AddScoped<IValidator<EmployeeRoleUpdateModel>, EmployeeRoleUpdateModelValidator>();
-builder.Services.AddScoped<IValidator<ProductCreateModel>, ProductCreateModelValidator>();
-builder.Services.AddScoped<IValidator<ProductUpdateModel>, ProductUpdateModelValidator>();
-
 
 builder.Services.AddScoped<IEncryptionService, EncryptionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
