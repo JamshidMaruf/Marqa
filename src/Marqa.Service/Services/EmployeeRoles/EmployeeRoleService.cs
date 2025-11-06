@@ -8,11 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.EmployeeRoles;
 
 public class EmployeeRoleService(IUnitOfWork unitOfWork,
-    IValidator<EmployeeRoleCreateModel> employeeRoleValidator) : IEmployeeRoleService
+    IValidator<EmployeeRoleCreateModel> employeeRoleCreateValidator,
+    IValidator<EmployeeRoleUpdateModel> employeeUpdateValdator) : IEmployeeRoleService
 {
     public async Task CreateAsync(EmployeeRoleCreateModel model)
     {
-        var validatorResult = await employeeRoleValidator.ValidateAsync(model);
+        var validatorResult = await employeeRoleCreateValidator.ValidateAsync(model);
 
         if (!validatorResult.IsValid)
             throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
@@ -89,6 +90,11 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
+        var validatorResult = await employeeUpdateValdator.ValidateAsync(model);
+
+        if (!validatorResult.IsValid)
+            throw new ArgumentIsNotValidException(validatorResult.Errors.FirstOrDefault().ErrorMessage);
+
         var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
              ?? throw new NotFoundException("Role not found");
 
