@@ -18,3 +18,4 @@ public class StudentPointAddModelValidator : AbstractValidator<StudentPointAddMo
         RuleFor(p => p.Operation).NotNull();
     }
 }
+
