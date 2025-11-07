@@ -27,10 +27,6 @@ public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateMode
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("Invalid Email format.");
 
-        RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(6).WithMessage("Password must be at least 6 characters.");
-
         RuleFor(x => x.Gender)
             .IsInEnum().WithMessage("Invalid gender value.");
 
