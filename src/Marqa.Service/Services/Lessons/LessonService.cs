@@ -31,13 +31,13 @@ public class LessonService(
         await unitOfWork.SaveAsync();
     }
 
-    public async Task ModifyAsync(int id, string name, HomeTaskStatus homeTaskStatus)
+    public async Task ModifyAsync(LessonModifyModel model)
     {
-        var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
-            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
+        var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.Id)
+            ?? throw new NotFoundException($"Lesson was not found with this ID = {model.Id}");
 
-        lesson.Name = name;
-        lesson.HomeTaskStatus = homeTaskStatus;
+        lesson.Name = model.Name;
+        lesson.HomeTaskStatus = model.HomeTaskStatus;
 
         unitOfWork.Lessons.Update(lesson);
         
