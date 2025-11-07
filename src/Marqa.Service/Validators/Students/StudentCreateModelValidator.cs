@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Marqa.Service.Services.Students.Models;
-namespace Marqa.Service.Validators.StudentPointHistories;
+
+namespace Marqa.Service.Validators.Students;
 
 public class StudentCreateModelValidator : AbstractValidator<StudentCreateModel>
 {
