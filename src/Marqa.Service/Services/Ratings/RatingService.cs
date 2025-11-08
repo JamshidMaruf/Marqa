@@ -14,6 +14,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         var ratings = await GetAllStudentRatingsAsync();
         return ratings.FirstOrDefault(r => r.StudentId == studentId);
     }
+
     public async Task<IEnumerable<Rating>> GetAllStudentRatingsAsync()
     {
         var students = unitOfWork.Students.SelectAllAsQueryable();
@@ -104,11 +105,61 @@ public class RatingService(IUnitOfWork unitOfWork,
         return ratings.OrderBy(r => r.TotalPoints).Take(3).ToList();
     }
 
-    public async Task<List<RatingPageRatingResult>> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
+    public async Task<RatingPageRatingResult> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
     {
-        var students = await GetMainPageRatingResultAsync(companyId);
+        var query = unitOfWork.Students
+            .SelectAllAsQueryable()
+            .Include(s => s.Courses)
+            .ThenInclude(c => c.Course)
+            .Where(s => s.CompanyId == companyId);
 
-        return new List<RatingPageRatingResult>();
+        //var courseStudents = new List<StudentCourse>().AsQueryable();
+        //if (courseId != null || courseId != 0)
+        //{
+        //    courseStudents = unitOfWork.StudentCourses
+        //        .SelectAllAsQueryable()
+        //        .Where(sc => sc.CourseId == courseId);
+        //}
+
+        var students = new RatingPageRatingResult
+        {
+            Students = await query.Select(s => new RatingPageRatingResult.StudentInfo
+            {
+                StudentId = s.Id,
+                StudentFirstName = s.FirstName,
+                StudentLastName = s.LastName,
+                ImageName = s.ImageFileName,
+                ImagePath = s.ImageFilePath,
+                ImageExtension = s.ImageFileExtension,
+                Courses = s.Courses.Select(c => new RatingPageRatingResult.CourseInfo
+                {
+                    Id = c.CourseId,
+                    Name = c.Course.Name
+                })
+            })
+            .ToListAsync()
+        };
+
+        students.Students.ToList().ForEach(async student =>
+        {
+            student.TotalPoints = await pointHistoryService.GetAsync(student.StudentId);
+        });
+        
+        students.Students = students.Students.OrderByDescending(s => s.TotalPoints);
+        
+        int rank = 1;
+        foreach(var student in students.Students)
+        {
+            student.Rank = rank++;
+        }
+
+        return students;
     }
 }
 
+//student fullname
+//student imagename, url, extension
+//student points
+//student position in rating
+//student courses containing id,name
+//filter by courseId and gender
