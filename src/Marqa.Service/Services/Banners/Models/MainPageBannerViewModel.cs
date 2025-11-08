@@ -1,4 +1,5 @@
-﻿namespace Marqa.Service.Services.Banners.Models;
+﻿using Microsoft.AspNetCore.Http;
+namespace Marqa.Service.Services.Banners.Models;
 
 
 public class MainPageBannerViewModel
