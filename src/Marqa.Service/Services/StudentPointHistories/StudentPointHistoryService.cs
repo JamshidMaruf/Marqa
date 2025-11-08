@@ -3,6 +3,7 @@ using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.StudentPointHistories.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +15,7 @@ public class StudentPointHistoryService(
 {
     public async Task AddPointAsync(StudentPointAddModel model)
     {
-        var validatorResult = await pointAddValidator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await pointAddValidator.EnsureValidatedAsync(model);
 
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException("This student is not found!");

@@ -2,6 +2,7 @@
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Validators.Courses;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
-        var validationResult = await courseCreateValidator.ValidateAsync(model);
-
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await courseCreateValidator.EnsureValidatedAsync(model);
 
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
@@ -90,10 +88,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
-        var validatorResult = await courseUpdateValidator.ValidateAsync(model);
-
-        if(!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await courseUpdateValidator.EnsureValidatedAsync(model);
 
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()

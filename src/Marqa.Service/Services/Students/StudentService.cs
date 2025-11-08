@@ -2,6 +2,7 @@
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Service.Services.Students.Models.DetailModels;
 using Microsoft.AspNetCore.Http;
@@ -16,10 +17,8 @@ public class StudentService(
 {
     public async Task CreateAsync(StudentCreateModel model)
     {
-        var validationResult = await createValidator.ValidateAsync(model);
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
-
+        await createValidator.EnsureValidatedAsync(model);
+        
         var company = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId);
         if (company == null)
             throw new NotFoundException("Company not found");
@@ -74,10 +73,8 @@ public class StudentService(
 
     public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
     {
-        var validationResult = await updateValidator.ValidateAsync(model);
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
-
+        await updateValidator.EnsureValidatedAsync(model);
+        
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try

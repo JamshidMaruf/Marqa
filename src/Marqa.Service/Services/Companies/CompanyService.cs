@@ -3,6 +3,7 @@ using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Service.Validators.Companies;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,7 @@ public class CompanyService(
 {
     public async Task CreateAsync(CompanyCreateModel model)
     {
-        var validatorResult = await createModelValidator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors.FirstOrDefault().ErrorMessage);
+        await createModelValidator.EnsureValidatedAsync(model);
 
         unitOfWork.Companies.Insert(new Company
         {
@@ -31,10 +29,7 @@ public class CompanyService(
 
     public async Task UpdateAsync(int id, CompanyUpdateModel model)
     {
-        var validatorResult = await updateModelValidator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors.FirstOrDefault().ErrorMessage);
+        await updateModelValidator.EnsureValidatedAsync(model);
 
         var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");

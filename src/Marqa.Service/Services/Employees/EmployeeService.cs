@@ -1,4 +1,5 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
@@ -7,10 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
 
-public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
+public class EmployeeService(IUnitOfWork unitOfWork,
+    IValidator<EmployeeCreateModel> validatorEmployeeCreate,
+    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate) : IEmployeeService
 {
     public async Task CreateAsync(EmployeeCreateModel model)
     {
+        await validatorEmployeeCreate.EnsureValidatedAsync(model);
+
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
 
@@ -42,6 +47,8 @@ public class EmployeeService(IUnitOfWork unitOfWork) : IEmployeeService
 
     public async Task UpdateAsync(int id, int companyId, EmployeeUpdateModel model)
     {
+        await validatorEmployeeUpdate.EnsureValidatedAsync(model);
+
         var existTeacher = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
         
