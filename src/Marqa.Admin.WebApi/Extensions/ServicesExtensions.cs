@@ -12,7 +12,6 @@ using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
-using Marqa.Service.Services.Messages;
 using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Ratings;
@@ -23,19 +22,16 @@ using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
-namespace Marqa.Student.WebApi.Extensions;
+namespace Marqa.Admin.WebApi.Extensions;
 
-public static class ServicesExtension
+public static class ServicesExtensions
 {
     public static void AddMarqaServices(this IServiceCollection services)
     {
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ISettingService, SettingService>();
-        services.AddScoped<ISmsService, SmsService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
@@ -51,10 +47,11 @@ public static class ServicesExtension
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
+        services.AddScoped<ISettingService, SettingService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
-    public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
+    public static void AddJWTService(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
@@ -71,37 +68,10 @@ public static class ServicesExtension
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["JWT.Issuer"],
-                    ValidAudience = jwtSettings["JWT.Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+                    ValidIssuer = jwtSettings["JWT:Issuer"],
+                    ValidAudience = jwtSettings["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT:Key"]))
                 };
             });
-    }
-
-    public static void AddSwaggerService(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Scheme = "Bearer",
-                Description =
-                    "Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    new string[] { }
-                }
-            });
-        });
     }
 }
