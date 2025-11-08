@@ -70,7 +70,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
         });
     }
 
-    [HttpGet("basket{stduentId:int}")]
+    [HttpGet("basket/{stduentId:int}")]
     public async Task<IActionResult> GetAsync(int studentId)
     {
         var basket = await orderService.GetBasketByStudentIdAsync(studentId);
