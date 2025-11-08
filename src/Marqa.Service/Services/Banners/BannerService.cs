@@ -2,6 +2,7 @@
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Banners.Models;
 using Marqa.Service.Services.Files;
 using Microsoft.AspNetCore.Http;
@@ -17,9 +18,7 @@ public class BannerService(
 {
     public async Task CreateAsync(BannerCreateModel model)
     {
-        var validationResult = await createValidator.ValidateAsync(model);
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
+        await createValidator.EnsureValidatedAsync(model);
 
         unitOfWork.Banners.Insert(new Banner
         {
@@ -63,10 +62,8 @@ public class BannerService(
 
     public async Task UpdateAsync(int id, BannerUpdateModel model)
     {
-        var validationResult = await updateValidator.ValidateAsync(model);
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors.FirstOrDefault().ErrorMessage);
-
+        await updateValidator.EnsureValidatedAsync(model);
+       
         var existBanner = await unitOfWork.Banners
             .SelectAllAsQueryable()
             .Where(b => !b.IsDeleted)

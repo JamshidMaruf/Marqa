@@ -1,16 +1,24 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.Tracing;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Exams.Models;
 using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Exams;
 
-public class ExamService(IUnitOfWork unitOfWork) : IExamService
+public class ExamService(IUnitOfWork unitOfWork,
+    IValidator<ExamCreateModel> examCreateValidator,
+    IValidator<ExamUpdateModel> examUpdateValidator,
+    IValidator<StudentExamResultCreate> studentExamCreateValidator,
+    IValidator<StudentExamResultUpdate> studentExamUpdateValidator) : IExamService
 {
     public async Task CreateExamAsync(ExamCreateModel model)
     {
+        await examCreateValidator.EnsureValidatedAsync(model);
+
         var existExam = await unitOfWork.Exams
             .SelectAllAsQueryable()
             .FirstOrDefaultAsync(e =>
@@ -63,8 +71,11 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
             throw;
         }
     }
+
     public async Task UpdateExamAsync(int examId, ExamUpdateModel model)
     {
+        await examUpdateValidator.EnsureValidatedAsync(model);
+
         var examForUpdation = await unitOfWork.Exams
             .SelectAllAsQueryable()
             .Include(e => e.ExamSetting)
@@ -103,7 +114,6 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
 
         await unitOfWork.SaveAsync();
     }
-
 
     public async Task DeleteExamAsync(int examId)
     {
@@ -208,6 +218,8 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
 
     public async Task ScoreExam(StudentExamResultCreate model)
     {
+        await studentExamCreateValidator.EnsureValidatedAsync(model);
+
         var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
             .FirstOrDefaultAsync(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId);
 
@@ -227,6 +239,8 @@ public class ExamService(IUnitOfWork unitOfWork) : IExamService
 
     public async Task UpdateExamScore(int examresultid, StudentExamResultUpdate model)
     {
+        await studentExamUpdateValidator.EnsureValidatedAsync(model);
+
         var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
             .FirstOrDefaultAsync(r => r.Id == examresultid)
             ?? throw new NotFoundException("Exam result not found");

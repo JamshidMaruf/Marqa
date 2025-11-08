@@ -27,8 +27,8 @@ public interface IStudentService
     /// </summary>
     /// <param name="id"></param>
     /// <exception cref="NotFoundException"></exception>
-    Task<int?> GetByPhoneAsync(string phone);
-    Task<int?> GetStudentParentByPhoneAsync(string phone);
+    Task<int> GetByPhoneAsync(string phone);
+    Task<int> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
 }

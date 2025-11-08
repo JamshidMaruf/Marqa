@@ -1,6 +1,8 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Service.Services.Students.Models.DetailModels;
 using Microsoft.AspNetCore.Http;
@@ -8,24 +10,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Students;
 
-
-public class StudentService(IUnitOfWork unitOfWork) : IStudentService
+public class StudentService(
+    IUnitOfWork unitOfWork,
+    IValidator<StudentCreateModel> createValidator,
+    IValidator<StudentUpdateModel> updateValidator) : IStudentService
 {
     public async Task CreateAsync(StudentCreateModel model)
     {
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-           ?? throw new NotFoundException("Company not found");
-
-        _ = await unitOfWork.Students
-            .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId)
-           ?? throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
+        await createValidator.EnsureValidatedAsync(model);
         
-        _ = await unitOfWork.StudentDetails
-            .SelectAsync(e => (e.FatherPhone == model.StudentDetailCreateModel.FatherPhone ||
-             e.MotherPhone == model.StudentDetailCreateModel.MotherPhone ||
-             e.GuardianPhone == model.StudentDetailCreateModel.GuardianPhone) 
-             && e.CompanyId == model.CompanyId)
-           ?? throw new AlreadyExistException($"this phone {model.Phone} already exists");
+        var company = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId);
+        if (company == null)
+            throw new NotFoundException("Company not found");
+
+        var existingStudent = await unitOfWork.Students
+            .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
+
+        if (existingStudent != null)
+            throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
@@ -43,9 +45,7 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             };
 
             unitOfWork.Students.Insert(createdStudent);
-
             await unitOfWork.SaveAsync();
-
 
             unitOfWork.StudentDetails.Insert(new StudentDetail
             {
@@ -62,10 +62,9 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             });
 
             await unitOfWork.SaveAsync();
-
             await transaction.CommitAsync();
         }
-        catch
+        catch (Exception)
         {
             await transaction.RollbackAsync();
             throw;
@@ -74,24 +73,25 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
 
     public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
     {
+        await updateValidator.EnsureValidatedAsync(model);
+        
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
             var existStudent = await unitOfWork.Students
-                .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
+                .SelectAsync(
+                    predicate: s => s.Id == id && s.CompanyId == companyId,
+                    includes: new[] { nameof(Student.StudentDetail) })
                 ?? throw new NotFoundException($"Student is not found");
 
-            _ = await unitOfWork.Students
-                    .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == companyId)
-                   ?? throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
+            var phoneExists = await unitOfWork.Students
+                .SelectAsync(e => e.Phone == model.Phone
+                              && e.CompanyId == companyId
+                              && e.Id != id);
 
-            _ = await unitOfWork.StudentDetails
-                .SelectAsync(e => (e.FatherPhone == model.StudentDetailUpdateModel.FatherPhone ||
-                 e.MotherPhone == model.StudentDetailUpdateModel.MotherPhone ||
-                 e.GuardianPhone == model.StudentDetailUpdateModel.GuardianPhone)
-                 && e.CompanyId == companyId)
-               ?? throw new AlreadyExistException($"this phone {model.Phone} already exists");
+            if (phoneExists != null)
+                throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
             existStudent.FirstName = model.FirstName;
             existStudent.LastName = model.LastName;
@@ -100,23 +100,25 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             existStudent.Phone = model.Phone;
             existStudent.Email = model.Email;
 
-            existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
-            existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
-            existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
-            existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
-            existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
-            existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
-            existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
-            existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
-            existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
+            if (existStudent.StudentDetail != null)
+            {
+                existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
+                existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
+                existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
+                existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
+                existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
+                existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
+                existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
+                existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
+                existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
+            }
 
             unitOfWork.Students.Update(existStudent);
             await unitOfWork.SaveAsync();
 
-
             await transaction.CommitAsync();
         }
-        catch
+        catch (Exception)
         {
             await transaction.RollbackAsync();
             throw;
@@ -126,7 +128,9 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
     public async Task DeleteAsync(int id)
     {
         var existStudent = await unitOfWork.Students
-            .SelectAsync(predicate: s => s.Id == id, includes: new[] { "StudentDetail" })
+            .SelectAsync(
+                predicate: s => s.Id == id,
+                includes: new[] { nameof(Student.StudentDetail) })
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail != null)
@@ -138,31 +142,35 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<int?> GetByPhoneAsync(string phone)
+    public async Task<int> GetByPhoneAsync(string phone)
     {
-        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
+        var student = await unitOfWork.Students.SelectAsync(s => s.Phone == phone)
+            ?? throw new NotFoundException($"Student with phone {phone} not found");
 
-        return employee?.Id;
+        return student.Id;
     }
 
-    public async Task<int?> GetStudentParentByPhoneAsync(string phone)
+    public async Task<int> GetStudentParentByPhoneAsync(string phone)
     {
         var studentDetail = await unitOfWork.StudentDetails
             .SelectAsync(sd => sd.FatherPhone == phone ||
                         sd.MotherPhone == phone ||
-                        sd.GuardianPhone == phone);
+                        sd.GuardianPhone == phone)
+            ?? throw new NotFoundException($"Student parent with phone {phone} not found");
 
-        if(studentDetail == null)
-            return null;
-        else
-            return studentDetail.Id;
+        return studentDetail.StudentId;
     }
 
     public async Task<StudentViewModel> GetAsync(int id)
     {
         var existStudent = await unitOfWork.Students
-            .SelectAsync(predicate: t => t.Id == id, includes: new[] { "StudentDetail" })
+            .SelectAsync(
+                predicate: t => t.Id == id,
+                includes: new[] { nameof(Student.StudentDetail) })
             ?? throw new NotFoundException($"Student is not found");
+
+        if (existStudent.StudentDetail == null)
+            throw new NotFoundException("Student details not found");
 
         return new StudentViewModel
         {
@@ -175,6 +183,8 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
             Email = existStudent.Email,
             StudentDetailViewModel = new StudentDetailViewModel
             {
+                Id = existStudent.StudentDetail.Id,
+                StudentId = existStudent.Id,
                 FatherFirstName = existStudent.StudentDetail.FatherFirstName,
                 FatherLastName = existStudent.StudentDetail.FatherLastName,
                 FatherPhone = existStudent.StudentDetail.FatherPhone,
@@ -231,18 +241,15 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
            ?? throw new NotFoundException($"Student not found (ID: {studentId})");
 
-        // Fayl formatini tekshirish
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
         var extension = Path.GetExtension(picture.FileName).ToLowerInvariant();
 
         if (!allowedExtensions.Contains(extension))
             throw new ArgumentIsNotValidException("Only image files are allowed (jpg, jpeg, png, webp)");
 
-        // Fayl hajmini tekshirish (masalan, max 5MB)
         if (picture.Length > 5 * 1024 * 1024)
             throw new ArgumentIsNotValidException("File size must not exceed 5MB");
 
-        // Eski rasmni o'chirish (agar mavjud bo'lsa)
         if (!string.IsNullOrEmpty(student.ProfilePicture))
         {
             var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
@@ -250,23 +257,19 @@ public class StudentService(IUnitOfWork unitOfWork) : IStudentService
                 File.Delete(oldFilePath);
         }
 
-        // Yangi fayl nomi generatsiya qilish
         var fileName = $"{studentId}_{Guid.NewGuid()}{extension}";
         var uploadsFolder = Path.Combine("wwwroot", "uploads", "students", "profiles");
 
-        // Papka mavjud emasligini tekshirish va yaratish
         if (!Directory.Exists(uploadsFolder))
             Directory.CreateDirectory(uploadsFolder);
 
         var filePath = Path.Combine(uploadsFolder, fileName);
 
-        // Faylni saqlash
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await picture.CopyToAsync(stream);
         }
 
-        // Database uchun nisbiy path
         var relativePath = $"/uploads/students/profiles/{fileName}";
         student.ProfilePicture = relativePath;
 

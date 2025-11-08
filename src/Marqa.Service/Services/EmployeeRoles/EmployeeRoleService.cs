@@ -2,6 +2,7 @@
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.EmployeeRoles.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,10 +14,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(EmployeeRoleCreateModel model)
     {
-        var validatorResult = await employeeRoleCreateValidator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await employeeRoleCreateValidator.EnsureValidatedAsync(model);
 
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
           ?? throw new NotFoundException("Company not found");
@@ -90,10 +88,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
-        var validatorResult = await employeeUpdateValdator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors.FirstOrDefault().ErrorMessage);
+        await employeeUpdateValdator.EnsureValidatedAsync(model);
 
         var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
              ?? throw new NotFoundException("Role not found");

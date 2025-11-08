@@ -5,6 +5,7 @@ using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.PointSettings.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,10 +20,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
     
     public async Task CreateAsync(PointSettingCreateModel model)
     {
-        var validatorResult = await pointSettingCreateValidator.ValidateAsync(model);
-        
-        if(!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await pointSettingCreateValidator.EnsureValidatedAsync(model);
 
         unitOfWork.PointSettings.Insert(new PointSetting
         {
@@ -37,10 +35,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, PointSettingUpdateModel model)
     {
-        var validatorResult = await pointSettingUpdateValidator.ValidateAsync(model);
-
-        if(!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await pointSettingUpdateValidator.EnsureValidatedAsync(model);
 
         var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
             ?? throw new NotFoundException($"No point_setting was found with ID {id}");
