@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
@@ -273,7 +274,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task AttachStudentAsync(int courseId, int studentId)
+    public async Task AttachStudentAsync(int courseId, int studentId,StudentStatus status)
     {
         _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
@@ -281,7 +282,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status });
         
         await unitOfWork.SaveAsync();
     }
@@ -296,6 +297,8 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         var studentCourse = await unitOfWork.StudentCourses.SelectAllAsQueryable()
             .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
+        
+        studentCourse.Status = StudentStatus.Detached;
 
         if (studentCourse is not null)
             unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);

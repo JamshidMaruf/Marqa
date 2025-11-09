@@ -29,10 +29,32 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         unitOfWork.EmployeeRoles.Insert(new EmployeeRole
         {
             Name = model.Name,
-            CompanyId = model.CompanyId,
+            CanTeach = model.CanTeach, 
+            CompanyId = model.CompanyId
         });
 
         await unitOfWork.SaveAsync();
+    }
+
+    public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
+    {
+        await employeeUpdateValdator.EnsureValidatedAsync(model);
+
+        var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
+             ?? throw new NotFoundException("Role not found");
+
+        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
+            .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
+            .FirstOrDefaultAsync();
+
+        if (existRole != null)
+            throw new AlreadyExistException("This role already exists");
+
+        existEmployeeRole.Name = model.Name;
+        existEmployeeRole.CanTeach = model.CanTeach;
+        existEmployeeRole.CompanyId = model.CompanyId;
+
+        unitOfWork.EmployeeRoles.Update(existEmployeeRole);
     }
 
     public async Task DeleteAsync(int id)
@@ -86,23 +108,4 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         return existRole;
     }
 
-    public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
-    {
-        await employeeUpdateValdator.EnsureValidatedAsync(model);
-
-        var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
-             ?? throw new NotFoundException("Role not found");
-
-        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
-            .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
-            .FirstOrDefaultAsync();
-
-        if (existRole != null)
-            throw new AlreadyExistException("This role already exists");
-
-        existEmployeeRole.Name = model.Name;
-        existEmployeeRole.CompanyId = model.CompanyId;
-
-        unitOfWork.EmployeeRoles.Update(existEmployeeRole);
-    }
 }
