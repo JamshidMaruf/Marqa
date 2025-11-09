@@ -1,9 +1,12 @@
-﻿namespace Marqa.Domain.Entities;
+﻿using Marqa.Domain.Enums;
+
+namespace Marqa.Domain.Entities;
 
 public class StudentCourse : Auditable
 {
     public int StudentId { get; set; }
     public int CourseId { get; set; }
+    public StudentStatus Status { get; set; }
 
     // Navigation
     public Student Student { get; set; }

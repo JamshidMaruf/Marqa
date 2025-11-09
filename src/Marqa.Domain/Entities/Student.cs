@@ -9,6 +9,7 @@ public class Student : Auditable
     public string LastName { get; set; }   
     public string Phone { get; set; }
     public string Email { get; set; }
+    public decimal Balance { get; set; }
     public string PasswordHash { get; set; }
     public string ProfilePicture { get; set; }
     public string ImageFileName { get; set; }

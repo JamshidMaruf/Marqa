@@ -1,34 +1,36 @@
-﻿using Marqa.Service.Exceptions;
+﻿using Marqa.Admin.WebApi.Models;
+using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class CoursesController(ICourseService courseService) : ControllerBase
 {
-
     [HttpPost]
     public async Task<IActionResult> PostAsync(CourseCreateModel model)
     {
         await courseService.CreateAsync(model);
+        
         return Ok(new Response
         {
             Status = 200,
-            Message = "success",
+            Message = "success"
         });
     }
 
     [HttpPost("AttachStudent")]
-    public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId)
+    public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId, [FromQuery] StudentStatus status)
     {
-        await courseService.AttachStudentAsync(courseId, studentId);
+        await courseService.AttachStudentAsync(courseId, studentId, status);
+         
         return Ok(new Response
         {
             Status = 200,
-            Message = "success",
+            Message = "success"
         });
     }
 
@@ -40,7 +42,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         return Ok(new Response
         {
             Status = 200,
-            Message = "success",
+            Message = "success"
         });
     }
 
@@ -52,7 +54,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         return Ok(new Response
         {
             Status = 200,
-            Message = "success",
+            Message = "success"
         });
     }
 
@@ -64,7 +66,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         return Ok(new Response
         {
             Status = 200,
-            Message = "success",
+            Message = "success"
         });
     }
 
@@ -92,6 +94,5 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Message = "success",
             Data = courses
         });
-
     }
 }
