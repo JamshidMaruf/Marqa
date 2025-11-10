@@ -269,7 +269,7 @@ public class StudentService(
         {
             await picture.CopyToAsync(stream);
         }
-
+        // bu yerda notogri tarzda saqlanga boshqa joydan namuna olib image_name, path,extension saqlanishi kerak
         var relativePath = $"/uploads/students/profiles/{fileName}";
         student.ProfilePicture = relativePath;
 
