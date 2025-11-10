@@ -223,15 +223,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
     {
-        var query = unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => c.CompanyId == companyId && !c.IsDeleted)
-            .Include(c => c.Subject)
-            .Include(c => c.Teacher)
-            .Include(c => c.Lessons)
-            .Include(c => c.StudentCourses)
-            .Include(c => c.CourseWeekdays)
-            .AsQueryable();
+        var query = unitOfWork.Courses.SelectAllAsQueryable(
+            predicate: c => c.CompanyId == companyId && !c.IsDeleted,
+            includes: new [] { "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays" });
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));

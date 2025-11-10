@@ -44,6 +44,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<ExamSetting> ExamSettings { get; } = new Repository<ExamSetting>(context);
 
     public IRepository<ExamSettingItem> ExamSettingItems { get; } = new Repository<ExamSettingItem>(context);
+    public IRepository<Permission> Permissions { get; }  = new Repository<Permission>(context);
+    public IRepository<RolePermission> RolePermissions { get; } = new Repository<RolePermission>(context);
 
     public async Task SaveAsync()
     {

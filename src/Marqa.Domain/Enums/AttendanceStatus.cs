@@ -7,10 +7,3 @@ public enum AttendanceStatus
     Late = 2,
     Absent = 3
 }
-
-public enum PaymentMethod
-{
-    Card = 1,
-    Cash = 2,
-    Transfer = 3
-}
