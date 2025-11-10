@@ -69,8 +69,23 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         return await query.FirstOrDefaultAsync(predicate);
     }
 
-    public IQueryable<TEntity> SelectAllAsQueryable()
+    public IQueryable<TEntity> SelectAllAsQueryable(
+        Expression<Func<TEntity, bool>> predicate = null,
+        string[] includes = null, 
+        bool tracking = false)
     {
-        return _context.Set<TEntity>().AsQueryable();
+        var query = _context.Set<TEntity>().AsQueryable();
+        
+        if(predicate != null)
+            query = query.Where(predicate);
+
+        if (includes != null)
+            foreach (var include in includes)
+                query = query.Include(include);
+        
+        if(!tracking)
+            query = query.AsNoTracking();
+        
+        return query;
     }
 }

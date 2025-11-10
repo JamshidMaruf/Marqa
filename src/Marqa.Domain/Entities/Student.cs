@@ -11,7 +11,6 @@ public class Student : Auditable
     public string Email { get; set; }
     public decimal Balance { get; set; }
     public string PasswordHash { get; set; }
-    public string ProfilePicture { get; set; }
     public string ImageFileName { get; set; }
     public string ImageFilePath { get; set; }
     public string ImageFileExtension { get; set; }

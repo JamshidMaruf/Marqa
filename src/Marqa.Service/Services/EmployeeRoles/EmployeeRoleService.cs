@@ -88,6 +88,31 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             }).ToListAsync();
     }
 
+    public async Task AttachPermissionsAsync(int id, List<int> permissionIds)
+    {
+        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
+            ?? throw new NotFoundException("Employee role not found");
+
+        var rolePermissions = await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(predicate: rp => rp.RoleId == id)
+            .ToListAsync();
+        
+        if(rolePermissions.Any())
+            unitOfWork.RolePermissions.RemoveRange(rolePermissions);
+            
+        await unitOfWork.SaveAsync();
+        
+        foreach (var permissionId in permissionIds)
+        {
+            _ = await unitOfWork.Permissions.SelectAsync(e => e.Id == permissionId)
+                ?? throw new NotFoundException("Permission not found");
+
+            unitOfWork.RolePermissions.Insert(new RolePermission { RoleId = id, PermissionId = permissionId });
+        }
+        
+        await unitOfWork.SaveAsync();
+    }
+
     public async Task<EmployeeRoleViewModel> GetAsync(int id)
     {
         var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
