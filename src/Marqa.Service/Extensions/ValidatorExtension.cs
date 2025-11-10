@@ -2,6 +2,7 @@
 using Marqa.Service.Exceptions;
 
 namespace Marqa.Service.Extensions;
+
 public static class ValidatorExtension
 {
     public static async Task EnsureValidatedAsync<TModel>(this IValidator<TModel> validator, TModel model)
@@ -12,4 +13,3 @@ public static class ValidatorExtension
             throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
     }
 }
-
