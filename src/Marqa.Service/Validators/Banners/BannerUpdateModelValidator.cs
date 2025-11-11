@@ -23,7 +23,7 @@ public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
             .NotEmpty()
             .WithMessage("Link URL is required")
             .MaximumLength(255)
-            .WithMessage("Link URL must not exceed 500 characters");
+            .WithMessage("Link URL must not exceed 255 characters");
 
         RuleFor(x => x.DisplayOrder)
             .GreaterThanOrEqualTo(0)
