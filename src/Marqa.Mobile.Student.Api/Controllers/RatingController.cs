@@ -10,7 +10,7 @@ public class RatingController(IRatingService ratingService) : BaseController
     [HttpGet("rating/{companyId:int}")]
     public async Task<IActionResult> GetRatingAsync(int companyId)
     {
-        return Ok(new Response<List<RatingPageRatingResult>>
+        return Ok(new Response<RatingPageRatingResult>
         {
             StatusCode = 200,
             Message = "success",

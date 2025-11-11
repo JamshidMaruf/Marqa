@@ -55,7 +55,7 @@ public static class ServicesExtension
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
-    public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
+    public static void AddJWTService(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 

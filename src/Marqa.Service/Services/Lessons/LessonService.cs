@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.Lessons;
 
 public class LessonService(
-    IUnitOfWork unitOfWork, 
+    IUnitOfWork unitOfWork,
     IFileService fileService) : ILessonService
 {
     public async Task UpdateAsync(int id, LessonUpdateModel model)
@@ -40,7 +40,7 @@ public class LessonService(
         lesson.HomeTaskStatus = homeTaskStatus;
 
         unitOfWork.Lessons.Update(lesson);
-        
+
         await unitOfWork.SaveAsync();
     }
 
@@ -49,11 +49,11 @@ public class LessonService(
         _ = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        var allowedExtensions = new string[]{ ".mp4", ".avi", ".mkv", ".mov", ".flv" };
-        
-        if(!allowedExtensions.Contains(Path.GetExtension(video.FileName)))
+        var allowedExtensions = new string[] { ".mp4", ".avi", ".mkv", ".mov", ".flv" };
+
+        if (!allowedExtensions.Contains(Path.GetExtension(video.FileName)))
             throw new ArgumentIsNotValidException("Not supported video format");
-        
+
         var result = await fileService.UploadAsync(video, "Files/Videos");
 
         unitOfWork.LessonVideos.Insert(new LessonVideo
@@ -74,11 +74,17 @@ public class LessonService(
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
-        var lessonAttendance = await unitOfWork.LessonAttendances.SelectAllAsQueryable()
-            .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
+        var lessonAttendance = await unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
-        if(!lesson.IsCompleted)
+        if (lesson.Number == 1)
+        {
+            var course = await unitOfWork.Courses.SelectAsync(c => c.Id == lesson.CourseId);
+            course.Status = CourseStatus.Active;
+        }
+
+        if (!lesson.IsCompleted)
             lesson.IsCompleted = true;
 
         if (lessonAttendance != null)
@@ -102,8 +108,7 @@ public class LessonService(
 
     public Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId)
     {
-        return unitOfWork.Lessons.SelectAllAsQueryable()
-            .Where(l => l.CourseId == courseId)
+        return unitOfWork.Lessons.SelectAllAsQueryable(l => l.CourseId == courseId)
             .Select(l => new LessonViewModel
             {
                 Id = l.Id,

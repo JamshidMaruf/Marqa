@@ -1,6 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.Tracing;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
@@ -20,10 +18,10 @@ public class ExamService(IUnitOfWork unitOfWork,
         await examCreateValidator.EnsureValidatedAsync(model);
 
         var existExam = await unitOfWork.Exams
-            .SelectAllAsQueryable()
-            .FirstOrDefaultAsync(e =>
+            .SelectAllAsQueryable(e =>
             e.CourseId == model.CourseId &&
-            (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
+            (e.EndTime > model.StartTime && e.StartTime < model.EndTime))
+            .FirstOrDefaultAsync();
 
         if (existExam != null)
             throw new AlreadyExistException($"Exam already exist for this course between this time frame");
@@ -77,17 +75,17 @@ public class ExamService(IUnitOfWork unitOfWork,
         await examUpdateValidator.EnsureValidatedAsync(model);
 
         var examForUpdation = await unitOfWork.Exams
-            .SelectAllAsQueryable()
+            .SelectAllAsQueryable(e => e.IsDeleted)
             .Include(e => e.ExamSetting)
             .ThenInclude(e => e.Items)
             .FirstOrDefaultAsync(e => e.Id == examId)
                 ?? throw new NotFoundException("Exam not found");
 
         var existExamDate = await unitOfWork.Exams
-            .SelectAllAsQueryable()
-            .FirstOrDefaultAsync(e =>
+            .SelectAllAsQueryable(e =>
             e.CourseId == model.CourseId &&
-            (e.EndTime > model.StartTime && e.StartTime < model.EndTime));
+            (e.EndTime > model.StartTime && e.StartTime < model.EndTime))
+            .FirstOrDefaultAsync();
 
         if (existExamDate != null && existExamDate.Id != examId)
             throw new AlreadyExistException($"Exam already exist for this course between this time frame");
@@ -118,8 +116,8 @@ public class ExamService(IUnitOfWork unitOfWork,
     public async Task DeleteExamAsync(int examId)
     {
         var exam = await unitOfWork.Exams
-            .SelectAllAsQueryable()
-            .Include(e => e.ExamResults)
+            .SelectAllAsQueryable(e => !e.IsDeleted,
+            new[] { "e => e.ExamResults" })
             .Include(e => e.ExamSetting)
             .ThenInclude(es => es.Items)
             .FirstOrDefaultAsync(e => e.Id == examId)
@@ -143,7 +141,8 @@ public class ExamService(IUnitOfWork unitOfWork,
 
     public async Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid)
     {
-        var exams = unitOfWork.Exams.SelectAllAsQueryable();
+        var exams = unitOfWork.Exams.SelectAllAsQueryable(e => !e.IsDeleted);
+
         if (!string.IsNullOrWhiteSpace(search))
             exams = exams.Where(exams => exams.Title.Contains(search));
         if (courseid.HasValue)
@@ -167,8 +166,8 @@ public class ExamService(IUnitOfWork unitOfWork,
 
     public async Task<ExamViewModel> GetExamByIdAsync(int examId)
     {
-        return await unitOfWork.Exams.SelectAllAsQueryable()
-            .Include(e => e.Course)
+        return await unitOfWork.Exams.SelectAllAsQueryable(e => !e.IsDeleted,
+        new[] { "e => e.Course" })
             .Where(e => e.Id == examId)
             .Select(e => new ExamViewModel
             {
@@ -188,9 +187,9 @@ public class ExamService(IUnitOfWork unitOfWork,
 
     public async Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid)
     {
-        return await unitOfWork.StudentExamResults.SelectAllAsQueryable()
-            .Include(r => r.Student)
-            .Include(r => r.Exam)
+        return await unitOfWork.StudentExamResults
+            .SelectAllAsQueryable(e => !e.IsDeleted,
+            new[] { "r => r.Student", "r => r.Exam" })
             .Where(r => r.StudentId == studentid)
             .Select(r => new StudentExamResultView
             {
@@ -220,8 +219,9 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         await studentExamCreateValidator.EnsureValidatedAsync(model);
 
-        var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
-            .FirstOrDefaultAsync(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId);
+        var existExamResult = await unitOfWork.StudentExamResults
+            .SelectAllAsQueryable(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId)
+            .FirstOrDefaultAsync();
 
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
@@ -241,8 +241,9 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         await studentExamUpdateValidator.EnsureValidatedAsync(model);
 
-        var existExamResult = await unitOfWork.StudentExamResults.SelectAllAsQueryable()
-            .FirstOrDefaultAsync(r => r.Id == examresultid)
+        var existExamResult = await unitOfWork.StudentExamResults
+            .SelectAllAsQueryable(r => r.Id == examresultid)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException("Exam result not found");
 
         existExamResult.Score = model.Score;

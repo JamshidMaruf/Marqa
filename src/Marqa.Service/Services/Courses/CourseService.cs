@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
@@ -91,10 +92,8 @@ public class CourseService(IUnitOfWork unitOfWork,
         await courseUpdateValidator.EnsureValidatedAsync(model);
 
         var existCourse = await unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => !c.IsDeleted)
-            .Include(c => c.Lessons.Where(l => !l.IsDeleted))
-            .Include(c => c.CourseWeekdays.Where(w => !w.IsDeleted))
+            .SelectAllAsQueryable(c => !c.IsDeleted, 
+            new[] { "c => c.Lessons.Where(l => !l.IsDeleted)", "c => c.CourseWeekdays.Where(w => !w.IsDeleted)"})
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
@@ -157,10 +156,9 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var existCourse = await unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => !c.IsDeleted)
-            .Include(c => c.Lessons)
-            .Include(c => c.CourseWeekdays)
+            .SelectAllAsQueryable(
+            predicate: c => !c.IsDeleted,
+            includes: new[] { "c => c.Lessons", "c => c.CourseWeekdays" })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
@@ -178,13 +176,9 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task<CourseViewModel> GetAsync(int id)
     {
         return await unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => !c.IsDeleted)
-            .Include(c => c.Subject)
-            .Include(c => c.Teacher)
-            .Include(c => c.Lessons.Where(l => !l.IsDeleted))
-            .Include(c => c.CourseWeekdays.Where(cwd => !cwd.IsDeleted))
-            .Include(c => c.StudentCourses)
+            .SelectAllAsQueryable(
+            predicate: c => !c.IsDeleted,
+            includes: new[] {"Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses"})
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -222,15 +216,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
     {
-        var query = unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => c.CompanyId == companyId && !c.IsDeleted)
-            .Include(c => c.Subject)
-            .Include(c => c.Teacher)
-            .Include(c => c.Lessons)
-            .Include(c => c.StudentCourses)
-            .Include(c => c.CourseWeekdays)
-            .AsQueryable();
+        var query = unitOfWork.Courses.SelectAllAsQueryable(
+            predicate: c => c.CompanyId == companyId && !c.IsDeleted,
+            includes: new [] { "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays" });
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -273,7 +261,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task AttachStudentAsync(int courseId, int studentId)
+    public async Task AttachStudentAsync(int courseId, int studentId,StudentStatus status)
     {
         _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
@@ -281,7 +269,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status });
         
         await unitOfWork.SaveAsync();
     }
@@ -294,8 +282,11 @@ public class CourseService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        var studentCourse = await unitOfWork.StudentCourses.SelectAllAsQueryable()
-            .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
+        var studentCourse = await unitOfWork.StudentCourses
+            .SelectAllAsQueryable(predicate: s => s.StudentId == studentId && s.CourseId == courseId)
+            .FirstOrDefaultAsync();
+        
+        studentCourse.Status = StudentStatus.Detached;
 
         if (studentCourse is not null)
             unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
@@ -305,8 +296,8 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
     {
-        return await unitOfWork.StudentCourses.SelectAllAsQueryable()
-            .Where(c => c.StudentId == studentId)
+        return await unitOfWork.StudentCourses
+            .SelectAllAsQueryable(predicate: c => c.StudentId == studentId)
             .Include(c => c.Course)
             .ThenInclude(c => c.Lessons)
             .Select(c => new MainPageCourseViewModel
@@ -375,9 +366,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
     {
-        return unitOfWork.StudentCourses.SelectAllAsQueryable()
-            .Include(sc => sc.Course)
-            .Where(sc => sc.StudentId == studentId)
+        return unitOfWork.StudentCourses.SelectAllAsQueryable(
+            predicate: sc => sc.StudentId == studentId,
+            includes: new[] {"sc => sc.Course"})
             .Select(sc => new CoursePageCourseViewModel
             {
                 Id = sc.CourseId,

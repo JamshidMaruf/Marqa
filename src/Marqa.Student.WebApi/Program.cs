@@ -36,7 +36,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 
-//app.UseSwaggerUI();
+app.UseSwaggerUI();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

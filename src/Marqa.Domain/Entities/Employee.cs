@@ -10,6 +10,7 @@ public class Employee : Auditable
     public string Email { get; set; }
     public string PasswordHash { get; set; }
     public DateOnly DateOfBirth { get; set; }
+    public decimal Salary { get; set; }
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
@@ -17,8 +18,8 @@ public class Employee : Auditable
     public string Info { get; set; }
     public int CompanyId { get; set; }
     public int RoleId { get; set; }
+    
     // Navigation
     public Company Company { get; set; }
     public EmployeeRole Role { get; set; }
 }
-

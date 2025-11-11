@@ -201,8 +201,7 @@ public class StudentService(
     public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
     {
         var students = await unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => c.Id == courseId && !c.IsDeleted)
+            .SelectAllAsQueryable(c => c.Id == courseId && !c.IsDeleted)
             .SelectMany(c => c.StudentCourses)
             .Select(sc => new StudentViewModel
             {
@@ -269,7 +268,7 @@ public class StudentService(
         {
             await picture.CopyToAsync(stream);
         }
-
+        // bu yerda notogri tarzda saqlanga boshqa joydan namuna olib image_name, path,extension saqlanishi kerak
         var relativePath = $"/uploads/students/profiles/{fileName}";
         student.ProfilePicture = relativePath;
 
