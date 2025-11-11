@@ -1,11 +1,9 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Companies.Models;
-using Marqa.Service.Validators.Companies;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Companies;
@@ -65,8 +63,8 @@ public class CompanyService(
 
     public async Task<List<CompanyViewModel>> GetAllAsync()
     {
-        return await unitOfWork.Companies.SelectAllAsQueryable()
-            .Where(t => !t.IsDeleted)
+        return await unitOfWork.Companies
+            .SelectAllAsQueryable(t => !t.IsDeleted)
             .Select(c => new CompanyViewModel
             {
                 Id = c.Id,
