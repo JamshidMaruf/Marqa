@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Validators.Courses;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
-        var validationResult = await courseCreateValidator.ValidateAsync(model);
-
-        if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await courseCreateValidator.EnsureValidatedAsync(model);
 
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company not found");
@@ -90,10 +89,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
-        var validatorResult = await courseUpdateValidator.ValidateAsync(model);
-
-        if(!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await courseUpdateValidator.EnsureValidatedAsync(model);
 
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable()
@@ -227,15 +223,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
     {
-        var query = unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => c.CompanyId == companyId && !c.IsDeleted)
-            .Include(c => c.Subject)
-            .Include(c => c.Teacher)
-            .Include(c => c.Lessons)
-            .Include(c => c.StudentCourses)
-            .Include(c => c.CourseWeekdays)
-            .AsQueryable();
+        var query = unitOfWork.Courses.SelectAllAsQueryable(
+            predicate: c => c.CompanyId == companyId && !c.IsDeleted,
+            includes: new [] { "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays" });
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -278,7 +268,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task AttachStudentAsync(int courseId, int studentId)
+    public async Task AttachStudentAsync(int courseId, int studentId,StudentStatus status)
     {
         _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
             ?? throw new NotFoundException("Course is not found");
@@ -286,7 +276,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
             ?? throw new NotFoundException("Student is not found");
 
-        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId });
+        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status });
         
         await unitOfWork.SaveAsync();
     }
@@ -301,6 +291,8 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         var studentCourse = await unitOfWork.StudentCourses.SelectAllAsQueryable()
             .FirstOrDefaultAsync(s => s.StudentId == studentId && s.CourseId == courseId);
+        
+        studentCourse.Status = StudentStatus.Detached;
 
         if (studentCourse is not null)
             unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);

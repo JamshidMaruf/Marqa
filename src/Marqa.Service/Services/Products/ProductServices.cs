@@ -1,13 +1,11 @@
-﻿using Marqa.DataAccess.Repositories;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Products.Models;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Products;
+using Marqa.Service.Services.Products.Models;
 using Microsoft.EntityFrameworkCore;
-using Marqa.DataAccess.UnitOfWork;
-using FluentValidation;
-using Marqa.Service.Services.EmployeeRoles.Models;
-using Marqa.Service.Services.EmployeeRoles;
 
 namespace Marqa.Service.Servcies.Products;
 
@@ -17,11 +15,8 @@ public class ProductService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(ProductCreateModel model)
     {
-
-        var validatorResult = await productCreateValidator.ValidateAsync(model);
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
-
+        await productCreateValidator.EnsureValidatedAsync(model);
+      
         var companyExists = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
             ?? throw new InvalidOperationException($"Company with ID {model.CompanyId} does not exist");
 
@@ -39,10 +34,7 @@ public class ProductService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, ProductUpdateModel model)
     {
-        var validatorResult = await productUpdateValidator.ValidateAsync(model);
-
-        if (!validatorResult.IsValid)
-            throw new ArgumentIsNotValidException(validatorResult.Errors?.FirstOrDefault()?.ErrorMessage);
+        await productUpdateValidator.EnsureValidatedAsync(model);
 
         var product = await unitOfWork.Products.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("This product is not found!");

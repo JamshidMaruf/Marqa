@@ -1,4 +1,4 @@
-namespace Marqa.Service.Extensions;
+﻿namespace Marqa.Service.Extensions;
 
 public static class StringExtension
 {
