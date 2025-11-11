@@ -55,8 +55,7 @@ public class StudentPointHistoryService(
     public async Task<List<StudentPointHistoryViewModel>> GetAllAsync(int studentId)
     {
         var studentPointsHistory = await unitOfWork.StudentPointHistories
-           .SelectAllAsQueryable()
-           .Where(t => t.StudentId == studentId)
+           .SelectAllAsQueryable(t => t.StudentId == studentId)
            .Select(s => new StudentPointHistoryViewModel
            {
                Id = s.Id,
@@ -75,8 +74,7 @@ public class StudentPointHistoryService(
     public async Task<int> GetAsync(int studentId)
     {
         var studentPointsHistory = await unitOfWork.StudentPointHistories
-            .SelectAllAsQueryable()
-            .Where(t => t.StudentId == studentId)
+            .SelectAllAsQueryable(t => t.StudentId == studentId)
             .ToListAsync();
 
         var minus = studentPointsHistory

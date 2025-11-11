@@ -74,8 +74,8 @@ public class ProductService(IUnitOfWork unitOfWork,
 
     public async Task<List<ProductViewModel>> GetAllAsync(int companyId, string search = null)
     {
-        var products = unitOfWork.Products.SelectAllAsQueryable()
-            .Where(p => !p.IsDeleted && p.CompanyId == companyId)
+        var products = unitOfWork.Products
+            .SelectAllAsQueryable(p => !p.IsDeleted && p.CompanyId == companyId)
             ?? throw new NotFoundException("This product is not found!");
 
         if (string.IsNullOrEmpty(search))

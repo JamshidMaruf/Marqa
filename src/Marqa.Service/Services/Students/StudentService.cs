@@ -201,8 +201,7 @@ public class StudentService(
     public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
     {
         var students = await unitOfWork.Courses
-            .SelectAllAsQueryable()
-            .Where(c => c.Id == courseId && !c.IsDeleted)
+            .SelectAllAsQueryable(c => c.Id == courseId && !c.IsDeleted)
             .SelectMany(c => c.StudentCourses)
             .Select(sc => new StudentViewModel
             {

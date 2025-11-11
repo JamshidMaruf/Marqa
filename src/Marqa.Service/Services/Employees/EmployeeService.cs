@@ -78,16 +78,15 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var employeeForDeletion = await unitOfWork.Employees
-            .SelectAllAsQueryable()
-            .Include(e => e.Role)
+            .SelectAllAsQueryable(b => !b.IsDeleted,
+            new[] {"e => e.Role"})
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
         if(employeeForDeletion.Role.Name.ToLower() == "teacher")
         {
             var teacherSubject = await unitOfWork.TeacherSubjects
-                .SelectAllAsQueryable()
-                .Where(ts => !ts.IsDeleted && ts.TeacherId == id)
+                .SelectAllAsQueryable(ts => !ts.IsDeleted && ts.TeacherId == id)
                 .FirstOrDefaultAsync(); 
 
             unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
@@ -101,8 +100,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable()
-            .Include(e => e.Role)
+            .SelectAllAsQueryable(e => !e.IsDeleted,
+            new[] {"e => e.Role"})
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -137,8 +136,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
         var employees = unitOfWork.Employees
-            .SelectAllAsQueryable()
-            .Where(e => e.CompanyId == companyId && !e.IsDeleted);
+            .SelectAllAsQueryable(e => e.CompanyId == companyId && !e.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
@@ -173,10 +171,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<TeacherViewModel> GetTeacherAsync(int id)
     {
         var teacher = await unitOfWork.TeacherSubjects
-           .SelectAllAsQueryable()
-           .Where(ts => ts.TeacherId == id && !ts.IsDeleted)
-           .Include(ts => ts.Teacher)
-           .Include(ts => ts.Subject)
+           .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
+           includes: new[] {"ts => ts.Teacher", "ts => ts.Subject"})
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,
@@ -198,8 +194,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
-        var courses = await unitOfWork.Courses.SelectAllAsQueryable()
-            .Include(c => c.Subject)
+        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
+            new[] { "c => c.Subject" })
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
@@ -218,9 +214,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable()
-            .Include(ts => ts.Teacher)
-            .Include(ts => ts.Subject)
+            .SelectAllAsQueryable(t => !t.IsDeleted,
+            new[] { "ts => ts.Teacher", "ts => ts.Subject"})
             .Where(ts => ts.Teacher.CompanyId == companyId)
             .Select(t => new TeacherViewModel
             {
@@ -257,8 +252,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
-                unitOfWork.Courses.SelectAllAsQueryable()
-                .Include(c => c.Subject),
+                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "c => c.Subject" }),
                 t => t.Id,
                 c => c.TeacherId,
                 (t, courses) => new TeacherViewModel 

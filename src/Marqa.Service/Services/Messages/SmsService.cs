@@ -40,8 +40,7 @@ public class SmsService(
             throw new NotFoundException("This phone number does not exist");
         
         var isVerified = await otpRepository
-            .SelectAllAsQueryable()
-            .Where(t =>
+            .SelectAllAsQueryable(t =>
                 t.PhoneNumber == phone &&
                 t.Code == code &&
                 !t.IsUsed &&
