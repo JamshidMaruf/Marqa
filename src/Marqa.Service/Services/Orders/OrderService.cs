@@ -140,7 +140,8 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<OrderViewModel> GetOrderByIdAsync(int id)
     {
-        var order = await unitOfWork.Orders.SelectAllAsQueryable()
+        var order = await unitOfWork.Orders
+            .SelectAllAsQueryable(o => !o.IsDeleted)
             .Include(o => o.OrderItems)
             .ThenInclude(ot => ot.Product)
             .FirstOrDefaultAsync(o => o.Id == id)
@@ -169,7 +170,8 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<List<OrderViewModel>> GetOrdersByStudentIdAsync(int studentId)
     {
-        var orders = await unitOfWork.Orders.SelectAllAsQueryable()
+        var orders = await unitOfWork.Orders
+            .SelectAllAsQueryable(o => !o.IsDeleted)
             .Include(o => o.OrderItems)
             .ThenInclude(ot => ot.Product)
             .ToListAsync();
@@ -208,7 +210,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     private async Task<long> GenerateOrderNumber()
     {
         var orders = await unitOfWork.Orders
-            .SelectAllAsQueryable()
+            .SelectAllAsQueryable(o => !o.IsDeleted)
             .OrderByDescending(o => o.Number)
             .Select(o => new
             {

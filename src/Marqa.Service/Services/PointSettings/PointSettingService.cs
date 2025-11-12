@@ -76,7 +76,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<PointSettingViewModel>> GetAllAsync(string search = null)
     {
         var pointQuery = unitOfWork.PointSettings
-            .SelectAllAsQueryable();
+            .SelectAllAsQueryable(p => !p.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -110,7 +110,6 @@ public class PointSettingService(IUnitOfWork unitOfWork,
 
         await unitOfWork.SaveAsync();
     }
-
 
     public string GenerateToken(TokenModel model)
     {

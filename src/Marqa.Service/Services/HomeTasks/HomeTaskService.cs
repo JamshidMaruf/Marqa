@@ -94,8 +94,8 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task<List<HomeTaskViewModel>> GetAsync(int lessonId)
     {
-        var existHomeTask = unitOfWork.HomeTasks.SelectAllAsQueryable()
-            .Where(ht => ht.LessonId == lessonId && !ht.IsDeleted);
+        var existHomeTask = unitOfWork.HomeTasks
+            .SelectAllAsQueryable(ht => ht.LessonId == lessonId && !ht.IsDeleted);
 
         if (existHomeTask == null)
             throw new NotFoundException("Home task is not found");

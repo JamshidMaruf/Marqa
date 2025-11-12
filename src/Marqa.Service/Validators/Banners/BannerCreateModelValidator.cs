@@ -15,7 +15,7 @@ public class BannerCreateModelValidator : AbstractValidator<BannerCreateModel>
             .NotEmpty()
             .WithMessage("Title is required")
             .MaximumLength(255)
-            .WithMessage("Title must not exceed 200 characters");
+            .WithMessage("Title must not exceed 255 characters");
 
         RuleFor(x => x.Description)
             .NotEmpty()
@@ -27,7 +27,7 @@ public class BannerCreateModelValidator : AbstractValidator<BannerCreateModel>
             .NotEmpty()
             .WithMessage("Link URL is required")
             .MaximumLength(255)
-            .WithMessage("Link URL must not exceed 500 characters");
+            .WithMessage("Link URL must not exceed 255 characters");
 
         RuleFor(x => x.DisplayOrder)
             .GreaterThanOrEqualTo(0)

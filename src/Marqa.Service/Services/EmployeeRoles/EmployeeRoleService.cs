@@ -19,8 +19,8 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
           ?? throw new NotFoundException("Company not found");
 
-        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
-            .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
+        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable(
+            e => e.CompanyId == model.CompanyId && e.Name == model.Name)
             .FirstOrDefaultAsync();
 
         if (existRole != null)
@@ -29,7 +29,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         unitOfWork.EmployeeRoles.Insert(new EmployeeRole
         {
             Name = model.Name,
-            CanTeach = model.CanTeach, 
+            CanTeach = model.CanTeach,
             CompanyId = model.CompanyId
         });
 
@@ -43,8 +43,8 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
              ?? throw new NotFoundException("Role not found");
 
-        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
-            .Where(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
+        var existRole = await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
             .FirstOrDefaultAsync();
 
         if (existRole != null)
@@ -63,18 +63,15 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException("Role not found");
 
         unitOfWork.EmployeeRoles.MarkAsDeleted(existRole);
-        
+
         await unitOfWork.SaveAsync();
     }
 
     public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId)
     {
-        var query = unitOfWork.EmployeeRoles.SelectAllAsQueryable();
-        if(companyId != null)
-            query = query.Where(x => x.CompanyId == companyId);
-
-        return await query
-            .Include(x => x.Company)
+        return await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.CompanyId == companyId,
+            new[] {"x => x.Company"})
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
@@ -96,12 +93,12 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         var rolePermissions = await unitOfWork.RolePermissions
             .SelectAllAsQueryable(predicate: rp => rp.RoleId == id)
             .ToListAsync();
-        
-        if(rolePermissions.Any())
+
+        if (rolePermissions.Any())
             unitOfWork.RolePermissions.RemoveRange(rolePermissions);
-            
+
         await unitOfWork.SaveAsync();
-        
+
         foreach (var permissionId in permissionIds)
         {
             _ = await unitOfWork.Permissions.SelectAsync(e => e.Id == permissionId)
@@ -109,15 +106,15 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 
             unitOfWork.RolePermissions.Insert(new RolePermission { RoleId = id, PermissionId = permissionId });
         }
-        
+
         await unitOfWork.SaveAsync();
     }
 
     public async Task<EmployeeRoleViewModel> GetAsync(int id)
     {
-        var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable()
-            .Where(x => x.Id == id)
-            .Include(c => c.Company)
+        var existRole = await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.Id == id,
+            new[] {"c => c.Company"})
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
@@ -132,5 +129,4 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException("Role not found");
         return existRole;
     }
-
 }

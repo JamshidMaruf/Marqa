@@ -17,15 +17,16 @@ public class RatingService(IUnitOfWork unitOfWork,
 
     public async Task<IEnumerable<Rating>> GetAllStudentRatingsAsync()
     {
-        var students = unitOfWork.Students.SelectAllAsQueryable();
+        var students = unitOfWork.Students
+            .SelectAllAsQueryable(o => !o.IsDeleted);
         var ratings = new List<Rating>();
         foreach (var student in students)
         {
             ratings.Add(new Rating
             {
                 CourseId = student.Courses.FirstOrDefault().Id,
-                Course = await unitOfWork.Courses.SelectAllAsQueryable()
-                    .Where(c => c.Id == student.Courses.FirstOrDefault().Id)
+                Course = await unitOfWork.Courses
+                .SelectAllAsQueryable(c => c.Id == student.Courses.FirstOrDefault().Id)
                     .Select(c => new Rating.CourseInfo
                     {
                         CourseId = c.Id,
@@ -49,16 +50,18 @@ public class RatingService(IUnitOfWork unitOfWork,
 
     public async Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId)
     {
-        var students = unitOfWork.Students.SelectAllAsQueryable()
-            .Where(s => s.Courses.Any());
+        var students = unitOfWork.Students
+            .SelectAllAsQueryable(s => s.Courses.Any());
+
         var ratings = new List<Rating>();
+
         foreach (var student in students)
         {
             ratings.Add(new Rating
             {
                 CourseId = courseId,
-                Course = await unitOfWork.Courses.SelectAllAsQueryable()
-                    .Where(c => c.Id == courseId)
+                Course = await unitOfWork.Courses
+                .SelectAllAsQueryable(c => c.Id == courseId)
                     .Select(c => new Rating.CourseInfo
                     {
                         CourseId = c.Id,
@@ -70,6 +73,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                 TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
+
         var rank = 1;
         foreach (var rating in ratings.OrderByDescending(r => r.TotalPoints))
         {
@@ -81,8 +85,9 @@ public class RatingService(IUnitOfWork unitOfWork,
 
     public async Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId)
     {
-        var students = unitOfWork.Students.SelectAllAsQueryable()
-            .Where(s => s.CompanyId == companyId);
+        var students = unitOfWork.Students
+            .SelectAllAsQueryable(s => s.CompanyId == companyId);
+
         var ratings = new List<MainPageRatingResult>();
         foreach (var student in students)
         {
@@ -94,6 +99,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                 TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
+
         var rank = 1;
         foreach (var rating in ratings.OrderByDescending(r => r.TotalPoints))
         {
@@ -108,7 +114,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<RatingPageRatingResult> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
     {
         var query = unitOfWork.Students
-            .SelectAllAsQueryable()
+            .SelectAllAsQueryable(s => !s.IsDeleted)
             .Include(s => s.Courses)
             .ThenInclude(c => c.Course)
             .Where(s => s.CompanyId == companyId);

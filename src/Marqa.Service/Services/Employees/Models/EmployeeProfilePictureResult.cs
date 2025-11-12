@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Marqa.Service.Services.Employees.Models;
 
-namespace Marqa.Service.Services.Employees.Models
+/// <summary>
+/// Represents the result of an employee profile picture upload operation
+/// </summary>
+public class EmployeeProfilePictureResult
 {
-    class EmployeeProfilePictureResult
-    {
-    }
+    public string Path { get; set; }
+    public string ImageName { get; set; }
+    public string Extension { get; set; }
 }

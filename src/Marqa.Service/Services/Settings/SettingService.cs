@@ -46,8 +46,8 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
 
     public async Task<Dictionary<string, string>> GetByCategoryAsync(string category)
     {
-        var settings = await unitOfWork.Settings.SelectAllAsQueryable()
-            .Where(s => s.Category == category)
+        var settings = await unitOfWork.Settings
+            .SelectAllAsQueryable(s => s.Category == category)
             .ToListAsync();
 
         foreach (var setting in settings)

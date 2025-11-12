@@ -38,9 +38,8 @@ public class BannerService(
     public async Task UploadBannerImageAsync(int bannerId, IFormFile file)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted)
-            .FirstOrDefaultAsync(b => b.Id == bannerId)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == bannerId)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Banner was not found with this ID = {bannerId}");
 
         string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
@@ -63,11 +62,10 @@ public class BannerService(
     public async Task UpdateAsync(int id, BannerUpdateModel model)
     {
         await updateValidator.EnsureValidatedAsync(model);
-       
+
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted)
-            .FirstOrDefaultAsync(b => b.Id == id)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == id)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException("Banner was not found");
 
         existBanner.Title = model.Title;
@@ -85,9 +83,8 @@ public class BannerService(
     public async Task DeleteAsync(int id)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted)
-            .FirstOrDefaultAsync(b => b.Id == id)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == id)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException("Banner was not found");
 
         unitOfWork.Banners.MarkAsDeleted(existBanner);
@@ -97,8 +94,7 @@ public class BannerService(
     public async Task<MainPageBannerViewModel> GetAsync(int id)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => b.Id == id && !b.IsDeleted)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == id)
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
@@ -115,8 +111,7 @@ public class BannerService(
     public async Task<List<MainPageBannerViewModel>> GetAllAsync()
     {
         return await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted)
+            .SelectAllAsQueryable(b => !b.IsDeleted)
             .OrderBy(b => b.DisplayOrder)
             .Select(b => new MainPageBannerViewModel
             {
@@ -133,8 +128,8 @@ public class BannerService(
         var currentDate = DateTime.UtcNow;
 
         return await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => !b.IsDeleted
+            .SelectAllAsQueryable(
+                b => !b.IsDeleted
                 && b.IsActive
                 && b.StartDate <= currentDate
                 && b.EndDate >= currentDate)
@@ -162,8 +157,7 @@ public class BannerService(
     public async Task<List<MainPageBannerViewModel>> GetByCompanyIdAsync(int companyId)
     {
         return await unitOfWork.Banners
-            .SelectAllAsQueryable()
-            .Where(b => b.CompanyId == companyId && b.IsActive && !b.IsDeleted)
+            .SelectAllAsQueryable(b => b.CompanyId == companyId && b.IsActive && !b.IsDeleted)
             .OrderBy(b => b.CreatedAt)
             .Select(b => new MainPageBannerViewModel
             {

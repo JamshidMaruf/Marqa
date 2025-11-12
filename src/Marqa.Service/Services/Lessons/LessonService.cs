@@ -74,8 +74,8 @@ public class LessonService(
         _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
-        var lessonAttendance = await unitOfWork.LessonAttendances.SelectAllAsQueryable()
-            .Where(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
+        var lessonAttendance = await unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
             .FirstOrDefaultAsync();
 
         if (lesson.Number == 1)
@@ -108,8 +108,7 @@ public class LessonService(
 
     public Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId)
     {
-        return unitOfWork.Lessons.SelectAllAsQueryable()
-            .Where(l => l.CourseId == courseId)
+        return unitOfWork.Lessons.SelectAllAsQueryable(l => l.CourseId == courseId)
             .Select(l => new LessonViewModel
             {
                 Id = l.Id,
