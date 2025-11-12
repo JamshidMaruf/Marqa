@@ -9,20 +9,16 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
-<<<<<<< HEAD
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-=======
->>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1-dev-02312" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-<<<<<<< HEAD
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" /> 
   </ItemGroup>
-=======
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />  </ItemGroup>
->>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
 
   <ItemGroup>
     <ProjectReference Include="..\Marqa.Service\Marqa.Service.csproj" />
