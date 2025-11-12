@@ -1,7 +1,6 @@
 ﻿using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Exams.Models;
-using Marqa.Service.Services.Students;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +15,7 @@ public class ExamController(IExamService examService) : ControllerBase
         await examService.CreateExamAsync(model);
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -27,7 +26,7 @@ public class ExamController(IExamService examService) : ControllerBase
         await examService.UpdateExamAsync(id, model);
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -38,7 +37,7 @@ public class ExamController(IExamService examService) : ControllerBase
         await examService.DeleteExamAsync(id);
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -49,7 +48,7 @@ public class ExamController(IExamService examService) : ControllerBase
         var exams = await examService.GetAllExamsAsync(search, courseid);
         return Ok(new Response<IEnumerable<ExamViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = exams
         });
@@ -61,7 +60,7 @@ public class ExamController(IExamService examService) : ControllerBase
         var exam = await examService.GetExamByIdAsync(id);
         return Ok(new Response<ExamViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = exam
         });
@@ -73,7 +72,7 @@ public class ExamController(IExamService examService) : ControllerBase
         await examService.ScoreExam(model);
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -84,7 +83,7 @@ public class ExamController(IExamService examService) : ControllerBase
         await examService.UpdateExamScore(id, model);
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -95,7 +94,7 @@ public class ExamController(IExamService examService) : ControllerBase
         var examResults = await examService.GetExamResultsByStudentIdAsync(studentId);
         return Ok(new Response<List<StudentExamResultView>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = examResults,
         });

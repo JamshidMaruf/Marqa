@@ -1,6 +1,7 @@
 ﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Ratings.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Mobile.Student.Api.Controllers;

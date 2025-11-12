@@ -2,6 +2,7 @@
 using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Orders;
 using Marqa.Service.Services.Orders.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Mobile.Student.Api.Controllers;

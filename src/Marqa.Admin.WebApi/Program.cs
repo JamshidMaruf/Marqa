@@ -2,6 +2,7 @@
 using Marqa.Admin.WebApi.Middlewares;
 using Marqa.DataAccess.Contexts;
 using Marqa.Service.Helpers;
+using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -16,7 +17,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerService();
 
 builder.Services.AddDbContext<AppDbContext>(option 
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));

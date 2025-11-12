@@ -1,10 +1,10 @@
 ﻿using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Products.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace Marqa.Admin.WebApi.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController(IProductService productService) : ControllerBase
@@ -16,7 +16,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -28,7 +28,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -40,7 +40,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -53,7 +53,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         return Ok(new Response<ProductViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = product,
         });
@@ -66,7 +66,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         
         return Ok(new Response<List<ProductViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = products,
         });

@@ -249,12 +249,12 @@ public class StudentService(
         if (picture.Length > 5 * 1024 * 1024)
             throw new ArgumentIsNotValidException("File size must not exceed 5MB");
 
-        if (!string.IsNullOrEmpty(student.ProfilePicture))
-        {
-            var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
-            if (File.Exists(oldFilePath))
-                File.Delete(oldFilePath);
-        }
+        // if (!string.IsNullOrEmpty(student.ProfilePicture))
+        // {
+        //     var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
+        //     if (File.Exists(oldFilePath))
+        //         File.Delete(oldFilePath);
+        // }
 
         var fileName = $"{studentId}_{Guid.NewGuid()}{extension}";
         var uploadsFolder = Path.Combine("wwwroot", "uploads", "students", "profiles");
@@ -270,7 +270,7 @@ public class StudentService(
         }
         // bu yerda notogri tarzda saqlanga boshqa joydan namuna olib image_name, path,extension saqlanishi kerak
         var relativePath = $"/uploads/students/profiles/{fileName}";
-        student.ProfilePicture = relativePath;
+        //student.ProfilePicture = relativePath;
 
         unitOfWork.Students.Update(student);
         await unitOfWork.SaveAsync();

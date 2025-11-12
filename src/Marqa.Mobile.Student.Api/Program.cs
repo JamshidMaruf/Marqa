@@ -1,7 +1,9 @@
 ﻿using Marqa.DataAccess.Contexts;
 using Marqa.Mobile.Student.Api.Extensions;
+using Marqa.Mobile.Student.Api.Filters;
 using Marqa.Mobile.Student.Api.Helpers;
 using Marqa.Mobile.Student.Api.Middlewares;
+using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -17,11 +19,10 @@ builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(
         new LowerCaseControllerName()));
+    options.Filters.Add(new PermissionAuthorizationFilter());
 });
 
 builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(option
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));

@@ -1,5 +1,5 @@
 ﻿using Marqa.Service.Exceptions;
-using Marqa.Teacher.WebApi.Models;
+using Marqa.Shared.Models;
 
 namespace Marqa.Teacher.WebApi.Middlewares;
 
@@ -24,7 +24,7 @@ public class ExceptionHandlingMiddleware
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
-                Status = ex.StatusCode,
+                StatusCode = ex.StatusCode,
                 Message = ex.Message
             });
         }
@@ -32,7 +32,7 @@ public class ExceptionHandlingMiddleware
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
-                Status = ex.StatusCode,
+                StatusCode = ex.StatusCode,
                 Message = ex.Message
             });
         }
@@ -40,7 +40,7 @@ public class ExceptionHandlingMiddleware
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
-                Status = ex.StatusCode,
+                StatusCode = ex.StatusCode,
                 Message = ex.Message
             });
         }
@@ -48,7 +48,7 @@ public class ExceptionHandlingMiddleware
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
-                Status = ex.StatusCode,
+                StatusCode = ex.StatusCode,
                 Message = ex.Message
             });
         }
@@ -56,7 +56,7 @@ public class ExceptionHandlingMiddleware
         {
             await httpContext.Response.WriteAsJsonAsync(new Response
             {
-                Status = 500,
+                StatusCode = 500,
                 Message = ex.Message
             });
             logger.LogError(ex, ex.Message);

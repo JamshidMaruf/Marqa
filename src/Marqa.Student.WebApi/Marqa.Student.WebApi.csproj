@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Marqa.Service\Marqa.Service.csproj" />
+    <ProjectReference Include="..\Marqa.Shared\Marqa.Shared.csproj" />
   </ItemGroup>
 
 </Project>

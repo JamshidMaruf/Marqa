@@ -368,7 +368,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return unitOfWork.StudentCourses.SelectAllAsQueryable(
             predicate: sc => sc.StudentId == studentId,
-            includes: new[] {"sc => sc.Course"})
+            includes: new[] {"Course"})
             .Select(sc => new CoursePageCourseViewModel
             {
                 Id = sc.CourseId,

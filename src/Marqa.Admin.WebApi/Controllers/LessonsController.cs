@@ -1,8 +1,8 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Lessons.Models;
-using Marqa.Admin.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Marqa.Service.Services.Lessons;
+using Marqa.Shared.Models;
 
 namespace Marqa.Admin.WebApi.Controllers;
 [ApiController]
@@ -16,7 +16,7 @@ public class LessonsController(ILessonService lessonService) : Controller
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -29,7 +29,7 @@ public class LessonsController(ILessonService lessonService) : Controller
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -41,7 +41,7 @@ public class LessonsController(ILessonService lessonService) : Controller
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -53,7 +53,7 @@ public class LessonsController(ILessonService lessonService) : Controller
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
