@@ -13,6 +13,13 @@ public class PermissionService(
     IValidator<PermissionCreateModel> createValidator,
     IValidator<PermissionUpdateModel> updateValidator) : IPermissionService
 {
+    /// <summary>
+    /// Creates a new permission in the system
+    /// </summary>
+    /// <param name="model">The permission creation model containing name, module, action and description</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    /// <exception cref="AlreadyExistException">Thrown when a permission with the same name, module and action already exists</exception>
+    /// <exception cref="ValidationException">Thrown when the model validation fails</exception>
     public async Task CreateAsync(PermissionCreateModel model)
     {
         await createValidator.EnsureValidatedAsync(model);
@@ -37,6 +44,16 @@ public class PermissionService(
         await unitOfWork.SaveAsync();
     }
 
+
+    /// <summary>
+    /// Updates an existing permission by its identifier
+    /// </summary>
+    /// <param name="id">The unique identifier of the permission to update</param>
+    /// <param name="model">The permission update model containing updated values</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    /// <exception cref="NotFoundException">Thrown when the permission with the specified ID is not found</exception>
+    /// <exception cref="AlreadyExistException">Thrown when another permission with the same name, module and action already exists</exception>
+    /// <exception cref="ValidationException">Thrown when the model validation fails</exception>
     public async Task UpdateAsync(int id, PermissionUpdateModel model)
     {
         await updateValidator.EnsureValidatedAsync(model);
@@ -62,7 +79,12 @@ public class PermissionService(
         unitOfWork.Permissions.Update(existPermission);
         await unitOfWork.SaveAsync();
     }
-
+    /// <summary>
+    /// Soft deletes a permission by marking it as deleted
+    /// </summary>
+    /// <param name="id">The unique identifier of the permission to delete</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    /// <exception cref="NotFoundException">Thrown when the permission with the specified ID is not found</exception>
     public async Task DeleteAsync(int id)
     {
         var existPermission = await unitOfWork.Permissions
@@ -72,7 +94,12 @@ public class PermissionService(
         unitOfWork.Permissions.MarkAsDeleted(existPermission);
         await unitOfWork.SaveAsync();
     }
-
+    /// <summary>
+    /// Retrieves a single permission by its identifier
+    /// </summary>
+    /// <param name="id">The unique identifier of the permission to retrieve</param>
+    /// <returns>A task representing the asynchronous operation with the permission view model</returns>
+    /// <exception cref="NotFoundException">Thrown when the permission with the specified ID is not found</exception>
     public async Task<PermissionViewModel> GetAsync(long id)
     {
         var permission = await unitOfWork.Permissions
@@ -88,7 +115,11 @@ public class PermissionService(
             Description = permission.Description,
         };
     }
-
+    /// <summary>
+    /// Retrieves all permissions from the system ordered by module and name
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation with a list of permission view models</returns>
+    /// <exception cref="NotFoundException">Thrown when no permissions are found in the system</exception>
     public async Task<List<PermissionViewModel>> GetAllAsync()
     {
         var permissions = await unitOfWork.Permissions
