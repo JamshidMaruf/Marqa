@@ -18,6 +18,7 @@ public class Student : Auditable
     public Gender Gender { get; set; }
     public int CompanyId { get; set; }
 
+
     public Company Company { get; set; }
     public StudentDetail StudentDetail { get; set; }
     public ICollection<StudentCourse> Courses { get; set; }

@@ -31,7 +31,7 @@ public interface IRepository<TEntity> where TEntity : Auditable
     /// <param name="entities"></param>
     void RemoveRange(IEnumerable<TEntity> entities);
     
-    Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null);
+    Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, params string[] includes);
     
     IQueryable<TEntity> SelectAllAsQueryable(Expression<Func<TEntity, bool>> predicate, string[] includes = null, bool tracking = false);
 }

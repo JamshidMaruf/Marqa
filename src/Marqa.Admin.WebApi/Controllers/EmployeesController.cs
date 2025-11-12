@@ -22,9 +22,9 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     }
 
     [HttpPut("update/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, int companyId, [FromBody] EmployeeUpdateModel model)
+    public async Task<IActionResult> PutAsync(int id, [FromBody] EmployeeUpdateModel model)
     {
-        await employeeService.UpdateAsync(id, companyId, model);
+        await employeeService.UpdateAsync(id, model);
 
         return Ok(new Response
         {

@@ -1,8 +1,10 @@
 ﻿using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Ratings.Models;
 using Marqa.Service.Services.StudentPointHistories;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Marqa.Service.Services.Ratings;
 
@@ -113,59 +115,93 @@ public class RatingService(IUnitOfWork unitOfWork,
 
     public async Task<RatingPageRatingResult> GetRatingPageRatingResultAsync(int companyId, int? courseId = null, Gender? gender = null)
     {
-        var query = unitOfWork.Students
-            .SelectAllAsQueryable(s => !s.IsDeleted)
-            .Include(s => s.Courses)
-            .ThenInclude(c => c.Course)
-            .Where(s => s.CompanyId == companyId);
-
-        //var courseStudents = new List<StudentCourse>().AsQueryable();
-        //if (courseId != null || courseId != 0)
-        //{
-        //    courseStudents = unitOfWork.StudentCourses
-        //        .SelectAllAsQueryable()
-        //        .Where(sc => sc.CourseId == courseId);
-        //}
-
-        var students = new RatingPageRatingResult
+        if (courseId != null && courseId != 0)
         {
-            Students = await query.Select(s => new RatingPageRatingResult.StudentInfo
+            var query = new List<StudentCourse>().AsQueryable();
+            query = unitOfWork.StudentCourses
+                .SelectAllAsQueryable(
+                sc => sc.CourseId == courseId,
+                includes: new[] { "Student" });
+
+            if (gender is not null)
             {
-                StudentId = s.Id,
-                StudentFirstName = s.FirstName,
-                StudentLastName = s.LastName,
-                ImageName = s.ImageFileName,
-                ImagePath = s.ImageFilePath,
-                ImageExtension = s.ImageFileExtension,
-                Courses = s.Courses.Select(c => new RatingPageRatingResult.CourseInfo
+                query = query.Where(s => s.Student.Gender == gender);
+            }
+
+            var students = new RatingPageRatingResult
+            {
+                Students = query.Select(s => new RatingPageRatingResult.StudentInfo
                 {
-                    Id = c.CourseId,
-                    Name = c.Course.Name
+                    StudentId = s.Id,
+                    StudentFirstName = s.Student.FirstName,
+                    StudentLastName = s.Student.LastName,
+                    ImageName = s.Student.ImageFileName,
+                    ImagePath = s.Student.ImageFilePath,
+                    ImageExtension = s.Student.ImageFileExtension
                 })
-            })
-            .ToListAsync()
-        };
+            };
 
-        students.Students.ToList().ForEach(async student =>
-        {
-            student.TotalPoints = await pointHistoryService.GetAsync(student.StudentId);
-        });
-        
-        students.Students = students.Students.OrderByDescending(s => s.TotalPoints);
-        
-        int rank = 1;
-        foreach(var student in students.Students)
-        {
-            student.Rank = rank++;
+            students.Students.ToList().ForEach(async student =>
+            {
+                student.TotalPoints = await pointHistoryService.GetAsync(student.StudentId);
+            });
+
+            students.Students = students.Students.OrderByDescending(s => s.TotalPoints);
+
+            int rank = 1;
+            foreach (var student in students.Students)
+            {
+                student.Rank = rank++;
+            }
+
+            return students;
         }
+        else
+        {
+            var query = unitOfWork.Students
+                .SelectAllAsQueryable(s => !s.IsDeleted)
+                .Include(s => s.Courses)
+                .ThenInclude(c => c.Course)
+                .Where(s => s.CompanyId == companyId);
 
-        return students;
+            if (gender is not null)
+            {
+                query = query.Where(s => s.Gender == gender);
+            }
+
+            var students = new RatingPageRatingResult
+            {
+                Students = await query.Select(s => new RatingPageRatingResult.StudentInfo
+                {
+                    StudentId = s.Id,
+                    StudentFirstName = s.FirstName,
+                    StudentLastName = s.LastName,
+                    ImageName = s.ImageFileName,
+                    ImagePath = s.ImageFilePath,
+                    ImageExtension = s.ImageFileExtension,
+                    Courses = s.Courses.Select(c => new RatingPageRatingResult.CourseInfo
+                    {
+                        Id = c.CourseId,
+                        Name = c.Course.Name
+                    })
+                })
+                    .ToListAsync()
+            };
+
+            students.Students.ToList().ForEach(async student =>
+            {
+                student.TotalPoints = await pointHistoryService.GetAsync(student.StudentId);
+            });
+
+            students.Students = students.Students.OrderByDescending(s => s.TotalPoints);
+
+            int rank = 1;
+            foreach (var student in students.Students)
+            {
+                student.Rank = rank++;
+            }
+
+            return students;
+        }
     }
 }
-
-//student fullname
-//student imagename, url, extension
-//student points
-//student position in rating
-//student courses containing id,name
-//filter by courseId and gender
