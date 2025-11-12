@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.PointSettings.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +16,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response
         {
-            Status = 201,
+            StatusCode = 201,
             Message = "success",
         });
     }
@@ -28,7 +28,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -48,7 +48,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response<PointSettingViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = pointSetting
         });
@@ -61,7 +61,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response<IEnumerable<PointSettingViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = pointSettings
         });
@@ -74,7 +74,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response<string>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = pointSettings
         });
@@ -87,7 +87,7 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
 
         return Ok(new Response<TokenModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = tokenModel
         });

@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +16,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 201,
+            StatusCode = 201,
             Message = "success"
         });
     }
@@ -28,7 +28,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -40,7 +40,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -52,7 +52,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response<EmployeeViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = result
         });
@@ -65,7 +65,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response<IEnumerable<EmployeeViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = result
         });
@@ -78,7 +78,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response<TeacherViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = result
         });
@@ -91,7 +91,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
         return Ok(new Response<IEnumerable<TeacherViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = result
         });

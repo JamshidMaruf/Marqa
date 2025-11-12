@@ -249,12 +249,12 @@ public class StudentService(
         if (picture.Length > 5 * 1024 * 1024)
             throw new ArgumentIsNotValidException("File size must not exceed 5MB");
 
-        if (!string.IsNullOrEmpty(student.ImageFilePath))
-        {
-            var oldFilePath = Path.Combine("wwwroot", student.ImageFilePath.TrimStart('/'));
-            if (File.Exists(oldFilePath))
-                File.Delete(oldFilePath);
-        }
+        // if (!string.IsNullOrEmpty(student.ProfilePicture))
+        // {
+        //     var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
+        //     if (File.Exists(oldFilePath))
+        //         File.Delete(oldFilePath);
+        // }
 
         var fileName = $"{studentId}_{Guid.NewGuid()}{extension}";
         var uploadsFolder = Path.Combine("wwwroot", "uploads", "students", "profiles");
@@ -269,9 +269,7 @@ public class StudentService(
             await picture.CopyToAsync(stream);
         }
         var relativePath = $"/uploads/students/profiles/{fileName}";
-        student.ImageFilePath = relativePath;
-        student.ImageFileName = fileName;
-        student.ImageFileExtension = extension;
+        //student.ProfilePicture = relativePath;
 
         unitOfWork.Students.Update(student);
         await unitOfWork.SaveAsync();

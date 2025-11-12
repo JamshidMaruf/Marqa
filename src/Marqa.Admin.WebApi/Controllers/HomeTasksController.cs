@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.HomeTasks.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +16,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -28,7 +28,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -40,7 +40,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -52,7 +52,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response<List<HomeTaskViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = homeTask,
         });
@@ -65,7 +65,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -77,7 +77,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -89,7 +89,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -101,7 +101,7 @@ public class HomeTasksController(IHomeTaskService homeTaskService) : ControllerB
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
