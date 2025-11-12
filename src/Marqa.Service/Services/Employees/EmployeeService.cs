@@ -45,7 +45,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateAsync(int id, int companyId, EmployeeUpdateModel model)
+    public async Task UpdateAsync(int id, EmployeeUpdateModel model)
     {
         await validatorEmployeeUpdate.EnsureValidatedAsync(model);
 
@@ -55,7 +55,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == companyId)
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existTeacher.CompanyId)
             ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
 
@@ -101,7 +101,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] {"e => e.Role"})
+            new[] {"e.Role"})
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
