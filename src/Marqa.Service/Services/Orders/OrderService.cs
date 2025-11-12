@@ -60,7 +60,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
                 predicate: b => b.Id == model.BasketId, 
-                includes: new []{ "BasketItems" })
+                includes: "BasketItems")
             ?? throw new NotFoundException("Basket not found");
 
         var basketItem = basket.BasketItems.FirstOrDefault(b => b.ProductId == model.ProductId);
@@ -91,7 +91,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
             predicate: b => b.StudentId == studentId,
-            includes: new[] { "BasketItems" })
+            includes: "BasketItems")
             ?? throw new NotFoundException("Basket not found");
 
         return new BasketViewModel
@@ -111,7 +111,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
                          predicate: b => b.Id == basketId, 
-                         includes: new []{ "BasketItems" })
+                         includes: "BasketItems")
                      ?? throw new NotFoundException("Basket not found");
         
         
