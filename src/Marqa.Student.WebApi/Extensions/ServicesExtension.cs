@@ -27,6 +27,10 @@ using Microsoft.OpenApi.Models;
 
 namespace Marqa.Student.WebApi.Extensions;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
 public static class ServicesExtension
 {
     public static void AddMarqaServices(this IServiceCollection services)

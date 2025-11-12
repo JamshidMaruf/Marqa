@@ -249,9 +249,9 @@ public class StudentService(
         if (picture.Length > 5 * 1024 * 1024)
             throw new ArgumentIsNotValidException("File size must not exceed 5MB");
 
-        if (!string.IsNullOrEmpty(student.ProfilePicture))
+        if (!string.IsNullOrEmpty(student.ImageFilePath))
         {
-            var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
+            var oldFilePath = Path.Combine("wwwroot", student.ImageFilePath.TrimStart('/'));
             if (File.Exists(oldFilePath))
                 File.Delete(oldFilePath);
         }
@@ -268,9 +268,10 @@ public class StudentService(
         {
             await picture.CopyToAsync(stream);
         }
-        // bu yerda notogri tarzda saqlanga boshqa joydan namuna olib image_name, path,extension saqlanishi kerak
         var relativePath = $"/uploads/students/profiles/{fileName}";
-        student.ProfilePicture = relativePath;
+        student.ImageFilePath = relativePath;
+        student.ImageFileName = fileName;
+        student.ImageFileExtension = extension;
 
         unitOfWork.Students.Update(student);
         await unitOfWork.SaveAsync();
