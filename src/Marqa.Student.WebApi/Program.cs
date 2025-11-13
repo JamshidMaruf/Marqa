@@ -2,7 +2,6 @@
 using Marqa.Shared.Extensions;
 using Marqa.Student.WebApi.Extensions;
 using Marqa.Student.WebApi.Middlewares;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -37,11 +36,7 @@ var app = builder.Build();
 
 app.UseSwagger();
 
-<<<<<<< HEAD
-//app.UseSwaggerUI();
-=======
 app.UseSwaggerUI();
->>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

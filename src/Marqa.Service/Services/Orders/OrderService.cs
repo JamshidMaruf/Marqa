@@ -92,7 +92,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         var basket = await unitOfWork.Baskets.SelectAsync(
             predicate: b => b.StudentId == studentId,
             includes: "BasketItems")
-            ?? throw new NotFoundException("Basket not found");
+             ?? throw new NotFoundException("Basket not found");
 
         return new BasketViewModel
         {
@@ -110,9 +110,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     public async Task CheckoutAsync(int basketId)
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
-                         predicate: b => b.Id == basketId, 
-                         includes: "BasketItems")
-                     ?? throw new NotFoundException("Basket not found");
+            predicate: b => b.Id == basketId, 
+            includes: "BasketItems")
+             ?? throw new NotFoundException("Basket not found");
         
         
         var createdOrder = unitOfWork.Orders.Insert(new Order
@@ -120,7 +120,7 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             StudentId = basket.StudentId,
             TotalPrice = basket.TotalPrice,
             Status = OrderStatus.InProcess,
-            Number = GenerateOrderNumber().Result,
+            Number = await GenerateOrderNumberAsync(),
         });
         
         await unitOfWork.SaveAsync();
@@ -140,11 +140,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task<OrderViewModel> GetOrderByIdAsync(int id)
     {
-        var order = await unitOfWork.Orders
-            .SelectAllAsQueryable(o => !o.IsDeleted)
-            .Include(o => o.OrderItems)
-            .ThenInclude(ot => ot.Product)
-            .FirstOrDefaultAsync(o => o.Id == id)
+        var order = await unitOfWork.Orders.SelectAsync(
+             predicate: o => o.Id == id,
+             includes: ["OrderItems", "OrderItems.Product"])
             ?? throw new NotFoundException($"No order was found with ID = {id}");
 
         return new OrderViewModel
@@ -171,9 +169,8 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     public async Task<List<OrderViewModel>> GetOrdersByStudentIdAsync(int studentId)
     {
         var orders = await unitOfWork.Orders
-            .SelectAllAsQueryable(o => !o.IsDeleted)
-            .Include(o => o.OrderItems)
-            .ThenInclude(ot => ot.Product)
+            .SelectAllAsQueryable(o => !o.IsDeleted,
+             includes: ["OrderItems", "OrderItems.Product"])
             .ToListAsync();
 
         return orders.Select(order => new OrderViewModel
@@ -207,9 +204,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
         await unitOfWork.SaveAsync();
     }
 
-    private async Task<long> GenerateOrderNumber()
+    private async Task<string> GenerateOrderNumberAsync()
     {
-        var orders = await unitOfWork.Orders
+        var order = await unitOfWork.Orders
             .SelectAllAsQueryable(o => !o.IsDeleted)
             .OrderByDescending(o => o.Number)
             .Select(o => new
@@ -218,9 +215,9 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
             })
             .FirstOrDefaultAsync();
 
-        if (orders == null)
-            return 00000001;
+        if (order == null)
+            return "00000001";
         else
-            return orders.Number + 1;
+            return (Convert.ToInt64(order.Number) + 1).ToString();
     }
 }

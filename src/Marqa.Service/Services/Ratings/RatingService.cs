@@ -20,7 +20,8 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<Rating>> GetAllStudentRatingsAsync()
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable(o => !o.IsDeleted);
+            .SelectAllAsQueryable();
+
         var ratings = new List<Rating>();
         foreach (var student in students)
         {
@@ -47,6 +48,7 @@ public class RatingService(IUnitOfWork unitOfWork,
             rating.Rank = rank;
             rank++;
         }
+
         return ratings.OrderBy(r => r.Rank);
     }
 
@@ -117,10 +119,8 @@ public class RatingService(IUnitOfWork unitOfWork,
     {
         if (courseId != null && courseId != 0)
         {
-            var query = new List<StudentCourse>().AsQueryable();
-            query = unitOfWork.StudentCourses
-                .SelectAllAsQueryable(
-                sc => sc.CourseId == courseId,
+            var query = unitOfWork.StudentCourses.SelectAllAsQueryable(
+                predicate: sc => sc.CourseId == courseId,
                 includes: new[] { "Student" });
 
             if (gender is not null)
