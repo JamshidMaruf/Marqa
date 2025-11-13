@@ -49,7 +49,15 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("FileExtension")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FilePath")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -163,16 +171,32 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Director")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Phone")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -259,6 +283,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
@@ -300,6 +328,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = ".Net C#",
+                            Price = 0m,
                             StartDate = new DateOnly(2025, 10, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 1,
@@ -319,6 +348,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 80,
                             MaxStudentCount = 20,
                             Name = "Flutter butcamp",
+                            Price = 0m,
                             StartDate = new DateOnly(2025, 11, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 2,
@@ -338,6 +368,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = "Intensive Ielts 1",
+                            Price = 0m,
                             StartDate = new DateOnly(2025, 10, 1),
                             StartTime = new TimeOnly(15, 0, 0),
                             Status = 1,
@@ -357,6 +388,7 @@ namespace Marqa.DataAccess.Migrations
                             LessonCount = 72,
                             MaxStudentCount = 24,
                             Name = "General English",
+                            Price = 0m,
                             StartDate = new DateOnly(2025, 11, 1),
                             StartTime = new TimeOnly(11, 0, 0),
                             Status = 2,
@@ -455,6 +487,10 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("Salary")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
                     b.Property<string>("Specialization")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -494,6 +530,7 @@ namespace Marqa.DataAccess.Migrations
                             PasswordHash = "hashlangan password",
                             Phone = "+998975777552",
                             RoleId = 1,
+                            Salary = 0m,
                             Specialization = "Software engineering",
                             Status = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -515,6 +552,7 @@ namespace Marqa.DataAccess.Migrations
                             PasswordHash = "hashlangan password",
                             Phone = "+998975771111",
                             RoleId = 1,
+                            Salary = 0m,
                             Specialization = "Computer Science",
                             Status = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -536,6 +574,7 @@ namespace Marqa.DataAccess.Migrations
                             PasswordHash = "hashlangan password",
                             Phone = "+998922221111",
                             RoleId = 1,
+                            Salary = 0m,
                             Specialization = "Teaching English",
                             Status = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -557,6 +596,7 @@ namespace Marqa.DataAccess.Migrations
                             PasswordHash = "hashlangan password",
                             Phone = "+998922221111",
                             RoleId = 1,
+                            Salary = 0m,
                             Specialization = "Teaching English",
                             Status = 1,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
@@ -570,6 +610,9 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("CanTeach")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
@@ -601,6 +644,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 1,
+                            CanTeach = false,
                             CompanyId = 1,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -611,6 +655,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 2,
+                            CanTeach = false,
                             CompanyId = 2,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -621,6 +666,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 3,
+                            CanTeach = false,
                             CompanyId = 3,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -631,6 +677,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 4,
+                            CanTeach = false,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -638,6 +685,46 @@ namespace Marqa.DataAccess.Migrations
                             Name = "Teacher",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.EmployeeSalary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Salary")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("EmployeeSalarys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Exam", b =>
@@ -1311,6 +1398,47 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.Permission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Module")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions", (string)null);
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.PointSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -1451,6 +1579,41 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("Name");
 
                     b.ToTable("Products", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.RolePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PermissionId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Setting", b =>
@@ -1693,6 +1856,10 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("Balance")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
@@ -1716,6 +1883,18 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ImageFileExtension")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ImageFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ImageFilePath")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -1728,10 +1907,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("character varying(400)");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("ProfilePicture")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -1755,6 +1930,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 1,
+                            Balance = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateOnly(2006, 1, 1),
@@ -1771,6 +1947,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 2,
+                            Balance = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateOnly(1999, 1, 1),
@@ -1787,6 +1964,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 3,
+                            Balance = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateOnly(2002, 1, 1),
@@ -1803,6 +1981,7 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 4,
+                            Balance = 0m,
                             CompanyId = 4,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfBirth = new DateOnly(2002, 1, 1),
@@ -1835,6 +2014,9 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1852,6 +2034,7 @@ namespace Marqa.DataAccess.Migrations
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1861,6 +2044,7 @@ namespace Marqa.DataAccess.Migrations
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1870,6 +2054,7 @@ namespace Marqa.DataAccess.Migrations
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -1879,6 +2064,7 @@ namespace Marqa.DataAccess.Migrations
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
+                            Status = 0,
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
@@ -2092,6 +2278,53 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("StudentHomeTaskId");
 
                     b.ToTable("StudentHomeTaskFiles", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentPaymentOperations", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PaymentOperationType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("StudentPaymentOperationss", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentPointHistory", b =>
@@ -2380,6 +2613,17 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.EmployeeSalary", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.Exam", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", "Course")
@@ -2536,6 +2780,25 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.RolePermission", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marqa.Domain.Entities.EmployeeRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.Student", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Company", "Company")
@@ -2624,6 +2887,17 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("StudentHomeTask");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.StudentPaymentOperations", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentPointHistory", b =>

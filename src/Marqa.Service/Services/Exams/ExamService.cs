@@ -117,7 +117,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         var exam = await unitOfWork.Exams
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] { "e => e.ExamResults" })
+            new[] { "ExamResults" })
             .Include(e => e.ExamSetting)
             .ThenInclude(es => es.Items)
             .FirstOrDefaultAsync(e => e.Id == examId)
@@ -167,7 +167,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     public async Task<ExamViewModel> GetExamByIdAsync(int examId)
     {
         return await unitOfWork.Exams.SelectAllAsQueryable(e => !e.IsDeleted,
-        new[] { "e => e.Course" })
+        new[] { "Course" })
             .Where(e => e.Id == examId)
             .Select(e => new ExamViewModel
             {
@@ -189,7 +189,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.StudentExamResults
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] { "r => r.Student", "r => r.Exam" })
+            new[] { "Student", "Exam" })
             .Where(r => r.StudentId == studentid)
             .Select(r => new StudentExamResultView
             {

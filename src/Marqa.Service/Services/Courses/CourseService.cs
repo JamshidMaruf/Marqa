@@ -158,7 +158,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: new[] { "c => c.Lessons", "c => c.CourseWeekdays" })
+            includes: new[] { "Lessons", "CourseWeekdays" })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
@@ -368,7 +368,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return unitOfWork.StudentCourses.SelectAllAsQueryable(
             predicate: sc => sc.StudentId == studentId,
-            includes: new[] {"sc => sc.Course"})
+            includes: new[] {"Course"})
             .Select(sc => new CoursePageCourseViewModel
             {
                 Id = sc.CourseId,

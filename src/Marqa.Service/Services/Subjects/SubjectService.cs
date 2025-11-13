@@ -57,7 +57,7 @@ public class SubjectService(
     public async Task<SubjectViewModel> GetAsync(int id)
     {
         var existSubject =  await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "s => s.Company" })
+            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "Company" })
             .Where(s => s.Id == id && !s.IsDeleted)
             .Select(s => new SubjectViewModel
             {
@@ -80,7 +80,7 @@ public class SubjectService(
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
     {
         return await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "s => s.Company" })
+            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "Company" })
             .Where(s => s.CompanyId == companyId && !s.IsDeleted)
             .Select(s => new SubjectViewModel
             {
