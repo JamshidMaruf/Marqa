@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Marqa.Shared.Helpers;
 
-public static class LowerCaseControllerName
+public static class LowerCaseConverter
 {
-    public static string? UseTransformOutbound(object? value)
+    public static string? Convert(object? value)
     {
         return value == null
             ? null

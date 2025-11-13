@@ -1,5 +1,6 @@
 ﻿using Marqa.Mobile.Teacher.Api.Models;
 using Marqa.Service.Exceptions;
+using Marqa.Shared.Models;
 
 namespace Marqa.Mobile.Teacher.Api.Middlewares;
 

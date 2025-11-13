@@ -1,7 +1,7 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Orders;
 using Marqa.Service.Services.Orders.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -17,7 +17,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 201,
+            StatusCode = 201,
             Message = "success",
         });
     }
@@ -29,7 +29,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -41,7 +41,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -53,7 +53,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -65,7 +65,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -77,7 +77,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response<BasketViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = basket
         });
@@ -90,7 +90,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response<OrderViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = order
         });
@@ -103,7 +103,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
 
         return Ok(new Response<List<OrderViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = order
         });

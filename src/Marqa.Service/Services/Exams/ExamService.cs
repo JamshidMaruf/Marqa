@@ -220,8 +220,9 @@ public class ExamService(IUnitOfWork unitOfWork,
         await studentExamCreateValidator.EnsureValidatedAsync(model);
 
         var existExamResult = await unitOfWork.StudentExamResults
-            .SelectAllAsQueryable(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId)
-            .FirstOrDefaultAsync();
+            .SelectAsync(
+            r => r.StudentId == model.StudentId &&
+            r.ExamId == model.ExamId);
 
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
@@ -237,13 +238,12 @@ public class ExamService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateExamScore(int examresultid, StudentExamResultUpdate model)
+    public async Task UpdateExamScore(int examResultId, StudentExamResultUpdate model)
     {
         await studentExamUpdateValidator.EnsureValidatedAsync(model);
 
         var existExamResult = await unitOfWork.StudentExamResults
-            .SelectAllAsQueryable(r => r.Id == examresultid)
-            .FirstOrDefaultAsync()
+            .SelectAsync(r => r.Id == examResultId)
             ?? throw new NotFoundException("Exam result not found");
 
         existExamResult.Score = model.Score;

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+﻿using Marqa.Shared.Helpers;
 
 namespace Marqa.Admin.WebApi.Extensions;
 
@@ -6,8 +6,6 @@ public class LowerCaseControllerName : IOutboundParameterTransformer
 {
     public string? TransformOutbound(object? value)
     {
-        return value == null
-            ? null
-            : Regex.Replace(value.ToString()!, "([a-z])([A-Z])", "$1-$2").ToLower();
+        return LowerCaseConverter.Convert(value);
     }
 }

@@ -10,6 +10,6 @@ public interface IExamService
     Task DeleteExamAsync(int examId);
 
     Task ScoreExam(StudentExamResultCreate model);
-    Task UpdateExamScore(int examresultid, StudentExamResultUpdate model);
+    Task UpdateExamScore(int examResultId, StudentExamResultUpdate model);
     Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid);
 }

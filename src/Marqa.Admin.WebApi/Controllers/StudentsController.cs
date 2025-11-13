@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +16,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -28,7 +28,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -40,7 +40,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -52,7 +52,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
 
         return Ok(new Response<StudentViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = student
         });
@@ -65,7 +65,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
 
         return Ok(new Response<List<StudentViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = students,
         });

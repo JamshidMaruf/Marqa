@@ -27,6 +27,10 @@ using Microsoft.OpenApi.Models;
 
 namespace Marqa.Student.WebApi.Extensions;
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
 public static class ServicesExtension
 {
     public static void AddMarqaServices(this IServiceCollection services)
@@ -52,56 +56,5 @@ public static class ServicesExtension
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
-    }
-
-    public static void AddJWTService(this IServiceCollection services, IConfiguration configuration)
-    {
-        var serviceProvider = services.BuildServiceProvider();
-
-        var settingService = serviceProvider.GetService<ISettingService>();
-
-        var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
-
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["JWT.Issuer"],
-                    ValidAudience = jwtSettings["JWT.Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
-                };
-            });
-    }
-
-    public static void AddSwaggerService(this IServiceCollection services)
-    {
-        services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Scheme = "Bearer",
-                Description =
-                    "Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
-            });
-
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    new string[] { }
-                }
-            });
-        });
     }
 }

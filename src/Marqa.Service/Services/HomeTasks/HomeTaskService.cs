@@ -36,8 +36,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
         string[] fileExtensions = {".mp3", ".wav", ".ogg", ".m4a", ".flac",
             ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt",
-            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"
-};
+            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"};
         if (imageExtensions.Contains(Path.GetExtension(file.FileName)))
         {
             var result = await fileService.UploadAsync(file, "Files/Images");
@@ -79,7 +78,10 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task DeleteAsync(int id)
     {
-        var existHomeTask = await unitOfWork.HomeTasks.SelectAsync(h => h.Id == id, new[] { "HomeTaskFile" })
+        var existHomeTask = await unitOfWork.HomeTasks
+            .SelectAsync(
+            h => h.Id == id,
+            includes: "HomeTaskFile" )
             ?? throw new NotFoundException("Home task is not found");
 
         if (existHomeTask.HomeTaskFile != null)
@@ -142,8 +144,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
         string[] fileExtensions = {".mp3", ".wav", ".ogg", ".m4a", ".flac",
             ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt",
-            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"
-};
+            ".zip", ".rar", ".7z", ".tar", ".gz",".cs", ".js", ".html", ".css", ".json", ".xml"};
         if (imageExtensions.Contains(Path.GetExtension(file.FileName)))
         {
             var result = await fileService.UploadAsync(file, "Files/Images");

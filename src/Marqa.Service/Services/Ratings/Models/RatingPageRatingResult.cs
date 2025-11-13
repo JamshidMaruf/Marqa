@@ -1,4 +1,7 @@
-﻿namespace Marqa.Service.Services.Ratings.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
+
+namespace Marqa.Service.Services.Ratings.Models;
 
 public class RatingPageRatingResult
 {
