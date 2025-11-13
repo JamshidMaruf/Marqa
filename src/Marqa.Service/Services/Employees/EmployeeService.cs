@@ -45,7 +45,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateAsync(int id, int companyId, EmployeeUpdateModel model)
+    public async Task UpdateAsync(int id, EmployeeUpdateModel model)
     {
         await validatorEmployeeUpdate.EnsureValidatedAsync(model);
 
@@ -55,7 +55,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == companyId)
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existTeacher.CompanyId)
             ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
 
@@ -79,11 +79,11 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var employeeForDeletion = await unitOfWork.Employees
             .SelectAllAsQueryable(b => !b.IsDeleted,
-            new[] {"e => e.Role"})
+            new[] {"Role"})
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
-        if(employeeForDeletion.Role.Name.ToLower() == "teacher")
+        if(employeeForDeletion.Role.CanTeach == true)
         {
             var teacherSubject = await unitOfWork.TeacherSubjects
                 .SelectAllAsQueryable(ts => !ts.IsDeleted && ts.TeacherId == id)
@@ -101,7 +101,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] {"e => e.Role"})
+            includes: ["Role"])
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -126,11 +126,11 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
 
-    public async Task<int?> GetByPhoneAsync(string phone)
+    public async Task<int> GetByPhoneAsync(string phone)
     {
         var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
 
-        return employee?.Id;
+        return employee.Id;
     }
 
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
@@ -172,7 +172,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: new[] {"ts => ts.Teacher", "ts => ts.Subject"})
+           includes: new[] {"Teacher", "Subject"})
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,
@@ -195,7 +195,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            new[] { "c => c.Subject" })
+            new[] { "Subject" })
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
@@ -215,7 +215,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacherQuery = unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(t => !t.IsDeleted,
-            new[] { "ts => ts.Teacher", "ts => ts.Subject"})
+            new[] { "Teacher", "Subject"})
             .Where(ts => ts.Teacher.CompanyId == companyId)
             .Select(t => new TeacherViewModel
             {
@@ -252,7 +252,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
-                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "c => c.Subject" }),
+                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "Subject" }),
                 t => t.Id,
                 c => c.TeacherId,
                 (t, courses) => new TeacherViewModel 

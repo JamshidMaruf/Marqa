@@ -75,8 +75,7 @@ public class LessonService(
             ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
         var lessonAttendance = await unitOfWork.LessonAttendances
-            .SelectAllAsQueryable(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId)
-            .FirstOrDefaultAsync();
+            .SelectAsync(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId);
 
         if (lesson.Number == 1)
         {

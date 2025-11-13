@@ -2,7 +2,6 @@
 using Marqa.Shared.Extensions;
 using Marqa.Student.WebApi.Extensions;
 using Marqa.Student.WebApi.Middlewares;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

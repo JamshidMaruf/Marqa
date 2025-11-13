@@ -20,8 +20,8 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
             .IsRequired();
 
         builder.HasOne(ts => ts.Teacher)
-            .WithOne()
-            .HasForeignKey<TeacherSubject>(ts => ts.TeacherId)
+            .WithMany()
+            .HasForeignKey(ts => ts.TeacherId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
 
@@ -34,19 +34,16 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
             },
             new()
             {
-                Id = 2,
                 TeacherId = 2,
                 SubjectId = 2
             },
             new()
             {
-                Id = 3,
                 TeacherId = 3,
                 SubjectId = 1
             },
             new()
             {
-                Id = 4,
                 TeacherId = 4,
                 SubjectId = 1
             }
