@@ -1,9 +1,7 @@
-﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Auth;
+﻿using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
-using Marqa.Service.Services.PointSettings.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -21,7 +19,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
 
         return Ok(new Response
         {
-            Status = 201,
+            StatusCode = 201,
             Message = "success",
         });
     }
@@ -33,7 +31,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -45,7 +43,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -57,7 +55,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
 
         return Ok(new Response<CompanyViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = company
         });
@@ -70,7 +68,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
 
         return Ok(new Response<List<CompanyViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = companies
         });

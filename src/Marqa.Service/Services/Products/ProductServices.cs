@@ -75,8 +75,7 @@ public class ProductService(IUnitOfWork unitOfWork,
     public async Task<List<ProductViewModel>> GetAllAsync(int companyId, string search = null)
     {
         var products = unitOfWork.Products
-            .SelectAllAsQueryable(p => !p.IsDeleted && p.CompanyId == companyId)
-            ?? throw new NotFoundException("This product is not found!");
+            .SelectAllAsQueryable(p => p.CompanyId == companyId);
 
         if (string.IsNullOrEmpty(search))
             products = products.Where(p => p.Name.ToLower() == search.ToLower());
@@ -89,8 +88,7 @@ public class ProductService(IUnitOfWork unitOfWork,
             Price = p.Price,
             CompanyId = p.CompanyId,
         })
-            .ToListAsync();
+        .ToListAsync();
     }
-
 }
 

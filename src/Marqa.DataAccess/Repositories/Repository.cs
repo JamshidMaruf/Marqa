@@ -54,7 +54,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.RemoveRange(entities);
     }
 
-    public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, string[] includes = null)
+    public async Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, params string[] includes)
     {
         var query = _context.Set<TEntity>().Where(predicate).AsQueryable();
 
@@ -71,8 +71,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
     public IQueryable<TEntity> SelectAllAsQueryable(
         Expression<Func<TEntity, bool>> predicate = null,
-        string[] includes = null, 
-        bool tracking = false)
+        string[] includes = null, bool tracking = false)
     {
         var query = _context.Set<TEntity>().AsQueryable();
         

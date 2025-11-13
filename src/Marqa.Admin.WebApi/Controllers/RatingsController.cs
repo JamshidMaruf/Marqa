@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Ratings.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -14,7 +14,7 @@ public class RatingsController(IRatingService ratingService) : Controller
         var ratings = await ratingService.GetStudentRatingsByCourseAsync(courseId);
         return Ok(new Response<List<Rating>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = ratings.ToList()
         });
@@ -26,7 +26,7 @@ public class RatingsController(IRatingService ratingService) : Controller
         var ratings = await ratingService.GetMainPageRatingResultAsync(companyId);
         return Ok(new Response<List<MainPageRatingResult>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = ratings
         });
@@ -38,7 +38,7 @@ public class RatingsController(IRatingService ratingService) : Controller
         var ratings = await ratingService.GetAllStudentRatingsAsync();
         return Ok(new Response<List<Rating>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = ratings.ToList()
         });
@@ -50,7 +50,7 @@ public class RatingsController(IRatingService ratingService) : Controller
         var rating = await ratingService.GetStudentRatingAsync(studentId);
         return Ok(new Response<Rating>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = rating
         });

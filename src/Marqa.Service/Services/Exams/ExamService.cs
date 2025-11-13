@@ -117,9 +117,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         var exam = await unitOfWork.Exams
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] { "ExamResults" })
-            .Include(e => e.ExamSetting)
-            .ThenInclude(es => es.Items)
+            new[] { "ExamResults", "ExamSetting", "ExamSetting.Items" })
             .FirstOrDefaultAsync(e => e.Id == examId)
             ?? throw new NotFoundException("Exam not found");
 
@@ -166,9 +164,8 @@ public class ExamService(IUnitOfWork unitOfWork,
 
     public async Task<ExamViewModel> GetExamByIdAsync(int examId)
     {
-        return await unitOfWork.Exams.SelectAllAsQueryable(e => !e.IsDeleted,
-        new[] { "Course" })
-            .Where(e => e.Id == examId)
+        return await unitOfWork.Exams.SelectAllAsQueryable(e => e.Id == examId,
+            includes: new[] { "Course" })
             .Select(e => new ExamViewModel
             {
                 Id = e.Id,
@@ -188,9 +185,8 @@ public class ExamService(IUnitOfWork unitOfWork,
     public async Task<List<StudentExamResultView>> GetExamResultsByStudentIdAsync(int studentid)
     {
         return await unitOfWork.StudentExamResults
-            .SelectAllAsQueryable(e => !e.IsDeleted,
+            .SelectAllAsQueryable(r => r.StudentId == studentid,
             new[] { "Student", "Exam" })
-            .Where(r => r.StudentId == studentid)
             .Select(r => new StudentExamResultView
             {
                 Id = r.Id,
@@ -220,8 +216,9 @@ public class ExamService(IUnitOfWork unitOfWork,
         await studentExamCreateValidator.EnsureValidatedAsync(model);
 
         var existExamResult = await unitOfWork.StudentExamResults
-            .SelectAllAsQueryable(r => r.StudentId == model.StudentId && r.ExamId == model.ExamId)
-            .FirstOrDefaultAsync();
+            .SelectAsync(
+            r => r.StudentId == model.StudentId &&
+            r.ExamId == model.ExamId);
 
         if (existExamResult != null)
             throw new AlreadyExistException("Exam result already exist for this student and exam");
@@ -237,13 +234,12 @@ public class ExamService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task UpdateExamScore(int examresultid, StudentExamResultUpdate model)
+    public async Task UpdateExamScore(int examResultId, StudentExamResultUpdate model)
     {
         await studentExamUpdateValidator.EnsureValidatedAsync(model);
 
         var existExamResult = await unitOfWork.StudentExamResults
-            .SelectAllAsQueryable(r => r.Id == examresultid)
-            .FirstOrDefaultAsync()
+            .SelectAsync(r => r.Id == examResultId)
             ?? throw new NotFoundException("Exam result not found");
 
         existExamResult.Score = model.Score;

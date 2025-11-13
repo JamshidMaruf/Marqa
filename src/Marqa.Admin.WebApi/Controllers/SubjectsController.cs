@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Subjects.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -17,7 +17,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -29,7 +29,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -41,7 +41,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -53,7 +53,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -65,7 +65,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
         });
     }
@@ -77,7 +77,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response<SubjectViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = subject
         });
@@ -90,7 +90,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
 
         return Ok(new Response<IEnumerable<SubjectViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = subjects
         });

@@ -2,6 +2,7 @@
 using Marqa.Mobile.Teacher.Api.Extensions;
 using Marqa.Mobile.Teacher.Api.Helpers;
 using Marqa.Mobile.Teacher.Api.Middlewares;
+using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -21,14 +22,14 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddDbContext<AppDbContext>(option
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));
 
 builder.Services.AddMarqaServices();
 
-builder.Services.AddJWTService(builder.Configuration);
+builder.Services.AddSwaggerService();
+
+builder.Services.AddJWTService();
 
 builder.Services.AddAuthorization();
 

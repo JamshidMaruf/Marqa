@@ -1,6 +1,6 @@
 ﻿using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.StudentPointHistories.Models;
-using Marqa.Admin.WebApi.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -16,7 +16,7 @@ public class StudentPoinHistoriesController(IStudentPointHistoryService studentP
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -28,7 +28,7 @@ public class StudentPoinHistoriesController(IStudentPointHistoryService studentP
 
         return Ok(new Response<int>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = point,
         });
@@ -41,7 +41,7 @@ public class StudentPoinHistoriesController(IStudentPointHistoryService studentP
 
         return Ok(new Response<List<StudentPointHistoryViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = pointHistories,
         });

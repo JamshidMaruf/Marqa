@@ -1,5 +1,5 @@
-﻿using Marqa.Mobile.Parent.Api.Models;
-using Marqa.Service.Exceptions;
+﻿using Marqa.Service.Exceptions;
+using Marqa.Shared.Models;
 
 namespace Marqa.Mobile.Parent.Api.Middlewares;
 

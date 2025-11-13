@@ -53,7 +53,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var pointSetting = await unitOfWork.PointSettings.SelectAsync(p => p.Id == id)
-            ?? throw new NotFoundException($"No poinit_setting was found with ID = {id}");
+            ?? throw new NotFoundException($"No point_setting was found with ID = {id}");
 
         unitOfWork.PointSettings.MarkAsDeleted(pointSetting);
 
@@ -76,7 +76,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<PointSettingViewModel>> GetAllAsync(string search = null)
     {
         var pointQuery = unitOfWork.PointSettings
-            .SelectAllAsQueryable(p => !p.IsDeleted);
+            .SelectAllAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {

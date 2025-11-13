@@ -6,18 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Subjects;
 
-public class SubjectService(
-    IUnitOfWork unitOfWork) : ISubjectService
+public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
 {
     public async Task CreateAsync(SubjectCreateModel model)
     {
         var alreadyExistSubject = await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted && s.Name == model.Name && s.CompanyId == model.CompanyId)
-            .FirstOrDefaultAsync();
+            .SelectAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
 
         if (alreadyExistSubject != null)
             throw new AlreadyExistException("This subject already exist!");
-       
+
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
@@ -32,11 +30,9 @@ public class SubjectService(
 
     public async Task UpdateAsync(int id, SubjectUpdateModel model)
     {
-        var existSubject = await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted && s.Id == id)
-            .FirstOrDefaultAsync()
+        var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
-       
+
         existSubject.Name = model.Name;
 
         unitOfWork.Subjects.Update(existSubject);
@@ -56,7 +52,7 @@ public class SubjectService(
 
     public async Task<SubjectViewModel> GetAsync(int id)
     {
-        var existSubject =  await unitOfWork.Subjects
+        return await unitOfWork.Subjects
             .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "Company" })
             .Where(s => s.Id == id && !s.IsDeleted)
             .Select(s => new SubjectViewModel
@@ -67,21 +63,13 @@ public class SubjectService(
                 Name = s.Name,
             }).FirstOrDefaultAsync()
             ?? throw new NotFoundException("Subject was not found");
-
-        return new SubjectViewModel
-        {
-            Id = existSubject.Id,
-            Name = existSubject.Name,
-            CompanyId = existSubject.CompanyId,
-            CompanyName = existSubject.CompanyName
-        };
     }
 
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
     {
-        return await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "Company" })
-            .Where(s => s.CompanyId == companyId && !s.IsDeleted)
+        return await unitOfWork.Subjects.SelectAllAsQueryable(
+            predicate: s => s.CompanyId == companyId,
+            includes: ["Company"])
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,
@@ -100,6 +88,13 @@ public class SubjectService(
         _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == model.SubjectId)
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
+        var exitAttachment = await unitOfWork.TeacherSubjects.SelectAsync(a =>
+            a.TeacherId == model.TeacherId &&
+            a.SubjectId == model.SubjectId);
+
+        if (exitAttachment != null)
+            throw new AlreadyExistException("The teacher has this subject already!");
+
         unitOfWork.TeacherSubjects.Insert(new TeacherSubject
         {
             TeacherId = model.TeacherId,
@@ -111,9 +106,8 @@ public class SubjectService(
 
     public async Task DetachAsync(int teacherId, int subjectId)
     {
-        var teacherSubject = unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == teacherId && ts.SubjectId == subjectId)
-            .FirstOrDefault()
+        var teacherSubject = await unitOfWork.TeacherSubjects
+            .SelectAsync(ts => ts.TeacherId == teacherId && ts.SubjectId == subjectId)
             ?? throw new NotFoundException($"No attachment was found with teacherID: {teacherId} and subjectID: {subjectId}.");
 
         unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);

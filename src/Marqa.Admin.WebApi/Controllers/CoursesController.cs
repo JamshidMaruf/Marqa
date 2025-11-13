@@ -1,7 +1,7 @@
-﻿using Marqa.Admin.WebApi.Models;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -17,7 +17,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -29,7 +29,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
          
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -41,7 +41,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -53,7 +53,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -65,7 +65,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
         return Ok(new Response
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success"
         });
     }
@@ -77,7 +77,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
         return Ok(new Response<CourseViewModel>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = course
         });
@@ -90,7 +90,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
         return Ok(new Response<List<CourseViewModel>>
         {
-            Status = 200,
+            StatusCode = 200,
             Message = "success",
             Data = courses
         });

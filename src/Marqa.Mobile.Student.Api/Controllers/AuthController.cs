@@ -1,6 +1,7 @@
 ﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Messages;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
