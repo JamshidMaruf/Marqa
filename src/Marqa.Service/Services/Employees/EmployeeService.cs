@@ -83,7 +83,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
-        if(employeeForDeletion.Role.Name.ToLower() == "teacher")
+        if(employeeForDeletion.Role.CanTeach == true)
         {
             var teacherSubject = await unitOfWork.TeacherSubjects
                 .SelectAllAsQueryable(ts => !ts.IsDeleted && ts.TeacherId == id)
@@ -101,7 +101,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] {"Role"})
+            includes: ["Role"])
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -252,7 +252,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
-                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "c => c.Subject" }),
+                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "Subject" }),
                 t => t.Id,
                 c => c.TeacherId,
                 (t, courses) => new TeacherViewModel 
