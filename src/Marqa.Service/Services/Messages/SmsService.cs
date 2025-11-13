@@ -59,26 +59,26 @@ public class SmsService(
         int entityId = 0;
         string entityType = "";
         
-        int? studentId = await studentService.GetByPhoneAsync(phone);
-        if (studentId != null)
+        int studentId = await studentService.GetByPhoneAsync(phone);
+        if (studentId is not default(int))
         {
-            entityId = studentId.Value;
+            entityId = studentId;
             entityType = "Student";
             return (entityId, entityType);
         }
 
-        int? teacherId = await employeeService.GetByPhoneAsync(phone);
-        if (teacherId != null)
+        int teacherId = await employeeService.GetByPhoneAsync(phone);
+        if (teacherId is not default(int))
         {
-            entityId = teacherId.Value;
+            entityId = teacherId;
             entityType = "Teacher";
             return (entityId, entityType);
         }
 
-        int? parentId = await studentService.GetStudentParentByPhoneAsync(phone);
-        if (parentId != null)
+        int parentId = await studentService.GetStudentParentByPhoneAsync(phone);
+        if (parentId is not default(int))
         {
-            entityId = parentId.Value;
+            entityId = parentId;
             entityType = "Parent";
             return (entityId, entityType);
         }

@@ -33,5 +33,5 @@ public interface IRepository<TEntity> where TEntity : Auditable
     
     Task<TEntity> SelectAsync(Expression<Func<TEntity, bool>> predicate, params string[] includes);
     
-    IQueryable<TEntity> SelectAllAsQueryable(Expression<Func<TEntity, bool>> predicate, string[] includes = null, bool tracking = false);
+    IQueryable<TEntity> SelectAllAsQueryable(Expression<Func<TEntity, bool>> predicate = null, string[] includes = null, bool tracking = false);
 }

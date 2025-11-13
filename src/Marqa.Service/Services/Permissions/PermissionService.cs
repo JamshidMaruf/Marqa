@@ -123,7 +123,7 @@ public class PermissionService(
     public async Task<List<PermissionViewModel>> GetAllAsync()
     {
         var permissions = await unitOfWork.Permissions
-        .SelectAllAsQueryable(p => true ) 
+        .SelectAllAsQueryable() 
         .OrderBy(p => p.Module)
         .ThenBy(p => p.Name)
         .Select(p => new PermissionViewModel
@@ -141,5 +141,4 @@ public class PermissionService(
 
         return permissions;
     }
-
 }

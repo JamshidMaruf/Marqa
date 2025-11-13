@@ -71,7 +71,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.EmployeeRoles
             .SelectAllAsQueryable(x => x.CompanyId == companyId,
-            new[] {"x => x.Company"})
+            new[] {"Company"})
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
@@ -114,7 +114,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     {
         var existRole = await unitOfWork.EmployeeRoles
             .SelectAllAsQueryable(x => x.Id == id,
-            new[] {"c => c.Company"})
+            new[] {"Company"})
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
