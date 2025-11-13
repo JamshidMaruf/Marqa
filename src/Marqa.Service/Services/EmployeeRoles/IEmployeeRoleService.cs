@@ -10,4 +10,5 @@ public interface IEmployeeRoleService
     Task<EmployeeRoleViewModel> GetAsync(int id);
     Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId);
     Task AttachPermissionsAsync(int id, List<int> permissionIds);
+    Task<bool> HasPermissionAsync(string roleName, string permissionName);
 }

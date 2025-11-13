@@ -117,7 +117,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         var exam = await unitOfWork.Exams
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] {"ExamResults", "ExamSetting", "ExamSetting.Items"})
+            includes: new[] {"ExamResults", "ExamSetting", "ExamSetting.Items"})
             .FirstOrDefaultAsync(e => e.Id == examId)
             ?? throw new NotFoundException("Exam not found");
 
@@ -186,7 +186,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.StudentExamResults
             .SelectAllAsQueryable(r => r.StudentId == studentid,
-            new[] { "Student", "Exam" })
+            includes: new[] { "Student", "Exam" })
             .Select(r => new StudentExamResultView
             {
                 Id = r.Id,

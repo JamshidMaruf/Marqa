@@ -43,6 +43,5 @@ public interface IPermissionService
     /// <returns>A task representing the asynchronous operation with a list of permission view models</returns>
     /// <exception cref="NotFoundException">Thrown when no permissions are found in the system</exception>
     Task<List<PermissionViewModel>> GetAllAsync();
-    
 }
 

@@ -3,6 +3,7 @@ using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Employees.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,8 @@ namespace Marqa.Service.Services.Employees;
 
 public class EmployeeService(IUnitOfWork unitOfWork,
     IValidator<EmployeeCreateModel> validatorEmployeeCreate,
-    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate) : IEmployeeService
+    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate,
+    IAuthService authService) : IEmployeeService
 {
     public async Task CreateAsync(EmployeeCreateModel model)
     {
@@ -79,7 +81,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var employeeForDeletion = await unitOfWork.Employees
             .SelectAllAsQueryable(b => !b.IsDeleted,
-            new[] {"Role"})
+            includes: new[] {"Role"})
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
@@ -195,7 +197,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            new[] { "Subject" })
+            includes: new[] { "Subject" })
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
@@ -215,7 +217,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacherQuery = unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(t => !t.IsDeleted,
-            new[] { "Teacher", "Subject"})
+            includes: new[] { "Teacher", "Subject"})
             .Where(ts => ts.Teacher.CompanyId == companyId)
             .Select(t => new TeacherViewModel
             {
@@ -252,7 +254,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
-                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, new[] { "Subject" }),
+                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
                 t => t.Id,
                 c => c.TeacherId,
                 (t, courses) => new TeacherViewModel 
@@ -280,5 +282,34 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .ToListAsync();
 
         return teacherCourses;
+    }
+
+    public async Task<EmployeeLoginViewModel> LoginAsync(EmployeeLoginModel model)
+    {
+        var employee = await unitOfWork.Employees
+            .SelectAsync(predicate: e => e.Phone == model.Phone, includes: "Role")
+            ?? throw new ArgumentIsNotValidException("Phone or Password is invalid.");
+        
+        if(!employee.PasswordHash.Verify(model.Password))
+            throw new ArgumentIsNotValidException("Phone or Password is invalid.");
+
+        var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
+
+        var employeePermissions = await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(predicate: r => r.RoleId == employee.RoleId, includes: "Permission")
+            .Select(r => new EmployeeLoginViewModel.PermissionInfo { Name = r.Permission.Name })
+            .ToListAsync();
+
+        return new EmployeeLoginViewModel
+        {
+            Id = employee.Id,
+            FirstName = employee.FirstName,
+            LastName = employee.LastName,
+            Phone = employee.Phone,
+            CompanyId = employee.CompanyId,
+            Role = employee.Role.Name,
+            Token = token,
+            Permissions = employeePermissions
+        };
     }
 }

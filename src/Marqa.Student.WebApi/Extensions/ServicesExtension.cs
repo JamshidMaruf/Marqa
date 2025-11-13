@@ -1,5 +1,4 @@
-﻿using System.Text;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Servcies.Products;
@@ -21,16 +20,8 @@ using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace Marqa.Student.WebApi.Extensions;
-
-<<<<<<< HEAD
-
-=======
->>>>>>> d4af47f8b7962328f603dbad791bea9ec04b1db5
 public static class ServicesExtension
 {
     public static void AddMarqaServices(this IServiceCollection services)
