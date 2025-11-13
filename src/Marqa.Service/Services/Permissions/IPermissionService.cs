@@ -6,6 +6,5 @@ public interface IPermissionService
     Task DeleteAsync(int id);
     Task<PermissionViewModel> GetAsync(long id);
     Task<List<PermissionViewModel>> GetAllAsync();
-    
 }
 

@@ -129,4 +129,14 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException("Role not found");
         return existRole;
     }
+    
+    
+    public async Task<bool> HasPermissionAsync(string roleName, string permissionName)
+    {
+        return await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(
+                predicate: r => r.Role.Name == roleName && r.Permission.Name == permissionName,
+                includes: ["Permission", "Role"])
+            .AnyAsync();
+    }
 }

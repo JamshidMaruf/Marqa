@@ -70,8 +70,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
     }
 
     public IQueryable<TEntity> SelectAllAsQueryable(
-        Expression<Func<TEntity, bool>> predicate = null,
-        string[] includes = null, bool tracking = false)
+        Expression<Func<TEntity, bool>> predicate = null, 
+        bool tracking = false,
+        params string[] includes)
     {
         var query = _context.Set<TEntity>().AsQueryable();
         
