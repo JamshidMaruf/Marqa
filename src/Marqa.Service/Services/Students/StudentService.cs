@@ -82,7 +82,7 @@ public class StudentService(
             var existStudent = await unitOfWork.Students
                 .SelectAsync(
                     predicate: s => s.Id == id && s.CompanyId == companyId,
-                    includes: new[] { nameof(Student.StudentDetail) })
+                    includes: "StudentDetail" )
                 ?? throw new NotFoundException($"Student is not found");
 
             var phoneExists = await unitOfWork.Students
@@ -130,7 +130,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: s => s.Id == id,
-                includes: new[] { nameof(Student.StudentDetail) })
+                includes: "StudentDetail" )
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail != null)
@@ -166,7 +166,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: new[] { nameof(Student.StudentDetail) })
+                includes: "StudentDetail" )
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail == null)
