@@ -121,7 +121,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         {
             var query = unitOfWork.StudentCourses.SelectAllAsQueryable(
                 predicate: sc => sc.CourseId == courseId,
-                includes: new[] { "Student" });
+                includes: "Student" );
 
             if (gender is not null)
             {

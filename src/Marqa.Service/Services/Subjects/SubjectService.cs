@@ -70,7 +70,7 @@ public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
     {
         return await unitOfWork.Subjects.SelectAllAsQueryable(
             predicate: s => s.CompanyId == companyId,
-            includes: ["Company"])
+            includes: "Company" )
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,

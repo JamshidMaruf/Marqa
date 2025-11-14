@@ -81,7 +81,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var employeeForDeletion = await unitOfWork.Employees
             .SelectAllAsQueryable(b => !b.IsDeleted,
-            includes: new[] {"Role"})
+            includes: "Role" )
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
@@ -103,7 +103,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            includes: ["Role"])
+            includes: "Role" )
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -197,7 +197,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: new[] { "Subject" })
+            includes: "Subject" )
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
@@ -217,7 +217,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacherQuery = unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(t => !t.IsDeleted,
-            includes: new[] { "Teacher", "Subject"})
+            includes: ["Teacher", "Subject"])
             .Where(ts => ts.Teacher.CompanyId == companyId)
             .Select(t => new TeacherViewModel
             {
