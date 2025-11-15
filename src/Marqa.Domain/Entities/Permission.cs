@@ -1,4 +1,4 @@
-namespace Marqa.Domain.Entities;
+﻿namespace Marqa.Domain.Entities;
 
 public class Permission : Auditable
 {

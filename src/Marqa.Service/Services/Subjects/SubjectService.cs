@@ -23,7 +23,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
         if (alreadyExistSubject != null)
             throw new AlreadyExistException("This subject already exist!");
-       
+
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
             ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
@@ -42,7 +42,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
         var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
-       
+
         existSubject.Name = model.Name;
 
         unitOfWork.Subjects.Update(existSubject);
@@ -102,12 +102,12 @@ public class SubjectService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
 
         var exitAttachment = await unitOfWork.TeacherSubjects.SelectAsync(a =>
-            a.TeacherId == model.TeacherId && 
+            a.TeacherId == model.TeacherId &&
             a.SubjectId == model.SubjectId);
 
         if (exitAttachment != null)
             throw new AlreadyExistException("The teacher has this subject already!");
-        
+
         unitOfWork.TeacherSubjects.Insert(new TeacherSubject
         {
             TeacherId = model.TeacherId,
