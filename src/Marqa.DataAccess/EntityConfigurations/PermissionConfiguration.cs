@@ -7,14 +7,12 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
     public void Configure(EntityTypeBuilder<Permission> builder)
     {
-        builder.ToTable("Permissions");
-
         builder.HasData(new List<Permission>
         {
             new()
             {
                 Id = 1,
-                Name = "View Users",
+                Name = "View.Users",
                 Module = "Users",
                 Action = "Read",
                 Description = "Allows viewing the list of users",
@@ -23,7 +21,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 2,
-                 Name = "Create User",
+                 Name = "Create.User",
                  Module = "Users",
                  Action = "Create",
                  Description = "Allows creating new users",
@@ -32,7 +30,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 3,
-                 Name = "Update User",
+                 Name = "Update.User",
                  Module = "Users",
                  Action = "Update",
                  Description = "Allows updating existing users",
@@ -41,7 +39,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 4,
-                 Name = "Delete User",
+                 Name = "Delete.User",
                  Module = "Users",
                  Action = "Delete",
                  Description = "Allows deleting users",
@@ -50,7 +48,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 5,
-                 Name = "View Roles",
+                 Name = "View.Roles",
                  Module = "Roles",
                  Action = "Read",
                  Description = "Allows viewing roles",
@@ -59,7 +57,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 6,
-                 Name = "Create Role",
+                 Name = "Create.Role",
                  Module = "Roles",
                  Action = "Create",
                  Description = "Allows creating roles",
@@ -68,7 +66,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 7,
-                 Name = "Update Role",
+                 Name = "Update.Role",
                  Module = "Roles",
                  Action = "Update",
                  Description = "Allows updating roles",
@@ -77,7 +75,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 8,
-                 Name = "Delete Role",
+                 Name = "Delete.Role",
                  Module = "Roles",
                  Action = "Delete",
                  Description = "Allows deleting roles",
@@ -86,7 +84,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 9,
-                 Name = "View Companies",
+                 Name = "View.Companies",
                  Module = "Companies",
                  Action = "Read",
                  Description = "Allows viewing company list",
@@ -95,7 +93,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 10,
-                 Name = "Create Company",
+                 Name = "Create.Company",
                  Module = "Companies",
                  Action = "Create",
                  Description = "Allows adding new company",
@@ -104,7 +102,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 11,
-                 Name = "Update Company",
+                 Name = "Update.Company",
                  Module = "Companies",
                  Action = "Update",
                  Description = "Allows editing company data",
@@ -113,7 +111,7 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
             new()
             {
                  Id = 12,
-                 Name = "Delete Company",
+                 Name = "Delete.Company",
                  Module = "Companies",
                  Action = "Delete",
                  Description = "Allows removing companies",
