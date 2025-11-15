@@ -62,17 +62,18 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task<SubjectViewModel> GetAsync(int id)
     {
-        return await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => !s.IsDeleted, new[] { "Company" })
-            .Where(s => s.Id == id && !s.IsDeleted)
-            .Select(s => new SubjectViewModel
-            {
-                Id = s.Id,
-                CompanyId = s.CompanyId,
-                CompanyName = s.Company.Name,
-                Name = s.Name,
-            }).FirstOrDefaultAsync()
-            ?? throw new NotFoundException("Subject was not found");
+        var existSubject = await unitOfWork.Subjects.SelectAsync(
+            predicate: s => s.Id == id, 
+            includes: "Company" )
+              ?? throw new NotFoundException("Subject was not found");
+
+        return new SubjectViewModel
+        {
+            Id = existSubject.Id,
+            Name = existSubject.Name,
+            CompanyId = existSubject.CompanyId,
+            CompanyName = existSubject.Company.Name
+        };
     }
 
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
