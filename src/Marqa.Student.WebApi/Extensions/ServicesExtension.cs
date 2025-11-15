@@ -22,7 +22,6 @@ using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
 
 namespace Marqa.Student.WebApi.Extensions;
-
 public static class ServicesExtension
 {
     public static void AddMarqaServices(this IServiceCollection services)

@@ -71,7 +71,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.EmployeeRoles
             .SelectAllAsQueryable(x => x.CompanyId == companyId,
-            new[] {"Company"})
+            includes: "Company")
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
@@ -114,7 +114,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     {
         var existRole = await unitOfWork.EmployeeRoles
             .SelectAllAsQueryable(x => x.Id == id,
-            new[] {"Company"})
+            includes: "Company")
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
@@ -128,5 +128,15 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             }).FirstOrDefaultAsync()
             ?? throw new NotFoundException("Role not found");
         return existRole;
+    }
+    
+    
+    public async Task<bool> HasPermissionAsync(string roleName, string permissionName)
+    {
+        return await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(
+                predicate: r => r.Role.Name == roleName && r.Permission.Name == permissionName,
+                includes: ["Permission", "Role"])
+            .AnyAsync();
     }
 }

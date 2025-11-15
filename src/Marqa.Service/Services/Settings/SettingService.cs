@@ -1,15 +1,20 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Settings.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Settings;
 
-public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptionService) : ISettingService
+public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptionService,
+    IValidator<SettingCreateModel> settingCreateValidator) : ISettingService
 {
     public async Task CreateAsync(SettingCreateModel model)
     {
+        await settingCreateValidator.EnsureValidatedAsync(model);
+
         string value = model.IsEncrypted ? encryptionService.Encrypt(model.Value) : model.Value;
         
         unitOfWork.Settings.Insert(new Setting()

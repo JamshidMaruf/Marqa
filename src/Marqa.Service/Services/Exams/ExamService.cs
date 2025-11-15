@@ -117,7 +117,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         var exam = await unitOfWork.Exams
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            new[] { "ExamResults", "ExamSetting", "ExamSetting.Items" })
+            includes: ["ExamResults", "ExamSetting", "ExamSetting.Items"])
             .FirstOrDefaultAsync(e => e.Id == examId)
             ?? throw new NotFoundException("Exam not found");
 
@@ -139,7 +139,7 @@ public class ExamService(IUnitOfWork unitOfWork,
 
     public async Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid)
     {
-        var exams = unitOfWork.Exams.SelectAllAsQueryable(e => !e.IsDeleted);
+        var exams = unitOfWork.Exams.SelectAllAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
             exams = exams.Where(exams => exams.Title.Contains(search));
@@ -165,7 +165,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     public async Task<ExamViewModel> GetExamByIdAsync(int examId)
     {
         return await unitOfWork.Exams.SelectAllAsQueryable(e => e.Id == examId,
-            includes: new[] { "Course" })
+            includes: "Course" )
             .Select(e => new ExamViewModel
             {
                 Id = e.Id,
@@ -186,7 +186,7 @@ public class ExamService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.StudentExamResults
             .SelectAllAsQueryable(r => r.StudentId == studentid,
-            new[] { "Student", "Exam" })
+            includes: [ "Student", "Exam" ])
             .Select(r => new StudentExamResultView
             {
                 Id = r.Id,

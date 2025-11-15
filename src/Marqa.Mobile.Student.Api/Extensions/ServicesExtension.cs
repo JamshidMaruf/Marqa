@@ -21,9 +21,6 @@ using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace Marqa.Mobile.Student.Api.Extensions;
 

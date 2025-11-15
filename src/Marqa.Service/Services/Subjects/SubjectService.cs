@@ -1,15 +1,23 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Subjects.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Subjects;
 
-public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
+public class SubjectService(IUnitOfWork unitOfWork,
+    IValidator<SubjectCreateModel> subjectCreateValidator,
+    IValidator<SubjectUpdateModel> subjectUpdateValidator,
+    IValidator<TeacherSubjectCreateModel> teacherSubjectCreateValidator) : ISubjectService
 {
+
     public async Task CreateAsync(SubjectCreateModel model)
     {
+        await subjectCreateValidator.EnsureValidatedAsync(model);
+
         var alreadyExistSubject = await unitOfWork.Subjects
             .SelectAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
 
@@ -30,6 +38,8 @@ public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
 
     public async Task UpdateAsync(int id, SubjectUpdateModel model)
     {
+        await subjectUpdateValidator.EnsureValidatedAsync(model);
+
         var existSubject = await unitOfWork.Subjects.SelectAsync(s => s.Id == id)
             ?? throw new NotFoundException("Subjet was not found");
 
@@ -69,7 +79,7 @@ public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
     {
         return await unitOfWork.Subjects.SelectAllAsQueryable(
             predicate: s => s.CompanyId == companyId,
-            includes: ["Company"])
+            includes: "Company" )
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,
@@ -82,6 +92,8 @@ public class SubjectService(IUnitOfWork unitOfWork) : ISubjectService
 
     public async Task AttachAsync(TeacherSubjectCreateModel model)
     {
+        await teacherSubjectCreateValidator.EnsureValidatedAsync(model);
+
         _ = await unitOfWork.Employees.SelectAsync(e => e.Id == model.TeacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}.");
 

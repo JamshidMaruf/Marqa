@@ -12,4 +12,5 @@ public interface IEmployeeService
     Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search = null);
     Task<TeacherViewModel> GetTeacherAsync(int id);
     Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null);
+    Task<EmployeeLoginViewModel> LoginAsync(EmployeeLoginModel model);
 }

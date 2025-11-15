@@ -1,13 +1,16 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Orders.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Orders;
 
-public class OrderService(IUnitOfWork unitOfWork) : IOrderService
+public class OrderService(IUnitOfWork unitOfWork,
+    IValidator<BasketItemCreateModel> basketItemCreateValidator) : IOrderService
 {
     public async Task CreateBasketAsync(int studentId)
     {
@@ -24,6 +27,8 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 
     public async Task CreateBasketItemAsync(BasketItemCreateModel model)
     {
+        await basketItemCreateValidator.EnsureValidatedAsync(model);
+
         var basket = await unitOfWork.Baskets.SelectAsync(b => b.Id == model.BasketId)
             ?? throw new NotFoundException("Basket not found");
 

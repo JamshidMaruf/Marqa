@@ -8,7 +8,7 @@ public class PermissionAuthorizationFilter : IAsyncAuthorizationFilter
     {
         var role = context.HttpContext.User.FindFirst("EntityType");
         
-        Console.WriteLine($"Role: {role.Value}");
+        Console.WriteLine($"Role: {role?.Value}");
         
         throw new NotImplementedException();
     }

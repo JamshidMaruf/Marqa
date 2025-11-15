@@ -1,7 +1,9 @@
-﻿using Marqa.Domain.Enums;
+﻿using Marqa.Admin.WebApi.Filters;
+using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -11,6 +13,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 public class CoursesController(ICourseService courseService) : ControllerBase
 {
     [HttpPost]
+    [RequirePermission("courses.create")]
     public async Task<IActionResult> PostAsync(CourseCreateModel model)
     {
         await courseService.CreateAsync(model);
@@ -22,6 +25,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
+    [RequirePermission("students.attach")]
     [HttpPost("AttachStudent")]
     public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId, [FromQuery] StudentStatus status)
     {

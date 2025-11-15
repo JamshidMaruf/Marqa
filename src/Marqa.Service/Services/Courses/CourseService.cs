@@ -93,7 +93,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable(c => !c.IsDeleted, 
-            new[] { "Lessons.Where(l => !l.IsDeleted)", "CourseWeekdays.Where(w => !w.IsDeleted)"})
+            includes: [ "Lessons", "CourseWeekdays"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
