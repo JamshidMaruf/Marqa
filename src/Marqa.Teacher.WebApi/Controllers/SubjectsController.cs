@@ -10,7 +10,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 public class SubjectsController(ISubjectService subjectService) : ControllerBase
 {
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<IActionResult> PostAsync(SubjectCreateModel model)
     {
         await subjectService.CreateAsync(model);
@@ -22,7 +22,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpPost("{subjectId}/attach/teachers{teacherId}")]
+    [HttpPost("attach-teacher")]
     public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
     {
         await subjectService.AttachAsync(model);
@@ -34,7 +34,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] SubjectUpdateModel model)
     {
         await subjectService.UpdateAsync(id, model);
@@ -46,7 +46,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpDelete("{subjectId}/detach/teachers{teacherId}")]
+    [HttpDelete("detach-teacher")]
     public async Task<IActionResult> DeleteAsync(int teacherId, int subjectId)
     {
         await subjectService.DetachAsync(teacherId, subjectId);
@@ -58,7 +58,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await subjectService.DeleteAsync(id);
@@ -70,7 +70,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var subject = await subjectService.GetAsync(id);
@@ -83,8 +83,8 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync([FromQuery] int companyId)
+    [HttpGet("by{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var subjects = await subjectService.GetAllAsync(companyId);
 
