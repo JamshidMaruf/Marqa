@@ -5,7 +5,6 @@ using Marqa.Service.Services.Lessons;
 using Marqa.Shared.Models;
 
 namespace Marqa.Admin.WebApi.Controllers;
-
 [ApiController]
 [Route("api/[controller]")]
 public class LessonsController(ILessonService lessonService) : Controller

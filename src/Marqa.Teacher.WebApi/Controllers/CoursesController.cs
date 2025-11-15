@@ -13,8 +13,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 public class CoursesController(ICourseService courseService) : ControllerBase
 {
     [HttpPost]
-    [RequirePermission("courses.create")]
-    public async Task<IActionResult> PostAsync([FromBody] CourseCreateModel model)
+    public async Task<IActionResult> PostAsync(CourseCreateModel model)
     {
         await courseService.CreateAsync(model);
         
@@ -25,9 +24,8 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
-    [RequirePermission("students.attach")]
     [HttpPost("attach-student")]
-    public async Task<IActionResult> AttachStudentAsync([FromBody] int courseId, [FromBody] int studentId, [FromBody] StudentStatus status)
+    public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId, [FromQuery] StudentStatus status)
     {
         await courseService.AttachStudentAsync(courseId, studentId, status);
          
