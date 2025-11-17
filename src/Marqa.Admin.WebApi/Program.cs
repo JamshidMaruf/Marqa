@@ -13,8 +13,6 @@ builder.Services.AddLogging();
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerService();
@@ -30,6 +28,7 @@ builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(
         new LowerCaseControllerName()));
+
 });
 
 builder.Services.AddAuthorization();
