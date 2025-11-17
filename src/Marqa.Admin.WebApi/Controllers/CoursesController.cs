@@ -38,7 +38,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     }
 
     [HttpPost("detach-student")]
-    public async Task<IActionResult> DetachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId)
+    public async Task<IActionResult> DetachStudentAsync(int courseId, int studentId)
     {
         await courseService.DetachStudentAsync(courseId, studentId);
 
