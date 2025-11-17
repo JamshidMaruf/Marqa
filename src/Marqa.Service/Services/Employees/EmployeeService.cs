@@ -30,6 +30,10 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         if(alreadyExistEmployee != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
+        var employeePhone = model.Phone.TrimPhoneNumber();
+        if (!employeePhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
         unitOfWork.Employees.Insert(new Employee
         {
             CompanyId = model.CompanyId,
@@ -37,7 +41,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
-            Phone = model.Phone,
+            Phone = employeePhone.Phone,
             Email = model.Email,
             Status = model.Status,
             PasswordHash = PasswordHelper.Hash(model.Password),
@@ -63,12 +67,15 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existEmployee.CompanyId)
             ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
+        var employeePhone = model.Phone.TrimPhoneNumber();
+        if (!employeePhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
 
         existEmployee.FirstName = model.FirstName;
         existEmployee.LastName = model.LastName;
         existEmployee.DateOfBirth = model.DateOfBirth;
         existEmployee.Gender = model.Gender;
-        existEmployee.Phone = model.Phone;
+        existEmployee.Phone = employeePhone.Phone;
         existEmployee.Email = model.Email;
         existEmployee.Status = model.Status;
         existEmployee.JoiningDate = model.JoiningDate;
