@@ -165,6 +165,5 @@ public class SettingConfiguration : IEntityTypeConfiguration<Setting>
                 IsDeleted = false
             }
         });
-
     }
 }

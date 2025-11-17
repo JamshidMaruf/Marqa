@@ -18,8 +18,10 @@ public class Employee : Auditable
     public string Info { get; set; }
     public int CompanyId { get; set; }
     public int RoleId { get; set; }
-    
+    public int? ParentId { get; set; } // for assistant teacher showing to whom he assists
+
     // Navigation
     public Company Company { get; set; }
     public EmployeeRole Role { get; set; }
+    public Employee? Parent { get; set; }
 }

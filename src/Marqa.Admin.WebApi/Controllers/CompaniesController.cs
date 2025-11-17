@@ -3,6 +3,7 @@ using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -39,6 +40,7 @@ public class CompaniesController(ICompanyService companyService) : BaseControlle
 
     [HttpDelete("{id:int}")]
     [RequirePermission("companies.delete")]
+   
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await companyService.DeleteAsync(id);
