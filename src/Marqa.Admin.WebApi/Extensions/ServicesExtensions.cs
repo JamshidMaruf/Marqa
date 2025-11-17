@@ -12,6 +12,8 @@ using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
+using Marqa.Service.Services.Permissions;
+using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Ratings;
@@ -48,6 +50,7 @@ public static class ServicesExtensions
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<ISettingService, SettingService>();
+        services.AddScoped<IPermissionService, PermissionService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 }

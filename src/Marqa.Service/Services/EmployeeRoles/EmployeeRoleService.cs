@@ -133,10 +133,16 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     
     public async Task<bool> HasPermissionAsync(string roleName, string permissionName)
     {
+        var role = await unitOfWork.EmployeeRoles
+            .SelectAsync(r => r.Name == roleName);
+        
+        var permission = await unitOfWork.Permissions.SelectAsync(p => p.Name == permissionName);
+        
         return await unitOfWork.RolePermissions
             .SelectAllAsQueryable(
-                predicate: r => r.Role.Name == roleName && r.Permission.Name == permissionName,
-                includes: ["Permission", "Role"])
+                predicate: r => 
+                    r.RoleId == role.Id &&
+                    r.PermissionId == permission.Id)
             .AnyAsync();
     }
 }

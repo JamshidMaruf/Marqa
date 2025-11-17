@@ -1,5 +1,6 @@
 ﻿using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Shared.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Marqa.Admin.WebApi.Filters;
@@ -12,14 +13,7 @@ public class PermissionAuthorizeFilter(IEmployeeRoleService employeeRoleService,
 
         if (string.IsNullOrEmpty(role))
         {
-            context.HttpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            
-            await context.HttpContext.Response.WriteAsJsonAsync(new Response
-            {
-                StatusCode = StatusCodes.Status401Unauthorized,
-                Message = "Unauthorized"
-            });
-            
+            context.Result = CreateJsonResult(StatusCodes.Status401Unauthorized, "Unauthorized");
             return;
         }
         
@@ -27,15 +21,18 @@ public class PermissionAuthorizeFilter(IEmployeeRoleService employeeRoleService,
 
         if (!result)
         {
-            context.HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-            
-            await context.HttpContext.Response.WriteAsJsonAsync(new Response
-            {
-                StatusCode = StatusCodes.Status403Forbidden,
-                Message = "You do not have permission to do that"
-            });
-            
+            context.Result = CreateJsonResult(StatusCodes.Status403Forbidden, "You do not have permission to do that");
             return;
         }
+    }
+    
+    private static JsonResult CreateJsonResult(int code, string message)
+    {
+        var response = new { code, message };
+        return new JsonResult(response)
+        {
+            StatusCode = code,
+            ContentType = "application/json"
+        };
     }
 }

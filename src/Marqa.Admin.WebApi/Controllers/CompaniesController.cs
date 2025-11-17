@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Auth;
+﻿using Marqa.Admin.WebApi.Filters;
+using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
@@ -8,13 +9,12 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(ICompanyService companyService, IAuthService authService, ILogger logger) : ControllerBase
+public class CompaniesController(ICompanyService companyService) : BaseController
 {
     [HttpPost]
+    [RequirePermission("companies.create")]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)
     {
-        logger.LogInformation("Creating new company");
-        
         await companyService.CreateAsync(model);
 
         return Ok(new Response
@@ -25,6 +25,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
     }
 
     [HttpPut("{id:int}")]
+    [RequirePermission("companies.update")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CompanyUpdateModel model)
     {
         await companyService.UpdateAsync(id, model);
@@ -37,6 +38,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
     }
 
     [HttpDelete("{id:int}")]
+    [RequirePermission("companies.delete")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await companyService.DeleteAsync(id);
@@ -49,6 +51,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
     }
     
     [HttpGet("{id:int}")]
+    [RequirePermission("companies.view")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var company = await companyService.GetAsync(id);
@@ -62,6 +65,7 @@ public class CompaniesController(ICompanyService companyService, IAuthService au
     }
 
     [HttpGet]
+    [RequirePermission("companies.view")]
     public async Task<IActionResult> GetAllAsync()
     {
         var companies = await companyService.GetAllAsync();

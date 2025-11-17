@@ -12,11 +12,11 @@ public static class ThirdPartServicesExtension
     public static void AddJWTService(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
-
+        
         var settingService = serviceProvider.GetService<ISettingService>();
-
+        
         var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
-
+        
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
