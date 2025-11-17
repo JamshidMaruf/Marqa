@@ -8,6 +8,6 @@ public class EmployeeRoleCreateModelValidator : AbstractValidator<EmployeeRoleCr
     public EmployeeRoleCreateModelValidator()
     {
         RuleFor(e => e.CompanyId).NotNull().GreaterThan(0);
-        RuleFor(e => e.Name).NotNull().Length(36);
+        RuleFor(e => e.Name).NotNull();
     }
 }

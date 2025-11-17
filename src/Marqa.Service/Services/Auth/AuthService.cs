@@ -28,7 +28,7 @@ public class AuthService(ISettingService settingService, IEncryptionService encr
             issuer: configuration["JWT.Issuer"],
             audience: configuration["JWT.Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.ExpiresInMinutes"])),
+            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.Expires"])),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -83,7 +83,7 @@ public class AuthService(ISettingService settingService, IEncryptionService encr
             issuer: configuration["JWT.Issuer"],
             audience: configuration["JWT.Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.ExpiresInMinutes"])),
+            expires: DateTime.Now.AddMinutes(int.Parse(configuration["JWT.Expires"])),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

@@ -3,6 +3,7 @@ using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Employees.Models;
 using Microsoft.EntityFrameworkCore;
@@ -24,8 +25,10 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId)
-            ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+        var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
+            
+        if(alreadyExistEmployee != null)
+            throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
         unitOfWork.Employees.Insert(new Employee
         {
@@ -37,7 +40,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             Phone = model.Phone,
             Email = model.Email,
             Status = model.Status,
-            PasswordHash = model.Password.Hash(),
+            PasswordHash = PasswordHelper.Hash(model.Password),
             JoiningDate = model.JoiningDate,
             Specialization = model.Specialization,
             Info = model.Info,
@@ -290,7 +293,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .SelectAsync(predicate: e => e.Phone == model.Phone, includes: "Role")
             ?? throw new ArgumentIsNotValidException("Phone or Password is invalid.");
         
-        if(!employee.PasswordHash.Verify(model.Password))
+        if(!PasswordHelper.Verify(model.Password, employee.PasswordHash))
             throw new ArgumentIsNotValidException("Phone or Password is invalid.");
 
         var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
