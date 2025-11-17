@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Marqa.Service.Services.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,11 +12,11 @@ public static class ThirdPartServicesExtension
     public static void AddJWTService(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
-        
+
         var settingService = serviceProvider.GetService<ISettingService>();
-        
+
         var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
-        
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -32,7 +32,7 @@ public static class ThirdPartServicesExtension
                 };
             });
     }
-    
+
     public static void AddSwaggerService(this IServiceCollection services)
     {
         services.AddSwaggerGen(options =>
