@@ -1,4 +1,4 @@
-﻿using Marqa.Admin.Extensions;
+using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
 using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;

@@ -1,4 +1,4 @@
-﻿using System.Security;
+using System.Security;
 using Marqa.Service.Services.Permissions.Models;
 using Microsoft.AspNetCore.Mvc;
 

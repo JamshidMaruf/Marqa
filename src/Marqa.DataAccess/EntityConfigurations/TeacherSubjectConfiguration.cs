@@ -24,29 +24,5 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
             .HasForeignKey(ts => ts.TeacherId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
-        builder.HasData(new List<TeacherSubject>
-        {
-            new()
-            {
-                TeacherId = 1,
-                SubjectId = 1
-            },
-            new()
-            {
-                TeacherId = 2,
-                SubjectId = 2
-            },
-            new()
-            {
-                TeacherId = 3,
-                SubjectId = 1
-            },
-            new()
-            {
-                TeacherId = 4,
-                SubjectId = 1
-            }
-        });
     }
 }
