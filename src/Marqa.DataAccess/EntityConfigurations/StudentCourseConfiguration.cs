@@ -24,29 +24,5 @@ public class StudentCourseConfiguration : IEntityTypeConfiguration<StudentCourse
             .HasForeignKey(sc => sc.CourseId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
-        builder.HasData(new List<StudentCourse>
-        {
-            new()
-            {
-                StudentId = 1,
-                CourseId = 1
-            },
-            new()
-            {
-                StudentId = 2,
-                CourseId = 1
-            },
-            new()
-            {
-                StudentId = 3,
-                CourseId = 1
-            },
-            new()
-            {
-                StudentId = 4,
-                CourseId = 1
-            }
-        });
     }
 }

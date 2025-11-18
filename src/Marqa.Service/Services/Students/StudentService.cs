@@ -29,6 +29,22 @@ public class StudentService(
         if (existingStudent != null)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
+        var studentPhoneResult = model.Phone.TrimPhoneNumber();
+        if (!studentPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var fatherPhoneResult = model.StudentDetailCreateModel.FatherPhone.TrimPhoneNumber();
+        if (!fatherPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var motherPhoneResult = model.StudentDetailCreateModel.MotherPhone.TrimPhoneNumber();
+        if (!motherPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var guardianPhoneResult = model.StudentDetailCreateModel.GuardianPhone.TrimPhoneNumber();
+        if (!guardianPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
@@ -40,7 +56,7 @@ public class StudentService(
                 LastName = model.LastName,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
-                Phone = model.Phone,
+                Phone = studentPhoneResult.Phone,
                 Email = model.Email,
             };
 
@@ -52,13 +68,13 @@ public class StudentService(
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
                 FatherLastName = model.StudentDetailCreateModel.FatherLastName,
-                FatherPhone = model.StudentDetailCreateModel.FatherPhone,
+                FatherPhone = fatherPhoneResult.Phone,
                 MotherFirstName = model.StudentDetailCreateModel.MotherFirstName,
                 MotherLastName = model.StudentDetailCreateModel.MotherLastName,
-                MotherPhone = model.StudentDetailCreateModel.MotherPhone,
+                MotherPhone = motherPhoneResult.Phone,
                 GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
                 GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
-                GuardianPhone = model.StudentDetailCreateModel.GuardianPhone
+                GuardianPhone = guardianPhoneResult.Phone,
             });
 
             await unitOfWork.SaveAsync();
@@ -74,7 +90,23 @@ public class StudentService(
     public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
     {
         await updateValidator.EnsureValidatedAsync(model);
-        
+
+        var studentPhoneResult = model.Phone.TrimPhoneNumber();
+        if (!studentPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var fatherPhoneResult = model.StudentDetailUpdateModel.FatherPhone.TrimPhoneNumber();
+        if (!fatherPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var motherPhoneResult = model.StudentDetailUpdateModel.MotherPhone.TrimPhoneNumber();
+        if (!motherPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var guardianPhoneResult = model.StudentDetailUpdateModel.GuardianPhone.TrimPhoneNumber();
+        if (!guardianPhoneResult.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
@@ -97,20 +129,20 @@ public class StudentService(
             existStudent.LastName = model.LastName;
             existStudent.Gender = model.Gender;
             existStudent.DateOfBirth = model.DateOfBirth;
-            existStudent.Phone = model.Phone;
+            existStudent.Phone = studentPhoneResult.Phone;
             existStudent.Email = model.Email;
 
             if (existStudent.StudentDetail != null)
             {
                 existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
                 existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
-                existStudent.StudentDetail.FatherPhone = model.StudentDetailUpdateModel.FatherPhone;
+                existStudent.StudentDetail.FatherPhone = fatherPhoneResult.Phone;
                 existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
                 existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
-                existStudent.StudentDetail.MotherPhone = model.StudentDetailUpdateModel.MotherPhone;
+                existStudent.StudentDetail.MotherPhone = motherPhoneResult.Phone;
                 existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
                 existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
-                existStudent.StudentDetail.GuardianPhone = model.StudentDetailUpdateModel.GuardianPhone;
+                existStudent.StudentDetail.GuardianPhone = guardianPhoneResult.Phone;
             }
 
             unitOfWork.Students.Update(existStudent);

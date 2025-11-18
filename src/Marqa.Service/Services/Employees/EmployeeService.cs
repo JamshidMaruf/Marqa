@@ -22,13 +22,17 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
            ?? throw new NotFoundException("Company was not found");
 
-        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
+        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == model.CompanyId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
             
         if(alreadyExistEmployee != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+
+        var employeePhone = model.Phone.TrimPhoneNumber();
+        if (!employeePhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
 
         unitOfWork.Employees.Insert(new Employee
         {
@@ -37,7 +41,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
-            Phone = model.Phone,
+            Phone = employeePhone.Phone,
             Email = model.Email,
             Status = model.Status,
             PasswordHash = PasswordHelper.Hash(model.Password),
@@ -54,28 +58,31 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         await validatorEmployeeUpdate.EnsureValidatedAsync(model);
 
-        var existTeacher = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
+        var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
         
-        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId)
+        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.CompanyId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existTeacher.CompanyId)
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existEmployee.CompanyId)
             ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
+        var employeePhone = model.Phone.TrimPhoneNumber();
+        if (!employeePhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        existTeacher.FirstName = model.FirstName;
-        existTeacher.LastName = model.LastName;
-        existTeacher.DateOfBirth = model.DateOfBirth;
-        existTeacher.Gender = model.Gender;
-        existTeacher.Phone = model.Phone;
-        existTeacher.Email = model.Email;
-        existTeacher.Status = model.Status;
-        existTeacher.JoiningDate = model.JoiningDate;
-        existTeacher.Specialization = model.Specialization;
-        existTeacher.RoleId = model.RoleId;
+        existEmployee.FirstName = model.FirstName;
+        existEmployee.LastName = model.LastName;
+        existEmployee.DateOfBirth = model.DateOfBirth;
+        existEmployee.Gender = model.Gender;
+        existEmployee.Phone = employeePhone.Phone;
+        existEmployee.Email = model.Email;
+        existEmployee.Status = model.Status;
+        existEmployee.JoiningDate = model.JoiningDate;
+        existEmployee.Specialization = model.Specialization;
+        existEmployee.RoleId = model.RoleId;
 
-        unitOfWork.Employees.Update(existTeacher);
+        unitOfWork.Employees.Update(existEmployee);
 
         await unitOfWork.SaveAsync();
     }
@@ -177,7 +184,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: new[] {"Teacher", "Subject"})
+           includes: [ "Teacher", "Subject" ])
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,

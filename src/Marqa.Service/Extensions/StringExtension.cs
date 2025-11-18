@@ -1,15 +1,36 @@
-﻿namespace Marqa.Service.Extensions;
+﻿using System.Text;
+
+namespace Marqa.Service.Extensions;
 
 public static class StringExtension
 {
-    public static string Hash(this string password)
+    public static (string Phone, bool IsSuccessful) TrimPhoneNumber(this string phone)
     {
-       // var salt = BCrypt.Net.BCrypt.GenerateSalt(12);
-        return BCrypt.Net.BCrypt.HashPassword(password);
-    }
+        var trimPhone = phone.Trim().ToCharArray();
 
-    public static bool Verify(this string sourcePassword, string passwordHash)
-    {
-        return BCrypt.Net.BCrypt.Verify(sourcePassword, passwordHash);
+        StringBuilder trimmedPhone = new StringBuilder();
+
+        foreach(var item in trimPhone)
+        {
+            if(char.IsDigit(item))
+            {
+                trimmedPhone.Append(item);
+            }
+        }
+
+        if(trimmedPhone.Length == 9)
+        {
+            return ("998" + trimmedPhone, true);
+
+        }
+        else if(trimmedPhone.Length == 12)
+        {
+            if (trimmedPhone.ToString().StartsWith("998"))
+            {
+                return (trimmedPhone.ToString(), true);
+            }
+        }
+
+        return (null, false);
     }
 }

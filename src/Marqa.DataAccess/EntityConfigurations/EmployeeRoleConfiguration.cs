@@ -16,33 +16,5 @@ public class EmployeeRoleConfiguration : IEntityTypeConfiguration<EmployeeRole>
             .HasForeignKey(e => e.CompanyId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
-        builder.HasData(new List<EmployeeRole>
-        {
-            new()
-            {
-                Id = 1,
-                Name = "Teacher",
-                CompanyId = 1
-            },
-            new()
-            {
-                Id = 2,
-                Name = "Teacher",
-                CompanyId = 2
-            },
-            new()
-            {
-                Id = 3,
-                Name = "Teacher",
-                CompanyId = 3
-            },
-            new()
-            {
-                Id = 4,
-                Name = "Teacher",
-                CompanyId = 4
-            }
-        });
     }
 }

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Marqa.Service.Services.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ public static class ThirdPartServicesExtension
                 };
             });
     }
-    
+
     public static void AddSwaggerService(this IServiceCollection services)
     {
         services.AddSwaggerGen(options =>
