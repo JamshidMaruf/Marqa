@@ -17,16 +17,14 @@ public static class ModelBuilderExtensions
         }
 
         foreach (var property in modelBuilder.Model.GetEntityTypes()
+        .SelectMany(t => t.GetProperties())
+        .Where(p => p.Name.EndsWith("FilePath") || p.Name.EndsWith("FileName")))
+            property.SetMaxLength(2048);
+
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType == typeof(string)))
             if (property.GetMaxLength() == null)
                 property.SetMaxLength(255);
-
-
-        foreach (var property in modelBuilder.Model.GetEntityTypes()
-                .SelectMany(t => t.GetProperties())
-                .Where(p => p.GetColumnName().EndsWith("FilePath") || p.GetColumnName().EndsWith("FileName")))
-            if (property.GetMaxLength() == null)
-                property.SetMaxLength(2048);
     }
 }
