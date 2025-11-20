@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddLogging();
 
 builder.Host.UseSerilog((context, configuration) =>
