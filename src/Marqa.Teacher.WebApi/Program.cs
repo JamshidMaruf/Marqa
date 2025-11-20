@@ -1,4 +1,5 @@
 ﻿using Marqa.DataAccess.Contexts;
+using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
 using Marqa.Teacher.WebApi.Extensions;
 using Marqa.Teacher.WebApi.Middlewares;
@@ -34,10 +35,11 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
+
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

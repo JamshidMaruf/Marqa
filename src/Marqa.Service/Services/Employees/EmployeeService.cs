@@ -26,8 +26,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
-            
-        if(alreadyExistEmployee != null)
+
+        if (alreadyExistEmployee != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
         var employeePhone = model.Phone.TrimPhoneNumber();
@@ -60,12 +60,14 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
             ?? throw new NotFoundException($"Employee was not found");
-        
+
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.CompanyId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existEmployee.CompanyId)
-            ?? throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+        var existPhone = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existEmployee.CompanyId && e.Id != id);
+
+        if (existPhone != null)
+            throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
         var employeePhone = model.Phone.TrimPhoneNumber();
         if (!employeePhone.IsSuccessful)
@@ -91,17 +93,20 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var employeeForDeletion = await unitOfWork.Employees
             .SelectAllAsQueryable(b => !b.IsDeleted,
-            includes: "Role" )
+            includes: "Role")
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
-        if(employeeForDeletion.Role.CanTeach == true)
+        if (employeeForDeletion.Role.CanTeach == true)
         {
-            var teacherSubject = await unitOfWork.TeacherSubjects
-                .SelectAllAsQueryable(ts => !ts.IsDeleted && ts.TeacherId == id)
-                .FirstOrDefaultAsync(); 
+            var teacherSubjects = await unitOfWork.TeacherSubjects
+                .SelectAllAsQueryable(ts => ts.TeacherId == id)
+                .ToListAsync();
 
-            unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
+            foreach (var teacherSubject in teacherSubjects)
+            {
+                unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
+            }
         }
 
         unitOfWork.Employees.MarkAsDeleted(employeeForDeletion);
@@ -113,7 +118,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            includes: "Role" )
+            includes: "Role")
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -184,7 +189,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: [ "Teacher", "Subject" ])
+           includes: ["Teacher", "Subject"])
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,
@@ -207,7 +212,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: "Subject" )
+            includes: "Subject")
             .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
@@ -267,7 +272,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
                 t => t.Id,
                 c => c.TeacherId,
-                (t, courses) => new TeacherViewModel 
+                (t, courses) => new TeacherViewModel
                 {
                     Id = t.Id,
                     DateOfBirth = t.DateOfBirth,
@@ -299,8 +304,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var employee = await unitOfWork.Employees
             .SelectAsync(predicate: e => e.Phone == model.Phone, includes: "Role")
             ?? throw new ArgumentIsNotValidException("Phone or Password is invalid.");
-        
-        if(!PasswordHelper.Verify(model.Password, employee.PasswordHash))
+
+        if (!PasswordHelper.Verify(model.Password, employee.PasswordHash))
             throw new ArgumentIsNotValidException("Phone or Password is invalid.");
 
         var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
