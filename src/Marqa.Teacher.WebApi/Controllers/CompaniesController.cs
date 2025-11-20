@@ -4,17 +4,15 @@ using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.Admin.WebApi.Controllers;
+namespace Marqa.Teacher.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(ICompanyService companyService, IAuthService authService, ILogger logger) : ControllerBase
+public class CompaniesController(ICompanyService companyService, IAuthService authService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)
     {
-        logger.LogInformation("Creating new company");
-        
         await companyService.CreateAsync(model);
 
         return Ok(new Response

@@ -3,7 +3,9 @@ using Marqa.Service.Services.Ratings.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.Admin.WebApi.Controllers;
+namespace Marqa.Teacher.WebApi.Controllers;
+
+
 [ApiController]
 [Route("api/[controller]")]
 public class RatingsController(IRatingService ratingService) : Controller
