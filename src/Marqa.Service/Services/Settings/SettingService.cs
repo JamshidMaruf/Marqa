@@ -63,4 +63,11 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
 
         return settings.ToDictionary(s => s.Key, s => s.Value);
     }
+    
+    public async Task<List<Setting>> GetAllAsync()
+    {
+        return await unitOfWork.Settings
+            .SelectAllAsQueryable()
+            .ToListAsync();
+    }
 }

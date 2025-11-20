@@ -1,3 +1,4 @@
+using Marqa.Domain.Entities;
 using Marqa.Service.Services.Settings.Models;
 
 namespace Marqa.Service.Services.Settings;
@@ -8,4 +9,5 @@ public interface ISettingService
     Task DeleteAsync(string key);
     Task<SettingViewModel> GetAsync(string key);
     Task<Dictionary<string, string>> GetByCategoryAsync(string category);
+    Task<List<Setting>> GetAllAsync();
 }

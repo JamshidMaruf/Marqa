@@ -92,7 +92,7 @@ public class PermissionService(
     public async Task<List<PermissionViewModel>> GetAllAsync()
     {
         var permissions = await unitOfWork.Permissions
-        .SelectAllAsQueryable() 
+        .SelectAllAsQueryable(predicate: p => !p.IsDeleted) 
         .OrderBy(p => p.Module)
         .ThenBy(p => p.Name)
         .Select(p => new PermissionViewModel
@@ -104,9 +104,6 @@ public class PermissionService(
             Description = p.Description,
         })
         .ToListAsync();
-
-        if (!permissions.Any())
-            throw new NotFoundException("No permissions found");
 
         return permissions;
     }
