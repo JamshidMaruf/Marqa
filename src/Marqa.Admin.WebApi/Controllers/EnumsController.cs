@@ -4,6 +4,7 @@ using Marqa.Service.Services.Enum.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
@@ -36,6 +37,13 @@ public class EnumsController : ControllerBase
     public async Task<IActionResult> GetPaymentOperationTypes()
     {
         var result = _enumService.GetEnumValues<PaymentOperationType>();
+        return Ok(new ApiResponse<List<EnumGetModel>>(result));
+    }
+
+    [HttpGet("employee-statuses")]
+    public async Task<IActionResult> GetEmployeeStatuses()
+    {
+        var result = _enumService.GetEnumValues<EmployeeStatus>();
         return Ok(new ApiResponse<List<EnumGetModel>>(result));
     }
 }
