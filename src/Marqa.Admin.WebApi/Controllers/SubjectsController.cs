@@ -23,9 +23,9 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
     }
 
     [HttpPost("{subjectId}/attach/teachers{teacherId}")]
-    public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
+    public async Task<IActionResult> PostAsync([FromQuery] int teacherId, [FromQuery] int subjectId)
     {
-        await subjectService.AttachAsync(model);
+        await subjectService.AttachAsync(teacherId, subjectId);
 
         return Ok(new Response
         {
@@ -47,7 +47,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
     }
 
     [HttpDelete("{subjectId}/detach/teachers{teacherId}")]
-    public async Task<IActionResult> DeleteAsync(int teacherId, int subjectId)
+    public async Task<IActionResult> DeleteAsync([FromQuery] int teacherId, [FromQuery] int subjectId)
     {
         await subjectService.DetachAsync(teacherId, subjectId);
 
@@ -83,8 +83,8 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllAsync([FromQuery] int companyId)
+    [HttpGet("{companyId}")]
+    public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var subjects = await subjectService.GetAllAsync(companyId);
 

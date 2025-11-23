@@ -1,10 +1,7 @@
 ﻿using System.Data;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Extensions;
-using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
 using Marqa.Service.Services.Subjects;
@@ -16,7 +13,6 @@ namespace Marqa.Service.Services.Teachers;
 public class TeacherService(
     IUnitOfWork unitOfWork,
     ISubjectService subjectService,
-    IValidator<TeacherUpdateModel> validatorTeacherUpdate,
     IEmployeeService employeeService) : ITeacherService
 {
     public async Task CreateAsync(TeacherCreateModel model)
@@ -61,16 +57,16 @@ public class TeacherService(
         {
             await employeeService.UpdateAsync(id, new EmployeeUpdateModel
             {
-                 FirstName = model.FirstName,
-                 LastName = model.LastName,
-                 DateOfBirth = model.DateOfBirth,
-                 Gender = model.Gender,
-                 Phone = model.Phone,
-                 Email = model.Email,
-                 Status = model.Status,
-                 JoiningDate = model.JoiningDate,
-                 Specialization = model.Specialization,
-                 RoleId = model.RoleId
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                Phone = model.Phone,
+                Email = model.Email,
+                Status = model.Status,
+                JoiningDate = model.JoiningDate,
+                Specialization = model.Specialization,
+                RoleId = model.RoleId
             });
 
             await subjectService.BulkAttachAsync(id, model.SubjectIds);
@@ -111,7 +107,7 @@ public class TeacherService(
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher", "Subject"])
+           includes: ["Teacher"])
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,
@@ -123,15 +119,21 @@ public class TeacherService(
                Phone = ts.Teacher.Phone,
                Status = ts.Teacher.Status,
                JoiningDate = ts.Teacher.JoiningDate,
-               Specialization = ts.Teacher.Specialization,
-               Subject = new TeacherViewModel.SubjectInfo
-               {
-                   Id = ts.SubjectId,
-                   Name = ts.Subject.Name
-               }
+               Specialization = ts.Teacher.Specialization
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
+
+        var subjects = await unitOfWork.TeacherSubjects
+            .SelectAllAsQueryable(ts => ts.TeacherId == id)
+            .Select(ts => new TeacherViewModel.SubjectInfo
+            {
+                Id = ts.SubjectId,
+                Name = ts.Subject.Name
+            })
+            .ToListAsync();
+
+        teacher.Subjects = subjects;
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
             includes: "Subject")
@@ -150,12 +152,60 @@ public class TeacherService(
         return teacher;
     }
 
+    public async Task<TeacherUpdateViewModel> GetForUpdateAsync(int id)
+    {
+        var teacher = await unitOfWork.TeacherSubjects
+           .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
+           includes: ["Teacher"])
+           .Select(ts => new TeacherUpdateViewModel
+           {
+               Id = ts.Teacher.Id,
+               DateOfBirth = ts.Teacher.DateOfBirth,
+               Gender = ts.Teacher.Gender,
+               FirstName = ts.Teacher.FirstName,
+               LastName = ts.Teacher.LastName,
+               Email = ts.Teacher.Email,
+               Phone = ts.Teacher.Phone,
+               Status = ts.Teacher.Status,
+               JoiningDate = ts.Teacher.JoiningDate,
+               Specialization = ts.Teacher.Specialization
+           })
+           .FirstOrDefaultAsync()
+            ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
+
+        var subjects = await unitOfWork.TeacherSubjects
+            .SelectAllAsQueryable(ts => ts.TeacherId == id)
+            .Select(ts => new TeacherUpdateViewModel.SubjectInfo
+            {
+                Id = ts.SubjectId,
+                Name = ts.Subject.Name
+            })
+            .ToListAsync();
+
+        teacher.Subjects = subjects;
+
+        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
+            includes: "Subject")
+            .Where(c => c.TeacherId == id)
+            .Select(c => new TeacherUpdateViewModel.CourseInfo
+            {
+                Id = c.Id,
+                Name = c.Name,
+                SubjectId = c.Subject.Id,
+                SubjectName = c.Subject.Name
+            })
+            .ToListAsync();
+
+        teacher.Courses = courses;
+
+        return teacher;
+    }
+
     public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(t => !t.IsDeleted,
+            .SelectAllAsQueryable(t => !t.IsDeleted && t.Teacher.CompanyId == companyId,
             includes: ["Teacher", "Subject"])
-            .Where(ts => ts.Teacher.CompanyId == companyId)
             .Select(t => new TeacherViewModel
             {
                 Id = t.TeacherId,
@@ -167,12 +217,7 @@ public class TeacherService(
                 Phone = t.Teacher.Phone,
                 Status = t.Teacher.Status,
                 JoiningDate = t.Teacher.JoiningDate,
-                Specialization = t.Teacher.Specialization,
-                Subject = new TeacherViewModel.SubjectInfo
-                {
-                    Id = t.SubjectId,
-                    Name = t.Subject.Name
-                }
+                Specialization = t.Teacher.Specialization
             });
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -186,8 +231,9 @@ public class TeacherService(
                 t.Email.Contains(search));
         }
 
-        if (subjectId != null)
-            teacherQuery = teacherQuery.Where(t => t.Subject.Id == subjectId);
+        //var teacherQuery = teacherQuery.Select
+        //if (subjectId != null)
+        //    teacherQuery = teacherQuery.Where(t => t.Subjects.Contains(subjectId));
 
         var teacherCourses = await teacherQuery
             .GroupJoin(
@@ -206,7 +252,7 @@ public class TeacherService(
                     Status = t.Status,
                     JoiningDate = t.JoiningDate,
                     Specialization = t.Specialization,
-                    Subject = t.Subject,
+                    //Subjects = t.Subjects,
                     Courses = courses.Select(c => new TeacherViewModel.CourseInfo
                     {
                         Id = c.Id,
@@ -220,4 +266,6 @@ public class TeacherService(
 
         return teacherCourses;
     }
+
+
 }
