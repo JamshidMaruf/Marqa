@@ -6,6 +6,7 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
@@ -15,7 +16,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     IValidator<EmployeeUpdateModel> validatorEmployeeUpdate,
     IAuthService authService) : IEmployeeService
 {
-    public async Task CreateAsync(EmployeeCreateModel model)
+    public async Task<Employee> CreateAsync(EmployeeCreateModel model)
     {
         await validatorEmployeeCreate.EnsureValidatedAsync(model);
 
@@ -34,7 +35,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        unitOfWork.Employees.Insert(new Employee
+        var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
             CompanyId = model.CompanyId,
             FirstName = model.FirstName,
@@ -52,6 +53,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         });
 
         await unitOfWork.SaveAsync();
+
+        return createdEmployee;
     }
 
     public async Task UpdateAsync(int id, EmployeeUpdateModel model)
@@ -97,17 +100,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
-        if (employeeForDeletion.Role.CanTeach == true)
-        {
-            var teacherSubjects = await unitOfWork.TeacherSubjects
-                .SelectAllAsQueryable(ts => ts.TeacherId == id)
-                .ToListAsync();
-
-            foreach (var teacherSubject in teacherSubjects)
-            {
-                unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
-            }
-        }
+        if (employeeForDeletion.Role.CanTeach)
+            throw new ArgumentIsNotValidException("Notable to delete employee from teacher category");
 
         unitOfWork.Employees.MarkAsDeleted(employeeForDeletion);
 
@@ -183,120 +177,6 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 Name = e.Role.Name
             }
         }).ToListAsync();
-    }
-
-    public async Task<TeacherViewModel> GetTeacherAsync(int id)
-    {
-        var teacher = await unitOfWork.TeacherSubjects
-           .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher", "Subject"])
-           .Select(ts => new TeacherViewModel
-           {
-               Id = ts.Teacher.Id,
-               DateOfBirth = ts.Teacher.DateOfBirth,
-               Gender = ts.Teacher.Gender,
-               FirstName = ts.Teacher.FirstName,
-               LastName = ts.Teacher.LastName,
-               Email = ts.Teacher.Email,
-               Phone = ts.Teacher.Phone,
-               Status = ts.Teacher.Status,
-               JoiningDate = ts.Teacher.JoiningDate,
-               Specialization = ts.Teacher.Specialization,
-               Subject = new TeacherViewModel.SubjectInfo
-               {
-                   Id = ts.SubjectId,
-                   Name = ts.Subject.Name
-               }
-           })
-           .FirstOrDefaultAsync()
-            ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
-
-        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: "Subject")
-            .Where(c => c.TeacherId == id)
-            .Select(c => new TeacherViewModel.CourseInfo
-            {
-                Id = c.Id,
-                Name = c.Name,
-                SubjectId = c.Subject.Id,
-                SubjectName = c.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Courses = courses;
-
-        return teacher;
-    }
-
-    public async Task<List<TeacherViewModel>> GetAllTeachersAsync(int companyId, string search = null, int? subjectId = null)
-    {
-        var teacherQuery = unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(t => !t.IsDeleted,
-            includes: ["Teacher", "Subject"])
-            .Where(ts => ts.Teacher.CompanyId == companyId)
-            .Select(t => new TeacherViewModel
-            {
-                Id = t.TeacherId,
-                DateOfBirth = t.Teacher.DateOfBirth,
-                Gender = t.Teacher.Gender,
-                FirstName = t.Teacher.FirstName,
-                LastName = t.Teacher.LastName,
-                Email = t.Teacher.Email,
-                Phone = t.Teacher.Phone,
-                Status = t.Teacher.Status,
-                JoiningDate = t.Teacher.JoiningDate,
-                Specialization = t.Teacher.Specialization,
-                Subject = new TeacherViewModel.SubjectInfo
-                {
-                    Id = t.SubjectId,
-                    Name = t.Subject.Name
-                }
-            });
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            search = search.ToLower();
-            teacherQuery = teacherQuery.Where(t =>
-                t.FirstName.ToLower().Contains(search) ||
-                t.LastName.ToLower().Contains(search) ||
-                t.Specialization.ToLower().Contains(search) ||
-                t.Phone.Contains(search) ||
-                t.Email.Contains(search));
-        }
-
-        if (subjectId != null)
-            teacherQuery = teacherQuery.Where(t => t.Subject.Id == subjectId);
-
-        var teacherCourses = await teacherQuery
-            .GroupJoin(
-                unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
-                t => t.Id,
-                c => c.TeacherId,
-                (t, courses) => new TeacherViewModel
-                {
-                    Id = t.Id,
-                    DateOfBirth = t.DateOfBirth,
-                    Gender = t.Gender,
-                    FirstName = t.FirstName,
-                    LastName = t.LastName,
-                    Email = t.Email,
-                    Phone = t.Phone,
-                    Status = t.Status,
-                    JoiningDate = t.JoiningDate,
-                    Specialization = t.Specialization,
-                    Subject = t.Subject,
-                    Courses = courses.Select(c => new TeacherViewModel.CourseInfo
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                        SubjectId = c.Subject.Id,
-                        SubjectName = c.Subject.Name
-                    })
-                }
-            )
-            .ToListAsync();
-
-        return teacherCourses;
     }
 
     public async Task<EmployeeLoginViewModel> LoginAsync(EmployeeLoginModel model)

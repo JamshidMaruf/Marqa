@@ -67,7 +67,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int? companyId)
+    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId)
     {
         return await unitOfWork.EmployeeRoles
             .SelectAllAsQueryable(x => x.CompanyId == companyId,
@@ -75,7 +75,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
-                CompanyId = s.CompanyId,
                 Name = s.Name,
                 Company = new EmployeeRoleViewModel.CompanyInfo
                 {
@@ -118,7 +117,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
-                CompanyId = s.CompanyId,
                 Name = s.Name,
                 Company = new EmployeeRoleViewModel.CompanyInfo
                 {
@@ -129,20 +127,54 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException("Role not found");
         return existRole;
     }
-    
-    
+
+
     public async Task<bool> HasPermissionAsync(string roleName, string permissionName)
     {
         var role = await unitOfWork.EmployeeRoles
             .SelectAsync(r => r.Name == roleName);
-        
+
         var permission = await unitOfWork.Permissions.SelectAsync(p => p.Name == permissionName);
-        
+
         return await unitOfWork.RolePermissions
             .SelectAllAsQueryable(
-                predicate: r => 
+                predicate: r =>
                     r.RoleId == role.Id &&
                     r.PermissionId == permission.Id)
             .AnyAsync();
+    }
+
+    public async Task<List<EmployeeRoleViewModel>> GetAllTeacherRolesAsync(int companyId)
+    {
+        return await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.CompanyId == companyId && x.CanTeach,
+            includes: "Company")
+            .Select(s => new EmployeeRoleViewModel
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Company = new EmployeeRoleViewModel.CompanyInfo
+                {
+                    Id = s.CompanyId,
+                    Name = s.Company.Name
+                }
+            }).ToListAsync();
+    }
+
+    public async Task<List<EmployeeRoleViewModel>> GetAllNotTeacherRolesAsync(int companyId)
+    {
+        return await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.CompanyId == companyId && !x.CanTeach,
+            includes: "Company")
+            .Select(s => new EmployeeRoleViewModel
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Company = new EmployeeRoleViewModel.CompanyInfo
+                {
+                    Id = s.CompanyId,
+                    Name = s.Company.Name
+                }
+            }).ToListAsync();
     }
 }

@@ -84,6 +84,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         catch
         {
             await transaction.RollbackAsync();
+            throw;
         }
     }
 

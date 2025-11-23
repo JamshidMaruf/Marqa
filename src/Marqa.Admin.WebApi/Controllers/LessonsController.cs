@@ -21,36 +21,11 @@ public class LessonsController(ILessonService lessonService) : Controller
             Message = "success",
         });
     }
-
-    [HttpPatch("{name:required}")]
-    public async Task<IActionResult> PatchAsync(int id, string name, HomeTaskStatus status)
-    {
-
-        await lessonService.ModifyAsync(id, name, status);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success",
-        });
-    }
    
     [HttpPost("CheckUp")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {
         await lessonService.CheckUpAsync(model);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success",
-        });
-    }
-
-    [HttpPost("video-upload")]
-    public async Task<IActionResult> VideoUploadAsync(int lessonId, IFormFile video)
-    {
-        await lessonService.VideoUploadAsync(lessonId, video);
 
         return Ok(new Response
         {
