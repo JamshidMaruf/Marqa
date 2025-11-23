@@ -1,9 +1,8 @@
-﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Teachers.Models;
 
-public class TeacherViewModel
+public class TeacherUpdateViewModel
 {
     public int Id { get; set; }
     public string FirstName { get; set; }
