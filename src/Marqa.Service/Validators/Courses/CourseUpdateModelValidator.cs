@@ -8,7 +8,7 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
     public CourseUpdateModelValidator()
     {
         RuleFor(c => c.TeacherId).NotNull().GreaterThan(0);
-        RuleFor(c => c.Name).NotEmpty().Length(36);
+        RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
         RuleFor(c => c.LessonCount).NotNull().GreaterThan(0);
         RuleFor(c => c.StartDate).NotNull();
         RuleFor(c => c.StartTime).NotNull();

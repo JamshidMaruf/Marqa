@@ -16,10 +16,10 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     public async Task<IActionResult> PostAsync([FromBody] CourseCreateModel model)
     {
         await courseService.CreateAsync(model);
-        
+
         return Ok(new Response
         {
-            StatusCode = 200,
+            StatusCode = 201,
             Message = "success"
         });
     }
@@ -29,7 +29,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     public async Task<IActionResult> AttachStudentAsync(int courseId, int studentId, StudentStatus status)
     {
         await courseService.AttachStudentAsync(courseId, studentId, status);
-         
+
         return Ok(new Response
         {
             StatusCode = 200,
@@ -75,6 +75,19 @@ public class CoursesController(ICourseService courseService) : ControllerBase
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
+    {
+        var course = await courseService.GetAsync(id);
+
+        return Ok(new Response<CourseViewModel>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = course
+        });
+    }
+
+    [HttpGet("{id:int}/update")]
+    public async Task<IActionResult> GetByUpdateAsync(int id)
     {
         var course = await courseService.GetAsync(id);
 
