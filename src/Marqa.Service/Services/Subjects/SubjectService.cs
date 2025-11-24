@@ -10,8 +10,7 @@ namespace Marqa.Service.Services.Subjects;
 
 public class SubjectService(IUnitOfWork unitOfWork,
     IValidator<SubjectCreateModel> subjectCreateValidator,
-    IValidator<SubjectUpdateModel> subjectUpdateValidator,
-    IValidator<TeacherSubjectCreateModel> teacherSubjectCreateValidator) : ISubjectService
+    IValidator<SubjectUpdateModel> subjectUpdateValidator) : ISubjectService
 {
 
     public async Task CreateAsync(SubjectCreateModel model)
@@ -63,8 +62,8 @@ public class SubjectService(IUnitOfWork unitOfWork,
     public async Task<SubjectViewModel> GetAsync(int id)
     {
         var existSubject = await unitOfWork.Subjects.SelectAsync(
-            predicate: s => s.Id == id, 
-            includes: "Company" )
+            predicate: s => s.Id == id,
+            includes: "Company")
               ?? throw new NotFoundException("Subject was not found");
 
         return new SubjectViewModel
@@ -80,40 +79,83 @@ public class SubjectService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Subjects.SelectAllAsQueryable(
             predicate: s => s.CompanyId == companyId,
-            includes: "Company" )
+            includes: "Company")
             .Select(s => new SubjectViewModel
             {
                 Id = s.Id,
+                Name = s.Name,
                 CompanyId = s.CompanyId,
                 CompanyName = s.Company.Name,
-                Name = s.Name,
             })
             .ToListAsync();
     }
 
-    public async Task AttachAsync(TeacherSubjectCreateModel model)
+    public async Task AttachAsync(int teacherId, int subjectId)
     {
-        await teacherSubjectCreateValidator.EnsureValidatedAsync(model);
+        _ = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
+            ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
 
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Id == model.TeacherId)
-            ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}.");
-
-        _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == model.SubjectId)
-            ?? throw new NotFoundException($"No subject was found with ID = {model.SubjectId}.");
+        _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == subjectId)
+            ?? throw new NotFoundException($"No subject was found with ID = {subjectId}.");
 
         var exitAttachment = await unitOfWork.TeacherSubjects.SelectAsync(a =>
-            a.TeacherId == model.TeacherId &&
-            a.SubjectId == model.SubjectId);
+            a.TeacherId == teacherId &&
+            a.SubjectId == subjectId);
 
         if (exitAttachment != null)
             throw new AlreadyExistException("The teacher has this subject already!");
 
         unitOfWork.TeacherSubjects.Insert(new TeacherSubject
         {
-            TeacherId = model.TeacherId,
-            SubjectId = model.SubjectId
+            TeacherId = teacherId,
+            SubjectId = subjectId
         });
 
+        await unitOfWork.SaveAsync();
+    }
+
+
+    public async Task BulkAttachAsync(int teacherId, List<int> subjectIds)
+    {
+        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
+            ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
+
+        List<int> existSubjects = await unitOfWork.Subjects
+            .SelectAllAsQueryable(s => s.CompanyId == teacher.CompanyId)
+            .Select(s => s.Id)
+            .Distinct()
+            .ToListAsync();
+
+        for (int i = 0; i < subjectIds.Count; i++)
+        {
+            if (!existSubjects.Contains(subjectIds[i]))
+                throw new NotFoundException($"No such subject was found");
+        }
+
+        var alreadyAttachedSubjects = await unitOfWork.TeacherSubjects
+            .SelectAllAsQueryable(s => s.TeacherId == teacherId)
+            .Select(s => new TeacherSubject
+            {
+                Id = s.Id
+            })
+            .ToListAsync();
+
+        foreach (var subject in alreadyAttachedSubjects)
+        {
+            unitOfWork.TeacherSubjects.Remove(subject);
+        }
+
+        List<TeacherSubject> teacherSubjects = new List<TeacherSubject>();
+        foreach (var subjectId in subjectIds)
+        {
+            teacherSubjects.Add(new TeacherSubject
+            {
+                TeacherId = teacherId,
+                SubjectId = subjectId
+            });
+        }
+
+        await unitOfWork.TeacherSubjects.InsertRangeAsync(teacherSubjects);
         await unitOfWork.SaveAsync();
     }
 

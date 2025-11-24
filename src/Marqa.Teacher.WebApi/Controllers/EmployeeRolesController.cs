@@ -3,13 +3,13 @@ using Marqa.Service.Services.EmployeeRoles.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.Admin.WebApi.Controllers;
+namespace Marqa.Teacher.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
 {
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> PostAsync(EmployeeRoleCreateModel model)
     {
         await employeeRoleService.CreateAsync(model);
@@ -21,7 +21,7 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         });
     }
 
-    [HttpPut("update/{id:int}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] EmployeeRoleUpdateModel model)
     {
         await employeeRoleService.UpdateAsync(id, model);
@@ -33,7 +33,7 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         });
     }
 
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await employeeRoleService.DeleteAsync(id);
@@ -45,7 +45,7 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         });
     }
 
-    [HttpGet("get/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var company = await employeeRoleService.GetAsync(id);
@@ -58,8 +58,8 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         });
     }
 
-    [HttpGet("by{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int? companyId)
+    [HttpGet("{companyId}")]
+    public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var companies = await employeeRoleService.GetAllAsync(companyId);
 

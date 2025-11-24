@@ -3,14 +3,13 @@ using Marqa.Service.Services.Subjects.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marqa.Admin.WebApi.Controllers;
+namespace Marqa.Teacher.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class SubjectsController(ISubjectService subjectService) : ControllerBase
 {
-
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> PostAsync(SubjectCreateModel model)
     {
         await subjectService.CreateAsync(model);
@@ -23,9 +22,9 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
     }
 
     [HttpPost("attach-teacher")]
-    public async Task<IActionResult> PostAsync(TeacherSubjectCreateModel model)
+    public async Task<IActionResult> PostAsync(int teacherId, int subjectId)
     {
-        await subjectService.AttachAsync(model);
+        await subjectService.AttachAsync(teacherId, subjectId);
 
         return Ok(new Response
         {
@@ -34,7 +33,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpPut("update/{id:int}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] SubjectUpdateModel model)
     {
         await subjectService.UpdateAsync(id, model);
@@ -58,7 +57,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await subjectService.DeleteAsync(id);
@@ -70,7 +69,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet("get/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var subject = await subjectService.GetAsync(id);
@@ -83,7 +82,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet("by{companyId:int}")]
+    [HttpGet("{companyId}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var subjects = await subjectService.GetAllAsync(companyId);

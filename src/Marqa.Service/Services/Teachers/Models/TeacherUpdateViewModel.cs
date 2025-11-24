@@ -1,10 +1,10 @@
-﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
-namespace Marqa.Service.Services.Employees.Models;
+namespace Marqa.Service.Services.Teachers.Models;
 
-public class TeacherViewModel : Auditable
+public class TeacherUpdateViewModel
 {
+    public int Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Phone { get; set; }
@@ -14,7 +14,7 @@ public class TeacherViewModel : Auditable
     public string Specialization { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
-    public SubjectInfo Subject { get; set; }
+    public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
 
     public class SubjectInfo

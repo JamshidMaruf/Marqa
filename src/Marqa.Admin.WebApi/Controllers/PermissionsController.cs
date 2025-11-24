@@ -8,43 +8,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [AllowAnonymous]
 public class PermissionsController(IPermissionService permissionService, IEmployeeRoleService employeeRoleService) : BaseController
-{
-    [HttpPost]
-    public async Task<IActionResult> PostAsync(PermissionCreateModel model)
-    {
-        await permissionService.CreateAsync(model);
-
-        return Ok(new Response
-        {
-            StatusCode = 201,
-            Message = "success",
-        });
-    }
-
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] PermissionUpdateModel model)
-    {
-        await permissionService.UpdateAsync(id, model);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
-
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteAsync(int id)
-    {
-        await permissionService.DeleteAsync(id);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
-    
+{    
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {

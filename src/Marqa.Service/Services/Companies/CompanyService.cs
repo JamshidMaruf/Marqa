@@ -1,4 +1,7 @@
-﻿using FluentValidation;
+﻿using System.IO;
+using System.Net;
+using System.Numerics;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
@@ -20,6 +23,10 @@ public class CompanyService(
         unitOfWork.Companies.Insert(new Company
         {
             Name = model.Name,
+            Address = model.Address,
+            Phone = model.Phone,
+            Email = model.Email,
+            Director = model.Director
         });
 
         await unitOfWork.SaveAsync();
@@ -33,6 +40,10 @@ public class CompanyService(
             ?? throw new NotFoundException("Company is not found");
 
         existCompany.Name = model.Name;
+        existCompany.Address = model.Address;
+        existCompany.Phone = model.Phone;
+        existCompany.Email = model.Email;
+        existCompany.Director = model.Director;
 
         unitOfWork.Companies.Update(existCompany);
 
@@ -58,6 +69,10 @@ public class CompanyService(
         {
             Id = existCompany.Id,
             Name = existCompany.Name,
+            Address = existCompany.Address,
+            Phone = existCompany.Phone,
+            Email = existCompany.Email,
+            Director = existCompany.Director,
         };
     }
 
@@ -69,6 +84,10 @@ public class CompanyService(
             {
                 Id = c.Id,
                 Name = c.Name,
+                Address = c.Address,
+                Phone = c.Phone,
+                Email = c.Email,
+                Director = c.Director,
             }).ToListAsync();
     }
 }
