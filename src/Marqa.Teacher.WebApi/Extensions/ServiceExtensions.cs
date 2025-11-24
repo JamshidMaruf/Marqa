@@ -34,21 +34,8 @@ public static class ServicesExtension
     {
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<ICourseService, CourseService>();
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
-        services.AddScoped<IHomeTaskService, HomeTaskService>();
-        services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<ISubjectService, SubjectService>();
-        services.AddScoped<IPointSettingService, PointSettingService>();
-        services.AddScoped<IExamService, ExamService>();
-        services.AddScoped<IRatingService, RatingService>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
+        services.AddScoped<IAuthService, JwtService>();
+        services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IPermissionService, PermissionService>();

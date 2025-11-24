@@ -19,7 +19,7 @@ public static class ServicesExtension
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, JwtService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 }
