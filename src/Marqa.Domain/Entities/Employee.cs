@@ -4,11 +4,7 @@ namespace Marqa.Domain.Entities;
 
 public class Employee : Auditable
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Phone { get; set; }
-    public string Email { get; set; }
-    public string PasswordHash { get; set; }
+    public int UserId { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public decimal Salary { get; set; }
     public Gender Gender { get; set; }
@@ -22,6 +18,7 @@ public class Employee : Auditable
 
     // Navigation
     public Company Company { get; set; }
+    public User User { get; set; }
     public EmployeeRole Role { get; set; }
     public Employee? Parent { get; set; }
 }

@@ -17,7 +17,7 @@ public static class ServicesExtension
     {
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, JwtService>();
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
