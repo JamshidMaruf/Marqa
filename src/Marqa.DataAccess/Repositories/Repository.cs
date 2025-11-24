@@ -13,21 +13,25 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         this._context = context;
         _context.Set<TEntity>();
     }
-    
+
     public TEntity Insert(TEntity entity)
     {
         entity.CreatedAt = DateTime.UtcNow;
-        _context.Add(entity);      
+        _context.Add(entity);
         return entity;
     }
 
     public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
     {
-        await entities.AsQueryable().ForEachAsync(entity =>
+        await Task.Run(() =>
         {
-            entity.CreatedAt = DateTime.UtcNow;
-            _context.Add(entity);
+            foreach (var entity in entities)
+            {
+                entity.CreatedAt = DateTime.UtcNow;
+                _context.Add(entity);
+            }
         });
+
     }
 
     public void Update(TEntity entity)
@@ -35,13 +39,13 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         entity.UpdatedAt = DateTime.UtcNow;
         _context.Update(entity);
     }
-   
+
     public void MarkAsDeleted(TEntity entity)
     {
         entity.DeletedAt = DateTime.UtcNow;
         entity.IsDeleted = true;
         _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
-        _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true; 
+        _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
     }
 
     public void Remove(TEntity entity)
@@ -65,26 +69,26 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
                 query = query.Include(include);
             }
         }
-        
+
         return await query.FirstOrDefaultAsync();
     }
 
     public IQueryable<TEntity> SelectAllAsQueryable(
-        Expression<Func<TEntity, bool>> predicate = null, 
+        Expression<Func<TEntity, bool>> predicate = null,
         bool tracking = true,
         params string[] includes)
     {
         var query = _context.Set<TEntity>().AsQueryable();
-        
-        if(predicate != null)
+
+        if (predicate != null)
             query = query.Where(predicate);
 
         foreach (var include in includes)
             query = query.Include(include);
-        
-        if(!tracking)
+
+        if (!tracking)
             query = query.AsNoTracking();
-        
+
         return query;
     }
 }

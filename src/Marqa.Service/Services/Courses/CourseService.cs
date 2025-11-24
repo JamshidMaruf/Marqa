@@ -40,6 +40,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartDate = model.StartDate,
                 StartTime = model.StartTime,
                 TeacherId = model.TeacherId,
+                Price = model.Price,
                 Status = model.Status,
                 Description = model.Description,
                 MaxStudentCount = model.MaxStudentCount,
@@ -84,6 +85,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         catch
         {
             await transaction.RollbackAsync();
+            throw;
         }
     }
 
@@ -96,9 +98,14 @@ public class CourseService(IUnitOfWork unitOfWork,
             includes: [ "Lessons", "CourseWeekdays"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
+        
+        _ = await unitOfWork.Employees.SelectAsync(c => 
+        c.Id == model.TeacherId && c.CompanyId == existCourse.CompanyId)
+            ?? throw new NotFoundException("This teacher not found!");
 
         existCourse.EndTime = model.EndTime;
         existCourse.TeacherId = model.TeacherId;
+        existCourse.Price = model.Price;
         existCourse.StartTime = model.StartTime;
         existCourse.StartDate = model.StartDate;
         existCourse.Status = model.Status;
@@ -110,16 +117,14 @@ public class CourseService(IUnitOfWork unitOfWork,
         {
 
             foreach (var lesson in existCourse.Lessons)
-                unitOfWork.Lessons.MarkAsDeleted(lesson);
+                unitOfWork.Lessons.Remove(lesson);
             
             await unitOfWork.SaveAsync();
             
-
             foreach (var weekday in existCourse.CourseWeekdays)
-                unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
+                unitOfWork.CourseWeekdays.Remove(weekday);
 
             await unitOfWork.SaveAsync();
-
 
             foreach (var weekDay in model.Weekdays)
                 unitOfWork.CourseWeekdays.Insert(new CourseWeekday
@@ -188,7 +193,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
                 Status = c.Status,
+                Description = c.Description,
                 AvailableStudentCount = c.StudentCourses.Count,
+                Price = c.Price,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -200,7 +207,11 @@ public class CourseService(IUnitOfWork unitOfWork,
                     FirstName = c.Teacher.FirstName,
                     LastName = c.Teacher.LastName,
                 },
-                Weekdays = c.CourseWeekdays.Select(cw => cw.Weekday).ToList(),
+                Weekdays = c.CourseWeekdays.Select(v => new CourseViewModel.WeekInfo
+                {
+                    Id = Convert.ToInt32(v.Weekday),
+                    Name = Convert.ToString(v.Weekday)
+                }).ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
                 {
                     Id = cl.Id,
@@ -237,6 +248,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartTime = c.StartTime,
                 Status = c.Status,
                 AvailableStudentCount = c.StudentCourses.Count,
+                Price = c.Price,
+                Description = c.Description,
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -248,7 +261,11 @@ public class CourseService(IUnitOfWork unitOfWork,
                     FirstName = c.Teacher.FirstName,
                     LastName = c.Teacher.LastName,
                 },
-                Weekdays = c.CourseWeekdays.Select(cw => cw.Weekday).ToList(),
+                Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
+                {
+                    Id = Convert.ToInt32(w.Weekday),
+                    Name = Enum.GetName(w.Weekday),
+                }).ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
                 {
                     Id = cl.Id,
