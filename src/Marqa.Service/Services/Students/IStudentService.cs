@@ -1,5 +1,4 @@
 ﻿using Marqa.Service.Services.Students.Models;
-using Marqa.Service.Services.Students.Models.DetailModels;
 using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.Students;
@@ -12,7 +11,7 @@ public interface IStudentService
     /// <param name="model"></param>
     /// <returns></returns>
     Task CreateAsync(StudentCreateModel model);
-    Task UpdateAsync(int id, int companyId, StudentUpdateModel model);
+    Task UpdateAsync(int id, StudentUpdateModel model);
     Task DeleteAsync(int id);
     
     /// <summary>
@@ -31,4 +30,6 @@ public interface IStudentService
     Task<int> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
+    Task<List<StudentViewModel>> GetAll(StudentFilterModel filterModel);
+    Task UpdateStudentCourseStatusAsync(int studentId, int courseId,int statusId);
 }

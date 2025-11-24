@@ -9,8 +9,8 @@ namespace Marqa.Admin.WebApi.Controllers;
 [Route("api/[controller]")]
 public class StudentsController(IStudentService studentService) : ControllerBase
 {
-    [HttpPost("create")]
-    public async Task<IActionResult> PostAsync(StudentCreateModel model)
+    [HttpPost()]
+    public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
         await studentService.CreateAsync(model);
 
@@ -21,10 +21,10 @@ public class StudentsController(IStudentService studentService) : ControllerBase
         });
     }
 
-    [HttpPut("update/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, int companyId, [FromBody] StudentUpdateModel model)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
     {
-        await studentService.UpdateAsync(id, companyId, model);
+        await studentService.UpdateAsync(id, model);
 
         return Ok(new Response
         {
@@ -33,7 +33,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
         });
     }
 
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await studentService.DeleteAsync(id);
@@ -45,7 +45,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
         });
     }
 
-    [HttpGet("get/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var student = await studentService.GetAsync(id);
@@ -58,16 +58,39 @@ public class StudentsController(IStudentService studentService) : ControllerBase
         });
     }
 
-    [HttpGet("courseStudents/{courseId:int}")]
-    public async Task<IActionResult> GetAllAsync(int courseId)
+    [HttpGet("{id}/update")]
+    public async Task<IActionResult> GetForUpdate(int id)
     {
-        var students = await studentService.GetAllByCourseIdAsync(courseId);
+        var student = await studentService.GetAsync(id);
 
+        return Ok(new Response<StudentViewModel>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = student
+        });
+    }
+
+    [HttpPut("{studentId}/courses/{courseId}/status{statusId}")]
+    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, int statusId)
+    {
+        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, statusId);
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success",
+        });
+    }
+
+    [HttpGet()]
+    public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
+    {
+        var students = await studentService.GetAll(filterModel);
         return Ok(new Response<List<StudentViewModel>>
         {
             StatusCode = 200,
             Message = "success",
-            Data = students,
+            Data = students
         });
     }
 }
