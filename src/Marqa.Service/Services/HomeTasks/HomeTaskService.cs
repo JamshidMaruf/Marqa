@@ -43,8 +43,11 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
             unitOfWork.HomeTaskFiles.Insert(new HomeTaskFile
             {
-                FileName = result.FileName,
-                FilePath = result.FilePath,
+                Asset = new Asset
+                {
+                    FileName = result.FileName,
+                    FilePath = result.FilePath,
+                },
                 HomeTaskId = homeTaskId
             });
         }
@@ -54,8 +57,11 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
             unitOfWork.HomeTaskFiles.Insert(new HomeTaskFile
             {
-                FileName = result.FileName,
-                FilePath = result.FilePath,
+                Asset = new Asset
+                {
+                    FileName = result.FileName,
+                    FilePath = result.FilePath,
+                },
                 HomeTaskId = homeTaskId
             });
         }
@@ -81,7 +87,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
         var existHomeTask = await unitOfWork.HomeTasks
             .SelectAsync(
             h => h.Id == id,
-            includes: "HomeTaskFile" )
+            includes: "HomeTaskFile")
             ?? throw new NotFoundException("Home task is not found");
 
         if (existHomeTask.HomeTaskFile != null)
@@ -151,10 +157,13 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
             unitOfWork.StudentHomeTaskFiles.Insert(new StudentHomeTaskFile
             {
-                FileName = result.FileName,
-                FilePath = result.FilePath,
+                Asset = new Asset
+                {
+                    FileName = result.FileName,
+                    FilePath = result.FilePath,
+                },
                 StudentHomeTaskId = studentHomeTaskId,
-                
+
             });
         }
         else if (fileExtensions.Contains(Path.GetExtension(file.FileName)))
@@ -163,8 +172,11 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
             unitOfWork.StudentHomeTaskFiles.Insert(new StudentHomeTaskFile
             {
-                FileName = result.FileName,
-                FilePath = result.FilePath,
+                Asset = new Asset
+                {
+                    FileName = result.FileName,
+                    FilePath = result.FilePath,
+                },
                 StudentHomeTaskId = studentHomeTaskId,
             });
         }

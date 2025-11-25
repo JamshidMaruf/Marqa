@@ -8,7 +8,7 @@ public class StudentPointHistory : Auditable
     public int PreviousPoint { get; set; }
     public int GivenPoint {  get; set; }
     public int CurrentPoint { get; set; }
-    public string Note { get; set; }
+    public string? Note { get; set; }
     public PointHistoryOperation Operation { get; set; }
 
     public Student Student { get; set; }

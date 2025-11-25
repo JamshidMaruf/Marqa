@@ -18,13 +18,13 @@ public class StudentService(
     public async Task CreateAsync(StudentCreateModel model)
     {
         await createValidator.EnsureValidatedAsync(model);
-        
+
         var company = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId);
         if (company == null)
             throw new NotFoundException("Company not found");
 
         var existingStudent = await unitOfWork.Students
-            .SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
+            .SelectAsync(e => e.User.Phone == model.Phone && e.CompanyId == model.CompanyId);
 
         if (existingStudent != null)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
@@ -51,13 +51,16 @@ public class StudentService(
         {
             var createdStudent = new Student()
             {
+                User = new User
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = studentPhoneResult.Phone,
+                    Email = model.Email,
+                },
                 CompanyId = model.CompanyId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
                 DateOfBirth = model.DateOfBirth,
-                Gender = model.Gender,
-                Phone = studentPhoneResult.Phone,
-                Email = model.Email,
+                Gender = model.Gender
             };
 
             unitOfWork.Students.Insert(createdStudent);
@@ -114,23 +117,23 @@ public class StudentService(
             var existStudent = await unitOfWork.Students
                 .SelectAsync(
                     predicate: s => s.Id == id,
-                    includes: "StudentDetail" )
+                    includes: [ "StudentDetail", "User" ])
                 ?? throw new NotFoundException($"Student is not found");
 
             var phoneExists = await unitOfWork.Students
-                .SelectAsync(e => e.Phone == model.Phone
+                .SelectAsync(e => e.User.Phone == model.Phone
                               && e.CompanyId == existStudent.CompanyId
                               && e.Id != id);
 
             if (phoneExists != null)
                 throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
-            existStudent.FirstName = model.FirstName;
-            existStudent.LastName = model.LastName;
+            existStudent.User.FirstName = model.FirstName;
+            existStudent.User.LastName = model.LastName;
             existStudent.Gender = model.Gender;
             existStudent.DateOfBirth = model.DateOfBirth;
-            existStudent.Phone = studentPhoneResult.Phone;
-            existStudent.Email = model.Email;
+            existStudent.User.Phone = studentPhoneResult.Phone;
+            existStudent.User.Email = model.Email;
 
             if (existStudent.StudentDetail != null)
             {
@@ -162,7 +165,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: s => s.Id == id,
-                includes: "StudentDetail" )
+                includes: "StudentDetail")
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail != null)
@@ -176,7 +179,7 @@ public class StudentService(
 
     public async Task<int> GetByPhoneAsync(string phone)
     {
-        var student = await unitOfWork.Students.SelectAsync(s => s.Phone == phone)
+        var student = await unitOfWork.Students.SelectAsync(s => s.User.Phone == phone)
             ?? throw new NotFoundException($"Student with phone {phone} not found");
 
         return student.Id;
@@ -198,7 +201,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: "StudentDetail" )
+                includes: [ "StudentDetail", "User" ])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail == null)
@@ -207,12 +210,12 @@ public class StudentService(
         return new StudentViewModel
         {
             Id = existStudent.Id,
-            FirstName = existStudent.FirstName,
-            LastName = existStudent.LastName,
+            FirstName = existStudent.User.FirstName,
+            LastName = existStudent.User.LastName,
             DateOfBirth = existStudent.DateOfBirth,
             Gender = existStudent.Gender,
-            Phone = existStudent.Phone,
-            Email = existStudent.Email,
+            Phone = existStudent.User.Phone,
+            Email = existStudent.User.Email,
             StudentDetailViewModel = new StudentDetailViewModel
             {
                 Id = existStudent.StudentDetail.Id,
@@ -238,12 +241,12 @@ public class StudentService(
             .Select(sc => new StudentViewModel
             {
                 Id = sc.Student.Id,
-                FirstName = sc.Student.FirstName,
-                LastName = sc.Student.LastName,
+                FirstName = sc.Student.User.FirstName,
+                LastName = sc.Student.User.LastName,
                 DateOfBirth = sc.Student.DateOfBirth,
                 Gender = sc.Student.Gender,
-                Phone = sc.Student.Phone,
-                Email = sc.Student.Email,
+                Phone = sc.Student.User.Phone,
+                Email = sc.Student.User.Email,
                 StudentDetailViewModel = new StudentDetailViewModel
                 {
                     Id = sc.Student.StudentDetail.Id,
@@ -340,22 +343,22 @@ public class StudentService(
             query = query.Where(s => s.CompanyId == filterModel.CompanyId);
 
         if (!string.IsNullOrEmpty(filterModel.SearchText))
-            query = query.Where(s => s.FirstName.Contains(filterModel.SearchText) ||
-                                     s.LastName.Contains(filterModel.SearchText) ||
-                                     s.Phone.Contains(filterModel.SearchText) ||
-                                     s.Email.Contains(filterModel.SearchText));
+            query = query.Where(s => s.User.FirstName.Contains(filterModel.SearchText) ||
+                                     s.User.LastName.Contains(filterModel.SearchText) ||
+                                     s.User.Phone.Contains(filterModel.SearchText) ||
+                                     s.User.Email.Contains(filterModel.SearchText));
         if (filterModel.CourseId != null)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
 
         return await query.Select(s => new StudentViewModel
         {
             Id = s.Id,
-            FirstName = s.FirstName,
-            LastName = s.LastName,
+            FirstName = s.User.FirstName,
+            LastName = s.User.LastName,
             DateOfBirth = s.DateOfBirth,
             Gender = s.Gender,
-            Phone = s.Phone,
-            Email = s.Email,
+            Phone = s.User.Phone,
+            Email = s.User.Email,
             StudentDetailViewModel = new StudentDetailViewModel
             {
                 Id = s.StudentDetail.Id,

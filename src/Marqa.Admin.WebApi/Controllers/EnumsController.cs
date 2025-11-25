@@ -1,6 +1,6 @@
 ﻿using Marqa.Domain.Enums;
-using Marqa.Service.Services.Enum;
-using Marqa.Service.Services.Enum.Models;
+using Marqa.Service.Services.Enums;
+using Marqa.Service.Services.Enums.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;

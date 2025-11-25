@@ -1,7 +1,7 @@
 ﻿using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Enum.Models;
+using Marqa.Service.Services.Enums.Models;
 
-namespace Marqa.Service.Services.Enum;
+namespace Marqa.Service.Services.Enums;
 public class EnumService : IEnumService
 {
     public List<EnumGetModel> GetEnumValues<T>() where T : System.Enum

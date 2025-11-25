@@ -89,9 +89,9 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("{id:int}/update")]
     public async Task<IActionResult> GetByUpdateAsync(int id)
     {
-        var course = await courseService.GetAsync(id);
+        var course = await courseService.GetForUpdateAsync(id);
 
-        return Ok(new Response<CourseViewModel>
+        return Ok(new Response<CourseUpdateViewModel>
         {
             StatusCode = 200,
             Message = "success",

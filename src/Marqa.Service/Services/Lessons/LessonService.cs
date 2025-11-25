@@ -58,8 +58,11 @@ public class LessonService(
 
         unitOfWork.LessonVideos.Insert(new LessonVideo
         {
-            FileName = result.FileName,
-            FilePath = result.FilePath,
+            Asset = new Asset
+            {
+                FileName = result.FileName,
+                FilePath = result.FilePath,
+            },
             LessonId = id
         });
 

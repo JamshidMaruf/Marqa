@@ -109,16 +109,16 @@ public class TeacherService(
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher"])
+           includes: ["Teacher", "Teacher.User"])
            .Select(ts => new TeacherViewModel
            {
                Id = ts.Teacher.Id,
                DateOfBirth = ts.Teacher.DateOfBirth,
                Gender = ts.Teacher.Gender,
-               FirstName = ts.Teacher.FirstName,
-               LastName = ts.Teacher.LastName,
-               Email = ts.Teacher.Email,
-               Phone = ts.Teacher.Phone,
+               FirstName = ts.Teacher.User.FirstName,
+               LastName = ts.Teacher.User.LastName,
+               Email = ts.Teacher.User.Email,
+               Phone = ts.Teacher.User.Phone,
                Status = ts.Teacher.Status,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization
@@ -159,16 +159,16 @@ public class TeacherService(
     {
         var teacher = await unitOfWork.TeacherSubjects
            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher"])
+           includes: ["Teacher", "Teacher.User"])
            .Select(ts => new TeacherUpdateViewModel
            {
                Id = ts.Teacher.Id,
                DateOfBirth = ts.Teacher.DateOfBirth,
                Gender = ts.Teacher.Gender,
-               FirstName = ts.Teacher.FirstName,
-               LastName = ts.Teacher.LastName,
-               Email = ts.Teacher.Email,
-               Phone = ts.Teacher.Phone,
+               FirstName = ts.Teacher.User.FirstName,
+               LastName = ts.Teacher.User.LastName,
+               Email = ts.Teacher.User.Email,
+               Phone = ts.Teacher.User.Phone,
                Status = ts.Teacher.Status,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization
@@ -209,17 +209,17 @@ public class TeacherService(
     {
         var teacherQuery = unitOfWork.Employees
             .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
-            includes: ["Role"]);
+            includes: ["Role", "User"]);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.ToLower().Trim();
             teacherQuery = teacherQuery.Where(t =>
-                t.FirstName.ToLower().Contains(search) ||
-                t.LastName.ToLower().Contains(search) ||
+                t.User.FirstName.ToLower().Contains(search) ||
+                t.User.LastName.ToLower().Contains(search) ||
                 t.Specialization.ToLower().Contains(search) ||
-                t.Phone.Contains(search) ||
-                t.Email.Contains(search));
+                t.User.Phone.Contains(search) ||
+                t.User.Email.Contains(search));
         }
         
         var teacherWithoutCourses = await teacherQuery.GroupJoin(
@@ -231,10 +231,10 @@ public class TeacherService(
                     Id = t.Id,
                     DateOfBirth = t.DateOfBirth,
                     Gender = t.Gender,
-                    FirstName = t.FirstName,
-                    LastName = t.LastName,
-                    Email = t.Email,
-                    Phone = t.Phone,
+                    FirstName = t.User.FirstName,
+                    LastName = t.User.LastName,
+                    Email = t.User.Email,
+                    Phone = t.User.Phone,
                     Status = t.Status,
                     JoiningDate = t.JoiningDate,
                     Specialization = t.Specialization,

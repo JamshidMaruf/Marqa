@@ -5,7 +5,7 @@ public class Banner : Auditable
     public int CompanyId { get; set; }
     public int AssetId { get; set; }
     public string Title { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public string LinkUrl { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }

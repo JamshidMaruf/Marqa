@@ -25,7 +25,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == model.CompanyId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == model.CompanyId);
+        var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.User.Phone == model.Phone && e.CompanyId == model.CompanyId);
 
         if (alreadyExistEmployee != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
@@ -36,16 +36,19 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
+            User = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Phone = employeePhone.Phone,
+                Email = model.Email,
+                PasswordHash = PasswordHelper.Hash(model.Password),
+            },
             CompanyId = model.CompanyId,
-            FirstName = model.FirstName,
-            LastName = model.LastName,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
-            Phone = employeePhone.Phone,
-            Email = model.Email,
             Status = model.Status,
             Salary = model.Salary,
-            PasswordHash = PasswordHelper.Hash(model.Password),
             JoiningDate = model.JoiningDate,
             Specialization = model.Specialization,
             Info = model.Info,
@@ -61,13 +64,16 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         await validatorEmployeeUpdate.EnsureValidatedAsync(model);
 
-        var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id)
+        var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id, includes: "User")
             ?? throw new NotFoundException($"Employee was not found");
 
         _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.CompanyId)
             ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
-        var existPhone = await unitOfWork.Employees.SelectAsync(e => e.Phone == model.Phone && e.CompanyId == existEmployee.CompanyId && e.Id != id);
+        var existPhone = await unitOfWork.Employees.SelectAsync(e => 
+                            e.User.Phone == model.Phone && 
+                            e.CompanyId == existEmployee.CompanyId && 
+                            e.Id != id, includes: "User");
 
         if (existPhone != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
@@ -76,12 +82,12 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        existEmployee.FirstName = model.FirstName;
-        existEmployee.LastName = model.LastName;
+        existEmployee.User.FirstName = model.FirstName;
+        existEmployee.User.LastName = model.LastName;
         existEmployee.DateOfBirth = model.DateOfBirth;
         existEmployee.Gender = model.Gender;
-        existEmployee.Phone = employeePhone.Phone;
-        existEmployee.Email = model.Email;
+        existEmployee.User.Phone = employeePhone.Phone;
+        existEmployee.User.Email = model.Email;
         existEmployee.Status = model.Status;
         existEmployee.Salary = model.Salary;
         existEmployee.JoiningDate = model.JoiningDate;
@@ -111,14 +117,14 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted,
-            includes: "Role")
+            includes: [ "Role", "User" ])
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
-                FirstName = e.FirstName,
-                LastName = e.LastName,
-                Phone = e.Phone,
-                Email = e.Email,
+                FirstName = e.User.Phone,
+                LastName = e.User.Phone,
+                Phone = e.User.Phone,
+                Email = e.User.Email,
                 DateOfBirth = e.DateOfBirth,
                 Gender = e.Gender,
                 Status = e.Status,
@@ -139,7 +145,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
     public async Task<int> GetByPhoneAsync(string phone)
     {
-        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.Phone == phone);
+        var employee = await unitOfWork.Employees.SelectAsync(emp => emp.User.Phone == phone);
 
         return employee.Id;
     }
@@ -151,19 +157,19 @@ public class EmployeeService(IUnitOfWork unitOfWork,
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
-                e.FirstName.Contains(search) ||
-                e.LastName.Contains(search) ||
-                e.Phone.Contains(search) ||
-                e.Email.Contains(search) ||
+                e.User.FirstName.Contains(search) ||
+                e.User.LastName.Contains(search) ||
+                e.User.Phone.Contains(search) ||
+                e.User.Email.Contains(search) ||
                 e.Specialization.Contains(search));
 
         return await employees.Select(e => new EmployeeViewModel
         {
             Id = e.Id,
-            FirstName = e.FirstName,
-            LastName = e.LastName,
-            Phone = e.Phone,
-            Email = e.Email,
+            FirstName = e.User.FirstName,
+            LastName = e.User.Phone,
+            Phone = e.User.Phone,
+            Email = e.User.Email,
             DateOfBirth = e.DateOfBirth,
             Gender = e.Gender,
             Status = e.Status,
@@ -183,13 +189,13 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeLoginViewModel> LoginAsync(EmployeeLoginModel model)
     {
         var employee = await unitOfWork.Employees
-            .SelectAsync(predicate: e => e.Phone == model.Phone, includes: "Role")
+            .SelectAsync(predicate: e => e.User.Phone == model.Phone, includes: ["Role", "User"])
             ?? throw new ArgumentIsNotValidException("Phone or Password is invalid.");
 
-        if (!PasswordHelper.Verify(model.Password, employee.PasswordHash))
+        if (!PasswordHelper.Verify(model.Password, employee.User.PasswordHash))
             throw new ArgumentIsNotValidException("Phone or Password is invalid.");
 
-        var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
+        //var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
 
         var employeePermissions = await unitOfWork.RolePermissions
             .SelectAllAsQueryable(predicate: r => r.RoleId == employee.RoleId, includes: "Permission")
@@ -199,12 +205,12 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         return new EmployeeLoginViewModel
         {
             Id = employee.Id,
-            FirstName = employee.FirstName,
-            LastName = employee.LastName,
-            Phone = employee.Phone,
+            FirstName = employee.User.Phone,
+            LastName = employee.User.LastName,
+            Phone = employee.User.Phone,
             CompanyId = employee.CompanyId,
             Role = employee.Role.Name,
-            Token = token,
+            //Token = token,
             Permissions = employeePermissions
         };
     }

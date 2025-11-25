@@ -5,7 +5,6 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Validators.Courses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
@@ -183,7 +182,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: new[] {"Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses"})
+            includes: [ "Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User" ])
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -204,15 +203,62 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Teacher = new CourseViewModel.TeacherInfo
                 {
                     Id = c.TeacherId,
-                    FirstName = c.Teacher.FirstName,
-                    LastName = c.Teacher.LastName,
+                    FirstName = c.Teacher.User.FirstName,
+                    LastName = c.Teacher.User.LastName,
                 },
-                Weekdays = c.CourseWeekdays.Select(v => new CourseViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {
-                    Id = Convert.ToInt32(v.Weekday),
-                    Name = Convert.ToString(v.Weekday)
+                    Id = Convert.ToInt32(w.Weekday),
+                    Name = Enum.GetName(w.Weekday),
                 }).ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
+                {
+                    Id = cl.Id,
+                    Date = cl.Date,
+                    EndTime = cl.EndTime,
+                    StartTime = cl.StartTime,
+                    Room = cl.Room,
+                }).OrderBy(l => l.Date).ToList(),
+            })
+            .FirstOrDefaultAsync(t => t.Id == id)
+            ?? throw new NotFoundException($"Course is not found with this ID {id}");
+    }
+
+    public async Task<CourseUpdateViewModel> GetForUpdateAsync(int id)
+    {
+        return await unitOfWork.Courses
+            .SelectAllAsQueryable(
+            predicate: c => !c.IsDeleted,
+            includes: [ "Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User" ])
+            .Select(c => new CourseUpdateViewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                EndTime = c.EndTime,
+                LessonCount = c.Lessons.Count,
+                StartDate = c.StartDate,
+                StartTime = c.StartTime,
+                Status = c.Status,
+                Description = c.Description,
+                AvailableStudentCount = c.StudentCourses.Count,
+                Price = c.Price,
+                Subject = new CourseUpdateViewModel.SubjectInfo
+                {
+                    SubjectId = c.SubjectId,
+                    SubjectName = c.Subject.Name,
+                },
+                Teacher = new CourseUpdateViewModel.TeacherInfo
+                {
+                    Id = c.TeacherId,
+                    FirstName = c.Teacher.User.FirstName,
+                    LastName = c.Teacher.User.LastName,
+                },
+                Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
+                {
+                    Id = Convert.ToInt32(w.Weekday),
+                    Name = Enum.GetName(w.Weekday)
+                }).ToList(),
+                Lessons = c.Lessons.Select(cl => new CourseUpdateViewModel.LessonInfo
                 {
                     Id = cl.Id,
                     Date = cl.Date,
@@ -229,7 +275,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(
             predicate: c => c.CompanyId == companyId && !c.IsDeleted,
-            includes: new [] { "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays" });
+            includes: [ "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays", "User" ]);
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -258,8 +304,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Teacher = new CourseViewModel.TeacherInfo
                 {
                     Id = c.TeacherId,
-                    FirstName = c.Teacher.FirstName,
-                    LastName = c.Teacher.LastName,
+                    FirstName = c.Teacher.User.FirstName,
+                    LastName = c.Teacher.User.LastName,
                 },
                 Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {

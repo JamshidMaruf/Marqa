@@ -24,5 +24,6 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .HasForeignKey(e => e.RoleId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
+
     }
 }

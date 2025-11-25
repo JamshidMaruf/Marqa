@@ -30,7 +30,8 @@ public static class ServiceExtensions
     {
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAuthService, JwtService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
