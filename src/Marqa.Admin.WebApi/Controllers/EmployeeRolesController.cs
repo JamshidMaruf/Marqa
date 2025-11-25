@@ -8,7 +8,6 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
 {
     [HttpPost]

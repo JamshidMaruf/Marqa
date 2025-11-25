@@ -30,6 +30,7 @@ public class TeacherService(
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
+                Salary = model.Salary,
                 Status = model.Status,
                 Password = model.Password,
                 JoiningDate = model.JoiningDate,
@@ -63,6 +64,7 @@ public class TeacherService(
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
+                Salary = model.Salary,
                 Status = model.Status,
                 JoiningDate = model.JoiningDate,
                 Specialization = model.Specialization,
@@ -113,14 +115,24 @@ public class TeacherService(
            {
                Id = ts.Teacher.Id,
                DateOfBirth = ts.Teacher.DateOfBirth,
-               Gender = ts.Teacher.Gender,
+               Gender = new TeacherViewModel.GenderInfo
+               {
+                   Id = Convert.ToInt32(ts.Teacher.Gender),
+                   Name = Enum.GetName(ts.Teacher.Gender),
+               },
                FirstName = ts.Teacher.User.FirstName,
                LastName = ts.Teacher.User.LastName,
                Email = ts.Teacher.User.Email,
                Phone = ts.Teacher.User.Phone,
-               Status = ts.Teacher.Status,
+               Status = new TeacherViewModel.StatusInfo
+               {
+                   Id = Convert.ToInt32(ts.Teacher.Status),
+                   Name = Enum.GetName(ts.Teacher.Status),
+               },
+               Salary = ts.Teacher.Salary,
                JoiningDate = ts.Teacher.JoiningDate,
-               Specialization = ts.Teacher.Specialization
+               Specialization = ts.Teacher.Specialization,
+               Info = ts.Teacher.Info,               
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
@@ -168,6 +180,7 @@ public class TeacherService(
                LastName = ts.Teacher.User.LastName,
                Email = ts.Teacher.User.Email,
                Phone = ts.Teacher.User.Phone,
+               Salary = ts.Teacher.Salary,
                Status = ts.Teacher.Status,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization
@@ -204,7 +217,7 @@ public class TeacherService(
     }
 
     // works but not optimal enough for large dataset
-    public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
+    public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Employees
             .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
@@ -225,24 +238,28 @@ public class TeacherService(
                 unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
                 t => t.Id,
                 ts => ts.TeacherId,
-                (t, ts) => new TeacherViewModel
+                (t, ts) => new TeacherTableViewModel
                 {
                     Id = t.Id,
-                    DateOfBirth = t.DateOfBirth,
-                    Gender = t.Gender,
                     FirstName = t.User.FirstName,
                     LastName = t.User.LastName,
-                    Email = t.User.Email,
                     Phone = t.User.Phone,
-                    Status = t.Status,
-                    JoiningDate = t.JoiningDate,
-                    Specialization = t.Specialization,
-                    Subjects = ts.Select(t => new TeacherViewModel.SubjectInfo
+                    Gender = new TeacherTableViewModel.GenderInfo
                     {
-                        Id = t.Id,
+                        Id = Convert.ToInt32(t.Gender),
+                        Name = Enum.GetName(t.Gender),
+                    },
+                    Status = new TeacherTableViewModel.StatusInfo
+                    {
+                        Id = Convert.ToInt32(t.Status),
+                        Name = Enum.GetName(t.Status),
+                    },
+                    Subjects = ts.Select(t => new TeacherTableViewModel.SubjectInfo
+                    {
+                        Id = t.SubjectId,
                         Name = t.Subject.Name,
                     }),
-                    Role = new TeacherViewModel.RoleInfo
+                    Role = new TeacherTableViewModel.RoleInfo
                     {
                         Id = t.Role.Id,
                         Name = t.Role.Name
@@ -250,26 +267,22 @@ public class TeacherService(
                 }).ToListAsync();
 
         if (subjectId is not null)
-            teacherWithoutCourses = teacherWithoutCourses.Where(t => t.Subjects.Select(t => t.Id).ToList().Contains(subjectId.Value)).ToList();
+            teacherWithoutCourses = teacherWithoutCourses.Where(t => t.Subjects.Select(t => t.Id).Contains(subjectId.Value)).ToList();
 
         var teachers = teacherWithoutCourses.GroupJoin(
                 await unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }).ToListAsync(),
                 t => t.Id,
                 c => c.TeacherId,
-                (t, courses) => new TeacherViewModel
+                (t, courses) => new TeacherTableViewModel
                 {
                     Id = t.Id,
-                    DateOfBirth = t.DateOfBirth,
                     Gender = t.Gender,
                     FirstName = t.FirstName,
                     LastName = t.LastName,
-                    Email = t.Email,
                     Phone = t.Phone,
                     Status = t.Status,
-                    JoiningDate = t.JoiningDate,
-                    Specialization = t.Specialization,
                     Subjects = t.Subjects,
-                    Courses = courses.Select(c => new TeacherViewModel.CourseInfo
+                    Courses = courses.Select(c => new TeacherTableViewModel.CourseInfo
                     {
                         Id = c.Id,
                         Name = c.Name,

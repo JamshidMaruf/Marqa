@@ -77,7 +77,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
     {
         var result = await teacherService.GetAllAsync(companyId, search, subjectId);
 
-        return Ok(new Response<IEnumerable<TeacherViewModel>>
+        return Ok(new Response<IEnumerable<TeacherTableViewModel>>
         {
             StatusCode = 200,
             Message = "success",

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251125113216_AddedRefreshTokenMigration")]
-    partial class AddedRefreshTokenMigration
+    [Migration("20251125160826_newUpdate")]
+    partial class newUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -15,17 +15,17 @@ public class AppDbContext : DbContext
 
         // Comment out foreach loop if generating migration while you don't have corresponding database
         // Global query applied for all entities
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            if (typeof(Auditable).IsAssignableFrom(entityType.ClrType))
-            {
-                var parameter = Expression.Parameter(entityType.ClrType, "e");
-                var prop = Expression.Property(parameter, nameof(Auditable.IsDeleted));
-                var condition = Expression.Equal(prop, Expression.Constant(false));
-                var lambda = Expression.Lambda(condition, parameter);
-                entityType.SetQueryFilter(lambda);
-            }
-        }
+        //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        //{
+        //    if (typeof(Auditable).IsAssignableFrom(entityType.ClrType))
+        //    {
+        //        var parameter = Expression.Parameter(entityType.ClrType, "e");
+        //        var prop = Expression.Property(parameter, nameof(Auditable.IsDeleted));
+        //        var condition = Expression.Equal(prop, Expression.Constant(false));
+        //        var lambda = Expression.Lambda(condition, parameter);
+        //        entityType.SetQueryFilter(lambda);
+        //    }
+        //}
 
         // Ensures each concrete class that inherit from Auditable is registered in Model
         var entityAssembly = typeof(Auditable).Assembly;

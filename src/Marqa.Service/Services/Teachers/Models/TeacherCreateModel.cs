@@ -12,6 +12,7 @@ public class TeacherCreateModel
     public string Email { get; set; }
     public string Password { get; set; }
     public Gender Gender { get; set; }
+    public decimal Salary { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
     public string Specialization { get; set; }
