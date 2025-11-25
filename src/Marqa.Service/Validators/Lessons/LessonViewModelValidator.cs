@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Service.Services.Lessons.Models;
 
 namespace Marqa.Service.Validators.Lessons;
@@ -13,7 +8,7 @@ public class LessonViewModelValidator : AbstractValidator<LessonViewModel>
     {
         RuleFor(x => x.Id).GreaterThan(0);
         RuleFor(x => x.Number).GreaterThan(0).NotNull();
-        RuleFor(x => x.Name).NotNull().MaximumLength(35);
+        RuleFor(x => x.Name).NotNull().MaximumLength(255);
         RuleFor(x => x.Date).NotNull();
         RuleFor(x => x.HomeTaskStatus).IsInEnum().NotNull();
     }

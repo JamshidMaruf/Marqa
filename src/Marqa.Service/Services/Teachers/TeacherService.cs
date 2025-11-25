@@ -7,7 +7,6 @@ using Marqa.Service.Services.Employees.Models;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
-using static Marqa.Service.Services.Teachers.Models.TeacherViewModel;
 
 namespace Marqa.Service.Services.Teachers;
 
@@ -238,12 +237,12 @@ public class TeacherService(
                     Status = t.Status,
                     JoiningDate = t.JoiningDate,
                     Specialization = t.Specialization,
-                    Subjects = ts.Select(t => new SubjectInfo
+                    Subjects = ts.Select(t => new TeacherViewModel.SubjectInfo
                     {
                         Id = t.Id,
                         Name = t.Subject.Name,
                     }),
-                    Role = new RoleInfo
+                    Role = new TeacherViewModel.RoleInfo
                     {
                         Id = t.Role.Id,
                         Name = t.Role.Name
@@ -270,7 +269,7 @@ public class TeacherService(
                     JoiningDate = t.JoiningDate,
                     Specialization = t.Specialization,
                     Subjects = t.Subjects,
-                    Courses = courses.Select(c => new CourseInfo
+                    Courses = courses.Select(c => new TeacherViewModel.CourseInfo
                     {
                         Id = c.Id,
                         Name = c.Name,

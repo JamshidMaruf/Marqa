@@ -13,17 +13,9 @@ public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
             .MaximumLength(255)
             .WithMessage("Title must not exceed 255 characters");
 
-        RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("Description is required")
-            .MaximumLength(1000)
-            .WithMessage("Description must not exceed 1000 characters");
-
         RuleFor(x => x.LinkUrl)
             .NotEmpty()
-            .WithMessage("Link URL is required")
-            .MaximumLength(255)
-            .WithMessage("Link URL must not exceed 255 characters");
+            .WithMessage("Link URL is required");
 
         RuleFor(x => x.DisplayOrder)
             .GreaterThanOrEqualTo(0)
@@ -41,5 +33,4 @@ public class BannerUpdateModelValidator : AbstractValidator<BannerUpdateModel>
             .GreaterThan(x => x.StartDate)
             .WithMessage("End date must be later than start date");
     }
-
 }

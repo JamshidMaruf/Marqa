@@ -7,14 +7,11 @@ public class StudentPointAddModelValidator : AbstractValidator<StudentPointAddMo
     public StudentPointAddModelValidator()
     {
         RuleFor(p => p.StudentId)
-            .NotNull()
             .GreaterThan(0)
             .WithMessage("Student Id is required");
 
-        RuleFor(p => p.Note).NotNull();
+        RuleFor(p => p.Point).GreaterThan(0);
 
-        RuleFor(p => p.Point).NotNull().GreaterThan(0);
-
-        RuleFor(p => p.Operation).NotNull();
+        RuleFor(p => p.Operation).IsInEnum();
     }
 }
