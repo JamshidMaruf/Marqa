@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Settings;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.Auth;

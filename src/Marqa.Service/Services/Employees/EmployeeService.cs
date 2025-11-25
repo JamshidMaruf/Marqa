@@ -6,7 +6,6 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Employees.Models;
-using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
@@ -45,6 +44,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             Phone = employeePhone.Phone,
             Email = model.Email,
             Status = model.Status,
+            Salary = model.Salary,
             PasswordHash = PasswordHelper.Hash(model.Password),
             JoiningDate = model.JoiningDate,
             Specialization = model.Specialization,
@@ -83,11 +83,10 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         existEmployee.Phone = employeePhone.Phone;
         existEmployee.Email = model.Email;
         existEmployee.Status = model.Status;
+        existEmployee.Salary = model.Salary;
         existEmployee.JoiningDate = model.JoiningDate;
         existEmployee.Specialization = model.Specialization;
         existEmployee.RoleId = model.RoleId;
-
-        unitOfWork.Employees.Update(existEmployee);
 
         await unitOfWork.SaveAsync();
     }
@@ -123,6 +122,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 DateOfBirth = e.DateOfBirth,
                 Gender = e.Gender,
                 Status = e.Status,
+                Salary = e.Salary,
                 JoiningDate = e.JoiningDate,
                 Specialization = e.Specialization,
                 Info = e.Info,
@@ -167,6 +167,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             DateOfBirth = e.DateOfBirth,
             Gender = e.Gender,
             Status = e.Status,
+            Salary = e.Salary,
             JoiningDate = e.JoiningDate,
             Specialization = e.Specialization,
             Info = e.Info,
