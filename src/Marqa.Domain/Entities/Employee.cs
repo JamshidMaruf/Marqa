@@ -10,8 +10,8 @@ public class Employee : Auditable
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
-    public string? Specialization { get; set; }
-    public string? Info { get; set; }
+    public string Specialization { get; set; }
+    public string Info { get; set; }
     public int CompanyId { get; set; }
     public int RoleId { get; set; }
     public int? ParentId { get; set; } // for assistant teacher showing to whom he assists
@@ -20,5 +20,5 @@ public class Employee : Auditable
     public Company Company { get; set; }
     public User User { get; set; }
     public EmployeeRole Role { get; set; }
-    public Employee? Parent { get; set; }
+    public Employee Parent { get; set; }
 }

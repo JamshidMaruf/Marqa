@@ -6,7 +6,7 @@ public interface IExamService
     Task CreateExamAsync(ExamCreateModel model);
     Task UpdateExamAsync(int examId, ExamUpdateModel model);
     Task<ExamViewModel> GetExamByIdAsync(int examId);
-    Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string? search, int? courseid);
+    Task<IEnumerable<ExamViewModel>> GetAllExamsAsync(string search, int? courseid);
     Task DeleteExamAsync(int examId);
 
     Task ScoreExam(StudentExamResultCreate model);

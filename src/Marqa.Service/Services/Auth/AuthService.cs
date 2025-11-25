@@ -1,4 +1,4 @@
-using Marqa.DataAccess.UnitOfWork;
+﻿using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -42,7 +42,7 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuth
             role.name = employeeRole.Name;
         }
         
-        var accessToken = await jwtService.GenerateToken(existUser, role.name);
+        var accessToken = await jwtService.GenerateJwtToken(existUser, role.name);
 
         // refresh token
         var refreshToken = jwtService.GenerateRefreshToken();
@@ -50,13 +50,13 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuth
         var refreshTokenExpiresIn = model.RememberMe 
             ? DateTime.UtcNow.AddDays(30) 
             : DateTime.UtcNow.AddDays(7);
-
+    
         var refreshTokenEntity = new RefreshToken
         {
             UserId = existUser.Id,
             Token = refreshToken, 
             ExpiresAt = refreshTokenExpiresIn, 
-            CreatedByIP = ipAddress,
+            CreatedByIp = ipAddress,
             CreatedAt = DateTime.UtcNow
         };
         
@@ -90,8 +90,80 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuth
         };
     }
 
-    public ValueTask<LoginResponseModel> RefreshTokenAsync(RefreshTokenModel model)
+    public async ValueTask<LoginResponseModel> RefreshTokenAsync(RefreshTokenModel model)
     {
-        throw new NotImplementedException();
+        var refreshToken = await unitOfWork.RefreshTokens
+            .SelectAsync(r => r.Token == model.Token)
+            ?? throw new NotFoundException("Refresh token not found");
+        
+        if(refreshToken.IsExpired)
+            throw new ArgumentIsNotValidException("Refresh token is expired");
+        
+        if(refreshToken.IsRevoked)
+            throw new ArgumentIsNotValidException("Refresh is revoked");
+        
+        var existUser = await unitOfWork.Users.SelectAsync(u => u.Id == refreshToken.UserId)
+             ?? throw new NotFoundException("User not found");
+        
+        (string name, int id) role = ("student", 0);
+        
+        if (existUser.Role == UserRole.Employee)
+        {
+            var employeeRole = await unitOfWork.Employees
+                .SelectAllAsQueryable(
+                    predicate: e => e.UserId == existUser.Id,
+                    includes: ["Role"])
+                .Select(e => new
+                {
+                    Id = e.RoleId,
+                    Name = e.Role.Name
+                })
+                .FirstOrDefaultAsync() ;
+            
+            role.name = employeeRole.Name;
+        }
+        
+        var permissions = await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(predicate: r => r.RoleId == role.id, includes: "Permission")
+            .Select(r => r.Permission.Name)
+            .ToListAsync();
+        
+        var accessToken = await jwtService.GenerateJwtToken(existUser, role.name);
+        
+        return new LoginResponseModel
+        {
+            User = new LoginResponseModel.UserData
+            {
+                Id = existUser.Id,
+                FirstName = existUser.FirstName,
+                LastName = existUser.LastName,
+                Phone = existUser.Phone,
+                Email = existUser.Email,
+                Role = role.name,
+                Permissions = permissions
+            },
+            Token = new LoginResponseModel.TokenData
+            {
+                AccessToken = accessToken.Token,
+                RefreshToken = refreshToken.Token,
+                ExpiresIn = accessToken.ExpiresIn,
+                TokenType = "Bearer"
+            }
+        };
+    }
+
+    public async ValueTask<bool> LogoutAsync(LogoutModel model, string ipAddress)
+    {
+        var refreshToken = await unitOfWork.RefreshTokens
+            .SelectAsync(r => r.Token == model.Token)
+            ?? throw new NotFoundException("Refresh token not found");
+        
+        refreshToken.RevokedAt = DateTime.Now;
+        refreshToken.RevokedByIp = ipAddress;
+        
+        unitOfWork.RefreshTokens.Update(refreshToken);
+        await unitOfWork.SaveAsync();
+        
+        return true;
     }
 }

@@ -8,8 +8,8 @@ public class RefreshToken : Auditable
     public DateTime? RevokedAt { get; set; }
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
     public bool IsRevoked => RevokedAt != null;
-    public string CreatedByIP { get; set; }
-    public string RevokedByIP { get; set; }
+    public string CreatedByIp { get; set; }
+    public string RevokedByIp { get; set; }
     
     // Navigation Properties
     public User User { get; set; }

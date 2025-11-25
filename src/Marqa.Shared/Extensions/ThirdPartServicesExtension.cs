@@ -11,26 +11,26 @@ public static class ThirdPartServicesExtension
 {
     public static void AddJWTService(this IServiceCollection services)
     {
-        // var serviceProvider = services.BuildServiceProvider();
-        //
-        // var settingService = serviceProvider.GetService<ISettingService>();
-        //
-        // var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
-        //
-        // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        //     .AddJwtBearer(options =>
-        //     {
-        //         options.TokenValidationParameters = new TokenValidationParameters
-        //         {
-        //             ValidateIssuer = true,
-        //             ValidateAudience = true,
-        //             ValidateLifetime = true,
-        //             ValidateIssuerSigningKey = true,
-        //             ValidIssuer = jwtSettings["JWT.Issuer"],
-        //             ValidAudience = jwtSettings["JWT.Audience"],
-        //             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
-        //         };
-        //     });
+        var serviceProvider = services.BuildServiceProvider();
+        
+        var settingService = serviceProvider.GetService<ISettingService>();
+        
+        var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
+        
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["JWT.Issuer"],
+                    ValidAudience = jwtSettings["JWT.Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+                };
+            });
     }
 
     public static void AddSwaggerService(this IServiceCollection services)

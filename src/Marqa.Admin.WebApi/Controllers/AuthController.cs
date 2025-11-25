@@ -17,33 +17,32 @@ public class AuthController(IAuthService authService) : ControllerBase
         return Ok(new Response<LoginResponseModel>
         {
             StatusCode = 200, 
-            Message = "success",
+            Message = "Login successfully",
             Data = data
         });
     }
     
     [HttpPost("logout")]
-    public async Task<IActionResult> LogoutAsync([FromBody] LoginModel model)
+    public async Task<IActionResult> LogoutAsync([FromBody] LogoutModel model)
     {
         var ipAddress = HttpContext?.Connection?.RemoteIpAddress?.ToString();
-        var data = await authService.LoginAsync(model, ipAddress);
-        return Ok(new Response<LoginResponseModel>
+        var data = await authService.LogoutAsync(model, ipAddress);
+        return Ok(new Response<bool>
         {
             StatusCode = 200, 
-            Message = "success",
+            Message = "Revoked successfully",
             Data = data
         });
     }
     
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshTokenAsync([FromBody] LoginModel model)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenModel model)
     {
-        var ipAddress = HttpContext?.Connection?.RemoteIpAddress?.ToString();
-        var data = await authService.LoginAsync(model, ipAddress);
+        var data = await authService.RefreshTokenAsync(model);
         return Ok(new Response<LoginResponseModel>
         {
             StatusCode = 200, 
-            Message = "success",
+            Message = "Refresh token successfully",
             Data = data
         });
     }

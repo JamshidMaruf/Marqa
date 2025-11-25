@@ -1,12 +1,14 @@
 ﻿using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.EmployeeRoles.Models;
 using Marqa.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
 {
     [HttpPost]
