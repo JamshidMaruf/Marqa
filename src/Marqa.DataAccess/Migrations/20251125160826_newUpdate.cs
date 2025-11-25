@@ -9,28 +9,20 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class initialmigration4 : Migration
+    public partial class newUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Banners",
+                name: "Assets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CompanyId = table.Column<int>(type: "integer", nullable: false),
-                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FileExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    LinkUrl = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DisplayOrder = table.Column<int>(type: "integer", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
+                    FileExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -38,7 +30,7 @@ namespace Marqa.DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Banners", x => x.Id);
+                    table.PrimaryKey("PK_Assets", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,11 +39,11 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Director = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Director = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -68,8 +60,8 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PhoneNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Code = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Code = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsUsed = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -88,10 +80,10 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Module = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Action = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Module = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Action = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -109,8 +101,8 @@ namespace Marqa.DataAccess.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Point = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Operation = table.Column<int>(type: "integer", nullable: false),
                     IsEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     QrCode = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
@@ -130,7 +122,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Code = table.Column<int>(type: "integer", nullable: false),
                     Point = table.Column<int>(type: "integer", nullable: false),
                     Operation = table.Column<int>(type: "integer", nullable: false),
@@ -166,12 +158,67 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    LastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsUseSystem = table.Column<bool>(type: "boolean", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Banners",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    LinkUrl = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    DisplayOrder = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Banners", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Banners_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EmployeeRoles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CanTeach = table.Column<bool>(type: "boolean", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -196,13 +243,11 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CompanyId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ImageName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ImagePage = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ImageExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     Price = table.Column<int>(type: "integer", nullable: false),
+                    CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -212,42 +257,13 @@ namespace Marqa.DataAccess.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
+                        name: "FK_Products_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Students",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    StudentAccessId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    FirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    LastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Balance = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    PasswordHash = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
-                    ImageFileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    ImageFilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    ImageFileExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
-                    Gender = table.Column<int>(type: "integer", nullable: false),
-                    CompanyId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Students", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_Companies_CompanyId",
+                        name: "FK_Products_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
                         principalColumn: "Id",
@@ -260,7 +276,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -279,23 +295,88 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Token = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedByIp = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    RevokedByIp = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StudentAccessId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Balance = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
+                    DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
+                    Gender = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    CompanyId = table.Column<int>(type: "integer", nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Students_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    LastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     DateOfBirth = table.Column<DateOnly>(type: "date", nullable: false),
                     Salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     JoiningDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    Specialization = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Info = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: false),
+                    Specialization = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Info = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     RoleId = table.Column<int>(type: "integer", nullable: false),
                     ParentId = table.Column<int>(type: "integer", nullable: true),
@@ -323,6 +404,12 @@ namespace Marqa.DataAccess.Migrations
                         column: x => x.ParentId,
                         principalTable: "Employees",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Employees_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -388,7 +475,7 @@ namespace Marqa.DataAccess.Migrations
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     TotalPrice = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    Number = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Number = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -410,15 +497,15 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FatherFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    FatherLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    FatherPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    MotherFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    MotherLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    MotherPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    GuardianFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    GuardianLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    GuardianPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    FatherFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    FatherLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    FatherPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    MotherFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    MotherLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    MotherPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    GuardianFirstName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    GuardianLastName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    GuardianPhone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -444,34 +531,6 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentHomeTasks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    StudentId = table.Column<int>(type: "integer", nullable: false),
-                    HomeTaskId = table.Column<int>(type: "integer", nullable: false),
-                    Feedback = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Score = table.Column<int>(type: "integer", nullable: false),
-                    UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StudentHomeTasks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StudentHomeTasks_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StudentPointHistories",
                 columns: table => new
                 {
@@ -481,7 +540,7 @@ namespace Marqa.DataAccess.Migrations
                     PreviousPoint = table.Column<int>(type: "integer", nullable: false),
                     GivenPoint = table.Column<int>(type: "integer", nullable: false),
                     CurrentPoint = table.Column<int>(type: "integer", nullable: false),
-                    Note = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Note = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Operation = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -504,7 +563,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     LessonCount = table.Column<int>(type: "integer", nullable: false),
                     StartDate = table.Column<DateOnly>(type: "date", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
@@ -512,7 +571,7 @@ namespace Marqa.DataAccess.Migrations
                     Status = table.Column<int>(type: "integer", nullable: false),
                     MaxStudentCount = table.Column<int>(type: "integer", nullable: false),
                     Price = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    Description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
+                    Description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     CompanyId = table.Column<int>(type: "integer", nullable: false),
                     SubjectId = table.Column<int>(type: "integer", nullable: false),
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
@@ -548,13 +607,13 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PaymentNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PaymentNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     EmployeeId = table.Column<int>(type: "integer", nullable: false),
                     Salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -665,32 +724,6 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentHomeTaskFiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePathExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    StudentHomeTaskId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StudentHomeTaskFiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StudentHomeTaskFiles_StudentHomeTasks_StudentHomeTaskId",
-                        column: x => x.StudentHomeTaskId,
-                        principalTable: "StudentHomeTasks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CourseWeekdays",
                 columns: table => new
                 {
@@ -720,10 +753,10 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CourseId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -746,12 +779,12 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Number = table.Column<int>(type: "integer", nullable: false),
                     StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
                     EndTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Room = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Room = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     HomeTaskStatus = table.Column<int>(type: "integer", nullable: false),
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: false),
                     CourseId = table.Column<int>(type: "integer", nullable: false),
@@ -812,16 +845,16 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PaymentNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PaymentNumber = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     PaymentOperationType = table.Column<int>(type: "integer", nullable: false),
                     CoursePrice = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: false),
                     CourseId = table.Column<int>(type: "integer", nullable: false),
                     StudentId = table.Column<int>(type: "integer", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "bytea", rowVersion: true, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -851,12 +884,10 @@ namespace Marqa.DataAccess.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ExamId = table.Column<int>(type: "integer", nullable: false),
+                    CertificateId = table.Column<int>(type: "integer", nullable: false),
                     MinScore = table.Column<float>(type: "real", nullable: false),
                     MaxScore = table.Column<float>(type: "real", nullable: false),
                     IsGivenCertificate = table.Column<bool>(type: "boolean", nullable: false),
-                    CertificateFileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    CertificateFilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    CertificateFileExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -865,6 +896,12 @@ namespace Marqa.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExamSettings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExamSettings_Assets_CertificateId",
+                        column: x => x.CertificateId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ExamSettings_Exams_ExamId",
                         column: x => x.ExamId,
@@ -882,7 +919,7 @@ namespace Marqa.DataAccess.Migrations
                     StudentId = table.Column<int>(type: "integer", nullable: false),
                     ExamId = table.Column<int>(type: "integer", nullable: false),
                     Score = table.Column<double>(type: "double precision", nullable: false),
-                    TeacherFeedback = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
+                    TeacherFeedback = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -913,7 +950,7 @@ namespace Marqa.DataAccess.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     LessonId = table.Column<int>(type: "integer", nullable: false),
                     Deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
+                    Description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -966,8 +1003,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
                     LessonId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -977,6 +1013,12 @@ namespace Marqa.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LessonFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LessonFiles_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LessonFiles_Lessons_LessonId",
                         column: x => x.LessonId,
@@ -991,9 +1033,8 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
                     LessonId = table.Column<int>(type: "integer", nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1002,6 +1043,12 @@ namespace Marqa.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LessonVideos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LessonVideos_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LessonVideos_Lessons_LessonId",
                         column: x => x.LessonId,
@@ -1041,10 +1088,8 @@ namespace Marqa.DataAccess.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FileName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FilePath = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    FileExtension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     HomeTaskId = table.Column<int>(type: "integer", nullable: false),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1054,9 +1099,79 @@ namespace Marqa.DataAccess.Migrations
                 {
                     table.PrimaryKey("PK_HomeTaskFiles", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_HomeTaskFiles_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_HomeTaskFiles_HomeTasks_HomeTaskId",
                         column: x => x.HomeTaskId,
                         principalTable: "HomeTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentHomeTasks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StudentId = table.Column<int>(type: "integer", nullable: false),
+                    HomeTaskId = table.Column<int>(type: "integer", nullable: false),
+                    Feedback = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Score = table.Column<int>(type: "integer", nullable: false),
+                    UploadedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentHomeTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentHomeTasks_HomeTasks_HomeTaskId",
+                        column: x => x.HomeTaskId,
+                        principalTable: "HomeTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentHomeTasks_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentHomeTaskFiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    AssetId = table.Column<int>(type: "integer", nullable: false),
+                    StudentHomeTaskId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentHomeTaskFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentHomeTaskFiles_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentHomeTaskFiles_StudentHomeTasks_StudentHomeTaskId",
+                        column: x => x.StudentHomeTaskId,
+                        principalTable: "StudentHomeTasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1113,6 +1228,11 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Banners_AssetId",
+                table: "Banners",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BasketItems_BasketId",
                 table: "BasketItems",
                 column: "BasketId");
@@ -1164,15 +1284,14 @@ namespace Marqa.DataAccess.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Employees_Phone_CompanyId",
-                table: "Employees",
-                columns: new[] { "Phone", "CompanyId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Employees_RoleId",
                 table: "Employees",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_UserId",
+                table: "Employees",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EmployeeSalarys_EmployeeId",
@@ -1196,10 +1315,20 @@ namespace Marqa.DataAccess.Migrations
                 column: "ExamSettingId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExamSettings_CertificateId",
+                table: "ExamSettings",
+                column: "CertificateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExamSettings_ExamId",
                 table: "ExamSettings",
                 column: "ExamId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HomeTaskFiles_AssetId",
+                table: "HomeTaskFiles",
+                column: "AssetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HomeTaskFiles_HomeTaskId",
@@ -1218,6 +1347,11 @@ namespace Marqa.DataAccess.Migrations
                 column: "LessonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LessonFiles_AssetId",
+                table: "LessonFiles",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LessonFiles_LessonId",
                 table: "LessonFiles",
                 column: "LessonId");
@@ -1231,6 +1365,11 @@ namespace Marqa.DataAccess.Migrations
                 name: "IX_Lessons_TeacherId",
                 table: "Lessons",
                 column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonVideos_AssetId",
+                table: "LessonVideos",
+                column: "AssetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LessonVideos_LessonId",
@@ -1259,6 +1398,11 @@ namespace Marqa.DataAccess.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_AssetId",
+                table: "Products",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CompanyId",
                 table: "Products",
                 column: "CompanyId");
@@ -1267,6 +1411,11 @@ namespace Marqa.DataAccess.Migrations
                 name: "IX_Products_Name",
                 table: "Products",
                 column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
@@ -1329,9 +1478,19 @@ namespace Marqa.DataAccess.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentHomeTaskFiles_AssetId",
+                table: "StudentHomeTaskFiles",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudentHomeTaskFiles_StudentHomeTaskId",
                 table: "StudentHomeTaskFiles",
                 column: "StudentHomeTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentHomeTasks_HomeTaskId",
+                table: "StudentHomeTasks",
+                column: "HomeTaskId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentHomeTasks_StudentId",
@@ -1360,15 +1519,19 @@ namespace Marqa.DataAccess.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Students_AssetId",
+                table: "Students",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_CompanyId",
                 table: "Students",
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_Phone_CompanyId",
+                name: "IX_Students_UserId",
                 table: "Students",
-                columns: new[] { "Phone", "CompanyId" },
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_CompanyId",
@@ -1424,6 +1587,9 @@ namespace Marqa.DataAccess.Migrations
                 name: "PointSystemSettings");
 
             migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
@@ -1457,9 +1623,6 @@ namespace Marqa.DataAccess.Migrations
                 name: "ExamSettings");
 
             migrationBuilder.DropTable(
-                name: "HomeTasks");
-
-            migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
@@ -1475,10 +1638,16 @@ namespace Marqa.DataAccess.Migrations
                 name: "Exams");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "HomeTasks");
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
+
+            migrationBuilder.DropTable(
+                name: "Assets");
 
             migrationBuilder.DropTable(
                 name: "Courses");
@@ -1491,6 +1660,9 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "EmployeeRoles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Companies");

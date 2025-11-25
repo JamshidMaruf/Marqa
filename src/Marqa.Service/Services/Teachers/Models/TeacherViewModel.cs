@@ -11,14 +11,26 @@ public class TeacherViewModel
     public string Phone { get; set; }
     public string Email { get; set; }
     public DateOnly DateOfBirth { get; set; }
-    public Gender Gender { get; set; }
+    public GenderInfo Gender { get; set; }
     public string Specialization { get; set; }
-    public EmployeeStatus Status { get; set; }
+    public StatusInfo Status { get; set; }
     public DateOnly JoiningDate { get; set; }
+    public decimal Salary { get; set; }
+    public string Info { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
     public RoleInfo Role { get; set; }
 
+    public class GenderInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+    public class StatusInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
     public class SubjectInfo
     {
         public int Id { get; set; }

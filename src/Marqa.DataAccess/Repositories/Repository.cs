@@ -31,7 +31,6 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
                 _context.Add(entity);
             }
         });
-
     }
 
     public void Update(TEntity entity)

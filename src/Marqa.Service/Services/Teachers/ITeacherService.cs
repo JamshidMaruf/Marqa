@@ -9,5 +9,5 @@ public interface ITeacherService
     Task DeleteAsync(int id);
     Task<TeacherViewModel> GetAsync(int id);
     Task<TeacherUpdateViewModel> GetForUpdateAsync(int id);
-    Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null);
+    Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null);
 }
