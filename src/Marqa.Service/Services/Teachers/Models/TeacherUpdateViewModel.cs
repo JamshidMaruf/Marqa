@@ -16,6 +16,7 @@ public class TeacherUpdateViewModel
     public DateOnly JoiningDate { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
+    public RoleInfo Role { get; set; }
 
     public class SubjectInfo
     {
@@ -29,5 +30,11 @@ public class TeacherUpdateViewModel
         public string Name { get; set; }
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
+    }
+
+    public class RoleInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

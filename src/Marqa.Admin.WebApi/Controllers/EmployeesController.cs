@@ -1,6 +1,5 @@
 ﻿using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
-using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,7 +58,7 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
         });
     }
 
-    [HttpGet("{companyId}")]
+    [HttpGet("by-company/{companyId}")]    
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search)
     {
         var result = await employeeService.GetAllAsync(companyId, search);

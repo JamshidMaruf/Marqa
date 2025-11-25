@@ -32,7 +32,6 @@ builder.Services.AddControllers(options =>
 
 });
 
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

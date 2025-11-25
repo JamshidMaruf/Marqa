@@ -58,7 +58,7 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
         });
     }
 
-    [HttpGet("{companyId}")]
+    [HttpGet("by-company/{companyId}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var companies = await employeeRoleService.GetAllAsync(companyId);

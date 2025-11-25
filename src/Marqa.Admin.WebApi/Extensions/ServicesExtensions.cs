@@ -1,5 +1,4 @@
-﻿using System.Text;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Servcies.Products;
@@ -22,9 +21,8 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
+using Marqa.Service.Services.Teachers;
 using Marqa.Service.Validators.Companies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Admin.WebApi.Extensions;
 
@@ -53,6 +51,7 @@ public static class ServicesExtensions
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<IEnumService, EnumService>();
+        services.AddScoped<ITeacherService, TeacherService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 }
