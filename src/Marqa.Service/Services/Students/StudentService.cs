@@ -34,16 +34,16 @@ public class StudentService(
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
         var fatherPhoneResult = model.StudentDetailCreateModel.FatherPhone.TrimPhoneNumber();
-        if (!fatherPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
-
         var motherPhoneResult = model.StudentDetailCreateModel.MotherPhone.TrimPhoneNumber();
-        if (!motherPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
-
         var guardianPhoneResult = model.StudentDetailCreateModel.GuardianPhone.TrimPhoneNumber();
-        if (!guardianPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        bool anyParentPhoneValid =
+            fatherPhoneResult.IsSuccessful ||
+            motherPhoneResult.IsSuccessful ||
+            guardianPhoneResult.IsSuccessful;
+
+        if (!anyParentPhoneValid)
+            throw new ArgumentIsNotValidException("At least one parent phone number must be valid");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
@@ -96,16 +96,16 @@ public class StudentService(
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
         var fatherPhoneResult = model.StudentDetailUpdateModel.FatherPhone.TrimPhoneNumber();
-        if (!fatherPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
-
         var motherPhoneResult = model.StudentDetailUpdateModel.MotherPhone.TrimPhoneNumber();
-        if (!motherPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
-
         var guardianPhoneResult = model.StudentDetailUpdateModel.GuardianPhone.TrimPhoneNumber();
-        if (!guardianPhoneResult.IsSuccessful)
-            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        bool anyParentPhoneValid =
+            fatherPhoneResult.IsSuccessful ||
+            motherPhoneResult.IsSuccessful ||
+            guardianPhoneResult.IsSuccessful;
+
+        if (!anyParentPhoneValid)
+            throw new ArgumentIsNotValidException("At least one parent phone number must be valid");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
