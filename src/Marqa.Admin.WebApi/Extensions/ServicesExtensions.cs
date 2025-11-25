@@ -7,7 +7,7 @@ using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Enum;
+using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks;
@@ -32,7 +32,8 @@ public static class ServicesExtensions
     {
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAuthService, JwtService>();
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IEmployeeService, EmployeeService>();

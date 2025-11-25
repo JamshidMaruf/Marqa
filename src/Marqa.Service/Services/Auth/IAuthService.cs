@@ -6,4 +6,5 @@ public interface IAuthService
 {
     ValueTask<LoginResponseModel> LoginAsync(LoginModel model, string ipAddress);
     ValueTask<LoginResponseModel> RefreshTokenAsync(RefreshTokenModel model);
+    ValueTask<bool> LogoutAsync(LogoutModel model, string ipAddress);
 }

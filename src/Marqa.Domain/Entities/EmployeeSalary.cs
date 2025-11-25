@@ -8,7 +8,7 @@ public class EmployeeSalary : Auditable
     public int EmployeeId { get; set; }
     public decimal Salary { get; set; }
     public DateTime DateTime { get; set; }
-    public string? Description { get; set; } 
+    public string Description { get; set; } 
     public PaymentMethod PaymentMethod { get; set; }
     public byte[] RowVersion { get; set; }
     // Navigation

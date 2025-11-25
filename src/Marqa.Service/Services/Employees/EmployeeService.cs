@@ -12,8 +12,7 @@ namespace Marqa.Service.Services.Employees;
 
 public class EmployeeService(IUnitOfWork unitOfWork,
     IValidator<EmployeeCreateModel> validatorEmployeeCreate,
-    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate,
-    IAuthService authService) : IEmployeeService
+    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate) : IEmployeeService
 {
     public async Task<Employee> CreateAsync(EmployeeCreateModel model)
     {
@@ -34,16 +33,19 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
+        var userEntity = unitOfWork.Users.Insert(new User()
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Phone = employeePhone.Phone,
+            Email = model.Email,
+            PasswordHash = PasswordHelper.Hash(model.Password)
+        });
+        await unitOfWork.SaveAsync();
+        
         var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
-            User = new User
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Phone = employeePhone.Phone,
-                Email = model.Email,
-                PasswordHash = PasswordHelper.Hash(model.Password),
-            },
+            UserId = userEntity.Id,
             CompanyId = model.CompanyId,
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,

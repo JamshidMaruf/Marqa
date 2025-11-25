@@ -24,7 +24,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, int companyId, [FromBody] StudentUpdateModel model)
     {
-        await studentService.UpdateAsync(id, companyId, model);
+      //  await studentService.UpdateAsync(id, companyId, model);
 
         return Ok(new Response
         {

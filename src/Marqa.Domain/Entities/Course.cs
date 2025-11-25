@@ -13,7 +13,7 @@ public class Course : Auditable
     public CourseStatus Status { get; set; }
     public int MaxStudentCount { get; set; }
     public decimal Price { get; set; }
-    public string? Description { get; set; }
+    public string Description { get; set; }
     public int CompanyId { get; set; }
     public int SubjectId { get; set; }
     public int TeacherId { get; set; }
