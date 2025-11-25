@@ -1,5 +1,4 @@
 ﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

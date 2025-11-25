@@ -2,10 +2,9 @@
 
 public class StudentHomeTaskFile : Auditable
 {
-    public string FileName { get; set; }
-    public string FilePath { get; set; }
-    public string FilePathExtension { get; set; }
+    public int AssetId { get; set; }
     public int StudentHomeTaskId { get; set; }
 
+    public Asset Asset { get; set; }
     public StudentHomeTask StudentHomeTask { get; set; }
 }

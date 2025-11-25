@@ -46,9 +46,12 @@ public class ExamService(IUnitOfWork unitOfWork,
                 MinScore = model.ExamSetting.MinScore,
                 MaxScore = model.ExamSetting.MaxScore,
                 IsGivenCertificate = model.ExamSetting.IsGivenCertificate,
-                CertificateFileName = model.ExamSetting.CertificateFileName,
-                CertificateFilePath = model.ExamSetting.CertificateFilePath,
-                CertificateFileExtension = model.ExamSetting.CertificateFileExtension
+                Certificate = new Asset
+                {
+                    FileName = model.ExamSetting.CertificateFileName,
+                    FilePath = model.ExamSetting.CertificateFilePath,
+                    FileExtension = model.ExamSetting.CertificateFileExtension
+                }
             });
 
             await unitOfWork.SaveAsync();
@@ -99,9 +102,9 @@ public class ExamService(IUnitOfWork unitOfWork,
         examForUpdation.ExamSetting.MinScore = model.ExamSetting.MinScore;
         examForUpdation.ExamSetting.MaxScore = model.ExamSetting.MaxScore;
         examForUpdation.ExamSetting.IsGivenCertificate = model.ExamSetting.IsGivenCertificate;
-        examForUpdation.ExamSetting.CertificateFileName = model.ExamSetting.CertificateFileName;
-        examForUpdation.ExamSetting.CertificateFilePath = model.ExamSetting.CertificateFilePath;
-        examForUpdation.ExamSetting.CertificateFileExtension = model.ExamSetting.CertificateFileExtension;
+        examForUpdation.ExamSetting.Certificate.FileName = model.ExamSetting.CertificateFileName;
+        examForUpdation.ExamSetting.Certificate.FilePath = model.ExamSetting.CertificateFilePath;
+        examForUpdation.ExamSetting.Certificate.FileExtension = model.ExamSetting.CertificateFileExtension;
 
         await unitOfWork.ExamSettingItems.InsertRangeAsync(model.ExamSetting.Items.Select(item => new ExamSettingItem
         {
@@ -197,9 +200,9 @@ public class ExamService(IUnitOfWork unitOfWork,
                 Student = new StudentExamResultView.StudentInfo
                 {
                     Id = r.Student.Id,
-                    FirstName = r.Student.FirstName,
-                    LastName = r.Student.LastName,
-                    Email = r.Student.Email
+                    FirstName = r.Student.User.FirstName,
+                    LastName = r.Student.User.LastName,
+                    Email = r.Student.User.Email
                 },
                 Exam = new StudentExamResultView.ExamInfo
                 {

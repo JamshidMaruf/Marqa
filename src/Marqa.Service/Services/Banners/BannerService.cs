@@ -38,7 +38,7 @@ public class BannerService(
     public async Task UploadBannerImageAsync(int bannerId, IFormFile file)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == bannerId)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == bannerId, includes: "Asset")
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Banner was not found with this ID = {bannerId}");
 
@@ -51,9 +51,9 @@ public class BannerService(
 
         var result = await fileService.UploadAsync(file, "Files/Images");
 
-        existBanner.FileName = result.FileName;
-        existBanner.FilePath = result.FilePath;
-        existBanner.FileExtension = fileExtension;
+        existBanner.Asset.FileName = result.FileName;
+        existBanner.Asset.FilePath = result.FilePath;
+        existBanner.Asset.FileExtension = fileExtension;
 
         unitOfWork.Banners.Update(existBanner);
         await unitOfWork.SaveAsync();
@@ -94,11 +94,11 @@ public class BannerService(
     public async Task<MainPageBannerViewModel> GetAsync(int id)
     {
         var existBanner = await unitOfWork.Banners
-            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == id)
+            .SelectAllAsQueryable(b => !b.IsDeleted && b.Id == id, includes: "Asset")
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.FilePath,
+                ImageUrl = b.Asset.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -111,12 +111,12 @@ public class BannerService(
     public async Task<List<MainPageBannerViewModel>> GetAllAsync()
     {
         return await unitOfWork.Banners
-            .SelectAllAsQueryable(b => !b.IsDeleted)
+            .SelectAllAsQueryable(b => !b.IsDeleted, includes: "Asset")
             .OrderBy(b => b.DisplayOrder)
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.FilePath,
+                ImageUrl = b.Asset.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -132,12 +132,12 @@ public class BannerService(
                 b => !b.IsDeleted
                 && b.IsActive
                 && b.StartDate <= currentDate
-                && b.EndDate >= currentDate)
+                && b.EndDate >= currentDate, includes: "Asset")
             .OrderBy(b => b.DisplayOrder)
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.FilePath,
+                ImageUrl = b.Asset.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })
@@ -157,12 +157,12 @@ public class BannerService(
     public async Task<List<MainPageBannerViewModel>> GetByCompanyIdAsync(int companyId)
     {
         return await unitOfWork.Banners
-            .SelectAllAsQueryable(b => b.CompanyId == companyId && b.IsActive && !b.IsDeleted)
+            .SelectAllAsQueryable(b => b.CompanyId == companyId && b.IsActive && !b.IsDeleted, includes: "Asset")
             .OrderBy(b => b.CreatedAt)
             .Select(b => new MainPageBannerViewModel
             {
                 Id = b.Id,
-                ImageUrl = b.FilePath,
+                ImageUrl = b.Asset.FilePath,
                 LinkUrl = b.LinkUrl,
                 DisplayOrder = b.DisplayOrder,
             })

@@ -2,7 +2,7 @@
 
 namespace Marqa.Service.Services.Courses.Models;
 
-public partial class CourseViewModel
+public partial class CourseUpdateViewModel
 {
     public int Id { get; set; }
     public string Name { get; set; }

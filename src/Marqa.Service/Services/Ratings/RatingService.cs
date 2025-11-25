@@ -1,10 +1,8 @@
 ﻿using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Ratings.Models;
 using Marqa.Service.Services.StudentPointHistories;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Marqa.Service.Services.Ratings;
 
@@ -20,7 +18,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<Rating>> GetAllStudentRatingsAsync()
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable();
+            .SelectAllAsQueryable(includes: "User");
 
         var ratings = new List<Rating>();
         foreach (var student in students)
@@ -36,8 +34,8 @@ public class RatingService(IUnitOfWork unitOfWork,
                         CourseName = c.Name
                     }).FirstOrDefaultAsync(),
                 StudentId = student.Id,
-                StudentFirstName = student.FirstName,
-                StudentLastName = student.LastName,
+                StudentFirstName = student.User.FirstName,
+                StudentLastName = student.User.LastName,
                 TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
@@ -55,7 +53,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId)
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable(s => s.Courses.Any());
+            .SelectAllAsQueryable(s => s.Courses.Any(), includes: "User");
 
         var ratings = new List<Rating>();
 
@@ -72,8 +70,8 @@ public class RatingService(IUnitOfWork unitOfWork,
                         CourseName = c.Name
                     }).FirstOrDefaultAsync(),
                 StudentId = student.Id,
-                StudentFirstName = student.FirstName,
-                StudentLastName = student.LastName,
+                StudentFirstName = student.User.FirstName,
+                StudentLastName = student.User.LastName,
                 TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
@@ -90,7 +88,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId)
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable(s => s.CompanyId == companyId);
+            .SelectAllAsQueryable(s => s.CompanyId == companyId, includes: "User");
 
         var ratings = new List<MainPageRatingResult>();
         foreach (var student in students)
@@ -98,8 +96,8 @@ public class RatingService(IUnitOfWork unitOfWork,
             ratings.Add(new MainPageRatingResult
             {
                 StudentId = student.Id,
-                StudentFirstName = student.FirstName,
-                StudentLastName = student.LastName,
+                StudentFirstName = student.User.FirstName,
+                StudentLastName = student.User.LastName,
                 TotalPoints = await pointHistoryService.GetAsync(student.Id),
             });
         }
@@ -121,7 +119,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         {
             var query = unitOfWork.StudentCourses.SelectAllAsQueryable(
                 predicate: sc => sc.CourseId == courseId,
-                includes: "Student" );
+                includes: [ "Student", "User" ]);
 
             if (gender is not null)
             {
@@ -133,11 +131,11 @@ public class RatingService(IUnitOfWork unitOfWork,
                 Students = query.Select(s => new RatingPageRatingResult.StudentInfo
                 {
                     StudentId = s.Id,
-                    StudentFirstName = s.Student.FirstName,
-                    StudentLastName = s.Student.LastName,
-                    ImageName = s.Student.ImageFileName,
-                    ImagePath = s.Student.ImageFilePath,
-                    ImageExtension = s.Student.ImageFileExtension
+                    StudentFirstName = s.Student.User.FirstName,
+                    StudentLastName = s.Student.User.LastName,
+                    ImageName = s.Student.Asset.FileName,
+                    ImagePath = s.Student.Asset.FilePath,
+                    ImageExtension = s.Student.Asset.FileExtension
                 })
             };
 
@@ -162,6 +160,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                 .SelectAllAsQueryable(s => !s.IsDeleted)
                 .Include(s => s.Courses)
                 .ThenInclude(c => c.Course)
+                .Include(s => s.User)
                 .Where(s => s.CompanyId == companyId);
 
             if (gender is not null)
@@ -174,11 +173,11 @@ public class RatingService(IUnitOfWork unitOfWork,
                 Students = await query.Select(s => new RatingPageRatingResult.StudentInfo
                 {
                     StudentId = s.Id,
-                    StudentFirstName = s.FirstName,
-                    StudentLastName = s.LastName,
-                    ImageName = s.ImageFileName,
-                    ImagePath = s.ImageFilePath,
-                    ImageExtension = s.ImageFileExtension,
+                    StudentFirstName = s.User.FirstName,
+                    StudentLastName = s.User.LastName,
+                    ImageName = s.Asset.FileName,
+                    ImagePath = s.Asset.FilePath,
+                    ImageExtension = s.Asset.FileExtension,
                     Courses = s.Courses.Select(c => new RatingPageRatingResult.CourseInfo
                     {
                         Id = c.CourseId,
