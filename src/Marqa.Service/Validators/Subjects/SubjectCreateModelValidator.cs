@@ -14,6 +14,6 @@ public class SubjectCreateModelValidator : AbstractValidator<SubjectCreateModel>
         RuleFor(x => x.CompanyId).GreaterThan(0);
         RuleFor(x => x.Name)
            .NotEmpty().WithMessage("Name cannot be empty.")
-           .MaximumLength(100).WithMessage("Name length must not exceed word limit.");
+           .MaximumLength(255).WithMessage("Name length must not exceed word limit.");
     }
 }

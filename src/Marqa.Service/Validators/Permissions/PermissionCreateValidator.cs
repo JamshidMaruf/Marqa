@@ -11,20 +11,14 @@ public class PermissionCreateValidator : AbstractValidator<PermissionCreateModel
     public PermissionCreateValidator()
     {
         RuleFor(p => p.Name)
-            .NotEmpty()
-            .MaximumLength(100);
+            .NotEmpty();
 
         RuleFor(p => p.Module)
-            .NotEmpty()
-            .MaximumLength(50);
+            .NotEmpty();
 
         RuleFor(p => p.Action)
             .NotEmpty().WithMessage("Action is required")
             .Must(BeValidAction).WithMessage($"Action must be one of: {string.Join(", ", ValidActions)}");
-
-        RuleFor(p => p.Description)
-            .MaximumLength(500)
-            .When(p => !string.IsNullOrEmpty(p.Description));
     }
 
     private bool BeValidAction(string action)
@@ -32,5 +26,4 @@ public class PermissionCreateValidator : AbstractValidator<PermissionCreateModel
         return !string.IsNullOrWhiteSpace(action) &&
                ValidActions.Contains(action, StringComparer.OrdinalIgnoreCase);
     }
-
 }

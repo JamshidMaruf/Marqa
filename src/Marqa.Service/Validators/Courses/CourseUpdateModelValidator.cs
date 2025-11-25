@@ -7,13 +7,13 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
 {
     public CourseUpdateModelValidator()
     {
-        RuleFor(c => c.TeacherId).NotNull().GreaterThan(0);
+        RuleFor(c => c.TeacherId).GreaterThan(0);
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
-        RuleFor(c => c.LessonCount).NotNull().GreaterThan(0);
-        RuleFor(c => c.StartDate).NotNull();
-        RuleFor(c => c.StartTime).NotNull();
-        RuleFor(c => c.EndTime).NotNull();
-        RuleFor(c => c.MaxStudentCount).NotNull();
-        RuleFor(c => c.Weekdays).NotNull();
+        RuleFor(c => c.LessonCount).GreaterThan(0);
+        RuleFor(x => x.EndTime)
+            .GreaterThan(x => x.StartTime)
+            .WithMessage("End time must be greater than start time.");
+        RuleFor(c => c.MaxStudentCount).GreaterThan(0);
+        RuleFor(c => c.Weekdays).IsInEnum();
     }
 }

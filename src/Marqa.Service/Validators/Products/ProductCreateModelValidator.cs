@@ -8,7 +8,7 @@ namespace Marqa.Service.Validators.Products
         public ProductCreateModelValidator()
         {
             RuleFor(p => p.CompanyId).NotNull().GreaterThan(0);
-            RuleFor(p => p.Name).NotNull().Length(36);
+            RuleFor(p => p.Name).NotEmpty().Length(255);
             RuleFor(p => p.Price).NotNull();
         }
     }
