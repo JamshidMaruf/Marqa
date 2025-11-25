@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Service.Services.Exams.Models;
 
 namespace Marqa.Service.Validators.Exams;
@@ -16,11 +11,7 @@ public class ExamCreateModelValidator : AbstractValidator<ExamCreateModel>
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(200).WithMessage("Title must be at most 200 characters.");
-
-        RuleFor(x => x.StartTime)
-            .GreaterThan(DateTime.UtcNow.AddMinutes(-1)) // allow small margin
-            .WithMessage("Start time must be in the future.");
+            .MaximumLength(255).WithMessage("Title must be at most 255 characters.");
 
         RuleFor(x => x.EndTime)
             .GreaterThan(x => x.StartTime)

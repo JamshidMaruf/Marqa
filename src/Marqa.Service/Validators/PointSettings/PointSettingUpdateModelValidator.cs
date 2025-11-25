@@ -7,8 +7,8 @@ public class PointSettingUpdateModelValidator : AbstractValidator<PointSettingUp
 {
     public PointSettingUpdateModelValidator()
     {
-        RuleFor(p => p.Name).NotNull().Length(100);
-        RuleFor(p => p.Operation).NotNull();
+        RuleFor(p => p.Name).NotEmpty().Length(255);
+        RuleFor(p => p.Operation).IsInEnum();
         RuleFor(p => p.Point).NotNull().GreaterThan(0);
     }
 }

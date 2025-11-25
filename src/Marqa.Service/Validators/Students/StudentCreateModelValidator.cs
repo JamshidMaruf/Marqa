@@ -9,11 +9,11 @@ public class StudentCreateModelValidator : AbstractValidator<StudentCreateModel>
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("FirstName is required")
-            .MaximumLength(50).WithMessage("FirstName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("FirstName must not exceed 50 characters");
 
         RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("LastName is required")
-            .MaximumLength(50).WithMessage("LastName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("LastName must not exceed 50 characters");
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone is required")

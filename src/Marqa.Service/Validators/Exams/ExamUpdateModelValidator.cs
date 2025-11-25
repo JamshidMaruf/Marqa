@@ -11,7 +11,7 @@ public class ExamUpdateModelValidator : AbstractValidator<ExamUpdateModel>
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
-            .MaximumLength(200).WithMessage("Title must be at most 200 characters.");
+            .MaximumLength(255).WithMessage("Title must be at most 255 characters.");
 
         RuleFor(x => x.StartTime)
             .LessThan(x => x.EndTime)

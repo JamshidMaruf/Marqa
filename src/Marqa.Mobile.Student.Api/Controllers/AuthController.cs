@@ -17,7 +17,7 @@ public class AuthController(IAuthService authService, ISmsService smsService) : 
         {
             StatusCode = 200,
             Message = "token_generated",
-            Data = await authService.GenerateAppToken(model.AppId, model.SecretKey)
+            //Data = await authService.GenerateAppToken(model.AppId, model.SecretKey)
         });
     }
 
@@ -39,13 +39,13 @@ public class AuthController(IAuthService authService, ISmsService smsService) : 
         var result = await smsService.VerifyOTPAsync(phone, code);
 
         var app = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "App")?.Value;
-        var token = await authService.GenerateToken(app, result.EntityId, result.EntityType);
+        //var token = await authService.GenerateToken(app, result.EntityId, result.EntityType);
 
         return Ok(new Response<string>
         {
             StatusCode = 200,
             Message = "otp_verified",
-            Data = token
+            //Data = token
         });
     }
 }

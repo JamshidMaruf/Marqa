@@ -13,8 +13,7 @@ public class HomeTaskAssessmentModelValidator : AbstractValidator<HomeTaskAssess
     {
         RuleFor(x => x.TeacherId).GreaterThan(0);
         RuleFor(x => x.StudentHomeTaskId).GreaterThan(0);
-        RuleFor(x => x.FeedBack).MaximumLength(300);
-        RuleFor(x => x.Status).IsInEnum().NotNull();
+        RuleFor(x => x.Status).IsInEnum();
         RuleFor(x => x.Score).GreaterThan(0);
     }
 }

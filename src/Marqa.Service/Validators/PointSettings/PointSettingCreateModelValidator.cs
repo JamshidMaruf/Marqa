@@ -7,7 +7,7 @@ public class PointSettingCreateModelValidator : AbstractValidator<PointSettingCr
     public PointSettingCreateModelValidator()
     {
         RuleFor(p => p.Point).NotNull().NotEmpty().GreaterThan(0);
-        RuleFor(p => p.Name).NotNull().Length(100);
-        RuleFor(p => p.Operation).NotNull();
+        RuleFor(p => p.Name).NotEmpty().Length(255);
+        RuleFor(p => p.Operation).IsInEnum();
     }
 }

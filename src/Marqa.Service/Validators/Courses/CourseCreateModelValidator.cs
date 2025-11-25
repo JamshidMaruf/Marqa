@@ -6,15 +6,15 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
 {
     public CourseCreateModelValidator()
     {
-        RuleFor(c => c.CompanyId).NotNull();
-        RuleFor(c => c.TeacherId).NotNull();
-        RuleFor(c => c.SubjectId).NotNull();
+        RuleFor(c => c.CompanyId).GreaterThan(0);
+        RuleFor(c => c.TeacherId).GreaterThan(0);
+        RuleFor(c => c.SubjectId).GreaterThan(0);
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
-        RuleFor(c => c.LessonCount).NotNull();
-        RuleFor(c => c.StartDate).NotNull();
-        RuleFor(c => c.StartTime).NotNull();
-        RuleFor(c => c.EndTime).NotNull();
-        RuleFor(c => c.MaxStudentCount).NotNull();
-        RuleFor(c => c.Weekdays).NotNull();
+        RuleFor(c => c.LessonCount).GreaterThan(0);
+        RuleFor(x => x.EndTime)
+            .GreaterThan(x => x.StartTime)
+            .WithMessage("End time must be greater than start time.");
+        RuleFor(c => c.MaxStudentCount).GreaterThan(0);
+        RuleFor(c => c.Weekdays).IsInEnum();
     }
 }
