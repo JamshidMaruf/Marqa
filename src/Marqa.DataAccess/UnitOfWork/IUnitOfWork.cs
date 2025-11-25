@@ -72,6 +72,9 @@ public interface IUnitOfWork : IDisposable
     IRepository<ExamSettingItem> ExamSettingItems { get; }
     IRepository<Permission> Permissions { get; }
     IRepository<RolePermission> RolePermissions { get; }
+    IRepository<RefreshToken> RefreshTokens { get; }
+    IRepository<User> Users { get; }
+    IRepository<Asset> Assets { get; }
 
     Task SaveAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();

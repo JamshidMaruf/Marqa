@@ -9,10 +9,10 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
     public void Configure(EntityTypeBuilder<Student> builder)
     {
-        builder.HasIndex(s => new { s.Phone, s.CompanyId }).IsUnique();
+       // builder.HasIndex(s => new { s.Phone, s.CompanyId }).IsUnique();
 
-        builder.Property(p => p.PasswordHash)
-            .HasMaxLength(400);
+      //  builder.Property(p => p.PasswordHash)
+       //     .HasMaxLength(400);
 
         builder.HasOne(s => s.Company)
             .WithMany()

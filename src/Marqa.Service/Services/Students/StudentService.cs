@@ -87,7 +87,7 @@ public class StudentService(
         }
     }
 
-    public async Task UpdateAsync(int id, int companyId, StudentUpdateModel model)
+    public async Task UpdateAsync(int id, StudentUpdateModel model)
     {
         await updateValidator.EnsureValidatedAsync(model);
 
@@ -113,13 +113,13 @@ public class StudentService(
         {
             var existStudent = await unitOfWork.Students
                 .SelectAsync(
-                    predicate: s => s.Id == id && s.CompanyId == companyId,
+                    predicate: s => s.Id == id,
                     includes: "StudentDetail" )
                 ?? throw new NotFoundException($"Student is not found");
 
             var phoneExists = await unitOfWork.Students
                 .SelectAsync(e => e.Phone == model.Phone
-                              && e.CompanyId == companyId
+                              && e.CompanyId == existStudent.CompanyId
                               && e.Id != id);
 
             if (phoneExists != null)
@@ -307,5 +307,69 @@ public class StudentService(
         await unitOfWork.SaveAsync();
 
         return relativePath;
+    }
+
+    public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, int statusId)
+    {
+        var studentCourse = unitOfWork.StudentCourses
+            .SelectAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId)
+            .GetAwaiter().GetResult()
+            ?? throw new NotFoundException("StudentCourse not found");
+
+        var transaction = await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            studentCourse.Status = (Domain.Enums.StudentStatus)statusId;
+            unitOfWork.StudentCourses.Update(studentCourse);
+            await unitOfWork.SaveAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<List<StudentViewModel>> GetAll(StudentFilterModel filterModel)
+    {
+        var query = unitOfWork.Students
+            .SelectAllAsQueryable(s => !s.IsDeleted);
+
+        if (filterModel.CompanyId != null)
+            query = query.Where(s => s.CompanyId == filterModel.CompanyId);
+
+        if (!string.IsNullOrEmpty(filterModel.SearchText))
+            query = query.Where(s => s.FirstName.Contains(filterModel.SearchText) ||
+                                     s.LastName.Contains(filterModel.SearchText) ||
+                                     s.Phone.Contains(filterModel.SearchText) ||
+                                     s.Email.Contains(filterModel.SearchText));
+        if (filterModel.CourseId != null)
+            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
+
+        return await query.Select(s => new StudentViewModel
+        {
+            Id = s.Id,
+            FirstName = s.FirstName,
+            LastName = s.LastName,
+            DateOfBirth = s.DateOfBirth,
+            Gender = s.Gender,
+            Phone = s.Phone,
+            Email = s.Email,
+            StudentDetailViewModel = new StudentDetailViewModel
+            {
+                Id = s.StudentDetail.Id,
+                StudentId = s.Id,
+                FatherFirstName = s.StudentDetail.FatherFirstName,
+                FatherLastName = s.StudentDetail.FatherLastName,
+                FatherPhone = s.StudentDetail.FatherPhone,
+                MotherFirstName = s.StudentDetail.MotherFirstName,
+                MotherLastName = s.StudentDetail.MotherLastName,
+                MotherPhone = s.StudentDetail.MotherPhone,
+                RelativeFirstName = s.StudentDetail.GuardianFirstName,
+                RelativeLastName = s.StudentDetail.GuardianLastName,
+                RelativePhone = s.StudentDetail.GuardianPhone
+            }
+        }).ToListAsync();
     }
 }

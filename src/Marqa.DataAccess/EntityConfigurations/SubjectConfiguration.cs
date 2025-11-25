@@ -14,6 +14,21 @@ public class SubjectConfiguration : IEntityTypeConfiguration<Subject>
             .HasForeignKey(s => s.CompanyId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
+
+        builder.HasData(
+            new Subject
+            {
+                Id = 1,
+                CompanyId = 1,
+                Name = "Oliy matematika"
+            },
+            new Subject
+            {
+                Id = 2,
+                CompanyId = 2,
+                Name = "Ona tili"
+            });
+
     }
 }
 

@@ -6,11 +6,11 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
 {
     public CourseCreateModelValidator()
     {
-        RuleFor(c => c.CompanyId).NotNull().GreaterThan(0);
-        RuleFor(c => c.TeacherId).NotNull().GreaterThan(0);
-        RuleFor(c => c.SubjectId).NotNull().GreaterThan(0);
-        RuleFor(c => c.Name).NotEmpty().Length(36);
-        RuleFor(c => c.LessonCount).NotNull().GreaterThan(0);
+        RuleFor(c => c.CompanyId).NotNull();
+        RuleFor(c => c.TeacherId).NotNull();
+        RuleFor(c => c.SubjectId).NotNull();
+        RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
+        RuleFor(c => c.LessonCount).NotNull();
         RuleFor(c => c.StartDate).NotNull();
         RuleFor(c => c.StartTime).NotNull();
         RuleFor(c => c.EndTime).NotNull();
