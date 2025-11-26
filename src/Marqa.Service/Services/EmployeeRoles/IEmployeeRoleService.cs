@@ -8,9 +8,7 @@ public interface IEmployeeRoleService
     Task UpdateAsync(int id, EmployeeRoleUpdateModel model);
     Task DeleteAsync(int id);
     Task<EmployeeRoleViewModel> GetAsync(int id);
-    Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId);
-    Task<List<EmployeeRoleViewModel>> GetAllTeacherRolesAsync(int companyId);
-    Task<List<EmployeeRoleViewModel>> GetAllNotTeacherRolesAsync(int companyId);
+    Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId, bool? canTeach);
     Task AttachPermissionsAsync(int id, List<int> permissionIds);
     Task<bool> HasPermissionAsync(string roleName, string permissionName);
 }

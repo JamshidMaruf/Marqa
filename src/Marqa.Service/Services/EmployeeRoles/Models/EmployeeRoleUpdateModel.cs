@@ -4,5 +4,4 @@ public class EmployeeRoleUpdateModel
 {
     public string Name { get; set; }
     public bool CanTeach { get; set; }
-    public int CompanyId { get; set; }
 }

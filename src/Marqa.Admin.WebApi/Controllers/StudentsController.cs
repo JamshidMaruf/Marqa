@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Students;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 [Route("api/[controller]")]
 public class StudentsController(IStudentService studentService) : ControllerBase
 {
-    [HttpPost()]
+    [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
         await studentService.CreateAsync(model);
@@ -72,9 +73,10 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     }
 
     [HttpPut("{studentId}/courses/{courseId}/status{statusId}")]
-    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, int statusId)
+    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status)
     {
-        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, statusId);
+        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
+
         return Ok(new Response
         {
             StatusCode = 200,

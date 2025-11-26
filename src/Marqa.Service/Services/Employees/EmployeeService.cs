@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
-using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Employees.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,7 +39,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             LastName = model.LastName,
             Phone = employeePhone.Phone,
             Email = model.Email,
-            PasswordHash = PasswordHelper.Hash(model.Password)
+            PasswordHash = PasswordHelper.Hash(model.Password),
+            Role = UserRole.Employee
         });
         await unitOfWork.SaveAsync();
         
@@ -102,13 +103,9 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var employeeForDeletion = await unitOfWork.Employees
-            .SelectAllAsQueryable(b => !b.IsDeleted,
-            includes: "Role")
+            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach)
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
-
-        if (employeeForDeletion.Role.CanTeach)
-            throw new ArgumentIsNotValidException("Notable to delete employee from teacher category");
 
         unitOfWork.Employees.MarkAsDeleted(employeeForDeletion);
 
@@ -118,7 +115,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted,
+            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach,
             includes: [ "Role", "User" ])
             .Select(e => new EmployeeViewModel
             {
@@ -145,6 +142,35 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
 
+    public async Task<EmployeeViewModel> GetForUpdateAsync(int id)
+    {
+        return await unitOfWork.Employees
+            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach,
+            includes: ["Role", "User"])
+            .Select(e => new EmployeeViewModel
+            {
+                Id = e.Id,
+                FirstName = e.User.Phone,
+                LastName = e.User.Phone,
+                Phone = e.User.Phone,
+                Email = e.User.Email,
+                DateOfBirth = e.DateOfBirth,
+                Gender = e.Gender,
+                Status = e.Status,
+                Salary = e.Salary,
+                JoiningDate = e.JoiningDate,
+                Specialization = e.Specialization,
+                Info = e.Info,
+                RoleId = e.RoleId,
+                Role = new EmployeeViewModel.EmployeeRoleInfo
+                {
+                    Id = e.RoleId,
+                    Name = e.Role.Name
+                }
+            })
+            .FirstOrDefaultAsync(e => e.Id == id)
+            ?? throw new NotFoundException($"No employee was found with ID = {id}");
+    }
     public async Task<int> GetByPhoneAsync(string phone)
     {
         var employee = await unitOfWork.Employees.SelectAsync(emp => emp.User.Phone == phone);
@@ -155,7 +181,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
         var employees = unitOfWork.Employees
-            .SelectAllAsQueryable(e => e.CompanyId == companyId && !e.IsDeleted);
+            .SelectAllAsQueryable(e => e.CompanyId == companyId && !e.IsDeleted && !e.Role.CanTeach);
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>

@@ -7,7 +7,6 @@ namespace Marqa.Service.Validators.EmployeeRoles
    {
         public EmployeeRoleUpdateModelValidator()
         {
-            RuleFor(e => e.CompanyId).NotNull().GreaterThan(0);
             RuleFor(e => e.Name).NotEmpty().MaximumLength(255);
         }
     }

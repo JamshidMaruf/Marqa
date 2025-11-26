@@ -20,7 +20,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
           ?? throw new NotFoundException("Company not found");
 
         var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable(
-            e => e.CompanyId == model.CompanyId && e.Name == model.Name)
+            e => e.CompanyId == model.CompanyId && e.Name.ToLower() == model.Name.ToLower())
             .FirstOrDefaultAsync();
 
         if (existRole != null)
@@ -44,7 +44,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
              ?? throw new NotFoundException("Role not found");
 
         var existRole = await unitOfWork.EmployeeRoles
-            .SelectAllAsQueryable(e => e.CompanyId == model.CompanyId && e.Name == model.Name)
+            .SelectAllAsQueryable(e => e.CompanyId == existEmployeeRole.CompanyId && e.Name == model.Name && e.Id != id)
             .FirstOrDefaultAsync();
 
         if (existRole != null)
@@ -52,9 +52,8 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 
         existEmployeeRole.Name = model.Name;
         existEmployeeRole.CanTeach = model.CanTeach;
-        existEmployeeRole.CompanyId = model.CompanyId;
 
-        unitOfWork.EmployeeRoles.Update(existEmployeeRole);
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -67,21 +66,63 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId)
+    public async Task<EmployeeRoleViewModel> GetAsync(int id)
     {
-        return await unitOfWork.EmployeeRoles
-            .SelectAllAsQueryable(x => x.CompanyId == companyId,
+        var existRole = await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.Id == id,
             includes: "Company")
             .Select(s => new EmployeeRoleViewModel
             {
                 Id = s.Id,
                 Name = s.Name,
+                CanTeach = s.CanTeach,
                 Company = new EmployeeRoleViewModel.CompanyInfo
                 {
                     Id = s.CompanyId,
                     Name = s.Company.Name
                 }
-            }).ToListAsync();
+            }).FirstOrDefaultAsync()
+            ?? throw new NotFoundException("Role not found");
+
+        return existRole;
+    }
+
+    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId, bool? canTeach)
+    {
+        if (canTeach != null)
+        {
+            return await unitOfWork.EmployeeRoles
+                .SelectAllAsQueryable(x => x.CompanyId == companyId && x.CanTeach == canTeach,
+                includes: "Company")
+                .Select(s => new EmployeeRoleViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    CanTeach = s.CanTeach,
+                    Company = new EmployeeRoleViewModel.CompanyInfo
+                    {
+                        Id = s.CompanyId,
+                        Name = s.Company.Name
+                    }
+                }).ToListAsync();
+        }
+        else
+        {
+            return await unitOfWork.EmployeeRoles
+                .SelectAllAsQueryable(x => x.CompanyId == companyId,
+                includes: "Company")
+                .Select(s => new EmployeeRoleViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    CanTeach = s.CanTeach,
+                    Company = new EmployeeRoleViewModel.CompanyInfo
+                    {
+                        Id = s.CompanyId,
+                        Name = s.Company.Name
+                    }
+                }).ToListAsync();
+        }
     }
 
     public async Task AttachPermissionsAsync(int id, List<int> permissionIds)
@@ -109,26 +150,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<EmployeeRoleViewModel> GetAsync(int id)
-    {
-        var existRole = await unitOfWork.EmployeeRoles
-            .SelectAllAsQueryable(x => x.Id == id,
-            includes: "Company")
-            .Select(s => new EmployeeRoleViewModel
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Company = new EmployeeRoleViewModel.CompanyInfo
-                {
-                    Id = s.CompanyId,
-                    Name = s.Company.Name
-                }
-            }).FirstOrDefaultAsync()
-            ?? throw new NotFoundException("Role not found");
-        return existRole;
-    }
-
-
     public async Task<bool> HasPermissionAsync(string roleName, string permissionName)
     {
         var role = await unitOfWork.EmployeeRoles
@@ -142,39 +163,5 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
                     r.RoleId == role.Id &&
                     r.PermissionId == permission.Id)
             .AnyAsync();
-    }
-
-    public async Task<List<EmployeeRoleViewModel>> GetAllTeacherRolesAsync(int companyId)
-    {
-        return await unitOfWork.EmployeeRoles
-            .SelectAllAsQueryable(x => x.CompanyId == companyId && x.CanTeach,
-            includes: "Company")
-            .Select(s => new EmployeeRoleViewModel
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Company = new EmployeeRoleViewModel.CompanyInfo
-                {
-                    Id = s.CompanyId,
-                    Name = s.Company.Name
-                }
-            }).ToListAsync();
-    }
-
-    public async Task<List<EmployeeRoleViewModel>> GetAllNotTeacherRolesAsync(int companyId)
-    {
-        return await unitOfWork.EmployeeRoles
-            .SelectAllAsQueryable(x => x.CompanyId == companyId && !x.CanTeach,
-            includes: "Company")
-            .Select(s => new EmployeeRoleViewModel
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Company = new EmployeeRoleViewModel.CompanyInfo
-                {
-                    Id = s.CompanyId,
-                    Name = s.Company.Name
-                }
-            }).ToListAsync();
     }
 }

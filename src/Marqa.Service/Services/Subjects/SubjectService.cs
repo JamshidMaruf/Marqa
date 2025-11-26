@@ -28,8 +28,8 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
         unitOfWork.Subjects.Insert(new Subject
         {
-            CompanyId = model.CompanyId,
             Name = model.Name,
+            CompanyId = model.CompanyId
         });
 
         await unitOfWork.SaveAsync();
@@ -43,8 +43,6 @@ public class SubjectService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException("Subjet was not found");
 
         existSubject.Name = model.Name;
-
-        unitOfWork.Subjects.Update(existSubject);
 
         await unitOfWork.SaveAsync();
     }
@@ -62,7 +60,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
     public async Task<SubjectViewModel> GetAsync(int id)
     {
         var existSubject = await unitOfWork.Subjects.SelectAsync(
-            predicate: s => s.Id == id,
+            predicate: s => s.Id == id && !s.IsDeleted,
             includes: "Company")
               ?? throw new NotFoundException("Subject was not found");
 
@@ -78,7 +76,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
     {
         return await unitOfWork.Subjects.SelectAllAsQueryable(
-            predicate: s => s.CompanyId == companyId,
+            predicate: s => s.CompanyId == companyId && !s.IsDeleted,
             includes: "Company")
             .Select(s => new SubjectViewModel
             {
@@ -117,11 +115,11 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task BulkAttachAsync(int teacherId, List<int> subjectIds)
     {
-        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
+        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId && e.Role.CanTeach)
             ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
 
         List<int> existSubjects = await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => s.CompanyId == teacher.CompanyId)
+            .SelectAllAsQueryable(s => s.CompanyId == teacher.CompanyId && !s.IsDeleted)
             .Select(s => s.Id)
             .Distinct()
             .ToListAsync();
@@ -129,14 +127,15 @@ public class SubjectService(IUnitOfWork unitOfWork,
         for (int i = 0; i < subjectIds.Count; i++)
         {
             if (!existSubjects.Contains(subjectIds[i]))
-                throw new NotFoundException($"No such subject was found");
+                throw new NotFoundException($"There is no subject with ID = {subjectIds[i]}");
         }
 
         var alreadyAttachedSubjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(s => s.TeacherId == teacherId)
+            .SelectAllAsQueryable(s => s.TeacherId == teacherId && !s.IsDeleted)
             .Select(s => new TeacherSubject
-            {
-                Id = s.Id
+            { // i am not getting id property of this entity, as it might have been enough, because there is no corresponding column in table
+                TeacherId = s.TeacherId,
+                SubjectId = s.SubjectId
             })
             .ToListAsync();
 
