@@ -119,7 +119,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
 
         List<int> existSubjects = await unitOfWork.Subjects
-            .SelectAllAsQueryable(s => s.CompanyId == teacher.CompanyId && !s.IsDeleted)
+            .SelectAllAsQueryable(s => s.CompanyId == teacher.User.CompanyId && !s.IsDeleted)
             .Select(s => s.Id)
             .Distinct()
             .ToListAsync();

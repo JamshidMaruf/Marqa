@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251125160826_newUpdate")]
-    partial class newUpdate
+    [Migration("20251126160914_StudentUpdate")]
+    partial class StudentUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -250,7 +250,7 @@ namespace Marqa.DataAccess.Migrations
                             Director = "Salim",
                             Email = "email",
                             IsDeleted = false,
-                            Name = "name",
+                            Name = "TechStar",
                             Phone = "947157279",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
@@ -380,7 +380,7 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
+                    b.Property<int?>("CompanyId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1170,8 +1170,8 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -1520,15 +1520,12 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssetId")
+                    b.Property<int?>("AssetId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Balance")
                         .HasPrecision(18, 3)
                         .HasColumnType("numeric(18,3)");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1558,8 +1555,6 @@ namespace Marqa.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("UserId");
 
@@ -2007,6 +2002,9 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -2035,8 +2033,8 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("PasswordHash")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(255)
@@ -2049,6 +2047,11 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("Phone", "CompanyId")
+                        .IsUnique();
 
                     b.ToTable("Users", (string)null);
                 });
@@ -2134,11 +2137,9 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Employee", b =>
                 {
-                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                    b.HasOne("Marqa.Domain.Entities.Company", null)
                         .WithMany("Employees")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CompanyId");
 
                     b.HasOne("Marqa.Domain.Entities.Employee", "Parent")
                         .WithMany()
@@ -2155,8 +2156,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Company");
 
                     b.Navigation("Parent");
 
@@ -2417,15 +2416,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     b.HasOne("Marqa.Domain.Entities.Asset", "Asset")
                         .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AssetId");
 
                     b.HasOne("Marqa.Domain.Entities.User", "User")
                         .WithMany()
@@ -2434,8 +2425,6 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Asset");
-
-                    b.Navigation("Company");
 
                     b.Navigation("User");
                 });
@@ -2593,6 +2582,17 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Subject");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.User", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Basket", b =>

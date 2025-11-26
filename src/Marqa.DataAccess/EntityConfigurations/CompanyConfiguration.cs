@@ -14,7 +14,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
             new Company
             {
                 Id = 1,
-                Name = "name",
+                Name = "TechStar",
                 Address = "address",
                 Phone = "947157279",
                 Email = "email",

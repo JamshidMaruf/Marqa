@@ -25,7 +25,7 @@ public class StudentService(
             throw new NotFoundException("Company not found");
 
         var existingStudent = await unitOfWork.Students
-            .SelectAsync(e => e.User.Phone == model.Phone && e.CompanyId == model.CompanyId);
+            .SelectAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
 
         if (existingStudent != null)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
@@ -58,9 +58,9 @@ public class StudentService(
                     LastName = model.LastName,
                     Phone = studentPhoneResult.Phone,
                     Email = model.Email,
-                    Role = UserRole.Student
+                    Role = UserRole.Student,
+                    CompanyId = model.CompanyId
                 },
-                CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender
             };
@@ -73,13 +73,14 @@ public class StudentService(
                 StudentId = createdStudent.Id,
                 FatherFirstName = model.StudentDetailCreateModel.FatherFirstName,
                 FatherLastName = model.StudentDetailCreateModel.FatherLastName,
-                FatherPhone = fatherPhoneResult.Phone,
+                FatherPhone = fatherPhoneResult.IsSuccessful ? fatherPhoneResult.Phone : null,
                 MotherFirstName = model.StudentDetailCreateModel.MotherFirstName,
                 MotherLastName = model.StudentDetailCreateModel.MotherLastName,
-                MotherPhone = motherPhoneResult.Phone,
+                MotherPhone = motherPhoneResult.IsSuccessful ? motherPhoneResult.Phone : null,
                 GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
                 GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
-                GuardianPhone = guardianPhoneResult.Phone,
+                GuardianPhone = guardianPhoneResult.IsSuccessful ? guardianPhoneResult.Phone : null,
+                CompanyId = model.CompanyId
             });
 
             await unitOfWork.SaveAsync();
@@ -124,7 +125,7 @@ public class StudentService(
 
             var phoneExists = await unitOfWork.Students
                 .SelectAsync(e => e.User.Phone == model.Phone
-                              && e.CompanyId == existStudent.CompanyId
+                              && e.User.CompanyId == existStudent.User.CompanyId
                               && e.Id != id);
 
             if (phoneExists != null)
@@ -331,7 +332,7 @@ public class StudentService(
             .SelectAllAsQueryable(s => !s.IsDeleted);
 
         if (filterModel.CompanyId != null)
-            query = query.Where(s => s.CompanyId == filterModel.CompanyId);
+            query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
 
         if (!string.IsNullOrEmpty(filterModel.SearchText))
             query = query.Where(s => s.User.FirstName.Contains(filterModel.SearchText) ||

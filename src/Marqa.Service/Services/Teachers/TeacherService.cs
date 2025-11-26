@@ -239,7 +239,7 @@ public class TeacherService(
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Employees
-            .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId && t.Role.CanTeach == true,
+            .SelectAllAsQueryable(t => !t.IsDeleted && t.User.CompanyId == companyId && t.Role.CanTeach == true,
             includes: ["Role", "User"]);
 
         if (!string.IsNullOrWhiteSpace(search))
