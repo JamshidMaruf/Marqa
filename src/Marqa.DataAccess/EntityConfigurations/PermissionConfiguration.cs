@@ -7,5 +7,6 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
     public void Configure(EntityTypeBuilder<Permission> builder)
     {
+        builder.Property(p => p.Description).IsRequired(false);
     }
 }

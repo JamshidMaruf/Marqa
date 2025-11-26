@@ -12,4 +12,7 @@ public class User : Auditable
     public bool IsActive { get; set; }
     public bool IsUseSystem { get; set; }
     public UserRole Role { get; set; }
+    public int CompanyId { get; set; }
+
+    public Company Company { get; set; }
 }

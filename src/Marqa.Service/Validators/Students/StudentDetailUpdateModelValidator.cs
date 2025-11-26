@@ -7,38 +7,25 @@ public class StudentDetailUpdateModelValidator : AbstractValidator<StudentDetail
     public StudentDetailUpdateModelValidator()
     {
         RuleFor(x => x.FatherFirstName)
-            .MaximumLength(255).WithMessage("Father's FirstName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("Father's FirstName must not exceed 255 characters");
 
         RuleFor(x => x.FatherLastName)
-            .MaximumLength(255).WithMessage("Father's LastName must not exceed 50 characters");
-
-        RuleFor(x => x.FatherPhone)
-            .Matches(@"^\+998\d{9}$").WithMessage("Father's phone number is not valid");
-
-
-
+            .MaximumLength(255).WithMessage("Father's LastName must not exceed 255 characters");
 
 
         RuleFor(x => x.MotherFirstName)
-            .MaximumLength(255).WithMessage("Mother's FirstName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("Mother's FirstName must not exceed 255 characters");
 
         RuleFor(x => x.MotherLastName)
-            .MaximumLength(255).WithMessage("Mother's LastName must not exceed 50 characters");
-
-        RuleFor(x => x.MotherPhone)
-            .Matches(@"^\+998\d{9}$").WithMessage("Mother's phone number is not valid");
-
-
+            .MaximumLength(255).WithMessage("Mother's LastName must not exceed 255 characters");
 
 
         RuleFor(x => x.GuardianFirstName)
-            .MaximumLength(255).WithMessage("Guardian's FirstName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("Guardian's FirstName must not exceed 255 characters");
 
         RuleFor(x => x.GuardianLastName)
-            .MaximumLength(255).WithMessage("Guardian's LastName must not exceed 50 characters");
+            .MaximumLength(255).WithMessage("Guardian's LastName must not exceed 255 characters");
 
-        RuleFor(x => x.GuardianPhone)
-            .Matches(@"^\+998\d{9}$").WithMessage("Guardian's phone number is not valid");
 
         RuleFor(x => x)
             .Must(x => !string.IsNullOrEmpty(x.FatherPhone) ||
