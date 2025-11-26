@@ -166,4 +166,53 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuth
         
         return true;
     }
+
+    public async ValueTask<LoginResponseModel.UserData> GetCurrentUser(RefreshTokenModel model)
+    {
+        var refreshToken = await unitOfWork.RefreshTokens
+            .SelectAsync(r => r.Token == model.Token)
+            ?? throw new NotFoundException("Refresh token not found");
+
+        if (refreshToken.IsExpired)
+            throw new ArgumentIsNotValidException("Refresh token is expired");
+
+        if (refreshToken.IsRevoked)
+            throw new ArgumentIsNotValidException("Refresh is revoked");
+
+        var existUser = await unitOfWork.Users.SelectAsync(u => u.Id == refreshToken.UserId)
+             ?? throw new NotFoundException("User not found");
+
+        (string name, int id) role = ("student", 0);
+
+        if (existUser.Role == UserRole.Employee)
+        {
+            var employeeRole = await unitOfWork.Employees
+                .SelectAllAsQueryable(
+                    predicate: e => e.UserId == existUser.Id,
+                    includes: ["Role"])
+                .Select(e => new
+                {
+                    Id = e.RoleId,
+                    Name = e.Role.Name
+                })
+                .FirstOrDefaultAsync();
+
+            role.name = employeeRole.Name;
+        }
+        var permissions = await unitOfWork.RolePermissions
+            .SelectAllAsQueryable(predicate: r => r.RoleId == role.id, includes: "Permission")
+            .Select(r => r.Permission.Name)
+            .ToListAsync();
+
+        return new LoginResponseModel.UserData
+        {
+            Id = existUser.Id,
+            FirstName = existUser.FirstName,
+            LastName = existUser.LastName,
+            Phone = existUser.Phone,
+            Email = existUser.Email,
+            Role = role.name,
+            Permissions = permissions
+        };
+    }
 }
