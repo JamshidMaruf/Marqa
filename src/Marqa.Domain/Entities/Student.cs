@@ -20,5 +20,5 @@ public class Student : Auditable
     public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
     public ICollection<Order> Orders { get; set; }
     public ICollection<StudentExamResult> ExamResults { get; set; }
-    public Asset Asset { get; set; }    
+    public Asset Asset { get; set; }
 }
