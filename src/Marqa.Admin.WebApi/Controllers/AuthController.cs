@@ -1,4 +1,4 @@
-using Marqa.Service.Services.Auth;
+﻿using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -48,11 +48,10 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
     
     [HttpPost("current-user")]
-    public async Task<IActionResult> GetCurrentUserAsync([FromBody] LoginModel model)
+    public async Task<IActionResult> GetCurrentUserAsync([FromBody] RefreshTokenModel model)
     {
-        var ipAddress = HttpContext?.Connection?.RemoteIpAddress?.ToString();
-        var data = await authService.LoginAsync(model, ipAddress);
-        return Ok(new Response<LoginResponseModel>
+        var data = await authService.GetCurrentUser(model);
+        return Ok(new Response<LoginResponseModel.UserData>
         {
             StatusCode = 200, 
             Message = "success",
