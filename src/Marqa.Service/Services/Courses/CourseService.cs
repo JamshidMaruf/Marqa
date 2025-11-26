@@ -99,7 +99,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
         _ = await unitOfWork.Employees.SelectAsync(c => 
-        c.Id == model.TeacherId && c.CompanyId == existCourse.CompanyId)
+        c.Id == model.TeacherId && c.User.CompanyId == existCourse.CompanyId)
             ?? throw new NotFoundException("This teacher not found!");
 
         existCourse.EndTime = model.EndTime;

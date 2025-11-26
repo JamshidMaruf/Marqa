@@ -9,11 +9,9 @@ public class Student : Auditable
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public int UserId { get; set; }
-    public int CompanyId { get; set; }
-    public int AssetId { get; set; }
+    public int? AssetId { get; set; }
     
     public User User { get; set; }
-    public Company Company { get; set; }
     public StudentDetail StudentDetail { get; set; }
     public ICollection<StudentCourse> Courses { get; set; }
     public ICollection<StudentHomeTask> StudentHomeTasks { get; set; }

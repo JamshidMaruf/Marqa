@@ -88,7 +88,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<List<MainPageRatingResult>> GetMainPageRatingResultAsync(int companyId)
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable(s => s.CompanyId == companyId, includes: "User");
+            .SelectAllAsQueryable(s => s.User.CompanyId == companyId, includes: "User");
 
         var ratings = new List<MainPageRatingResult>();
         foreach (var student in students)
@@ -161,7 +161,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                 .Include(s => s.Courses)
                 .ThenInclude(c => c.Course)
                 .Include(s => s.User)
-                .Where(s => s.CompanyId == companyId);
+                .Where(s => s.User.CompanyId == companyId);
 
             if (gender is not null)
             {

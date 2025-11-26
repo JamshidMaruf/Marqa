@@ -11,7 +11,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(t => t.Name).IsUnique(false);
 
         builder.Property(p => p.Description)
-            .HasMaxLength(1000);
+            .HasMaxLength(5000);
 
         builder.HasOne(p => p.Company)
             .WithMany(c => c.Products)

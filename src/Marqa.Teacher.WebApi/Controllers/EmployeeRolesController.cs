@@ -59,9 +59,9 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
     }
 
     [HttpGet("{companyId}")]
-    public async Task<IActionResult> GetAllAsync(int companyId)
+    public async Task<IActionResult> GetAllAsync(int companyId, bool? canTeach = null)
     {
-        var companies = await employeeRoleService.GetAllAsync(companyId);
+        var companies = await employeeRoleService.GetAllAsync(companyId,canTeach);
 
         return Ok(new Response<List<EmployeeRoleViewModel>>
         {
