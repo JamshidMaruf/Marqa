@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Students.Models;
@@ -57,6 +58,7 @@ public class StudentService(
                     LastName = model.LastName,
                     Phone = studentPhoneResult.Phone,
                     Email = model.Email,
+                    Role = UserRole.Student
                 },
                 CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
@@ -117,7 +119,7 @@ public class StudentService(
             var existStudent = await unitOfWork.Students
                 .SelectAsync(
                     predicate: s => s.Id == id,
-                    includes: [ "StudentDetail", "User" ])
+                    includes: ["StudentDetail", "User"])
                 ?? throw new NotFoundException($"Student is not found");
 
             var phoneExists = await unitOfWork.Students
@@ -201,7 +203,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: [ "StudentDetail", "User" ])
+                includes: ["StudentDetail", "User"])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail == null)
@@ -312,26 +314,15 @@ public class StudentService(
         return relativePath;
     }
 
-    public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, int statusId)
+    public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status)
     {
-        var studentCourse = unitOfWork.StudentCourses
+        var studentCourse = await unitOfWork.StudentCourses
             .SelectAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId)
-            .GetAwaiter().GetResult()
             ?? throw new NotFoundException("StudentCourse not found");
 
-        var transaction = await unitOfWork.BeginTransactionAsync();
-        try
-        {
-            studentCourse.Status = (Domain.Enums.StudentStatus)statusId;
-            unitOfWork.StudentCourses.Update(studentCourse);
-            await unitOfWork.SaveAsync();
-            await transaction.CommitAsync();
-        }
-        catch (Exception)
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        studentCourse.Status = status;
+
+        await unitOfWork.SaveAsync();
     }
 
     public async Task<List<StudentViewModel>> GetAll(StudentFilterModel filterModel)

@@ -132,7 +132,12 @@ public class TeacherService(
                Salary = ts.Teacher.Salary,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization,
-               Info = ts.Teacher.Info,               
+               Info = ts.Teacher.Info,     
+               Role = new TeacherViewModel.RoleInfo
+               {
+                   Id = ts.Teacher.RoleId,
+                   Name = ts.Teacher.Role.Name
+               }
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
@@ -169,24 +174,38 @@ public class TeacherService(
     public async Task<TeacherUpdateViewModel> GetForUpdateAsync(int id)
     {
         var teacher = await unitOfWork.TeacherSubjects
-           .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher", "Teacher.User"])
-           .Select(ts => new TeacherUpdateViewModel
-           {
-               Id = ts.Teacher.Id,
-               DateOfBirth = ts.Teacher.DateOfBirth,
-               Gender = ts.Teacher.Gender,
-               FirstName = ts.Teacher.User.FirstName,
-               LastName = ts.Teacher.User.LastName,
-               Email = ts.Teacher.User.Email,
-               Phone = ts.Teacher.User.Phone,
-               Salary = ts.Teacher.Salary,
-               Status = ts.Teacher.Status,
-               JoiningDate = ts.Teacher.JoiningDate,
-               Specialization = ts.Teacher.Specialization
-           })
-           .FirstOrDefaultAsync()
-            ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
+            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
+            includes: ["Teacher", "Teacher.User"])
+            .Select(ts => new TeacherUpdateViewModel
+            {
+                Id = ts.Teacher.Id,
+                DateOfBirth = ts.Teacher.DateOfBirth,
+                Gender = new TeacherUpdateViewModel.GenderInfo
+                {
+                    Id = Convert.ToInt32(ts.Teacher.Gender),
+                    Name = Enum.GetName(ts.Teacher.Gender),
+                },
+                FirstName = ts.Teacher.User.FirstName,
+                LastName = ts.Teacher.User.LastName,
+                Email = ts.Teacher.User.Email,
+                Phone = ts.Teacher.User.Phone,
+                Status = new TeacherUpdateViewModel.StatusInfo
+                {
+                    Id = Convert.ToInt32(ts.Teacher.Status),
+                    Name = Enum.GetName(ts.Teacher.Status),
+                },
+                Salary = ts.Teacher.Salary,
+                JoiningDate = ts.Teacher.JoiningDate,
+                Specialization = ts.Teacher.Specialization,
+                Info = ts.Teacher.Info,
+                Role = new TeacherUpdateViewModel.RoleInfo
+                {
+                    Id = ts.Teacher.RoleId,
+                    Name = ts.Teacher.Role.Name
+                }
+            })
+            .FirstOrDefaultAsync()
+             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
         var subjects = await unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(ts => ts.TeacherId == id)
@@ -220,7 +239,7 @@ public class TeacherService(
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Employees
-            .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
+            .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId && t.Role.CanTeach == true,
             includes: ["Role", "User"]);
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -296,6 +315,8 @@ public class TeacherService(
         return teachers.ToList();
     }
 
+    #region lab
+
     //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     //{
     //    var teacherQuery = unitOfWork.Employees
@@ -362,4 +383,5 @@ public class TeacherService(
 
     //    return teachers;
     //}
+    #endregion
 }

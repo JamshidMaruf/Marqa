@@ -2,6 +2,7 @@
 using Marqa.DataAccess.Extensions;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Marqa.DataAccess.Contexts;
 
@@ -14,20 +15,21 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // Comment out foreach loop if generating migration while you don't have corresponding database
-        // Global query applied for all entities
-        //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        //{
-        //    if (typeof(Auditable).IsAssignableFrom(entityType.ClrType))
-        //    {
-        //        var parameter = Expression.Parameter(entityType.ClrType, "e");
-        //        var prop = Expression.Property(parameter, nameof(Auditable.IsDeleted));
-        //        var condition = Expression.Equal(prop, Expression.Constant(false));
-        //        var lambda = Expression.Lambda(condition, parameter);
-        //        entityType.SetQueryFilter(lambda);
-        //    }
-        //}
+        // Global query applied for all entities        
+        Expression<Func<Auditable, bool>> filterExpr = bm => !bm.IsDeleted;
+        foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (mutableEntityType.ClrType.IsAssignableTo(typeof(Auditable)))
+            {
+                var parameter = Expression.Parameter(mutableEntityType.ClrType);
+                var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
+                var lambdaExpression = Expression.Lambda(body, parameter);
 
-        // Ensures each concrete class that inherit from Auditable is registered in Model
+                mutableEntityType.SetQueryFilter(lambdaExpression);
+            }
+        }
+
+        // Ensures each concrete class that inherit from Auditable is registered in the Model
         var entityAssembly = typeof(Auditable).Assembly;
         var entityTypes = entityAssembly
             .GetTypes()

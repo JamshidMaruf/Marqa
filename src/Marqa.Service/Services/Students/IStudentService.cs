@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Students.Models;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Students.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.Students;
@@ -31,5 +32,5 @@ public interface IStudentService
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
     Task<List<StudentViewModel>> GetAll(StudentFilterModel filterModel);
-    Task UpdateStudentCourseStatusAsync(int studentId, int courseId,int statusId);
+    Task UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status);
 }
