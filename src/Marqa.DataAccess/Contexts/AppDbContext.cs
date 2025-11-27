@@ -12,6 +12,21 @@ public class AppDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Ensures each concrete class that inherit from Auditable is registered in the Model
+        var entityAssembly = typeof(Auditable).Assembly;
+        var entityTypes = entityAssembly
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(Auditable).IsAssignableFrom(t));
+
+        foreach (var type in entityTypes)
+            modelBuilder.Entity(type);
+        
+        // Applies global configurations written using reflection
+        modelBuilder.ApplyGlobalConfigurations();
+        // Applies custom entity configurations from assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+
         base.OnModelCreating(modelBuilder);
 
         // Comment out foreach loop if generating migration while you don't have corresponding database
@@ -28,20 +43,5 @@ public class AppDbContext : DbContext
                 mutableEntityType.SetQueryFilter(lambdaExpression);
             }
         }
-
-        // Ensures each concrete class that inherit from Auditable is registered in the Model
-        var entityAssembly = typeof(Auditable).Assembly;
-        var entityTypes = entityAssembly
-            .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(Auditable).IsAssignableFrom(t));
-
-        foreach (var type in entityTypes)
-            modelBuilder.Entity(type);
-        
-        // Applies global configurations written using reflection
-        modelBuilder.ApplyGlobalConfigurations();
-
-        // Applies custom entity configurations from assembly
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
