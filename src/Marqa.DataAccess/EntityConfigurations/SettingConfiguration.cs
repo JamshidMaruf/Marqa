@@ -163,7 +163,27 @@ public class SettingConfiguration : IEntityTypeConfiguration<Setting>
                 Category = "App",
                 IsEncrypted = false,
                 IsDeleted = false
-            }
+            },
+
+            // RefreshToken
+            new Setting
+            {
+                Id = 3,
+                Key = "RefreshToken.Expires.RememberMe",
+                Value = "30",
+                Category = "RefreshToken",
+                IsEncrypted = false,
+                IsDeleted = false
+            },
+            new Setting
+            {
+                Id = 4,
+                Key = "RefreshToken.Expires.Standard",
+                Value = "7",
+                Category = "RefreshToken",
+                IsEncrypted = false,
+                IsDeleted = false
+            },
         });
     }
 }

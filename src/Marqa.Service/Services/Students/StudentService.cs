@@ -151,7 +151,6 @@ public class StudentService(
                 existStudent.StudentDetail.GuardianPhone = guardianPhoneResult.Phone;
             }
 
-            unitOfWork.Students.Update(existStudent);
             await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
@@ -333,12 +332,15 @@ public class StudentService(
 
         if (filterModel.CompanyId != null)
             query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
+        
+        var searchText = filterModel.SearchText.ToLower();
 
         if (!string.IsNullOrEmpty(filterModel.SearchText))
-            query = query.Where(s => s.User.FirstName.Contains(filterModel.SearchText) ||
-                                     s.User.LastName.Contains(filterModel.SearchText) ||
-                                     s.User.Phone.Contains(filterModel.SearchText) ||
-                                     s.User.Email.Contains(filterModel.SearchText));
+            query = query.Where(s => s.User.FirstName.ToLower().Contains(searchText) ||
+                                     s.User.LastName.ToLower().Contains(searchText) ||
+                                     s.User.Phone.ToLower().Contains(searchText) ||
+                                     s.User.Email.ToLower().Contains(searchText));
+        
         if (filterModel.CourseId != null)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
 

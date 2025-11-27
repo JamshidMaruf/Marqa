@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.Auth;
 
-public class JwtService(ISettingService settingService, IEncryptionService encryptionService) : IJwtService
+public class JwtService(ISettingService settingService) : IJwtService
 {
     public async ValueTask<(string Token, DateTime ExpiresIn)> GenerateJwtToken(User user, string role)
     {

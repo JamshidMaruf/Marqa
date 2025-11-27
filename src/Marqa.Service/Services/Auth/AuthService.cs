@@ -4,11 +4,12 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth.Models;
+using Marqa.Service.Services.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Auth;
 
-public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuthService
+public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, ISettingService settingService ) : IAuthService
 {
     public async ValueTask<LoginResponseModel> LoginAsync(LoginModel model, string ipAddress)
     {
@@ -46,10 +47,12 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService) : IAuth
 
         // refresh token
         var refreshToken = jwtService.GenerateRefreshToken();
-        
+
+        var configuration = await settingService.GetByCategoryAsync("RefreshToken");
+
         var refreshTokenExpiresIn = model.RememberMe 
-            ? DateTime.UtcNow.AddDays(30) 
-            : DateTime.UtcNow.AddDays(7);
+            ? DateTime.UtcNow.AddDays(Convert.ToInt16(configuration["RefreshToken.Expires.RememberMe"])) 
+            : DateTime.UtcNow.AddDays(Convert.ToInt16(configuration["RefreshToken.Expires.Standard"]));
     
         var refreshTokenEntity = new RefreshToken
         {
