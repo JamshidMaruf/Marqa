@@ -10,8 +10,7 @@ public class CancelPaymentModelValidator : AbstractValidator<CancelPaymentModel>
             .GreaterThan(0);
 
         RuleFor(x => x.Description)
-            .NotEmpty()
-            .MaximumLength(500);
+            .NotEmpty();
     }
 }
 
