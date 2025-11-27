@@ -23,10 +23,6 @@ public class CreatePaymentModelValidator : AbstractValidator<CreatePaymentModel>
         RuleFor(x => x.PaymentOperationType)
             .IsInEnum().WithMessage("Invalid operation type!");
 
-        RuleFor(x => x.Description)
-            .MaximumLength(500)
-            .When(x => x.Description != null);
-
         RuleFor(x => x.PaymentOperationType)
             .Must(type => type == Domain.Enums.PaymentOperationType.Income ||
                          type == Domain.Enums.PaymentOperationType.Expense);
