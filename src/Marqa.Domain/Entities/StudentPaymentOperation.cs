@@ -4,7 +4,7 @@ namespace Marqa.Domain.Entities;
 
 public class StudentPaymentOperation : Auditable
 {
-    public string PaymentNumber { get; set; } // unique identifier of the payment for user
+    public string PaymentNumber { get; set; } 
     public PaymentMethod PaymentMethod { get; set; }
     public decimal Amount { get; set; }
     public DateTime DateTime { get; set; }
