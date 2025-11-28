@@ -13,7 +13,11 @@ public class Employee : Auditable
     public string Specialization { get; set; }
     public string Info { get; set; }
     public int RoleId { get; set; }
-    public int? ParentId { get; set; } // for assistant teacher showing to whom he assists
+    
+    /// <summary>
+    /// This is for assistant teacher showing to whom he assists
+    /// </summary>
+    public int? ParentId { get; set; }
 
     // Navigation
     public User User { get; set; }

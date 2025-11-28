@@ -168,7 +168,7 @@ public class SettingConfiguration : IEntityTypeConfiguration<Setting>
             // RefreshToken
             new Setting
             {
-                Id = 3,
+                Id = 16,
                 Key = "RefreshToken.Expires.RememberMe",
                 Value = "30",
                 Category = "RefreshToken",
@@ -177,7 +177,7 @@ public class SettingConfiguration : IEntityTypeConfiguration<Setting>
             },
             new Setting
             {
-                Id = 4,
+                Id = 17,
                 Key = "RefreshToken.Expires.Standard",
                 Value = "7",
                 Category = "RefreshToken",

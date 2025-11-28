@@ -1506,6 +1506,30 @@ namespace Marqa.DataAccess.Migrations
                             Key = "ParentApp.AppId",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Value = "71286a64bc1b4c41beadbed6c0c973ec"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Category = "RefreshToken",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            IsEncrypted = false,
+                            Key = "RefreshToken.Expires.RememberMe",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Value = "30"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Category = "RefreshToken",
+                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            IsEncrypted = false,
+                            Key = "RefreshToken.Expires.Standard",
+                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Value = "7"
                         });
                 });
 

@@ -1,5 +1,5 @@
 ﻿using Marqa.Admin.WebApi.Extensions;
-using Marqa.Admin.WebApi.Middlewares;
+using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;
 using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
@@ -25,11 +25,17 @@ builder.Services.AddMarqaServices();
 
 builder.Services.AddJWTService();
 
+builder.Services.AddExceptionHandler<AlreadyExitExceptionHandler>();
+builder.Services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
+builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddExceptionHandler<NotMatchedExceptionHandler>();
+builder.Services.AddExceptionHandler<InternalServerErrorHandler>();
+builder.Services.AddProblemDetails();
+
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(
         new LowerCaseControllerName()));
-
 });
 
 builder.Services.AddAuthorization();
@@ -38,11 +44,11 @@ var app = builder.Build();
 
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 
+app.UseExceptionHandler();
+
 app.UseSwagger();
 
 app.UseSwaggerUI();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
