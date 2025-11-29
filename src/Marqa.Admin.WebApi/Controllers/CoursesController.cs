@@ -24,7 +24,6 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
-    [RequirePermission("students.attach")]
     [HttpPost("attach-student")]
     public async Task<IActionResult> AttachStudentAsync(int courseId, int studentId, StudentStatus status)
     {
@@ -98,6 +97,8 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Data = course
         });
     }
+    
+    // courses/company/1 -> id, name, teacherName, courseStudentCount
 
     [HttpGet("companies/{companyId:int}/courses")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)

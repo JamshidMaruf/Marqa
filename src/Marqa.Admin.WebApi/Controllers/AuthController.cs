@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1")]
+// TODO: Implement default api versioning
+[Route("api/v1/[controller]")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]

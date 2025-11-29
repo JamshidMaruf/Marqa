@@ -13,6 +13,13 @@ public class Response
     public string Message { get; set; }
 }
 
+public class ErrorResponse
+{
+    public int StatusCode { get; set; }
+    public string Message { get; set; }
+    public List<string> Errors { get; set; }
+}
+
 public class ApiResponse<T>
 {
     public int StatusCode { get; set; }
