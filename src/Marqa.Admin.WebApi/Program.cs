@@ -3,6 +3,7 @@ using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;
 using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -24,6 +25,13 @@ builder.Services.AddDbContext<AppDbContext>(option
 builder.Services.AddMarqaServices();
 
 builder.Services.AddJWTService();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 2);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+});
 
 builder.Services.AddExceptionHandler<AlreadyExitExceptionHandler>();
 builder.Services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();

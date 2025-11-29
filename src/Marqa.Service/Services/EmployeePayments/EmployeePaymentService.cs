@@ -11,8 +11,7 @@ namespace Marqa.Service.Services.EmployeePayments;
 
 public class EmployeePaymentService(IUnitOfWork unitOfWork,
         IValidator<EmployeePaymentCreateModel> createValidator,
-        IValidator<EmployeePaymentUpdateModel> updateValidator,
-        IValidator<EmployeePaymentCancelModel> cancelValidator) : IEmployeePaymentService
+        IValidator<EmployeePaymentUpdateModel> updateValidator) : IEmployeePaymentService
 {
     /// <summary>
     /// This method Generate PaymentNumber;
