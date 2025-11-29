@@ -1,4 +1,4 @@
-namespace Marqa.Domain.Enums;
+﻿namespace Marqa.Domain.Enums;
 
 public enum PaymentMethod
 {

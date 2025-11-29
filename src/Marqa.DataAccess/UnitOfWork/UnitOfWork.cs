@@ -43,6 +43,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<BasketItem> BasketItems { get; } = new Repository<BasketItem>(context);
 
     public IRepository<ExamSetting> ExamSettings { get; } = new Repository<ExamSetting>(context);
+    public IRepository<EmployeePayment> EmployeePayments { get; } = new Repository<EmployeePayment>(context);
 
     public IRepository<ExamSettingItem> ExamSettingItems { get; } = new Repository<ExamSettingItem>(context);
     public IRepository<Permission> Permissions { get; }  = new Repository<Permission>(context);

@@ -245,6 +245,11 @@ public class StudentPaymentService(
         return MapToViewModel(existPayment);
     }
 
+    /// <summary>
+    /// Thos method makes model for GetAll Method
+    /// </summary>
+    /// <param name="payment"></param>
+    /// <returns></returns>
     private StudentPaymentListViewModel MapToListViewModel(StudentPaymentOperation payment)
     {
         return new StudentPaymentListViewModel

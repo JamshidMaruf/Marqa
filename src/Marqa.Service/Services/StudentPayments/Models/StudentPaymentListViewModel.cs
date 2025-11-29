@@ -9,3 +9,8 @@ public class StudentPaymentListViewModel
     public EnumViewModel PaymentOperationType { get; set; }
     public string CourseName { get; set; }
 }
+public class EnumViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+}
