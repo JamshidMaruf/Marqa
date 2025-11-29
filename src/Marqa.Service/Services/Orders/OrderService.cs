@@ -14,12 +14,14 @@ public class OrderService(IUnitOfWork unitOfWork,
 {
     public async Task CreateBasketAsync(int studentId)
     {
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
-            ?? throw new NotFoundException("Student not found");
-        
+        var existstudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
+
+        if (!existstudent)
+            throw new NotFoundException("Student not found");
+
         unitOfWork.Baskets.Insert(new Basket
         {
-            StudentId = studentId   
+            StudentId = studentId
         });
 
         await unitOfWork.SaveAsync();
@@ -40,7 +42,7 @@ public class OrderService(IUnitOfWork unitOfWork,
         {
             existBasketItem.Quantity += model.Quantity;
             unitOfWork.BasketItems.Update(existBasketItem);
-            
+
             basket.TotalPrice += model.InlinePrice;
             unitOfWork.Baskets.Update(basket);
         }
@@ -57,19 +59,19 @@ public class OrderService(IUnitOfWork unitOfWork,
             basket.TotalPrice += model.InlinePrice;
             unitOfWork.Baskets.Update(basket);
         }
-        
+
         await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteBasketItemAsync(BasketItemDeleteModel model)
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
-                predicate: b => b.Id == model.BasketId, 
+                predicate: b => b.Id == model.BasketId,
                 includes: "BasketItems")
             ?? throw new NotFoundException("Basket not found");
 
         var basketItem = basket.BasketItems.FirstOrDefault(b => b.ProductId == model.ProductId);
-        
+
         if (basketItem != null)
         {
             if (basketItem.Quantity == model.Quantity)
@@ -79,15 +81,15 @@ public class OrderService(IUnitOfWork unitOfWork,
                 basket.TotalPrice -= model.InlinePrice;
                 unitOfWork.Baskets.Update(basket);
             }
-            else if(basketItem.Quantity > model.Quantity)
+            else if (basketItem.Quantity > model.Quantity)
             {
                 basketItem.Quantity -= model.Quantity;
                 unitOfWork.BasketItems.Update(basketItem);
-                
+
                 basket.TotalPrice -= model.InlinePrice;
                 unitOfWork.Baskets.Update(basket);
             }
-            
+
             await unitOfWork.SaveAsync();
         }
     }
@@ -115,11 +117,11 @@ public class OrderService(IUnitOfWork unitOfWork,
     public async Task CheckoutAsync(int basketId)
     {
         var basket = await unitOfWork.Baskets.SelectAsync(
-            predicate: b => b.Id == basketId, 
+            predicate: b => b.Id == basketId,
             includes: "BasketItems")
              ?? throw new NotFoundException("Basket not found");
-        
-        
+
+
         var createdOrder = unitOfWork.Orders.Insert(new Order
         {
             StudentId = basket.StudentId,
@@ -127,13 +129,13 @@ public class OrderService(IUnitOfWork unitOfWork,
             Status = OrderStatus.InProcess,
             Number = await GenerateOrderNumberAsync(),
         });
-        
+
         await unitOfWork.SaveAsync();
 
         var orderItems = basket.BasketItems.Select(bi => new OrderItem
         {
-            ProductId = bi.ProductId, 
-            Quantity = bi.Quantity, 
+            ProductId = bi.ProductId,
+            Quantity = bi.Quantity,
             InlinePrice = bi.InlinePrice,
             OrderId = createdOrder.Id
         });
@@ -203,7 +205,7 @@ public class OrderService(IUnitOfWork unitOfWork,
     {
         var order = await unitOfWork.Orders.SelectAsync(t => t.Id == orderId)
             ?? throw new NotFoundException("Order not found");
-        
+
         order.Status = newStatus;
         unitOfWork.Orders.Update(order);
         await unitOfWork.SaveAsync();
