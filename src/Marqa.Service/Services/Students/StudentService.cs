@@ -50,17 +50,21 @@ public class StudentService(
 
         try
         {
+            var userId = unitOfWork.Users.Insert(new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Phone = studentPhoneResult.Phone,
+                Email = model.Email,
+                Role = UserRole.Student,
+                CompanyId = model.CompanyId
+            }).Id;
+            
+            await unitOfWork.SaveAsync();
+
             var createdStudent = new Student()
             {
-                User = new User
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Phone = studentPhoneResult.Phone,
-                    Email = model.Email,
-                    Role = UserRole.Student,
-                    CompanyId = model.CompanyId
-                },
+                UserId = userId,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender
             };
