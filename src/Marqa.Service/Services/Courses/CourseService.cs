@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -332,19 +333,28 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task AttachStudentAsync(int courseId, int studentId, StudentStatus status)
     {
-        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == courseId);
+        try
+        {
+            var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
+               ?? throw new NotFoundException("Course is not found");
 
-        if (!existCourse)
-            throw new NotFoundException("Course is not found");
+            var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
 
-        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == studentId);
+            if (!existStudent)
+                throw new NotFoundException("Student is not found");
 
-        if (!existCourse)
-            throw new NotFoundException("Student is not found");
+            if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
+                throw new RequestRefusedException("This course has reached its maximum number of students.");
 
-        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status });
+            existCourse.EnrolledStudentCount++;
+            unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status, });
 
-        await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new RequestRefusedException("Course capacity was reached by another student.");
+        }   
     }
 
     public async Task DetachStudentAsync(int courseId, int studentId)
@@ -387,15 +397,61 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
+    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
+    {
+        return unitOfWork.StudentCourses.SelectAllAsQueryable(
+            predicate: sc => sc.StudentId == studentId,
+            includes: new[] { "Course" })
+            .Select(sc => new CoursePageCourseViewModel
+            {
+                Id = sc.CourseId,
+                Name = sc.Course.Name
+            })
+            .ToListAsync();
+    } 
+
+    public async Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId)
+    {
+        return await unitOfWork.StudentCourses
+            .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
+            c.Status != StudentStatus.Detached,
+            includes: "Courses" )
+            .Select(c => new CourseNamesModel
+            {
+                Id = c.Course.Id,
+                Name = c.Course.Name
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int companyId)
+    {
+        return await unitOfWork.Courses
+            .SelectAllAsQueryable(predicate: c => 
+                c.CompanyId == companyId &&
+                c.Status == CourseStatus.Active ||
+                c.Status == CourseStatus.Upcoming,
+            includes: ["Teacher", "Teacher.User"])
+            .Select(c => new MinimalCourseDataModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                TeacherFullName = c.Teacher.User.FirstName + c.Teacher.User.LastName,
+                MaxStudentCount = c.MaxStudentCount,
+                EnrolledStudentCount = c.EnrolledStudentCount
+            })
+            .ToListAsync();
+    }
+
     private async Task GenerateLessonAsync(
-        int courseId,
-        DateOnly startDate,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        string room,
-        int lessonCount,
-        int teacherId,
-        List<DayOfWeek> weekDays)
+     int courseId,
+     DateOnly startDate,
+     TimeOnly startTime,
+     TimeOnly endTime,
+     string room,
+     int lessonCount,
+     int teacherId,
+     List<DayOfWeek> weekDays)
     {
         List<Lesson> lessons = new List<Lesson>
         {
@@ -439,18 +495,5 @@ public class CourseService(IUnitOfWork unitOfWork,
         });
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
-    }
-
-    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
-    {
-        return unitOfWork.StudentCourses.SelectAllAsQueryable(
-            predicate: sc => sc.StudentId == studentId,
-            includes: new[] { "Course" })
-            .Select(sc => new CoursePageCourseViewModel
-            {
-                Id = sc.CourseId,
-                Name = sc.Course.Name
-            })
-            .ToListAsync();
     }
 }
