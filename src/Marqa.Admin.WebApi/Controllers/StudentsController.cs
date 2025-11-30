@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
  
-public class StudentsController(IStudentService studentService, ICourseService courseService) : BaseController
+public class StudentsController(
+    IStudentService studentService, 
+    ICourseService courseService) : BaseController
 { 
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
@@ -97,7 +99,7 @@ public class StudentsController(IStudentService studentService, ICourseService c
         });
     }
     
-    [HttpGet()]
+    [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAll(filterModel);
@@ -106,6 +108,30 @@ public class StudentsController(IStudentService studentService, ICourseService c
             StatusCode = 200,
             Message = "success",
             Data = students
+        });
+    }
+
+    [HttpPost("attach-student")]
+    public async Task<IActionResult> AttachStudentAsync(AttachModel model)
+    {
+        await courseService.AttachStudentAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success"
+        });
+    }
+
+    [HttpPost("detach-student")]
+    public async Task<IActionResult> DetachStudentAsync(int courseId, int studentId)
+    {
+        await courseService.DetachStudentAsync(courseId, studentId);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success"
         });
     }
 }

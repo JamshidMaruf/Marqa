@@ -330,15 +330,14 @@ public class CourseService(IUnitOfWork unitOfWork,
             })
             .ToListAsync();
     }
-
-    public async Task AttachStudentAsync(int courseId, int studentId, StudentStatus status)
+    public async Task AttachStudentAsync(AttachModel model)
     {
         try
         {
-            var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
+            var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                ?? throw new NotFoundException("Course is not found");
 
-            var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
+            var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
 
             if (!existStudent)
                 throw new NotFoundException("Student is not found");
@@ -346,8 +345,30 @@ public class CourseService(IUnitOfWork unitOfWork,
             if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
                 throw new RequestRefusedException("This course has reached its maximum number of students.");
 
+
+            if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
+                if (model.Amount > 100 || model.Amount < 0)
+                    throw new ArgumentIsNotValidException("Invalid amount");
+
+            else if(model.PaymentType == CoursePaymentType.Fixed)
+                if(model.Amount < 0)
+                    throw new ArgumentIsNotValidException("Invalid amount");
+
+            if (model.EnrollmentDate > DateTime.UtcNow)
+                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
+            
             existCourse.EnrolledStudentCount++;
-            unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status, });
+
+            // todo: student payment create shu malumotlaga asoslanib create qilinadi
+            unitOfWork.StudentCourses.Insert(new StudentCourse
+            { 
+                CourseId = model.CourseId,
+                StudentId = model.StudentId,
+                Status = StudentStatus.Active,
+                PaymentType = model.PaymentType,
+                Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
+                EnrolledDate = model.EnrollmentDate
+            });
 
             await unitOfWork.SaveAsync();
         }

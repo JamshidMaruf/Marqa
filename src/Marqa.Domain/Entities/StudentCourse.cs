@@ -8,6 +8,8 @@ public class StudentCourse : Auditable
     public int CourseId { get; set; }
     public StudentStatus Status { get; set; }
     public DateTime EnrolledDate { get; set; }
+    public CoursePaymentType PaymentType { get; set; }
+    public decimal Amount { get; set; }
 
     // Navigation
     public Student Student { get; set; }
