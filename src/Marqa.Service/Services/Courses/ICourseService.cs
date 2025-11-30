@@ -27,6 +27,5 @@ public interface ICourseService
     Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int studentId);
     // for mobile
     Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId);
-    Task<List<StudentCoursesGetModel.CourseInfo>> GetStudentCourses(int companyId);
     Task MoveStudentCourse(TransferStudentAcrossComaniesModel model);
 }
