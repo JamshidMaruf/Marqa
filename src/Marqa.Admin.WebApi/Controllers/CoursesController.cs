@@ -98,7 +98,18 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
     
-    // courses/company/1 -> id, name, teacherName, courseStudentCount
+    [HttpGet("by-company/{companyId:int}")]
+    public async Task<IActionResult> GetAvailableCoursesAsync(int companyId)
+    {
+        var result = await courseService.GetAvailableCoursesAsync(companyId);
+
+        return Ok(new Response<List<MinimalCourseDataModel>>
+        {
+            StatusCode = 200,  
+            Message = "success",
+            Data = result
+        });
+    }
 
     [HttpGet("companies/{companyId:int}/courses")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
