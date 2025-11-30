@@ -37,6 +37,7 @@ builder.Services.AddExceptionHandler<AlreadyExitExceptionHandler>();
 builder.Services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<NotMatchedExceptionHandler>();
+builder.Services.AddExceptionHandler<RequestRefusedExceptionHandler>();
 builder.Services.AddExceptionHandler<InternalServerErrorHandler>();
 builder.Services.AddProblemDetails();
 
