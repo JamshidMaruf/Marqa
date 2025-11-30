@@ -1,6 +1,5 @@
-# Marqa.Admin.WebApi - AuthController API Documentation
+# AuthController API Documentation
 
-## 📚 Umumiy Ma'lumot
 
 **Base URL:** `https://localhost/api/auth`
 
@@ -519,9 +518,3 @@ if (response.status === 401) {
   ]
 }
 ```
-
----
-
-**Oxirgi yangilash:** 29 Noyabr 2025  
-**Versiya:** 1.0.0  
-**Mualliflik:** API Documentation
