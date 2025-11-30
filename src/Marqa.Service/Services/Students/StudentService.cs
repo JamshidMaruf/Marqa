@@ -20,14 +20,14 @@ public class StudentService(
     {
         await createValidator.EnsureValidatedAsync(model);
 
-        var company = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId);
-        if (company == null)
+        var company = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
+        if (!company)
             throw new NotFoundException("Company not found");
 
         var existingStudent = await unitOfWork.Students
-            .SelectAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+            .ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
 
-        if (existingStudent != null)
+        if (existingStudent)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
         var studentPhoneResult = model.Phone.TrimPhoneNumber();
@@ -128,11 +128,11 @@ public class StudentService(
                 ?? throw new NotFoundException($"Student is not found");
 
             var phoneExists = await unitOfWork.Students
-                .SelectAsync(e => e.User.Phone == model.Phone
+                .ExistsAsync(e => e.User.Phone == model.Phone
                               && e.User.CompanyId == existStudent.User.CompanyId
                               && e.Id != id);
 
-            if (phoneExists != null)
+            if (phoneExists)
                 throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
             existStudent.User.FirstName = model.FirstName;

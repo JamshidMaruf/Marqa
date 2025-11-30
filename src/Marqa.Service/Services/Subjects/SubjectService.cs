@@ -18,13 +18,15 @@ public class SubjectService(IUnitOfWork unitOfWork,
         await subjectCreateValidator.EnsureValidatedAsync(model);
 
         var alreadyExistSubject = await unitOfWork.Subjects
-            .SelectAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
+            .ExistsAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
 
-        if (alreadyExistSubject != null)
+        if (alreadyExistSubject)
             throw new AlreadyExistException("This subject already exist!");
 
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-            ?? throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
+        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
+
+        if (!existCompany)
+            throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
         unitOfWork.Subjects.Insert(new Subject
         {
@@ -90,11 +92,15 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task AttachAsync(int teacherId, int subjectId)
     {
-        _ = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
-            ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
+        var existEmployee = await unitOfWork.Employees.ExistsAsync(e => e.Id == teacherId);
 
-        _ = await unitOfWork.Subjects.SelectAsync(s => s.Id == subjectId)
-            ?? throw new NotFoundException($"No subject was found with ID = {subjectId}.");
+        if (!existEmployee)
+            throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
+
+        var existSubject = await unitOfWork.Subjects.ExistsAsync(s => s.Id == subjectId);
+
+        if (!existSubject)
+            throw new NotFoundException($"No subject was found with ID = {subjectId}.");
 
         var exitAttachment = await unitOfWork.TeacherSubjects.SelectAsync(a =>
             a.TeacherId == teacherId &&

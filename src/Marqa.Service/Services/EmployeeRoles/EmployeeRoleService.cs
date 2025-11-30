@@ -16,8 +16,10 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
     {
         await employeeRoleCreateValidator.EnsureValidatedAsync(model);
 
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-          ?? throw new NotFoundException("Company not found");
+        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
+
+        if (!existCompany)
+            throw new NotFoundException("Company was not found");
 
         var existRole = await unitOfWork.EmployeeRoles.SelectAllAsQueryable(
             e => e.CompanyId == model.CompanyId && e.Name.ToLower() == model.Name.ToLower())

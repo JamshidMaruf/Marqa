@@ -19,11 +19,11 @@ public class PermissionService(
         await createValidator.EnsureValidatedAsync(model);
 
         var existingPermission = await unitOfWork.Permissions
-            .SelectAsync(p => p.Name.ToLower() == model.Name.ToLower()
+            .ExistsAsync(p => p.Name.ToLower() == model.Name.ToLower()
                            && p.Module.ToLower() == model.Module.ToLower()
                            && p.Action.ToLower() == model.Action.ToLower());
 
-        if (existingPermission != null)
+        if (existingPermission)
             throw new AlreadyExistException($"Permission '{model.Name}' with action '{model.Action}' in module '{model.Module}' already exists");
 
         var permission = new Permission
@@ -47,12 +47,12 @@ public class PermissionService(
             ?? throw new NotFoundException("Permission is not found");
 
         var duplicate = await unitOfWork.Permissions
-            .SelectAsync(p => p.Id != id
+            .ExistsAsync(p => p.Id != id
                            && p.Name.ToLower() == model.Name.ToLower()
                            && p.Module.ToLower() == model.Module.ToLower()
                            && p.Action.ToLower() == model.Action.ToLower());
 
-        if (duplicate != null)
+        if (duplicate)
             throw new AlreadyExistException($"Permission '{model.Name}' with action '{model.Action}' in module '{model.Module}' already exists");
 
         existPermission.Name = model.Name.Trim();
