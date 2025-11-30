@@ -1,7 +1,9 @@
 ﻿using Marqa.Admin.WebApi.Filters;
+using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Students;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -97,8 +99,18 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Data = course
         });
     }
-    
-    // courses/company/1 -> id, name, teacherName, courseStudentCount
+
+    [HttpGet("company/{companyId}")]
+    public async Task<IActionResult> GetCoursesByCompany(int companyId)
+    {
+        var courses = await courseService.GetStudentCourses(companyId);
+        return Ok(new Response<List<StudentCoursesGetModel.CourseInfo>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = courses
+        });
+    }
 
     [HttpGet("companies/{companyId:int}/courses")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)

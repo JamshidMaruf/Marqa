@@ -15,4 +15,6 @@ public interface ICourseService
     Task DetachStudentAsync(int courseId, int studentId);
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId);
     Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId);
+    Task<List<StudentCoursesGetModel.CourseInfo>> GetStudentCourses(int companyId);
+    Task MoveStudentCourse(TransferStudentAcrossComaniesModel model);
 }

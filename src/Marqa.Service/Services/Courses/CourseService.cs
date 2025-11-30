@@ -5,13 +5,15 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Validators.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
 public class CourseService(IUnitOfWork unitOfWork, 
     IValidator<CourseCreateModel> courseCreateValidator,
-    IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
+    IValidator<CourseUpdateModel> courseUpdateValidator,
+    IValidator<TransferStudentAcrossComaniesModel> transferValidator) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
@@ -439,4 +441,68 @@ public class CourseService(IUnitOfWork unitOfWork,
             })
             .ToListAsync();
     }
+
+    public async Task<List<StudentCoursesGetModel.CourseInfo>> GetStudentCourses(int companyId)
+    {
+        var courses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => !c.IsDeleted && c.CompanyId == companyId,
+                includes: ["StudentCourses", "Teacher.User"])
+            .Select(c => new StudentCoursesGetModel.CourseInfo
+            {
+                Id = c.Id,
+                Name = c.Name,
+                TeacherName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
+                CourseStudentCount = c.StudentCourses.Count(sc => !sc.IsDeleted)
+            })
+            .ToListAsync();
+
+        return new List<StudentCoursesGetModel.CourseInfo>(courses);
+    }
+
+    public async Task MoveStudentCourse(TransferStudentAcrossComaniesModel model)
+    {
+        await transferValidator.EnsureValidatedAsync(model);
+
+        using var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            // 1. Load studentCourse from the source course
+            var studentCourse = await unitOfWork.StudentCourses
+                .SelectAsync(sc => sc.StudentId == model.StudentId
+                                   && sc.CourseId == model.FromCourseId
+                                   && !sc.IsDeleted)
+                ?? throw new NotFoundException("Student is not enrolled in the source course");
+
+            // 2. Load the target course & ensure NOT finished
+            var targetCourse = await unitOfWork.Courses
+                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
+                ?? throw new NotFoundException("Target course not found or finished");
+
+            // 3. Remove from old course
+            unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
+            await unitOfWork.SaveAsync();
+
+            // 4. Add new course record
+            var newStudentCourse = new StudentCourse
+            {
+                StudentId = model.StudentId,
+                CourseId = model.ToCourseId,
+                EnrolledDate = model.DateOfTransfer,
+                Status = StudentStatus.Active,
+                TransferReason = model.Reason
+            };
+
+            unitOfWork.StudentCourses.Insert(newStudentCourse);
+            await unitOfWork.SaveAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
 }
