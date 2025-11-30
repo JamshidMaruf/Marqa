@@ -1,4 +1,5 @@
 ﻿using Marqa.Service.Exceptions;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,8 +14,8 @@ public class AlreadyExitExceptionHandler : IExceptionHandler
         
         var ex = new ProblemDetails
         {
-            Status = alreadyExistException.StatusCode, 
-            Title = exception.Message,
+            Detail = alreadyExistException.Message,
+            Status = alreadyExistException.StatusCode
         };
         
         httpContext.Response.StatusCode = alreadyExistException.StatusCode;

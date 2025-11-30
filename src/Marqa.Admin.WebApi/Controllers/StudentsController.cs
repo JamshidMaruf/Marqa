@@ -16,7 +16,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student created successfully",
         });
     }
 
@@ -28,7 +28,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student updated successfully",
         });
     }
 
@@ -40,7 +40,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student deleted successfully",
         });
     }
 
@@ -78,7 +78,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student Course status updated successfully",
         });
     }
 
