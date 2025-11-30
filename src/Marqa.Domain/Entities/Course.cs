@@ -29,5 +29,5 @@ public class Course : Auditable
     public ICollection<CourseWeekday> CourseWeekdays { get; set; }
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }
-    public ICollection<StudentCourse> StudentCourses { get; set; }
+    public ICollection<Enrollment> StudentCourses { get; set; }
 }

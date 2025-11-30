@@ -38,4 +38,6 @@ public interface IRepository<TEntity> where TEntity : Auditable
         bool tracking = false,
         params string[] includes);
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
+
+    bool Exist(Expression<Func<TEntity, bool>> predicate);
 }

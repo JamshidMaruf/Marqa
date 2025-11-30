@@ -13,7 +13,7 @@ public class Student : Auditable
     
     public User User { get; set; }
     public StudentDetail StudentDetail { get; set; }
-    public ICollection<StudentCourse> Courses { get; set; }
+    public ICollection<Enrollment> Courses { get; set; }
     public ICollection<StudentHomeTask> StudentHomeTasks { get; set; }
     public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
     public ICollection<Order> Orders { get; set; }

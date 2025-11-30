@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Services.Employees.Models;
-using Marqa.Service.Services.Teachers;
+﻿using Marqa.Service.Services.Teachers;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -85,3 +84,4 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         });
     }
 }
+

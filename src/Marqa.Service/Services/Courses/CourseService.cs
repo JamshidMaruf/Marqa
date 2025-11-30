@@ -360,11 +360,11 @@ public class CourseService(IUnitOfWork unitOfWork,
             existCourse.EnrolledStudentCount++;
 
             // todo: student payment create shu malumotlaga asoslanib create qilinadi
-            unitOfWork.StudentCourses.Insert(new StudentCourse
+            unitOfWork.StudentCourses.Insert(new Enrollment
             { 
                 CourseId = model.CourseId,
                 StudentId = model.StudentId,
-                Status = StudentStatus.Active,
+                StudentStatus = StudentStatus.Active,
                 PaymentType = model.PaymentType,
                 Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
                 EnrolledDate = model.EnrollmentDate
@@ -395,7 +395,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException("Attachment is not found!");
 
-        studentCourse.Status = StudentStatus.Detached;
+        studentCourse.StudentStatus = StudentStatus.Detached;
 
         unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
 
@@ -435,7 +435,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.StudentCourses
             .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
-            c.Status != StudentStatus.Detached,
+            c.StudentStatus != StudentStatus.Detached,
             includes: "Courses")
             .Select(c => new CourseNamesModel
             {
@@ -459,7 +459,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = c.Name,
                 TeacherFullName = c.Teacher.User.FirstName + c.Teacher.User.LastName,
                 MaxStudentCount = c.MaxStudentCount,
-                EnrolledStudentCount = c.EnrolledStudentCount
+                EnrolledStudentCount = c.EnrolledStudentCount,
+                CoursePrice = c.Price
             })
             .ToListAsync();
     }

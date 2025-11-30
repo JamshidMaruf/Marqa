@@ -34,7 +34,7 @@ public interface IUnitOfWork : IDisposable
 
     IRepository<OTP> OTPs { get; }
 
-    IRepository<StudentCourse> StudentCourses { get; }
+    IRepository<Enrollment> StudentCourses { get; }
 
     IRepository<StudentExamResult> StudentExamResults { get; }
 
