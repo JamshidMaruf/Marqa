@@ -1,4 +1,6 @@
 ﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Courses;
+using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
@@ -6,7 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
  
-public class StudentsController(IStudentService studentService) : BaseController
+public class StudentsController(
+    IStudentService studentService, 
+    ICourseService courseService) : BaseController
 { 
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
@@ -16,7 +20,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student created successfully",
         });
     }
 
@@ -28,7 +32,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student updated successfully",
         });
     }
 
@@ -40,7 +44,7 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student deleted successfully",
         });
     }
 
@@ -78,21 +82,56 @@ public class StudentsController(IStudentService studentService) : BaseController
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success",
+            Message = "Student Course status updated successfully",
         });
     }
 
-    // students/2/courses -> id, name
+    [HttpGet("{studentId:int}/courses")]
+    public async Task<IActionResult> GetAvailableCourses(int studentId)
+    {
+        var result = await courseService.GetAllStudentCourseNamesAsync(studentId);
+
+        return Ok(new Response<IEnumerable<CourseNamesModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
     
-    [HttpGet()]
+    [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAll(filterModel);
-        return Ok(new Response<List<StudentViewModel>>
+        return Ok(new Response<IEnumerable<StudentViewModel>>
         {
             StatusCode = 200,
             Message = "success",
             Data = students
+        });
+    }
+
+    [HttpPost("attach-student")]
+    public async Task<IActionResult> AttachStudentAsync(AttachModel model)
+    {
+        await courseService.AttachStudentAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success"
+        });
+    }
+
+    [HttpPost("detach-student")]
+    public async Task<IActionResult> DetachStudentAsync(int courseId, int studentId)
+    {
+        await courseService.DetachStudentAsync(courseId, studentId);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success"
         });
     }
 }

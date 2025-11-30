@@ -26,29 +26,6 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
-    [HttpPost("attach-student")]
-    public async Task<IActionResult> AttachStudentAsync(int courseId, int studentId, StudentStatus status)
-    {
-        await courseService.AttachStudentAsync(courseId, studentId, status);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
-
-    [HttpPost("detach-student")]
-    public async Task<IActionResult> DetachStudentAsync(int courseId, int studentId)
-    {
-        await courseService.DetachStudentAsync(courseId, studentId);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)
@@ -99,16 +76,17 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Data = course
         });
     }
-
-    [HttpGet("company/{companyId}")]
-    public async Task<IActionResult> GetCoursesByCompany(int companyId)
+    
+    [HttpGet("by-company/{companyId:int}")]
+    public async Task<IActionResult> GetAvailableCoursesAsync(int companyId)
     {
-        var courses = await courseService.GetStudentCourses(companyId);
-        return Ok(new Response<List<StudentCoursesGetModel.CourseInfo>>
+        var result = await courseService.GetAvailableCoursesAsync(companyId);
+
+        return Ok(new Response<List<MinimalCourseDataModel>>
         {
-            StatusCode = 200,
+            StatusCode = 200,  
             Message = "success",
-            Data = courses
+            Data = result
         });
     }
 

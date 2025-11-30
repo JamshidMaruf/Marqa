@@ -11,9 +11,21 @@ public interface ICourseService
     Task<CourseViewModel> GetAsync(int id);
     Task<CourseUpdateViewModel> GetForUpdateAsync(int id);
     Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId);
-    Task AttachStudentAsync(int courseId, int studentId,StudentStatus status);
+    Task AttachStudentAsync(AttachModel model);
     Task DetachStudentAsync(int courseId, int studentId);
+    // for mobile
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId);
+    
+    // for dashboard panel
+    /// <summary>
+    /// returns all student active courses
+    /// </summary>
+    /// <param name="studentId"></param>
+    /// <returns></returns>
+    Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId);
+    // for dashboard panel
+    Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int studentId);
+    // for mobile
     Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId);
     Task<List<StudentCoursesGetModel.CourseInfo>> GetStudentCourses(int companyId);
     Task MoveStudentCourse(TransferStudentAcrossComaniesModel model);

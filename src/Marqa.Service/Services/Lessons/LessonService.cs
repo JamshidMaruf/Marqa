@@ -18,8 +18,10 @@ public class LessonService(
         var lessonForUpdation = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
-            ?? throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
+        var existEmployee = await unitOfWork.Employees.ExistsAsync(t => t.Id == model.TeacherId);
+
+        if (!existEmployee)
+            throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
 
         lessonForUpdation.StartTime = model.StartTime;
         lessonForUpdation.EndTime = model.EndTime;
@@ -46,8 +48,10 @@ public class LessonService(
 
     public async Task VideoUploadAsync(int id, IFormFile video)
     {
-        _ = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
-            ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
+        var existLesson = await unitOfWork.Lessons.ExistsAsync(l => l.Id == id);
+
+        if (!existLesson)
+            throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
         var allowedExtensions = new string[] { ".mp4", ".avi", ".mkv", ".mov", ".flv" };
 
@@ -74,8 +78,10 @@ public class LessonService(
         var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
-            ?? throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
+
+        if (!existStudent)
+            throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
 
         var lessonAttendance = await unitOfWork.LessonAttendances
             .SelectAsync(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId);
