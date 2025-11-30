@@ -313,7 +313,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time without time zone");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubjectId")
@@ -416,7 +416,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -807,7 +807,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("LateTimeInMinutes")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
@@ -952,7 +952,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .HasColumnType("integer");
 
                     b.Property<int>("StudentId")
@@ -1582,7 +1582,7 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentCourse", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
                 {
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
@@ -1599,7 +1599,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -1762,7 +1762,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("StudentStatus")
                         .HasColumnType("integer");
 
                     b.Property<int>("StudentId")
@@ -2450,7 +2450,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.StudentCourse", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", "Course")
                         .WithMany("StudentCourses")
