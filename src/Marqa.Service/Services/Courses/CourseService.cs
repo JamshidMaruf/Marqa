@@ -354,7 +354,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         catch (DbUpdateConcurrencyException)
         {
             throw new RequestRefusedException("Course capacity was reached by another student.");
-        }   
+        }
     }
 
     public async Task DetachStudentAsync(int courseId, int studentId)
@@ -364,19 +364,19 @@ public class CourseService(IUnitOfWork unitOfWork,
         if (!existCourse)
             throw new NotFoundException("Course is not found");
 
-        var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == studentId);
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
 
-        if (!existCourse)
+        if (!existStudent)
             throw new NotFoundException("Student is not found");
 
         var studentCourse = await unitOfWork.StudentCourses
             .SelectAllAsQueryable(predicate: s => s.StudentId == studentId && s.CourseId == courseId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync()
+            ?? throw new NotFoundException("Attachment is not found!");
 
         studentCourse.Status = StudentStatus.Detached;
 
-        if (studentCourse is not null)
-            unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
+        unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
 
         await unitOfWork.SaveAsync();
     }
@@ -408,14 +408,14 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = sc.Course.Name
             })
             .ToListAsync();
-    } 
+    }
 
     public async Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId)
     {
         return await unitOfWork.StudentCourses
             .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
             c.Status != StudentStatus.Detached,
-            includes: "Courses" )
+            includes: "Courses")
             .Select(c => new CourseNamesModel
             {
                 Id = c.Course.Id,
@@ -427,7 +427,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int companyId)
     {
         return await unitOfWork.Courses
-            .SelectAllAsQueryable(predicate: c => 
+            .SelectAllAsQueryable(predicate: c =>
                 c.CompanyId == companyId &&
                 c.Status == CourseStatus.Active ||
                 c.Status == CourseStatus.Upcoming,
