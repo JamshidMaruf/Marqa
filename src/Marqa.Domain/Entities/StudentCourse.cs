@@ -14,4 +14,6 @@ public class StudentCourse : Auditable
     // Navigation
     public Student Student { get; set; }
     public Course Course { get; set; }
+    public DateTime EnrolledDate { get; set; }
+    public string TransferReason { get; set; }
 }
