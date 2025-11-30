@@ -18,4 +18,3 @@ public class Enrollment : Auditable
     public Course Course { get; set; }
     public EnrollmentCancellation EnrollmentCancellation { get; set; }
 }
-
