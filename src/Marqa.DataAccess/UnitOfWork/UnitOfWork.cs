@@ -20,7 +20,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Lesson> Lessons { get; } = new Repository<Lesson>(context);
     public IRepository<LessonAttendance> LessonAttendances { get; } = new Repository<LessonAttendance>(context);
     public IRepository<OTP> OTPs { get; } = new Repository<OTP>(context);
-    public IRepository<StudentCourse> StudentCourses { get; } = new Repository<StudentCourse>(context);
+    public IRepository<Enrollment> StudentCourses { get; } = new Repository<Enrollment>(context);
     public IRepository<StudentExamResult> StudentExamResults { get; } = new Repository<StudentExamResult>(context);
     public IRepository<Subject> Subjects { get; } = new Repository<Subject>(context);
     public IRepository<StudentHomeTask> StudentHomeTasks { get; } = new Repository<StudentHomeTask>(context);

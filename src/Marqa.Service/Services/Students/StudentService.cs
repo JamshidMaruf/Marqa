@@ -50,7 +50,7 @@ public class StudentService(
 
         try
         {
-            var userId = unitOfWork.Users.Insert(new User
+            int userId = unitOfWork.Users.Insert(new User
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -322,7 +322,7 @@ public class StudentService(
     {
         var studentCourse = await unitOfWork.StudentCourses
             .SelectAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId)
-            ?? throw new NotFoundException("StudentCourse not found");
+            ?? throw new NotFoundException("Enrollment not found");
 
         studentCourse.Status = status;
 

@@ -7,4 +7,5 @@ public class MinimalCourseDataModel
     public string TeacherFullName { get; set; }
     public int MaxStudentCount { get; set; }
     public int EnrolledStudentCount { get; set; }
+    public decimal CoursePrice { get; set; }
 }

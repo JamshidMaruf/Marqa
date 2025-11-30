@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Marqa.DataAccess.EntityConfigurations;
 
-public class StudentCourseConfiguration : IEntityTypeConfiguration<StudentCourse>
+public class StudentCourseConfiguration : IEntityTypeConfiguration<Enrollment>
 {
-    public void Configure(EntityTypeBuilder<StudentCourse> builder)
+    public void Configure(EntityTypeBuilder<Enrollment> builder)
     {
         builder.Ignore(la => la.Id);
 
