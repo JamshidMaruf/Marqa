@@ -13,8 +13,10 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
-        var existLesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
-            ?? throw new NotFoundException("Lesson is not found");
+        var existLesson = await unitOfWork.Lessons.ExistsAsync(l => l.Id == model.LessonId);
+
+        if (!existLesson)
+            throw new NotFoundException("Lesson is not found");
 
         unitOfWork.HomeTasks.Insert(new HomeTask
         {
@@ -29,8 +31,10 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
     {
-        _ = await unitOfWork.HomeTasks.SelectAsync(l => l.Id == homeTaskId)
-            ?? throw new NotFoundException($"Hometask was not found with this ID = {homeTaskId}");
+        var existHomeTask = await unitOfWork.HomeTasks.ExistsAsync(l => l.Id == homeTaskId);
+
+        if (!existHomeTask)
+            throw new NotFoundException($"Hometask was not found with this ID = {homeTaskId}");
 
         string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
 
@@ -143,8 +147,10 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task UploadStudentHomeTaskFileAsync(int studentHomeTaskId, IFormFile file)
     {
-        _ = await unitOfWork.StudentHomeTasks.SelectAsync(h => h.Id == studentHomeTaskId)
-            ?? throw new NotFoundException($"Student hometask was not found with this ID = {studentHomeTaskId}!");
+        var existHometaskStudent = await unitOfWork.StudentHomeTasks.ExistsAsync(h => h.Id == studentHomeTaskId);
+
+        if (!existHometaskStudent)
+            throw new NotFoundException($"Student hometask was not found with this ID = {studentHomeTaskId}!");
 
         string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".tiff", ".ico" };
 

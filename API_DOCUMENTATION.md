@@ -1,6 +1,3 @@
-# AuthController API Documentation
-
-
 **Base URL:** `https://localhost/api/auth`
 
 **Authentication:** JWT Bearer Token (Access Token)

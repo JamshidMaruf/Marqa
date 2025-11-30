@@ -10,6 +10,11 @@ public static class ValidatorExtension
         var validationResult = await validator.ValidateAsync(model);
 
         if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
+            throw new ArgumentIsNotValidException(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
     }
 }
+
+// 1. Create custom exception fo validation
+// 2. Update EnsureValidatedAsync metod
+// 3. Move existValidations to Validator
+// 4. Crete Handler for custom exception

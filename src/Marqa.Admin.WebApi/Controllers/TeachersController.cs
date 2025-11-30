@@ -18,7 +18,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         return Ok(new Response
         {
             StatusCode = 201,
-            Message = "success"
+            Message = "Teacher created successfully"
         });
     }
 
@@ -30,7 +30,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success"
+            Message = "Teacher updated successfully"
         });
     }
 
@@ -42,7 +42,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         return Ok(new Response
         {
             StatusCode = 200,
-            Message = "success"
+            Message = "Teacher deleted successfully"
         });
     }
 

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -9,22 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
-public class CourseService(IUnitOfWork unitOfWork, 
+public class CourseService(IUnitOfWork unitOfWork,
     IValidator<CourseCreateModel> courseCreateValidator,
     IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
         await courseCreateValidator.EnsureValidatedAsync(model);
-
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-           ?? throw new NotFoundException("Company not found");
-
-        _ = await unitOfWork.Subjects.SelectAsync(c => c.Id == model.SubjectId)
-            ?? throw new NotFoundException("Subject not found");
-
-        _ = await unitOfWork.Employees.SelectAsync(t => t.Id == model.TeacherId)
-            ?? throw new NotFoundException("Teacher not found");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
@@ -93,12 +85,12 @@ public class CourseService(IUnitOfWork unitOfWork,
         await courseUpdateValidator.EnsureValidatedAsync(model);
 
         var existCourse = await unitOfWork.Courses
-            .SelectAllAsQueryable(c => !c.IsDeleted, 
-            includes: [ "Lessons", "CourseWeekdays"])
+            .SelectAllAsQueryable(c => !c.IsDeleted,
+            includes: ["Lessons", "CourseWeekdays"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-        
-        _ = await unitOfWork.Employees.SelectAsync(c => 
+
+        _ = await unitOfWork.Employees.SelectAsync(c =>
         c.Id == model.TeacherId && c.User.CompanyId == existCourse.CompanyId)
             ?? throw new NotFoundException("This teacher not found!");
 
@@ -117,9 +109,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
             foreach (var lesson in existCourse.Lessons)
                 unitOfWork.Lessons.Remove(lesson);
-            
+
             await unitOfWork.SaveAsync();
-            
+
             foreach (var weekday in existCourse.CourseWeekdays)
                 unitOfWork.CourseWeekdays.Remove(weekday);
 
@@ -146,7 +138,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                model.Weekdays);
             await unitOfWork.SaveAsync();
 
-            unitOfWork.Courses.Update(existCourse);            
+            unitOfWork.Courses.Update(existCourse);
             await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
@@ -165,14 +157,14 @@ public class CourseService(IUnitOfWork unitOfWork,
             includes: new[] { "Lessons", "CourseWeekdays" })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-        
+
         foreach (var lesson in existCourse.Lessons)
-             unitOfWork.Lessons.MarkAsDeleted(lesson);
+            unitOfWork.Lessons.MarkAsDeleted(lesson);
 
         foreach (var weekday in existCourse.CourseWeekdays)
-             unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
+            unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
 
-         unitOfWork.Courses.MarkAsDeleted(existCourse);
+        unitOfWork.Courses.MarkAsDeleted(existCourse);
 
         await unitOfWork.SaveAsync();
     }
@@ -182,7 +174,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: [ "Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User" ])
+            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User"])
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -229,7 +221,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: [ "Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User" ])
+            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User"])
             .Select(c => new CourseUpdateViewModel
             {
                 Id = c.Id,
@@ -275,7 +267,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(
             predicate: c => c.CompanyId == companyId && !c.IsDeleted,
-            includes: [ "Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays", "User" ]);
+            includes: ["Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays", "User"]);
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -324,35 +316,52 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task AttachStudentAsync(int courseId, int studentId,StudentStatus status)
+    public async Task AttachStudentAsync(int courseId, int studentId, StudentStatus status)
     {
-        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
-            ?? throw new NotFoundException("Course is not found");
+        try
+        {
+            var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
+               ?? throw new NotFoundException("Course is not found");
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
-            ?? throw new NotFoundException("Student is not found");
+            var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
 
-        unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status });
-        
-        await unitOfWork.SaveAsync();
+            if (!existStudent)
+                throw new NotFoundException("Student is not found");
+
+            if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
+                throw new RequestRefusedException("This course has reached its maximum number of students.");
+
+            existCourse.EnrolledStudentCount++;
+            unitOfWork.StudentCourses.Insert(new StudentCourse() { CourseId = courseId, StudentId = studentId, Status = status, });
+
+            await unitOfWork.SaveAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new RequestRefusedException("Course capacity was reached by another student.");
+        }
     }
 
     public async Task DetachStudentAsync(int courseId, int studentId)
     {
-        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId)
-            ?? throw new NotFoundException("Course is not found");
+        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == courseId);
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
-            ?? throw new NotFoundException("Student is not found");
+        if (!existCourse)
+            throw new NotFoundException("Course is not found");
+
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
+
+        if (!existStudent)
+            throw new NotFoundException("Student is not found");
 
         var studentCourse = await unitOfWork.StudentCourses
             .SelectAllAsQueryable(predicate: s => s.StudentId == studentId && s.CourseId == courseId)
-            .FirstOrDefaultAsync();
-        
+            .FirstOrDefaultAsync()
+            ?? throw new NotFoundException("Attachment is not found!");
+
         studentCourse.Status = StudentStatus.Detached;
 
-        if (studentCourse is not null)
-            unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
+        unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
 
         await unitOfWork.SaveAsync();
     }
@@ -373,15 +382,61 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
+    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
+    {
+        return unitOfWork.StudentCourses.SelectAllAsQueryable(
+            predicate: sc => sc.StudentId == studentId,
+            includes: new[] { "Course" })
+            .Select(sc => new CoursePageCourseViewModel
+            {
+                Id = sc.CourseId,
+                Name = sc.Course.Name
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId)
+    {
+        return await unitOfWork.StudentCourses
+            .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
+            c.Status != StudentStatus.Detached,
+            includes: "Courses")
+            .Select(c => new CourseNamesModel
+            {
+                Id = c.Course.Id,
+                Name = c.Course.Name
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int companyId)
+    {
+        return await unitOfWork.Courses
+            .SelectAllAsQueryable(predicate: c =>
+                c.CompanyId == companyId &&
+                c.Status == CourseStatus.Active ||
+                c.Status == CourseStatus.Upcoming,
+            includes: ["Teacher", "Teacher.User"])
+            .Select(c => new MinimalCourseDataModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                TeacherFullName = c.Teacher.User.FirstName + c.Teacher.User.LastName,
+                MaxStudentCount = c.MaxStudentCount,
+                EnrolledStudentCount = c.EnrolledStudentCount
+            })
+            .ToListAsync();
+    }
+
     private async Task GenerateLessonAsync(
-        int courseId,
-        DateOnly startDate,
-        TimeOnly startTime,
-        TimeOnly endTime,
-        string room,
-        int lessonCount,
-        int teacherId,
-        List<DayOfWeek> weekDays)
+     int courseId,
+     DateOnly startDate,
+     TimeOnly startTime,
+     TimeOnly endTime,
+     string room,
+     int lessonCount,
+     int teacherId,
+     List<DayOfWeek> weekDays)
     {
         List<Lesson> lessons = new List<Lesson>
         {
@@ -425,18 +480,5 @@ public class CourseService(IUnitOfWork unitOfWork,
         });
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
-    }
-
-    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
-    {
-        return unitOfWork.StudentCourses.SelectAllAsQueryable(
-            predicate: sc => sc.StudentId == studentId,
-            includes: new[] {"Course"})
-            .Select(sc => new CoursePageCourseViewModel
-            {
-                Id = sc.CourseId,
-                Name = sc.Course.Name
-            })
-            .ToListAsync();
     }
 }

@@ -5,9 +5,11 @@ using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
- 
-public class StudentsController(IStudentService studentService) : BaseController
-{ 
+
+[ApiController]
+[Route("api/[controller]")]
+public class StudentsController(IStudentService studentService) : ControllerBase
+{
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
@@ -82,8 +84,6 @@ public class StudentsController(IStudentService studentService) : BaseController
         });
     }
 
-    // students/2/courses -> id, name
-    
     [HttpGet()]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {

@@ -1,4 +1,5 @@
-﻿using Marqa.Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using Marqa.Domain.Enums;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Marqa.Domain.Entities;
@@ -12,11 +13,14 @@ public class Course : Auditable
     public TimeOnly EndTime { get; set; }
     public CourseStatus Status { get; set; }
     public int MaxStudentCount { get; set; }
+    public int EnrolledStudentCount { get; set; }
     public decimal Price { get; set; }
     public string Description { get; set; }
     public int CompanyId { get; set; }
     public int SubjectId { get; set; }
     public int TeacherId { get; set; }
+    // concurrency token
+    public byte[] RowVersion { get; set; }
 
     // Navigation
     public Company Company { get; set; }

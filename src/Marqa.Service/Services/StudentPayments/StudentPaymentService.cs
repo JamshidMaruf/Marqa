@@ -4,7 +4,7 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.DTOs.StudentPaymentOperations;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Extensions; 
+using Marqa.Service.Extensions;
 using Marqa.Service.Interfaces;
 using Marqa.Service.Services.Exams.Models;
 using Microsoft.EntityFrameworkCore;
@@ -58,11 +58,15 @@ public class StudentPaymentService(
     {
         await createValidator.EnsureValidatedAsync(model);
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
-            ?? throw new NotFoundException($"Student not found with ID: {model.StudentId}");
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
 
-        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
-            ?? throw new NotFoundException($"Course not found with ID: {model.CourseId}");
+        if (!existStudent)
+            throw new NotFoundException($"Student not found with ID: {model.StudentId}");
+
+        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == model.CourseId);
+
+        if (!existCourse)
+            throw new NotFoundException($"Course not found with ID: {model.CourseId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
@@ -100,11 +104,15 @@ public class StudentPaymentService(
             .SelectAsync(p => p.Id == model.PaymentId)
             ?? throw new NotFoundException($"Payment not found with ID: {model.PaymentId}");
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
-            ?? throw new NotFoundException($"Student not found with ID: {model.StudentId}");
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
 
-        _ = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
-            ?? throw new NotFoundException($"Course not found with ID: {model.CourseId}");
+        if (!existStudent)
+            throw new NotFoundException($"Student not found with ID: {model.StudentId}");
+
+        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == model.CourseId);
+
+        if (!existCourse)
+            throw new NotFoundException($"Course not found with ID: {model.CourseId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
@@ -187,7 +195,7 @@ public class StudentPaymentService(
                 StudentId = originalPayment.StudentId,
                 CourseId = originalPayment.CourseId,
                 PaymentMethod = originalPayment.PaymentMethod,
-                Amount = originalPayment.Amount, 
+                Amount = originalPayment.Amount,
                 DateTime = DateTime.UtcNow,
                 Description = $"REFUND for {originalPayment.PaymentNumber}: {model.Description}",
                 PaymentOperationType = PaymentOperationType.Expense,
@@ -207,14 +215,16 @@ public class StudentPaymentService(
 
     public async Task TransferAsync(TransferPaymentModel model)
     {
-        await transferValidator.EnsureValidatedAsync(model); 
+        await transferValidator.EnsureValidatedAsync(model);
 
         var existPayment = await unitOfWork.StudentPaymentOperations
-            .SelectAsync(p => p.Id ==model.PaymentId && !p.IsDeleted)
+            .SelectAsync(p => p.Id == model.PaymentId && !p.IsDeleted)
             ?? throw new NotFoundException($"Payment not found with ID: {model.PaymentId}");
 
-        _ = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId && !s.IsDeleted)
-            ?? throw new NotFoundException($"Student not found with ID: {model.StudentId}");
+        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
+
+        if (!existStudent)
+            throw new NotFoundException($"Student not found with ID: {model.StudentId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
@@ -259,7 +269,7 @@ public class StudentPaymentService(
             Amount = payment.Amount,
             DateTime = payment.DateTime,
             PaymentOperationType = new EnumViewModel { Id = (int)payment.PaymentOperationType, Name = payment.PaymentOperationType.ToString() },
-            CourseName = payment.Course?.Name 
+            CourseName = payment.Course?.Name
         };
     }
 
@@ -278,9 +288,9 @@ public class StudentPaymentService(
             string normalizedSearch = search.Trim().ToLower();
             query = query.Where(p =>
                 p.PaymentNumber.ToLower().Contains(normalizedSearch) ||
-                p.Course.Name.ToLower().Contains(normalizedSearch) 
-                                                                   
-                                                                   
+                p.Course.Name.ToLower().Contains(normalizedSearch)
+
+
             );
         }
 

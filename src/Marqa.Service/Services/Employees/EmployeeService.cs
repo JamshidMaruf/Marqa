@@ -18,15 +18,19 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         await validatorEmployeeCreate.EnsureValidatedAsync(model);
 
-        _ = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-           ?? throw new NotFoundException("Company was not found");
+        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
 
-        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == model.CompanyId)
-            ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
+        if (!existCompany)
+            throw new NotFoundException("Company was not found");
 
-        var alreadyExistEmployee = await unitOfWork.Employees.SelectAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+        var existEmployeeRole = await unitOfWork.EmployeeRoles.ExistsAsync(e => e.Id == model.RoleId && e.CompanyId == model.CompanyId);
 
-        if (alreadyExistEmployee != null)
+        if (!existEmployeeRole)
+            throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
+
+        var alreadyExistEmployee = await unitOfWork.Employees.ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+
+        if (alreadyExistEmployee)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
 
         var employeePhone = model.Phone.TrimPhoneNumber();
@@ -44,7 +48,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             CompanyId = model.CompanyId,
         });
         await unitOfWork.SaveAsync();
-        
+
         var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
             UserId = userEntity.Id,
@@ -70,12 +74,14 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id, includes: "User")
             ?? throw new NotFoundException($"Employee was not found");
 
-        _ = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.User.CompanyId)
-            ?? throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
+        var existEmployeeRole = await unitOfWork.EmployeeRoles.ExistsAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.User.CompanyId);
 
-        var existPhone = await unitOfWork.Employees.SelectAsync(e => 
-                            e.User.Phone == model.Phone && 
-                            e.User.CompanyId == existEmployee.User.CompanyId && 
+        if (!existEmployeeRole)
+            throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
+
+        var existPhone = await unitOfWork.Employees.SelectAsync(e =>
+                            e.User.Phone == model.Phone &&
+                            e.User.CompanyId == existEmployee.User.CompanyId &&
                             e.Id != id, includes: "User");
 
         if (existPhone != null)
@@ -116,7 +122,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach,
-            includes: [ "Role", "User" ])
+            includes: ["Role", "User"])
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,

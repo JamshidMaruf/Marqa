@@ -90,4 +90,13 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
         return query;
     }
+    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _context.Set<TEntity>().AnyAsync(predicate);
+    }
+    
+    public bool Exist(Expression<Func<TEntity, bool>> predicate)
+    {
+        return _context.Set<TEntity>().Any(predicate);
+    }
 }
