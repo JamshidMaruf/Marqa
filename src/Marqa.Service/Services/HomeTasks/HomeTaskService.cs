@@ -13,10 +13,6 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
-        var existLesson = await unitOfWork.Lessons.ExistsAsync(l => l.Id == model.LessonId);
-
-        if (!existLesson)
-            throw new NotFoundException("Lesson is not found");
 
         unitOfWork.HomeTasks.Insert(new HomeTask
         {

@@ -58,15 +58,7 @@ public class StudentPaymentService(
     {
         await createValidator.EnsureValidatedAsync(model);
 
-        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
 
-        if (!existStudent)
-            throw new NotFoundException($"Student not found with ID: {model.StudentId}");
-
-        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == model.CourseId);
-
-        if (!existCourse)
-            throw new NotFoundException($"Course not found with ID: {model.CourseId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 
@@ -104,15 +96,6 @@ public class StudentPaymentService(
             .SelectAsync(p => p.Id == model.PaymentId)
             ?? throw new NotFoundException($"Payment not found with ID: {model.PaymentId}");
 
-        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
-
-        if (!existStudent)
-            throw new NotFoundException($"Student not found with ID: {model.StudentId}");
-
-        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == model.CourseId);
-
-        if (!existCourse)
-            throw new NotFoundException($"Course not found with ID: {model.CourseId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 

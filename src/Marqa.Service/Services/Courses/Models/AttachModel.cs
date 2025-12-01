@@ -8,5 +8,5 @@ public class AttachModel
     public int StudentId { get; set; }
     public CoursePaymentType PaymentType { get; set; }
     public decimal Amount { get; set; }
-    public DateTime EnrollmentDate { get; set;
+    public DateTime EnrollmentDate { get; set; }
 }

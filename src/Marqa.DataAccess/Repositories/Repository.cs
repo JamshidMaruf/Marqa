@@ -100,4 +100,3 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         return _context.Set<TEntity>().Any(predicate);
     }
 }
-}

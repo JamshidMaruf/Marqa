@@ -16,9 +16,6 @@ public class ProductService(IUnitOfWork unitOfWork,
     public async Task CreateAsync(ProductCreateModel model)
     {
         await productCreateValidator.EnsureValidatedAsync(model);
-      
-        var companyExists = await unitOfWork.Companies.SelectAsync(c => c.Id == model.CompanyId)
-            ?? throw new InvalidOperationException($"Company with ID {model.CompanyId} does not exist");
 
         unitOfWork.Products
             .Insert(new Product

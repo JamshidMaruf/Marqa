@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Companies.Models;
 
 namespace Marqa.Service.Validators.Companies;
@@ -18,7 +19,5 @@ public class CompanyCreateModelValidator : AbstractValidator<CompanyCreateModel>
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("Invalid Email format.");
-
-
     }
 }
