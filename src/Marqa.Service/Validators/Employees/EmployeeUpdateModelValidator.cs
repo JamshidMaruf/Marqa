@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Employees.Models;
 
 namespace Marqa.Service.Validators.Employees;
 public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateModel>
 {
-    public EmployeeUpdateModelValidator()
+    public EmployeeUpdateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -39,5 +40,7 @@ public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateMode
 
         RuleFor(x => x.RoleId)
             .GreaterThan(0).WithMessage("RoleId is required.");
+        RuleFor(x => x.RoleId).Must(roleId => unitOfWork.EmployeeRoles.Exist(r => r.Id == roleId))
+            .WithMessage("Employee role with given Id does not exist.");
     }
 }

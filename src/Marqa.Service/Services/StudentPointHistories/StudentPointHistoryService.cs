@@ -17,8 +17,6 @@ public class StudentPointHistoryService(
     {
         await pointAddValidator.EnsureValidatedAsync(model);
 
-        var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
-            ?? throw new NotFoundException("This student is not found!");
 
         var summ = await GetAsync(model.StudentId);
 

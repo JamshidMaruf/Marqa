@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -18,21 +18,6 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task CreateAsync(CourseCreateModel model)
     {
         await courseCreateValidator.EnsureValidatedAsync(model);
-
-        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
-
-        if (!existCompany)
-            throw new NotFoundException("Company not found");
-
-        var existSubject = await unitOfWork.Subjects.ExistsAsync(c => c.Id == model.SubjectId);
-
-        if (!existSubject)
-            throw new NotFoundException("Subject not found");
-
-        var existEmployee = await unitOfWork.Employees.ExistsAsync(t => t.Id == model.TeacherId);
-
-        if (!existEmployee)
-            throw new NotFoundException("Teacher not found");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
@@ -105,10 +90,6 @@ public class CourseService(IUnitOfWork unitOfWork,
             includes: ["Lessons", "CourseWeekdays"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-
-        _ = await unitOfWork.Employees.SelectAsync(c =>
-        c.Id == model.TeacherId && c.User.CompanyId == existCourse.CompanyId)
-            ?? throw new NotFoundException("This teacher not found!");
 
         existCourse.EndTime = model.EndTime;
         existCourse.TeacherId = model.TeacherId;

@@ -1,13 +1,16 @@
 ﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Exams.Models;
 
 namespace Marqa.Service.Validators.Exams;
 public class ExamUpdateModelValidator : AbstractValidator<ExamUpdateModel>
 {
-    public ExamUpdateModelValidator()
+    public ExamUpdateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.CourseId)
             .GreaterThan(0).WithMessage("CourseId is required.");
+        RuleFor(x => x.CourseId).Must(x => unitOfWork.Courses.Exist(c => c.Id == x))
+            .WithMessage("Course with the given CourseId does not exist.");
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")

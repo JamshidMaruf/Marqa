@@ -34,6 +34,7 @@ builder.Services.AddApiVersioning(options =>
 });
 
 builder.Services.AddExceptionHandler<AlreadyExitExceptionHandler>();
+builder.Services.AddExceptionHandler<ValidateExceptionHandler>();
 builder.Services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 builder.Services.AddExceptionHandler<NotMatchedExceptionHandler>();

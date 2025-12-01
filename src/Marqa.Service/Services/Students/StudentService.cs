@@ -20,9 +20,6 @@ public class StudentService(
     {
         await createValidator.EnsureValidatedAsync(model);
 
-        var company = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
-        if (!company)
-            throw new NotFoundException("Company not found");
 
         var existingStudent = await unitOfWork.Students
             .ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);

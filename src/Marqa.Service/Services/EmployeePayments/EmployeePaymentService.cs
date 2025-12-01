@@ -70,11 +70,6 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
     {
         await createValidator.EnsureValidatedAsync(model);
 
-        var employee = await unitOfWork.Employees.ExistsAsync(e => e.Id == model.EmployeeId && !e.IsDeleted);
-
-        if (!employee)
-            throw new NotFoundException($"Employee not found with ID: {model.EmployeeId}");
-
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
@@ -109,8 +104,6 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
             .SelectAsync(p => p.Id == model.Id && !p.IsDeleted)
             ??throw new NotFoundException($"Payment not found with ID: {model.Id}");
 
-        var employee = await unitOfWork.Employees.SelectAsync(e => e.Id == model.EmployeeId && !e.IsDeleted)
-            ?? throw new NotFoundException($"Employee not found with ID: {model.EmployeeId}");
 
         var transaction = await unitOfWork.BeginTransactionAsync();
 

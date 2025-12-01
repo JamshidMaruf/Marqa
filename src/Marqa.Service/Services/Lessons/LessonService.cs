@@ -18,11 +18,6 @@ public class LessonService(
         var lessonForUpdation = await unitOfWork.Lessons.SelectAsync(l => l.Id == id)
             ?? throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        var existEmployee = await unitOfWork.Employees.ExistsAsync(t => t.Id == model.TeacherId);
-
-        if (!existEmployee)
-            throw new NotFoundException($"No teacher was found with ID = {model.TeacherId}");
-
         lessonForUpdation.StartTime = model.StartTime;
         lessonForUpdation.EndTime = model.EndTime;
         lessonForUpdation.Date = model.Date;

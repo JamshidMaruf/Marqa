@@ -1,15 +1,22 @@
 ﻿using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 
 namespace Marqa.Service.Validators.StudentPaymentOperations;
 public class CreatePaymentModelValidator : AbstractValidator<CreatePaymentModel>
 {
-    public CreatePaymentModelValidator()
+    public CreatePaymentModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.StudentId)
             .GreaterThan(0);
+        RuleFor(x => x.StudentId).Must(studentId =>
+            unitOfWork.Students.Exist(s => s.Id == studentId))
+            .WithMessage("Student does not exist.");
 
         RuleFor(x => x.CourseId)
             .GreaterThan(0);
+        RuleFor(x => x.CourseId).Must(courseid =>
+            unitOfWork.Courses.Exist(c => c.Id == courseid))
+            .WithMessage("Course does not exist.");
 
         RuleFor(x => x.Amount)
             .GreaterThan(0);

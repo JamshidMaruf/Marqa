@@ -23,10 +23,6 @@ public class SubjectService(IUnitOfWork unitOfWork,
         if (alreadyExistSubject)
             throw new AlreadyExistException("This subject already exist!");
 
-        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
-
-        if (!existCompany)
-            throw new NotFoundException($"No company was found with ID = {model.CompanyId}");
 
         unitOfWork.Subjects.Insert(new Subject
         {

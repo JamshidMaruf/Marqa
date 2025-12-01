@@ -5,15 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Validators;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Employees.Models;
 
 namespace Marqa.Service.Validators.Employees;
 public class EmployeeCreateModelValidator : AbstractValidator<EmployeeCreateModel>
 {
-    public EmployeeCreateModelValidator()
+    public EmployeeCreateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.CompanyId)
             .GreaterThan(0).WithMessage("CompanyId is required.");
+        RuleFor(x => x.CompanyId)
+            .Must(companyId => unitOfWork.Companies.Exist(c => c.Id == companyId))
+            .WithMessage("Company with given Id does not exist.");
 
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -52,5 +56,7 @@ public class EmployeeCreateModelValidator : AbstractValidator<EmployeeCreateMode
 
         RuleFor(x => x.RoleId)
             .GreaterThan(0).WithMessage("RoleId is required.");
+        RuleFor(x => x.RoleId).Must(roleId => unitOfWork.EmployeeRoles.Exist(r => r.Id == roleId))
+            .WithMessage("Employee role with given Id does not exist.");
     }
 }

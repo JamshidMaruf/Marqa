@@ -10,6 +10,6 @@ public static class ValidatorExtension
         var validationResult = await validator.ValidateAsync(model);
 
         if (!validationResult.IsValid)
-            throw new ArgumentIsNotValidException(validationResult.Errors?.FirstOrDefault()?.ErrorMessage);
+            throw new ValidateException(validationResult.Errors.Select(e => e.ErrorMessage).ToList());
     }
 }

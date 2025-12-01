@@ -18,15 +18,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         await validatorEmployeeCreate.EnsureValidatedAsync(model);
 
-        var existCompany = await unitOfWork.Companies.ExistsAsync(c => c.Id == model.CompanyId);
 
-        if (!existCompany)
-            throw new NotFoundException("Company was not found");
-
-        var existEmployeeRole = await unitOfWork.EmployeeRoles.ExistsAsync(e => e.Id == model.RoleId && e.CompanyId == model.CompanyId);
-
-        if (!existEmployeeRole)
-            throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
 
         var alreadyExistEmployee = await unitOfWork.Employees.ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
 
