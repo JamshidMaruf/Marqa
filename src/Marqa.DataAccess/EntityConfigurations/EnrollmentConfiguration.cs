@@ -1,18 +1,13 @@
 ﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Marqa.DataAccess.EntityConfigurations;
 
-public class StudentCourseConfiguration : IEntityTypeConfiguration<Enrollment>
+public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
 {
     public void Configure(EntityTypeBuilder<Enrollment> builder)
-    {
-        builder.Ignore(la => la.Id);
-
-        builder.HasKey(sc => new { sc.StudentId, sc.CourseId });
-        
+    {   
         builder.HasOne(sc => sc.Student)
             .WithMany(s => s.Courses)
             .HasForeignKey(sc => sc.StudentId)
@@ -20,7 +15,7 @@ public class StudentCourseConfiguration : IEntityTypeConfiguration<Enrollment>
             .IsRequired();
 
         builder.HasOne(sc => sc.Course)
-            .WithMany(c => c.StudentCourses)
+            .WithMany(c => c.Enrollments)
             .HasForeignKey(sc => sc.CourseId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();

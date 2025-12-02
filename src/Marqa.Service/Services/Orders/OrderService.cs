@@ -14,7 +14,7 @@ public class OrderService(IUnitOfWork unitOfWork,
 {
     public async Task CreateBasketAsync(int studentId)
     {
-        var existstudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
+        var existstudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId);
 
         if (!existstudent)
             throw new NotFoundException("Student not found");

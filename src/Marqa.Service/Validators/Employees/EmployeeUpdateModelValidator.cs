@@ -40,7 +40,7 @@ public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateMode
 
         RuleFor(x => x.RoleId)
             .GreaterThan(0).WithMessage("RoleId is required.");
-        RuleFor(x => x.RoleId).Must(roleId => unitOfWork.EmployeeRoles.Exist(r => r.Id == roleId))
+        RuleFor(x => x.RoleId).Must(roleId => unitOfWork.EmployeeRoles.CheckExist(r => r.Id == roleId))
             .WithMessage("Employee role with given Id does not exist.");
     }
 }

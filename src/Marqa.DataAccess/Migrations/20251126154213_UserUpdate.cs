@@ -745,7 +745,7 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentCourses",
+                name: "Enrollments",
                 columns: table => new
                 {
                     StudentId = table.Column<int>(type: "integer", nullable: false),
@@ -1434,7 +1434,7 @@ namespace Marqa.DataAccess.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentCourses_CourseId",
-                table: "StudentCourses",
+                table: "Enrollments",
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
@@ -1601,7 +1601,7 @@ namespace Marqa.DataAccess.Migrations
                 name: "Settings");
 
             migrationBuilder.DropTable(
-                name: "StudentCourses");
+                name: "Enrollments");
 
             migrationBuilder.DropTable(
                 name: "StudentDetails");

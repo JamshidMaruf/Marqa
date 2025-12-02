@@ -16,6 +16,7 @@ public interface IRepository<TEntity> where TEntity : Auditable
     /// </summary>
     /// <param name="entity"></param>
     void MarkAsDeleted(TEntity entity);
+    Task MarkRangeAsDeletedAsync(IEnumerable<TEntity> entity);
 
     /// <summary>
     /// Sets the entity object's state as deleted which ef core will delete the corresponding record from database table 
@@ -37,7 +38,6 @@ public interface IRepository<TEntity> where TEntity : Auditable
         Expression<Func<TEntity, bool>> predicate = null,
         bool tracking = false,
         params string[] includes);
-    Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
-
-    bool Exist(Expression<Func<TEntity, bool>> predicate);
+    Task<bool> CheckExistAsync(Expression<Func<TEntity, bool>> predicate);
+    bool CheckExist(Expression<Func<TEntity, bool>> predicate);
 }

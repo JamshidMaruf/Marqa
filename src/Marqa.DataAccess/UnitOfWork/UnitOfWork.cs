@@ -20,7 +20,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Lesson> Lessons { get; } = new Repository<Lesson>(context);
     public IRepository<LessonAttendance> LessonAttendances { get; } = new Repository<LessonAttendance>(context);
     public IRepository<OTP> OTPs { get; } = new Repository<OTP>(context);
-    public IRepository<Enrollment> StudentCourses { get; } = new Repository<Enrollment>(context);
+    public IRepository<Enrollment> Enrollments { get; } = new Repository<Enrollment>(context);
     public IRepository<StudentExamResult> StudentExamResults { get; } = new Repository<StudentExamResult>(context);
     public IRepository<Subject> Subjects { get; } = new Repository<Subject>(context);
     public IRepository<StudentHomeTask> StudentHomeTasks { get; } = new Repository<StudentHomeTask>(context);
@@ -37,20 +37,19 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<OrderItem> OrderItems { get; } = new Repository<OrderItem>(context);
     public IRepository<StudentPaymentOperation> StudentPaymentOperations { get; } = new Repository<StudentPaymentOperation>(context);
     public IRepository<Setting> Settings { get; } = new Repository<Setting>(context);
-
     public IRepository<Basket> Baskets { get; } = new Repository<Basket>(context);
-
     public IRepository<BasketItem> BasketItems { get; } = new Repository<BasketItem>(context);
-
     public IRepository<ExamSetting> ExamSettings { get; } = new Repository<ExamSetting>(context);
     public IRepository<EmployeePayment> EmployeePayments { get; } = new Repository<EmployeePayment>(context);
-
     public IRepository<ExamSettingItem> ExamSettingItems { get; } = new Repository<ExamSettingItem>(context);
     public IRepository<Permission> Permissions { get; }  = new Repository<Permission>(context);
     public IRepository<RolePermission> RolePermissions { get; } = new Repository<RolePermission>(context);
     public IRepository<RefreshToken> RefreshTokens { get; } = new Repository<RefreshToken>(context);
     public IRepository<User> Users { get; } = new Repository<User>(context);
     public IRepository<Asset> Assets { get; } = new Repository<Asset>(context);
+    public IRepository<EnrollmentFrozen> EnrollmentFrozens => new Repository<EnrollmentFrozen>(context);
+    public IRepository<EnrollmentCancellation> EnrollmentCancellations => new Repository<EnrollmentCancellation>(context);
+
 
     public async Task SaveAsync()
     {

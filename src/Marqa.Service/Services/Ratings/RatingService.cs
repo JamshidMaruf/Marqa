@@ -117,7 +117,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     {
         if (courseId != null && courseId != 0)
         {
-            var query = unitOfWork.StudentCourses.SelectAllAsQueryable(
+            var query = unitOfWork.Enrollments.SelectAllAsQueryable(
                 predicate: sc => sc.CourseId == courseId,
                 includes: [ "Student", "User" ]);
 

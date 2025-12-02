@@ -26,7 +26,6 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
-
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)
     {
@@ -74,19 +73,6 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             StatusCode = 200,
             Message = "success",
             Data = course
-        });
-    }
-    
-    [HttpGet("by-company/{companyId:int}")]
-    public async Task<IActionResult> GetAvailableCoursesAsync(int companyId)
-    {
-        var result = await courseService.GetAvailableCoursesAsync(companyId);
-
-        return Ok(new Response<List<MinimalCourseDataModel>>
-        {
-            StatusCode = 200,  
-            Message = "success",
-            Data = result
         });
     }
 

@@ -19,7 +19,7 @@ public class PermissionService(
         await createValidator.EnsureValidatedAsync(model);
 
         var existingPermission = await unitOfWork.Permissions
-            .ExistsAsync(p => p.Name.ToLower() == model.Name.ToLower()
+            .CheckExistAsync(p => p.Name.ToLower() == model.Name.ToLower()
                            && p.Module.ToLower() == model.Module.ToLower()
                            && p.Action.ToLower() == model.Action.ToLower());
 
@@ -47,7 +47,7 @@ public class PermissionService(
             ?? throw new NotFoundException("Permission is not found");
 
         var duplicate = await unitOfWork.Permissions
-            .ExistsAsync(p => p.Id != id
+            .CheckExistAsync(p => p.Id != id
                            && p.Name.ToLower() == model.Name.ToLower()
                            && p.Module.ToLower() == model.Module.ToLower()
                            && p.Action.ToLower() == model.Action.ToLower());

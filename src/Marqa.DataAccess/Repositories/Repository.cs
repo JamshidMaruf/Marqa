@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Marqa.DataAccess.Contexts;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,20 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
     }
 
+    public async Task MarkRangeAsDeletedAsync(IEnumerable<TEntity> entities)
+    {
+        await Task.Run(() =>
+        {
+            foreach (var entity in entities)
+            {
+                entity.DeletedAt = DateTime.UtcNow;
+                entity.IsDeleted = true;
+                _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
+                _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
+            }
+        });
+    }
+
     public void Remove(TEntity entity)
     {
         _context.Remove(entity);
@@ -90,13 +105,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
         return query;
     }
-    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+
+    public async Task<bool> CheckExistAsync(Expression<Func<TEntity, bool>> predicate)
     {
         return await _context.Set<TEntity>().AnyAsync(predicate);
     }
 
-    public bool Exist(Expression<Func<TEntity, bool>> predicate)
+    public bool CheckExist(Expression<Func<TEntity, bool>> predicate)
     {
         return _context.Set<TEntity>().Any(predicate);
     }
+
+
 }

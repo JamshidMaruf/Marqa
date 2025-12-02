@@ -20,9 +20,8 @@ public class StudentService(
     {
         await createValidator.EnsureValidatedAsync(model);
 
-
         var existingStudent = await unitOfWork.Students
-            .ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+            .CheckExistAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
 
         if (existingStudent)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
@@ -56,7 +55,7 @@ public class StudentService(
                 Role = UserRole.Student,
                 CompanyId = model.CompanyId
             }).Id;
-            
+
             await unitOfWork.SaveAsync();
 
             var createdStudent = new Student()
@@ -114,24 +113,25 @@ public class StudentService(
         if (!anyParentPhoneValid)
             throw new ArgumentIsNotValidException("At least one parent phone number must be valid");
 
+        var existStudent = await unitOfWork.Students
+            .SelectAsync(
+                predicate: s => s.Id == id,
+                includes: ["StudentDetail", "User"])
+            ?? throw new NotFoundException($"Student is not found");
+
+        var phoneExists = await unitOfWork.Students
+            .CheckExistAsync(e => e.User.Phone == model.Phone
+                          && e.User.CompanyId == existStudent.User.CompanyId
+                          && e.Id != id);
+
+        if (phoneExists)
+            throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
+
+
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
-            var existStudent = await unitOfWork.Students
-                .SelectAsync(
-                    predicate: s => s.Id == id,
-                    includes: ["StudentDetail", "User"])
-                ?? throw new NotFoundException($"Student is not found");
-
-            var phoneExists = await unitOfWork.Students
-                .ExistsAsync(e => e.User.Phone == model.Phone
-                              && e.User.CompanyId == existStudent.User.CompanyId
-                              && e.Id != id);
-
-            if (phoneExists)
-                throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
-
             existStudent.User.FirstName = model.FirstName;
             existStudent.User.LastName = model.LastName;
             existStudent.Gender = model.Gender;
@@ -156,7 +156,7 @@ public class StudentService(
 
             await transaction.CommitAsync();
         }
-        catch (Exception)
+        catch
         {
             await transaction.RollbackAsync();
             throw;
@@ -199,6 +199,8 @@ public class StudentService(
         return studentDetail.StudentId;
     }
 
+
+
     public async Task<StudentViewModel> GetAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -240,7 +242,7 @@ public class StudentService(
     {
         var students = await unitOfWork.Courses
             .SelectAllAsQueryable(c => c.Id == courseId && !c.IsDeleted)
-            .SelectMany(c => c.StudentCourses)
+            .SelectMany(c => c.Enrollments)
             .Select(sc => new StudentViewModel
             {
                 Id = sc.Student.Id,
@@ -317,23 +319,23 @@ public class StudentService(
 
     public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status)
     {
-        var studentCourse = await unitOfWork.StudentCourses
+        var studentCourse = await unitOfWork.Enrollments
             .SelectAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId)
-            ?? throw new NotFoundException("Enrollment not found");
+            ?? throw new NotFoundException("Enrollments not found");
 
-        studentCourse.Status = status;
+        studentCourse.StudentStatus = status;
 
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<List<StudentViewModel>> GetAll(StudentFilterModel filterModel)
+    public async Task<List<StudentViewModel>> GetAllAsync(StudentFilterModel filterModel)
     {
         var query = unitOfWork.Students
             .SelectAllAsQueryable(s => !s.IsDeleted);
 
         if (filterModel.CompanyId != null)
             query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
-        
+
         var searchText = filterModel.SearchText.ToLower();
 
         if (!string.IsNullOrEmpty(filterModel.SearchText))
@@ -341,7 +343,7 @@ public class StudentService(
                                      s.User.LastName.ToLower().Contains(searchText) ||
                                      s.User.Phone.ToLower().Contains(searchText) ||
                                      s.User.Email.ToLower().Contains(searchText));
-        
+
         if (filterModel.CourseId != null)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
 

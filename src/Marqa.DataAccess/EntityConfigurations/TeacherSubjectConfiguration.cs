@@ -9,10 +9,6 @@ public class TeacherSubjectConfiguration : IEntityTypeConfiguration<TeacherSubje
 {
     public void Configure(EntityTypeBuilder<TeacherSubject> builder)
     {
-        builder.Ignore(ts => ts.Id);
-
-        builder.HasKey(ts => new { ts.SubjectId, ts.TeacherId });
-
         builder.HasOne(ts => ts.Subject)
             .WithMany()
             .HasForeignKey(ts => ts.SubjectId)

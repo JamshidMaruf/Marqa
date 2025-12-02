@@ -10,7 +10,7 @@ public class TransferPaymentModelValidator : AbstractValidator<TransferPaymentMo
         RuleFor(x => x.StudentId)
             .GreaterThan(0);
         RuleFor(x => x.StudentId).Must(studentId => 
-            unitOfWork.Students.Exist(s => s.Id == studentId))
+            unitOfWork.Students.CheckExist(s => s.Id == studentId))
             .WithMessage("Student does not exist.");
     }
 }

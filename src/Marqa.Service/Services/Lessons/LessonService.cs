@@ -43,7 +43,7 @@ public class LessonService(
 
     public async Task VideoUploadAsync(int id, IFormFile video)
     {
-        var existLesson = await unitOfWork.Lessons.ExistsAsync(l => l.Id == id);
+        var existLesson = await unitOfWork.Lessons.CheckExistAsync(l => l.Id == id);
 
         if (!existLesson)
             throw new NotFoundException($"Lesson was not found with this ID = {id}");
@@ -73,7 +73,7 @@ public class LessonService(
         var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
-        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
+        var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
         if (!existStudent)
             throw new NotFoundException($"Student was not found with ID = {model.StudentId}");

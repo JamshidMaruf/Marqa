@@ -204,7 +204,7 @@ public class StudentPaymentService(
             .SelectAsync(p => p.Id == model.PaymentId && !p.IsDeleted)
             ?? throw new NotFoundException($"Payment not found with ID: {model.PaymentId}");
 
-        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
+        var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
         if (!existStudent)
             throw new NotFoundException($"Student not found with ID: {model.StudentId}");

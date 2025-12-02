@@ -9,7 +9,7 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
     public CourseUpdateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(c => c.TeacherId).GreaterThan(0);
-        RuleFor(c => c.TeacherId).Must(c => unitOfWork.Employees.Exist(ex => ex.Id == c))
+        RuleFor(c => c.TeacherId).Must(c => unitOfWork.Employees.CheckExist(ex => ex.Id == c))
             .WithMessage("Teacher does not exist.");
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
         RuleFor(c => c.LessonCount).GreaterThan(0);

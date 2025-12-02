@@ -18,9 +18,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     {
         await validatorEmployeeCreate.EnsureValidatedAsync(model);
 
-
-
-        var alreadyExistEmployee = await unitOfWork.Employees.ExistsAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+        var alreadyExistEmployee = await unitOfWork.Employees.CheckExistAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
 
         if (alreadyExistEmployee)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
@@ -29,21 +27,18 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        var userEntity = unitOfWork.Users.Insert(new User()
-        {
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Phone = employeePhone.Phone,
-            Email = model.Email,
-            PasswordHash = PasswordHelper.Hash(model.Password),
-            Role = UserRole.Employee,
-            CompanyId = model.CompanyId,
-        });
-        await unitOfWork.SaveAsync();
-
         var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
-            UserId = userEntity.Id,
+            User = new User()
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Phone = employeePhone.Phone,
+                Email = model.Email,
+                PasswordHash = PasswordHelper.Hash(model.Password),
+                Role = UserRole.Employee,
+                CompanyId = model.CompanyId,
+            },
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
             Status = model.Status,
@@ -51,7 +46,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             JoiningDate = model.JoiningDate,
             Specialization = model.Specialization,
             Info = model.Info,
-            RoleId = model.RoleId
+            RoleId = model.RoleId          
         });
 
         await unitOfWork.SaveAsync();
@@ -66,7 +61,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id, includes: "User")
             ?? throw new NotFoundException($"Employee was not found");
 
-        var existEmployeeRole = await unitOfWork.EmployeeRoles.ExistsAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.User.CompanyId);
+        var existEmployeeRole = await unitOfWork.EmployeeRoles.CheckExistAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.User.CompanyId);
 
         if (!existEmployeeRole)
             throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
@@ -169,6 +164,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync(e => e.Id == id)
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
+
     public async Task<int> GetByPhoneAsync(string phone)
     {
         var employee = await unitOfWork.Employees.SelectAsync(emp => emp.User.Phone == phone);

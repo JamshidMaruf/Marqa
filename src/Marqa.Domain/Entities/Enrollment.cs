@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Domain.Entities;
 
@@ -17,5 +16,6 @@ public class Enrollment : Auditable
     public Student Student { get; set; }
     public Course Course { get; set; }
     public EnrollmentCancellation EnrollmentCancellation { get; set; }
+    public EnrollmentFrozen EnrollmentFrozen { get; set; }
 }
 

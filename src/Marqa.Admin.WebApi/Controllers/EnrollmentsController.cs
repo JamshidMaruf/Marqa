@@ -1,41 +1,87 @@
-﻿using Marqa.Service.Services.Enrollments;
+﻿using System.Threading.Tasks;
+using Marqa.Service.Services.Courses;
+using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Enrollments;
 using Marqa.Service.Services.Enrollments.Models;
+using Marqa.Shared.Models;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-public class EnrollmentsController(IEnrollmentService enrollmentService) : BaseController
+public class EnrollmentsController(
+    IEnrollmentService enrollmentService,
+    ICourseService courseService) : BaseController
 {
     [HttpPost("attach")]
-    public IActionResult AttachAsync(EnrollmentCreateModel model)
+    public async Task<IActionResult> AttachAsync(EnrollmentCreateModel model)
     {
-        // logic
-        return Ok();
+        await enrollmentService.CreateAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 201,
+            Message = "Enrollment has been created successfully"
+        });
     }
 
     [HttpPost("detach")]
-    public IActionResult DetachAsync(DetachModel model)
+    public async Task<IActionResult> DetachAsync(DetachModel model)
     {
-        // logic
-        return Ok();
+        await enrollmentService.DeleteAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 201,
+            Message = "Enrollment has been deleted successfully"
+        });
     }
 
     [HttpPost("freeze")]
-    public IActionResult Freeze(FreezeModel model)
+    public async Task<IActionResult> Freeze(FreezeModel model)
     {
-        return Ok();
+        await enrollmentService.FreezeStudent(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 201,
+            Message = "Enrollment has been frozen successfully"
+        });
     }
 
     [HttpGet("frozen-courses")]
-    public IActionResult GetFrozenCoursesAsync(int studentId)
+    public async Task<IActionResult> GetFrozenCoursesAsync(int studentId)
     {
-        return Ok();
+        var result = await courseService.GetFrozenCoursesAsync(studentId);
+        return Ok(new Response<List<FrozenEnrollmentModel>>
+        { 
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
     }
 
     [HttpPost("unfreeze")]
-    public IActionResult Unfreeze(UnFreezeModel model)
+    public async Task<IActionResult> Unfreeze(UnFreezeModel model)
     {
-        return Ok();
+        await enrollmentService.UnFreezeStudent(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 201,
+            Message = "Enrollment has been unfrozen successfully"
+        });
+    }
+
+    [HttpGet("{studentId:int}/active-courses")]
+    public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
+    {
+        var students = await courseService.GetActiveStudentCoursesAsync(studentId);
+        return Ok(new Response<IEnumerable<NonFrozenEnrollmentModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = students
+        });
     }
 }
-

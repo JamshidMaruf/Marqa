@@ -27,7 +27,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
     {
-        var existHomeTask = await unitOfWork.HomeTasks.ExistsAsync(l => l.Id == homeTaskId);
+        var existHomeTask = await unitOfWork.HomeTasks.CheckExistAsync(l => l.Id == homeTaskId);
 
         if (!existHomeTask)
             throw new NotFoundException($"Hometask was not found with this ID = {homeTaskId}");
@@ -143,7 +143,7 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
 
     public async Task UploadStudentHomeTaskFileAsync(int studentHomeTaskId, IFormFile file)
     {
-        var existHometaskStudent = await unitOfWork.StudentHomeTasks.ExistsAsync(h => h.Id == studentHomeTaskId);
+        var existHometaskStudent = await unitOfWork.StudentHomeTasks.CheckExistAsync(h => h.Id == studentHomeTaskId);
 
         if (!existHometaskStudent)
             throw new NotFoundException($"Student hometask was not found with this ID = {studentHomeTaskId}!");

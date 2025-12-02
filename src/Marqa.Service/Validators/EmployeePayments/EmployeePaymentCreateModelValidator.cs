@@ -11,7 +11,7 @@ public class EmployeePaymentCreateModelValidator : AbstractValidator<EmployeePay
         RuleFor(model => model.EmployeeId)
             .NotEmpty()
             .GreaterThan(0);
-        RuleFor(model => model.EmployeeId).Must(e => unitOfWork.Employees.Exist(ex => ex.Id == e))
+        RuleFor(model => model.EmployeeId).Must(e => unitOfWork.Employees.CheckExist(ex => ex.Id == e))
             .WithMessage("Employee not found.");
 
         RuleFor(model => model.PaymentMethod)

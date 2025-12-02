@@ -9,7 +9,7 @@ public class ExamCreateModelValidator : AbstractValidator<ExamCreateModel>
     {
         RuleFor(x => x.CourseId)
             .GreaterThan(0).WithMessage("CourseId is required.");
-        RuleFor(x => x.CourseId).Must(x => unitOfWork.Courses.Exist(c => c.Id == x))
+        RuleFor(x => x.CourseId).Must(x => unitOfWork.Courses.CheckExist(c => c.Id == x))
             .WithMessage("Course with the given CourseId does not exist.");
 
         RuleFor(x => x.Title)

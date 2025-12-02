@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.ComponentModel.Design;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -20,9 +21,9 @@ public class CourseService(IUnitOfWork unitOfWork,
         await courseCreateValidator.EnsureValidatedAsync(model);
 
         var transaction = await unitOfWork.BeginTransactionAsync();
+        
         try
         {
-
             Course createdCourse = new Course
             {
                 Name = model.Name,
@@ -32,6 +33,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartDate = model.StartDate,
                 StartTime = model.StartTime,
                 TeacherId = model.TeacherId,
+                Level = model.Level,
                 Price = model.Price,
                 Status = model.Status,
                 Description = model.Description,
@@ -99,11 +101,11 @@ public class CourseService(IUnitOfWork unitOfWork,
         existCourse.Status = model.Status;
         existCourse.MaxStudentCount = model.MaxStudentCount;
         existCourse.Description = model.Description;
+        existCourse.Level = model.Level;
 
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
         {
-
             foreach (var lesson in existCourse.Lessons)
                 unitOfWork.Lessons.Remove(lesson);
 
@@ -171,7 +173,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User"])
+            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "Enrollments", "User"])
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -182,7 +184,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartTime = c.StartTime,
                 Status = c.Status,
                 Description = c.Description,
-                AvailableStudentCount = c.StudentCourses.Count,
+                AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = new CourseViewModel.SubjectInfo
                 {
@@ -218,7 +220,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "StudentCourses", "User"])
+            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "Enrollments", "User"])
             .Select(c => new CourseUpdateViewModel
             {
                 Id = c.Id,
@@ -229,7 +231,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartTime = c.StartTime,
                 Status = c.Status,
                 Description = c.Description,
-                AvailableStudentCount = c.StudentCourses.Count,
+                AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = new CourseUpdateViewModel.SubjectInfo
                 {
@@ -264,7 +266,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(
             predicate: c => c.CompanyId == companyId && !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "StudentCourses", "CourseWeekdays", "User"]);
+            includes: ["Subject", "Teacher", "Lessons", "Enrollments", "CourseWeekdays", "User"]);
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -282,7 +284,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StartDate = c.StartDate,
                 StartTime = c.StartTime,
                 Status = c.Status,
-                AvailableStudentCount = c.StudentCourses.Count,
+                AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Description = c.Description,
                 Subject = new CourseViewModel.SubjectInfo
@@ -312,81 +314,10 @@ public class CourseService(IUnitOfWork unitOfWork,
             })
             .ToListAsync();
     }
-    public async Task AttachStudentAsync(AttachModel model)
-    {
-        try
-        {
-            var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
-               ?? throw new NotFoundException("Course is not found");
-
-            var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == model.StudentId);
-
-            if (!existStudent)
-                throw new NotFoundException("Student is not found");
-
-            if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
-                throw new RequestRefusedException("This course has reached its maximum number of students.");
-
-
-            if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
-                if (model.Amount > 100 || model.Amount < 0)
-                    throw new ArgumentIsNotValidException("Invalid amount");
-
-            else if(model.PaymentType == CoursePaymentType.Fixed)
-                if(model.Amount < 0)
-                    throw new ArgumentIsNotValidException("Invalid amount");
-
-            if (model.EnrollmentDate > DateTime.UtcNow)
-                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-            
-            existCourse.EnrolledStudentCount++;
-
-            // todo: student payment create shu malumotlaga asoslanib create qilinadi
-            unitOfWork.StudentCourses.Insert(new Enrollment
-            { 
-                CourseId = model.CourseId,
-                StudentId = model.StudentId,
-                StudentStatus = StudentStatus.Active,
-                PaymentType = model.PaymentType,
-                Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
-                EnrolledDate = model.EnrollmentDate
-            });
-
-            await unitOfWork.SaveAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            throw new RequestRefusedException("Course capacity was reached by another student.");
-        }
-    }
-
-    public async Task DetachStudentAsync(int courseId, int studentId)
-    {
-        var existCourse = await unitOfWork.Courses.ExistsAsync(c => c.Id == courseId);
-
-        if (!existCourse)
-            throw new NotFoundException("Course is not found");
-
-        var existStudent = await unitOfWork.Students.ExistsAsync(s => s.Id == studentId);
-
-        if (!existStudent)
-            throw new NotFoundException("Student is not found");
-
-        var studentCourse = await unitOfWork.StudentCourses
-            .SelectAllAsQueryable(predicate: s => s.StudentId == studentId && s.CourseId == courseId)
-            .FirstOrDefaultAsync()
-            ?? throw new NotFoundException("Attachment is not found!");
-
-        studentCourse.StudentStatus = StudentStatus.Detached;
-
-        unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
-
-        await unitOfWork.SaveAsync();
-    }
 
     public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
     {
-        return await unitOfWork.StudentCourses
+        return await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c => c.StudentId == studentId)
             .Include(c => c.Course)
             .ThenInclude(c => c.Lessons)
@@ -400,11 +331,10 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
+    public Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId)
     {
-        return unitOfWork.StudentCourses.SelectAllAsQueryable(
-            predicate: sc => sc.StudentId == studentId,
-            includes: new[] { "Course" })
+        return unitOfWork.Enrollments.SelectAllAsQueryable(
+            predicate: sc => sc.StudentId == studentId)
             .Select(sc => new CoursePageCourseViewModel
             {
                 Id = sc.CourseId,
@@ -415,10 +345,9 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId)
     {
-        return await unitOfWork.StudentCourses
+        return await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
-            c.StudentStatus != StudentStatus.Detached,
-            includes: "Courses")
+            c.StudentStatus != StudentStatus.Detached)
             .Select(c => new CourseNamesModel
             {
                 Id = c.Course.Id,
@@ -427,24 +356,102 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int companyId)
+    public async Task<List<MinimalCourseDataModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId)
     {
         return await unitOfWork.Courses
             .SelectAllAsQueryable(predicate: c =>
                 c.CompanyId == companyId &&
-                c.Status == CourseStatus.Active ||
-                c.Status == CourseStatus.Upcoming,
-            includes: ["Teacher", "Teacher.User"])
+                !c.Enrollments.Any(e => e.StudentId == studentId) &&
+                (c.Status == CourseStatus.Active ||
+                 c.Status == CourseStatus.Upcoming))
             .Select(c => new MinimalCourseDataModel
             {
                 Id = c.Id,
                 Name = c.Name,
-                TeacherFullName = c.Teacher.User.FirstName + c.Teacher.User.LastName,
+                TeacherFullName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
                 MaxStudentCount = c.MaxStudentCount,
                 EnrolledStudentCount = c.EnrolledStudentCount,
                 CoursePrice = c.Price
-            })
-            .ToListAsync();
+            }).ToListAsync();
+    }
+
+
+
+
+    public async Task MoveStudentCourseAsync(TransferStudentAcrossComaniesModel model)
+    {
+        await transferValidator.EnsureValidatedAsync(model);
+
+        using var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            // 1. Load studentCourse from the source course
+            var studentCourse = await unitOfWork.Enrollments
+                .SelectAsync(sc => sc.StudentId == model.StudentId
+                                   && sc.CourseId == model.FromCourseId
+                                   && !sc.IsDeleted)
+                ?? throw new NotFoundException("Student is not enrolled in the source course");
+
+            // 2. Load the target course & ensure NOT finished
+            var targetCourse = await unitOfWork.Courses
+                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
+                ?? throw new NotFoundException("Target course not found or finished");
+
+            // 3. Remove from old course
+            unitOfWork.Enrollments.MarkAsDeleted(studentCourse);
+            await unitOfWork.SaveAsync();
+
+            // 4. Add new course record
+            var newStudentCourse = new Enrollment
+            {
+                StudentId = model.StudentId,
+                CourseId = model.ToCourseId,
+                EnrolledDate = model.DateOfTransfer,
+                StudentStatus = StudentStatus.Active,
+                //Reason = model.Reason
+            };
+
+            unitOfWork.Enrollments.Insert(newStudentCourse);
+            await unitOfWork.SaveAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId)
+    {
+        return await unitOfWork.Enrollments
+            .SelectAllAsQueryable(predicate: c =>
+                c.StudentId == studentId &&
+                c.Status == EnrollmentStatus.Active && 
+                (c.Course.Status == CourseStatus.Active ||
+                c.Course.Status == CourseStatus.Upcoming))
+            .Select(c => new NonFrozenEnrollmentModel
+            {
+                Id = c.Id,
+                Name = c.Course.Name,
+                Level = c.Course.Level
+            }).ToListAsync();
+    }
+
+    public async Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId)
+    {
+        return await unitOfWork.Enrollments
+            .SelectAllAsQueryable(predicate: c =>
+                c.StudentId == studentId &&
+                c.Status == EnrollmentStatus.Frozen)
+            .Select(c => new FrozenEnrollmentModel
+            {
+                Id = c.Id,
+                Name = c.Course.Name,
+                Level = c.Course.Level
+            }).ToListAsync();
     }
 
     private async Task GenerateLessonAsync(
@@ -501,63 +508,5 @@ public class CourseService(IUnitOfWork unitOfWork,
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
 
-    public Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId)
-    {
-        return unitOfWork.StudentCourses.SelectAllAsQueryable(
-            predicate: sc => sc.StudentId == studentId,
-            includes: new[] {"Course"})
-            .Select(sc => new CoursePageCourseViewModel
-            {
-                Id = sc.CourseId,
-                Name = sc.Course.Name
-            })
-            .ToListAsync();
-    }
-
-    public async Task MoveStudentCourse(TransferStudentAcrossComaniesModel model)
-    {
-        await transferValidator.EnsureValidatedAsync(model);
-
-        using var transaction = await unitOfWork.BeginTransactionAsync();
-
-        try
-        {
-            // 1. Load studentCourse from the source course
-            var studentCourse = await unitOfWork.StudentCourses
-                .SelectAsync(sc => sc.StudentId == model.StudentId
-                                   && sc.CourseId == model.FromCourseId
-                                   && !sc.IsDeleted)
-                ?? throw new NotFoundException("Student is not enrolled in the source course");
-
-            // 2. Load the target course & ensure NOT finished
-            var targetCourse = await unitOfWork.Courses
-                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
-                ?? throw new NotFoundException("Target course not found or finished");
-
-            // 3. Remove from old course
-            unitOfWork.StudentCourses.MarkAsDeleted(studentCourse);
-            await unitOfWork.SaveAsync();
-
-            // 4. Add new course record
-            var newStudentCourse = new StudentCourse
-            {
-                StudentId = model.StudentId,
-                CourseId = model.ToCourseId,
-                EnrolledDate = model.DateOfTransfer,
-                Status = StudentStatus.Active,
-                TransferReason = model.Reason
-            };
-
-            unitOfWork.StudentCourses.Insert(newStudentCourse);
-            await unitOfWork.SaveAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
 
 }
