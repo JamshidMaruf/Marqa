@@ -6,7 +6,6 @@ public class Enrollment : Auditable
 {
     public int StudentId { get; set; }
     public int CourseId { get; set; }
-    public StudentStatus StudentStatus { get; set; }
     public DateTime EnrolledDate { get; set; }
     public CoursePaymentType PaymentType { get; set; }
     public decimal Amount { get; set; }

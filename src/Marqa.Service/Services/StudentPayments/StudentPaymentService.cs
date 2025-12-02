@@ -25,6 +25,7 @@ public class StudentPaymentService(
     {
         return $"PAY-{DateTime.UtcNow:yyyyMMdd}-{new Random().Next(1000, 9999)}";
     }
+    
     /// <summary>
     /// This method make view model with PaymentNumber to show this model;
     /// </summary>
@@ -44,7 +45,7 @@ public class StudentPaymentService(
             Id = payment.Id,
             PaymentNumber = paymentNumberInt,
             Amount = payment.Amount,
-            DateTime = payment.DateTime,
+            DateTime = payment.GivenDate,
             Description = payment.Description,
             PaymentMethod = payment.PaymentMethod,
             PaymentOperationType = payment.PaymentOperationType,
@@ -71,7 +72,7 @@ public class StudentPaymentService(
                 CourseId = model.CourseId,
                 PaymentMethod = model.PaymentMethod,
                 Amount = model.Amount,
-                DateTime = DateTime.UtcNow,
+                GivenDate = DateTime.UtcNow,
                 Description = model.Description,
                 PaymentOperationType = model.PaymentOperationType,
                 CoursePrice = model.CoursePrice
@@ -179,7 +180,7 @@ public class StudentPaymentService(
                 CourseId = originalPayment.CourseId,
                 PaymentMethod = originalPayment.PaymentMethod,
                 Amount = originalPayment.Amount,
-                DateTime = DateTime.UtcNow,
+                GivenDate = DateTime.UtcNow,
                 Description = $"REFUND for {originalPayment.PaymentNumber}: {model.Description}",
                 PaymentOperationType = PaymentOperationType.Expense,
                 CoursePrice = originalPayment.CoursePrice
@@ -250,7 +251,7 @@ public class StudentPaymentService(
             StudentId = payment.StudentId,
             PaymentMethod = new EnumViewModel { Id = (int)payment.PaymentMethod, Name = payment.PaymentMethod.ToString() },
             Amount = payment.Amount,
-            DateTime = payment.DateTime,
+            DateTime = payment.GivenDate,
             PaymentOperationType = new EnumViewModel { Id = (int)payment.PaymentOperationType, Name = payment.PaymentOperationType.ToString() },
             CourseName = payment.Course?.Name
         };
@@ -277,7 +278,7 @@ public class StudentPaymentService(
             );
         }
 
-        query = query.OrderByDescending(p => p.DateTime);
+        query = query.OrderByDescending(p => p.GivenDate);
 
         if (pageIndex > 0 && pageSize > 0)
         {

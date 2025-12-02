@@ -7,9 +7,6 @@ public enum EnrollmentStatus
     [Description("Foal")]
     Active = 1,
 
-    [Description("Nofaol")]
-    Inactive = 2,
-
     [Description("Chiqib ketgan")]
     Dropped = 3,
 

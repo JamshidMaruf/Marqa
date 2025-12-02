@@ -221,9 +221,8 @@ public class StudentService(
             Gender = existStudent.Gender,
             Phone = existStudent.User.Phone,
             Email = existStudent.User.Email,
-            StudentDetailViewModel = new StudentDetailViewModel
+            Detail = new StudentDetailViewModel
             {
-                Id = existStudent.StudentDetail.Id,
                 StudentId = existStudent.Id,
                 FatherFirstName = existStudent.StudentDetail.FatherFirstName,
                 FatherLastName = existStudent.StudentDetail.FatherLastName,
@@ -252,9 +251,8 @@ public class StudentService(
                 Gender = sc.Student.Gender,
                 Phone = sc.Student.User.Phone,
                 Email = sc.Student.User.Email,
-                StudentDetailViewModel = new StudentDetailViewModel
+                Detail = new StudentDetailViewModel
                 {
-                    Id = sc.Student.StudentDetail.Id,
                     StudentId = sc.Student.Id,
                     FatherFirstName = sc.Student.StudentDetail.FatherFirstName,
                     FatherLastName = sc.Student.StudentDetail.FatherLastName,
@@ -356,9 +354,8 @@ public class StudentService(
             Gender = s.Gender,
             Phone = s.User.Phone,
             Email = s.User.Email,
-            StudentDetailViewModel = new StudentDetailViewModel
+            Detail = new StudentDetailViewModel
             {
-                Id = s.StudentDetail.Id,
                 StudentId = s.Id,
                 FatherFirstName = s.StudentDetail.FatherFirstName,
                 FatherLastName = s.StudentDetail.FatherLastName,

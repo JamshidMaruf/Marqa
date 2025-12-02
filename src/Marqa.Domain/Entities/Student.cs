@@ -8,6 +8,7 @@ public class Student : Auditable
     public decimal Balance { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
+    public StudentStatus Status { get; set; }
     public int UserId { get; set; }
     public int? AssetId { get; set; }
     

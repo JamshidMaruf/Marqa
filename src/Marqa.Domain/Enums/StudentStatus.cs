@@ -1,8 +1,11 @@
-﻿namespace Marqa.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Marqa.Domain.Enums;
 
 public enum StudentStatus
 {
-    Active = 1,
-    Inactive = 2,
-    Detached = 3
+    [Description("Faol")] Active = 1,
+    [Description("Nofaol")] InActive = 2,
+    [Description("Chiqib ketgan")] Dropped = 3,
+    [Description("Tugatgan")] Completed = 4
 }
