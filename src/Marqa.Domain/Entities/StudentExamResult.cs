@@ -11,3 +11,4 @@ public class StudentExamResult : Auditable
     public Student Student { get; set; }
     public Exam Exam { get; set; }
 }
+

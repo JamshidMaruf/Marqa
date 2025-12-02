@@ -11,9 +11,15 @@ public class StudentUpdateModel
     public Gender Gender { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
-    public List<int> GroupIds { get; set; }
+    public List<StudentCourseData> Courses { get; set; }
 
     //details
     public StudentDetailUpdateModel StudentDetailUpdateModel { get; set; }
-
+    
+    
+    public class StudentCourseData
+    {
+        public int CourseId { get; set; }
+        public int CourseStatusId { get; set; }
+    }
 }
