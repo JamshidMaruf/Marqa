@@ -59,10 +59,65 @@ public class EnumsController : ControllerBase
     {
         var result = _enumService.GetEnumValues<EmployeeStatus>();
         return Ok(new Response<List<EnumGetModel>>
-        { 
+        {
             StatusCode = 200,
             Message = "success",
-            Data = result 
+            Data = result
+        });
+    }
+    [HttpGet("enrollment-status")]
+    public async Task<IActionResult> GetEnrollmentStatus()
+    {
+        var result = _enumService.GetEnumValues<EnrollmentStatus>();
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    [HttpGet("course-payment-type")]
+    public async Task<IActionResult> GetCoursePaymentType()
+    {
+        var result = _enumService.GetEnumValues<CoursePaymentType>();
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    [HttpGet("employee-payment-operation-type")]
+    public async Task<IActionResult> GetEmployeePaymentOperationType()
+    {
+        var result = _enumService.GetEnumValues<EmployeePaymentOperationType>();
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    [HttpGet("payment-method")]
+    public async Task<IActionResult> GetPaymentMethod()
+    {
+        var result = _enumService.GetEnumValues<PaymentMethod>();
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    [HttpGet("student-status")]
+    public async Task<IActionResult> GetStudentStatus()
+    {
+        var result = _enumService.GetEnumValues<StudentStatus>();
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
         });
     }
 }
