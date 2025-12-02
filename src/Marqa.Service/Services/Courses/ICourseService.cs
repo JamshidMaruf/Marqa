@@ -11,21 +11,17 @@ public interface ICourseService
     Task<CourseViewModel> GetAsync(int id);
     Task<CourseUpdateViewModel> GetForUpdateAsync(int id);
     Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId);
-    Task AttachStudentAsync(AttachModel model);
-    Task DetachStudentAsync(int courseId, int studentId);
-    // for mobile
-    Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId);
+    Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); // for mobile
     
-    // for dashboard panel
     /// <summary>
     /// returns all student active courses
     /// </summary>
     /// <param name="studentId"></param>
     /// <returns></returns>
-    Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId);
-    // for dashboard panel
-    Task<List<MinimalCourseDataModel>> GetAvailableCoursesAsync(int studentId);
-    // for mobile
-    Task<List<CoursePageCourseViewModel>> GetNameByStudentIdAsync(int studentId);
-    Task MoveStudentCourse(TransferStudentAcrossComaniesModel model);
+    Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); // for dashboard panel
+    Task<List<MinimalCourseDataModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
+    Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
+    Task MoveStudentCourseAsync(TransferStudentAcrossComaniesModel model);
+    Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
+    Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
 }

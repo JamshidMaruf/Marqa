@@ -12,6 +12,7 @@ public class CourseCreateModel
     public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
     public decimal Price { get; set; }
+    public string Level { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
     public CourseStatus Status  { get; set; }

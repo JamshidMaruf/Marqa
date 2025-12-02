@@ -30,7 +30,7 @@ public class StudentCreateModelValidator : AbstractValidator<StudentCreateModel>
 
         RuleFor(x => x.CompanyId)
             .GreaterThan(0).WithMessage("CompanyId must be greater than 0");
-        RuleFor(x => x.CompanyId).Must(id => unitOfWork.Companies.Exist(c => c.Id == id))
+        RuleFor(x => x.CompanyId).Must(id => unitOfWork.Companies.CheckExist(c => c.Id == id))
             .WithMessage("Company not found");
 
         RuleFor(x => x.StudentDetailCreateModel)

@@ -1561,7 +1561,7 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("Students", (string)null);
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.Enrollments", b =>
                 {
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
@@ -1588,7 +1588,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("StudentCourses", (string)null);
+                    b.ToTable("Enrollments", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>
@@ -2431,10 +2431,10 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.Enrollments", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", "Course")
-                        .WithMany("StudentCourses")
+                        .WithMany("Enrollments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2621,7 +2621,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.Navigation("Lessons");
 
-                    b.Navigation("StudentCourses");
+                    b.Navigation("Enrollments");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Exam", b =>

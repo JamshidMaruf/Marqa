@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Marqa.Domain.Enums;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Domain.Entities;
 
@@ -12,6 +10,7 @@ public class Course : Auditable
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
     public CourseStatus Status { get; set; }
+    public string Level { get; set; }
     public int MaxStudentCount { get; set; }
     public int EnrolledStudentCount { get; set; }
     public decimal Price { get; set; }
@@ -29,5 +28,5 @@ public class Course : Auditable
     public ICollection<CourseWeekday> CourseWeekdays { get; set; }
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }
-    public ICollection<Enrollment> StudentCourses { get; set; }
+    public ICollection<Enrollment> Enrollments { get; set; }
 }

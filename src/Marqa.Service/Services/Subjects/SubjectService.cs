@@ -18,7 +18,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
         await subjectCreateValidator.EnsureValidatedAsync(model);
 
         var alreadyExistSubject = await unitOfWork.Subjects
-            .ExistsAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
+            .CheckExistAsync(s => s.Name == model.Name && s.CompanyId == model.CompanyId);
 
         if (alreadyExistSubject)
             throw new AlreadyExistException("This subject already exist!");
@@ -88,12 +88,12 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task AttachAsync(int teacherId, int subjectId)
     {
-        var existEmployee = await unitOfWork.Employees.ExistsAsync(e => e.Id == teacherId);
+        var existEmployee = await unitOfWork.Employees.CheckExistAsync(e => e.Id == teacherId);
 
         if (!existEmployee)
             throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
 
-        var existSubject = await unitOfWork.Subjects.ExistsAsync(s => s.Id == subjectId);
+        var existSubject = await unitOfWork.Subjects.CheckExistAsync(s => s.Id == subjectId);
 
         if (!existSubject)
             throw new NotFoundException($"No subject was found with ID = {subjectId}.");
@@ -135,9 +135,8 @@ public class SubjectService(IUnitOfWork unitOfWork,
         var alreadyAttachedSubjects = await unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(s => s.TeacherId == teacherId && !s.IsDeleted)
             .Select(s => new TeacherSubject
-            { // i am not getting id property of this entity, as it might have been enough, because there is no corresponding column in table
-                TeacherId = s.TeacherId,
-                SubjectId = s.SubjectId
+            { 
+                Id = s.Id
             })
             .ToListAsync();
 

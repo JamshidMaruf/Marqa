@@ -13,7 +13,7 @@ public class HomeTaskUpdateModelValidator : AbstractValidator<HomeTaskUpdateMode
     public HomeTaskUpdateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.LessonId).GreaterThan(0);
-        RuleFor(x => x.LessonId).Must(x => unitOfWork.Lessons.Exist(l => l.Id == x))
+        RuleFor(x => x.LessonId).Must(x => unitOfWork.Lessons.CheckExist(l => l.Id == x))
             .WithMessage("Lesson with the given Id does not exist.");
         RuleFor(x => x.Deadline).GreaterThan(DateTime.UtcNow);
     }

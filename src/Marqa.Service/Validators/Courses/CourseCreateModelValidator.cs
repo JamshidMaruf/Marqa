@@ -8,15 +8,15 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
     public CourseCreateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(c => c.CompanyId).GreaterThan(0);
-        RuleFor(c => c.CompanyId).Must(c => unitOfWork.Companies.Exist(ex => ex.Id == c))
+        RuleFor(c => c.CompanyId).Must(c => unitOfWork.Companies.CheckExist(ex => ex.Id == c))
             .WithMessage("Company does not exist.");
 
         RuleFor(c => c.TeacherId).GreaterThan(0);
-        RuleFor(c => c.TeacherId).Must(c => unitOfWork.Employees.Exist(ex => ex.Id == c))
+        RuleFor(c => c.TeacherId).Must(c => unitOfWork.Employees.CheckExist(ex => ex.Id == c))
             .WithMessage("Teacher does not exist.");
 
         RuleFor(c => c.SubjectId).GreaterThan(0);
-        RuleFor(c => c.SubjectId).Must(c => unitOfWork.Subjects.Exist(ex => ex.Id == c))
+        RuleFor(c => c.SubjectId).Must(c => unitOfWork.Subjects.CheckExist(ex => ex.Id == c))
             .WithMessage("Subject does not exist.");
 
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);

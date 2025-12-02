@@ -34,7 +34,7 @@ public interface IUnitOfWork : IDisposable
 
     IRepository<OTP> OTPs { get; }
 
-    IRepository<Enrollment> StudentCourses { get; }
+    IRepository<Enrollment> Enrollments { get; }
 
     IRepository<StudentExamResult> StudentExamResults { get; }
 
@@ -77,6 +77,9 @@ public interface IUnitOfWork : IDisposable
     IRepository<StudentPaymentOperation> StudentPaymentOperations { get; }
     IRepository<User> Users { get; }
     IRepository<Asset> Assets { get; }
+    IRepository<EnrollmentFrozen> EnrollmentFrozens { get; }
+    IRepository<EnrollmentCancellation> EnrollmentCancellations { get; }
+
 
     Task SaveAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();

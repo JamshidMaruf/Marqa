@@ -20,7 +20,7 @@ public class CourseController(ICourseService courseService, ILessonService lesso
         {
             StatusCode = 200,
             Message = "success",
-            Data = await courseService.GetNameByStudentIdAsync(studentId)
+            Data = await courseService.GetCourseNamesByStudentIdAsync(studentId)
         });
     }
 

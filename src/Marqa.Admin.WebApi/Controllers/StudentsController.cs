@@ -87,7 +87,7 @@ public class StudentsController(
     }
 
     [HttpGet("{studentId:int}/courses")]
-    public async Task<IActionResult> GetAvailableCourses(int studentId)
+    public async Task<IActionResult> GetStudentCourses(int studentId)
     {
         var result = await courseService.GetAllStudentCourseNamesAsync(studentId);
 
@@ -98,40 +98,29 @@ public class StudentsController(
             Data = result
         });
     }
-    
+
+    [HttpGet("{studentId:int}/unenrolled-courses")]
+    public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
+    {
+        var result = await courseService.GetUnEnrolledStudentCoursesAsync(companyId, studentId);
+
+        return Ok(new Response<List<MinimalCourseDataModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
-        var students = await studentService.GetAll(filterModel);
+        var students = await studentService.GetAllAsync(filterModel);
         return Ok(new Response<IEnumerable<StudentViewModel>>
         {
             StatusCode = 200,
             Message = "success",
             Data = students
-        });
-    }
-
-    [HttpPost("attach-student")]
-    public async Task<IActionResult> AttachStudentAsync(AttachModel model)
-    {
-        await courseService.AttachStudentAsync(model);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
-
-    [HttpPost("detach-student")]
-    public async Task<IActionResult> DetachStudentAsync(int courseId, int studentId)
-    {
-        await courseService.DetachStudentAsync(courseId, studentId);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
         });
     }
 }
