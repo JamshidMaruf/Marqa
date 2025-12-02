@@ -75,7 +75,7 @@ public class StudentsController(
     }
 
     [HttpPut("{studentId}/courses/{courseId}/status{statusId}")]
-    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status)
+    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)
     {
         await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
 
