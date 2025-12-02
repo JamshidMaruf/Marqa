@@ -199,8 +199,6 @@ public class StudentService(
         return studentDetail.StudentId;
     }
 
-
-
     public async Task<StudentViewModel> GetAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -315,13 +313,13 @@ public class StudentService(
         return relativePath;
     }
 
-    public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status)
+    public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)
     {
         var studentCourse = await unitOfWork.Enrollments
             .SelectAsync(sc => sc.StudentId == studentId && sc.CourseId == courseId)
             ?? throw new NotFoundException("Enrollments not found");
 
-        studentCourse.StudentStatus = status;
+        studentCourse.Status = status;
 
         await unitOfWork.SaveAsync();
     }

@@ -14,6 +14,6 @@ public interface IStudentService
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
     Task<List<StudentViewModel>> GetAllAsync(StudentFilterModel filterModel);
-    Task UpdateStudentCourseStatusAsync(int studentId, int courseId, StudentStatus status);
+    Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
 
 }

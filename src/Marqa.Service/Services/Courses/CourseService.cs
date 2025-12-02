@@ -347,7 +347,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c => c.StudentId == studentId &&
-            c.StudentStatus != StudentStatus.Detached)
+            c.Status != EnrollmentStatus.Dropped)
             .Select(c => new CourseNamesModel
             {
                 Id = c.Course.Id,
@@ -408,7 +408,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 StudentId = model.StudentId,
                 CourseId = model.ToCourseId,
                 EnrolledDate = model.DateOfTransfer,
-                StudentStatus = StudentStatus.Active,
+                Status = EnrollmentStatus.Active,
                 //Reason = model.Reason
             };
 

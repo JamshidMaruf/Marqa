@@ -13,7 +13,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
     {
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                           ?? throw new NotFoundException("Course is not found");
-
+// add this check logic to validator
         var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
         if (!existStudent)
@@ -32,7 +32,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
         if (model.EnrollmentDate > DateTime.UtcNow)
             throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-
+//
         existCourse.EnrolledStudentCount++;
         unitOfWork.Courses.Update(existCourse);
 
@@ -76,22 +76,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
         await unitOfWork.SaveAsync();
 
-        var haveActiveEnrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable()
-            .AnyAsync(e => 
-                e.StudentId == model.StudentId && 
-                e.Status == EnrollmentStatus.Active && 
-                e.Status == EnrollmentStatus.Test);
-
-        if (!haveActiveEnrollments)
-        {
-            if (existStudent.Status != StudentStatus.Active)
-            {
-                existStudent.Status = StudentStatus.Dropped;
-                unitOfWork.Students.Update(existStudent);
-                await unitOfWork.SaveAsync();
-            }
-        }
+        await EnsureStudentStatusUptoDateAfterDeleteAsync(model, existStudent);
     }
 
     public async Task FreezeStudent(FreezeModel model)
@@ -123,20 +108,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
         }
 
         await unitOfWork.SaveAsync();
-        
-        var haveActiveEnrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable()
-            .AnyAsync(e => 
-                e.StudentId == model.StudentId && 
-                e.Status == EnrollmentStatus.Active && 
-                e.Status == EnrollmentStatus.Test);
 
-        if (!haveActiveEnrollments)
-        {
-            student.Status = StudentStatus.InActive;
-            unitOfWork.Students.Update(student);
-            await unitOfWork.SaveAsync();
-        }
+        await EnsureStudentStatusUptoDateAfterFrozenAsync(model,student);
     }
 
     public async Task UnFreezeStudent(UnFreezeModel model)
@@ -161,10 +134,49 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
     private async Task EnsureEnrollmentsExist(int studentId, List<int> courseIds)
     {
-        var result = await unitOfWork.Enrollments.SelectAllAsQueryable()
-            .AnyAsync(e => e.StudentId == studentId && courseIds.Contains(e.CourseId));
-       
-        if (!result)
-            throw new ArgumentIsNotValidException("Course not found");
+        var result = new List<int>();
+        result = await unitOfWork.Enrollments.SelectAllAsQueryable(e => e.StudentId == studentId)
+            .Select(e => e.CourseId)
+            .ToListAsync();
+
+        for (int i = 0; i < courseIds.Count(); i++)
+            if (!result.Contains(courseIds[i]))
+                throw new ArgumentIsNotValidException($"No goup was found with ID {courseIds[i]} for this student");
+    }
+
+    private async Task EnsureStudentStatusUptoDateAfterFrozenAsync(FreezeModel model, Student student)
+    {
+        var haveActiveEnrollments = await unitOfWork.Enrollments
+        .SelectAllAsQueryable()
+        .AnyAsync(e =>
+            e.StudentId == model.StudentId &&
+            e.Status == EnrollmentStatus.Active &&
+            e.Status == EnrollmentStatus.Test);
+
+        if (!haveActiveEnrollments)
+        {
+            student.Status = StudentStatus.InActive;
+            unitOfWork.Students.Update(student);
+            await unitOfWork.SaveAsync();
+        }
+    }
+    private async Task EnsureStudentStatusUptoDateAfterDeleteAsync(DetachModel model, Student student)
+    {
+        var haveActiveEnrollments = await unitOfWork.Enrollments
+        .SelectAllAsQueryable()
+        .AnyAsync(e =>
+            e.StudentId == model.StudentId &&
+            e.Status == EnrollmentStatus.Active &&
+            e.Status == EnrollmentStatus.Test);
+
+        if (!haveActiveEnrollments)
+        {
+            if (student.Status != StudentStatus.Active)
+            {
+                student.Status = StudentStatus.Dropped;
+                unitOfWork.Students.Update(student);
+                await unitOfWork.SaveAsync();
+            }
+        }
     }
 }
