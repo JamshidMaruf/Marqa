@@ -46,7 +46,7 @@ public class StudentService(
 
         try
         {
-            int userId = unitOfWork.Users.Insert(new User
+            var user = unitOfWork.Users.Insert(new User
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
@@ -54,13 +54,13 @@ public class StudentService(
                 Email = model.Email,
                 Role = UserRole.Student,
                 CompanyId = model.CompanyId
-            }).Id;
+            });
 
             await unitOfWork.SaveAsync();
 
             var createdStudent = new Student()
             {
-                UserId = userId,
+                UserId = user.Id,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender
             };
@@ -329,16 +329,18 @@ public class StudentService(
         var query = unitOfWork.Students
             .SelectAllAsQueryable(s => !s.IsDeleted);
 
-        if (filterModel.CompanyId != null)
-            query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
+        query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
 
-        var searchText = filterModel.SearchText.ToLower();
 
         if (!string.IsNullOrEmpty(filterModel.SearchText))
+        {
+            var searchText = filterModel.SearchText.ToLower();
             query = query.Where(s => s.User.FirstName.ToLower().Contains(searchText) ||
                                      s.User.LastName.ToLower().Contains(searchText) ||
                                      s.User.Phone.ToLower().Contains(searchText) ||
                                      s.User.Email.ToLower().Contains(searchText));
+        }
+
 
         if (filterModel.CourseId != null)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
