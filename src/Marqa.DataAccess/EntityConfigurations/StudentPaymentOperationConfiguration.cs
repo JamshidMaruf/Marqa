@@ -10,7 +10,7 @@ public class StudentPaymentOperationConfiguration : IEntityTypeConfiguration<Stu
     {
         builder.HasIndex(s => s.PaymentNumber).IsUnique();
 
-        builder.Property<long>("RowVersion").IsRowVersion();
+        builder.Property<long>("RowVersion").HasDefaultValue(1).IsRowVersion();
     }
 }
 
