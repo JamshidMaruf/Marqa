@@ -10,6 +10,6 @@ public class EmployeeSalaryConfiguration : IEntityTypeConfiguration<EmployeeSala
     {
         builder.HasIndex(e => e.PaymentNumber).IsUnique();
 
-        builder.Property(e => e.RowVersion).IsRowVersion();
+        builder.Property<long>("RowVersion").HasDefaultValue(1).IsRowVersion();
     }
 }
