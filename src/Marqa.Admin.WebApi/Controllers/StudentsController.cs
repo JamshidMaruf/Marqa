@@ -116,7 +116,7 @@ public class StudentsController(
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAllAsync(filterModel);
-        return Ok(new Response<IEnumerable<StudentViewModel>>
+        return Ok(new Response<IEnumerable<StudentListModel>>
         {
             StatusCode = 200,
             Message = "success",

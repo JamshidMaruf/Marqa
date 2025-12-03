@@ -324,7 +324,7 @@ public class StudentService(
         await unitOfWork.SaveAsync();
     }
 
-    public async Task<List<StudentViewModel>> GetAllAsync(StudentFilterModel filterModel)
+    public async Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel)
     {
         var query = unitOfWork.Students
             .SelectAllAsQueryable(s => !s.IsDeleted);
@@ -345,28 +345,60 @@ public class StudentService(
         if (filterModel.CourseId != null)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
 
-        return await query.Select(s => new StudentViewModel
+        return await query.Select(x => new StudentListModel
         {
-            Id = s.Id,
-            FirstName = s.User.FirstName,
-            LastName = s.User.LastName,
-            DateOfBirth = s.DateOfBirth,
-            Gender = s.Gender,
-            Phone = s.User.Phone,
-            Email = s.User.Email,
-            Detail = new StudentDetailViewModel
+            Id = x.Id,
+            Status = x.Status,
+            Balance = x.Balance,
+            FirstName = x.User.FirstName,
+            LastName = x.User.LastName,
+            Phone = x.User.Phone,
+            Courses = x.Courses.Select(c => new StudentListModel.StudentCourseData
             {
-                StudentId = s.Id,
-                FatherFirstName = s.StudentDetail.FatherFirstName,
-                FatherLastName = s.StudentDetail.FatherLastName,
-                FatherPhone = s.StudentDetail.FatherPhone,
-                MotherFirstName = s.StudentDetail.MotherFirstName,
-                MotherLastName = s.StudentDetail.MotherLastName,
-                MotherPhone = s.StudentDetail.MotherPhone,
-                RelativeFirstName = s.StudentDetail.GuardianFirstName,
-                RelativeLastName = s.StudentDetail.GuardianLastName,
-                RelativePhone = s.StudentDetail.GuardianPhone
-            }
+                CourseId = c.CourseId,
+                CourseName = c.Course.Name,
+                CourseStatus = Enum.GetName(c.Course.Status)
+            }).ToList()
         }).ToListAsync();
+    }
+
+    public async Task<StudentViewForUpdateModel> GetForUpdateAsync(int id)
+    {
+        var existStudent = await unitOfWork.Students
+            .SelectAsync(
+                predicate: t => t.Id == id,
+                includes: ["StudentDetail", "User", "Courses"])
+            ?? throw new NotFoundException($"Student is not found");
+
+        if (existStudent.StudentDetail == null)
+            throw new NotFoundException("Student details not found");
+
+        return new StudentViewForUpdateModel
+        {
+            Id = existStudent.Id,
+            FirstName = existStudent.User.FirstName,
+            LastName = existStudent.User.LastName,
+            DateOfBirth = existStudent.DateOfBirth,
+            Gender = existStudent.Gender,
+            Phone = existStudent.User.Phone,
+            Email = existStudent.User.Email,
+            FatherFirstName = existStudent.StudentDetail.FatherFirstName,
+            FatherLastName = existStudent.StudentDetail.FatherLastName,
+            MotherFirstName = existStudent.StudentDetail.MotherFirstName,
+            MotherLastName = existStudent.StudentDetail.MotherLastName,
+            FatherPhone = existStudent.StudentDetail.FatherPhone,
+            MotherPhone = existStudent.StudentDetail.MotherPhone,
+            GuardianFirstName = existStudent.StudentDetail.GuardianFirstName,
+            GuardianLastName = existStudent.StudentDetail.GuardianLastName,
+            GuardianPhone = existStudent.StudentDetail.GuardianPhone,
+            Status = existStudent.Status,
+            Courses = existStudent.Courses.Select(x => new StudentViewForUpdateModel.StudentCourseData
+            {
+                CourseId = x.CourseId,
+                CourseName = x.Course.Name,
+                CourseStatusId = ((int)x.Course.Status),
+                CourseStatusName = Enum.GetName(x.Course.Status),
+            }).ToList()
+        };
     }
 }
