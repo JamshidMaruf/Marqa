@@ -395,7 +395,7 @@ public class StudentService(
                 CourseId = x.CourseId,
                 CourseName = x.Course.Name,
                 CourseStatusId = ((int)x.Course.Status),
-                CourseStatusName = x.Course.Status.ToString(),
+                CourseStatusName = Enum.GetName(x.Course.Status),
             }).ToList()
         };
     }
