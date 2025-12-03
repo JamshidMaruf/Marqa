@@ -1,4 +1,4 @@
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Students.Models;
 
@@ -10,7 +10,7 @@ public class StudentListModel
     public string Phone { get; set; }
     public decimal Balance { get; set; }
     public StudentStatus Status { get; set; }
-
+    public List<StudentCourseData> Courses { get; set; }
     public class StudentCourseData
     {
         public int CourseId { get; set; }
