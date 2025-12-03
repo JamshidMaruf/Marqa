@@ -355,7 +355,7 @@ public class StudentService(
             {
                 CourseId = c.CourseId,
                 CourseName = c.Course.Name,
-                CourseStatus = c.Course.Status.ToString()
+                CourseStatus = Enum.GetName(c.Course.Status)
             }).ToList()
         }).ToListAsync();
     }
