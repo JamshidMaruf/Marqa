@@ -1,4 +1,6 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -7,13 +9,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Enrollments;
 
-public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
+public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCreateModel> validator) : IEnrollmentService
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                           ?? throw new NotFoundException("Course is not found");
-        // add this check logic to validator
+
+        await validator.ValidateAndThrowAsync(model);
+
         var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
         if (!existStudent)
@@ -127,6 +131,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
         }
 
         // TODO: Add hangfire for activate courses
+
 
         await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozen));
         await unitOfWork.SaveAsync();
