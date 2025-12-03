@@ -29,6 +29,7 @@ public static class EnrollmentValidatorHelper
             e => e.StudentId == studentId && e.CourseId == courseId);
 
         return !existingEnrollment;
+
     }
 }
 
