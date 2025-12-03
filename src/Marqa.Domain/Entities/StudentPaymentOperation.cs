@@ -13,7 +13,6 @@ public class StudentPaymentOperation : Auditable
     public decimal CoursePrice { get; set; }
     public int CourseId { get; set; }
     public int StudentId { get; set; }
-    public byte[] RowVersion { get; set; }
     
     // Navigation Properties
     public Course Course { get; set; }
