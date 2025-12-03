@@ -18,8 +18,6 @@ public class Course : Auditable
     public int CompanyId { get; set; }
     public int SubjectId { get; set; }
     public int TeacherId { get; set; }
-    // concurrency token
-    public byte[] RowVersion { get; set; }
 
     // Navigation
     public Company Company { get; set; }

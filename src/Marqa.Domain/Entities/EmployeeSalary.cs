@@ -10,7 +10,7 @@ public class EmployeeSalary : Auditable
     public DateTime DateTime { get; set; }
     public string Description { get; set; } 
     public PaymentMethod PaymentMethod { get; set; }
-    public byte[] RowVersion { get; set; }
+
     // Navigation
     public Employee Employee { get; set; }
 }
