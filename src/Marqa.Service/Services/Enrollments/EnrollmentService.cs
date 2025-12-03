@@ -13,7 +13,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
     {
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                           ?? throw new NotFoundException("Course is not found");
-// add this check logic to validator
+        // add this check logic to validator
         var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
         if (!existStudent)
@@ -32,7 +32,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
         if (model.EnrollmentDate > DateTime.UtcNow)
             throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-//
+        //
         existCourse.EnrolledStudentCount++;
         unitOfWork.Courses.Update(existCourse);
 
@@ -52,12 +52,12 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
     {
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException("Student is not found");
-        
+
         await EnsureEnrollmentsExist(model.StudentId, model.CourseIds);
-        
+
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(e => 
-                e.StudentId == model.StudentId && 
+            .SelectAllAsQueryable(e =>
+                e.StudentId == model.StudentId &&
                 model.CourseIds.Contains(e.CourseId))
             .ToListAsync();
 
@@ -87,8 +87,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
         await EnsureEnrollmentsExist(model.StudentId, model.CourseIds);
 
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(e => 
-                e.StudentId == model.StudentId && 
+            .SelectAllAsQueryable(e =>
+                e.StudentId == model.StudentId &&
                 model.CourseIds.Contains(e.CourseId))
             .ToListAsync();
 
@@ -109,13 +109,13 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
         await unitOfWork.SaveAsync();
 
-        await EnsureStudentStatusUptoDateAfterFrozenAsync(model,student);
+        await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
 
     public async Task UnFreezeStudent(UnFreezeModel model)
     {
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(predicate: e => 
+            .SelectAllAsQueryable(predicate: e =>
                     e.StudentId == model.StudentId &&
                     e.Status == EnrollmentStatus.Frozen &&
                     model.CourseIds.Contains(e.CourseId))
@@ -125,7 +125,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
         {
             enrollment.Status = EnrollmentStatus.Active;
         }
-        
+
         // TODO: Add hangfire for activate courses
 
         await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozen));
@@ -134,14 +134,16 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
 
     private async Task EnsureEnrollmentsExist(int studentId, List<int> courseIds)
     {
-        var result = new List<int>();
-        result = await unitOfWork.Enrollments.SelectAllAsQueryable(e => e.StudentId == studentId)
+        var allStudentCourseIds = new HashSet<int>(
+            await unitOfWork.Enrollments
+            .SelectAllAsQueryable(e => e.StudentId == studentId)
             .Select(e => e.CourseId)
-            .ToListAsync();
+            .ToListAsync());
 
-        for (int i = 0; i < courseIds.Count(); i++)
-            if (!result.Contains(courseIds[i]))
-                throw new ArgumentIsNotValidException($"No goup was found with ID {courseIds[i]} for this student");
+        List<int> missings = courseIds.Where(id => !allStudentCourseIds.Contains(id)).ToList();
+
+        if (missings.Count > 0)
+            throw new ArgumentIsNotValidException($"These groups were not found for this student: {string.Join(", ", missings)}");
     }
 
     private async Task EnsureStudentStatusUptoDateAfterFrozenAsync(FreezeModel model, Student student)
@@ -160,6 +162,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
             await unitOfWork.SaveAsync();
         }
     }
+
     private async Task EnsureStudentStatusUptoDateAfterDeleteAsync(DetachModel model, Student student)
     {
         var haveActiveEnrollments = await unitOfWork.Enrollments

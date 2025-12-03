@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Marqa.Service.Helpers;
 
@@ -12,7 +12,7 @@ public class EncryptionService : IEncryptionService
 
     public EncryptionService()
     {
-        _encryptionKey = SettingConstant.EncryptionKey;
+        _encryptionKey = SettingConstant.ENCRYPTIONKEY;
             
         using (var sha256 = SHA256.Create())
         {

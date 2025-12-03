@@ -9,10 +9,6 @@ public class LessonAttendanceConfiguration : IEntityTypeConfiguration<LessonAtte
 {
     public void Configure(EntityTypeBuilder<LessonAttendance> builder)
     {
-         builder.Ignore(la => la.Id);
-
-        builder.HasKey(l => new { l.StudentId, l.LessonId });
-         
         builder.Property(la => la.Status)
             .HasDefaultValue(AttendanceStatus.None);
 

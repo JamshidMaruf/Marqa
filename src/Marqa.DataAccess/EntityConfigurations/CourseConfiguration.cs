@@ -8,7 +8,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
     public void Configure(EntityTypeBuilder<Course> builder)
     {
-        builder.Property(c => c.RowVersion).IsConcurrencyToken();
+        builder.Property<long>("RowVersion").IsRowVersion();
 
         builder.Property(p => p.Description)
             .HasMaxLength(5000);  

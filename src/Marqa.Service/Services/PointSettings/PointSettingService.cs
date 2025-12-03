@@ -6,6 +6,7 @@ using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Helpers;
 using Marqa.Service.Services.PointSettings.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,8 +17,6 @@ public class PointSettingService(IUnitOfWork unitOfWork,
     IValidator<PointSettingCreateModel> pointSettingCreateValidator,
     IValidator<PointSettingUpdateModel> pointSettingUpdateValidator) : IPointSettingService
 {
-    private string _key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-    
     public async Task CreateAsync(PointSettingCreateModel model)
     {
         await pointSettingCreateValidator.EnsureValidatedAsync(model);
@@ -120,7 +119,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
         byte[] payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
         string payloadB64 = Base64UrlEncoder.Encode(payloadBytes);
 
-        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(_key));
+        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(PointSettingConstant.QR_CODE_TOKEN_KEY));
         var signature = hMACSHA3_512.ComputeHash(payloadBytes);
         var sigB64 = Base64UrlEncoder.Encode(signature);
 
@@ -147,7 +146,7 @@ public class PointSettingService(IUnitOfWork unitOfWork,
         byte[] decodedSignature = Base64UrlEncoder.DecodeBytes(sigB64);
 
         // hashing the encoded payload in order to compare with the hashed signature
-        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(_key));
+        using HMACSHA3_512 hMACSHA3_512 = new HMACSHA3_512(Encoding.UTF8.GetBytes(PointSettingConstant.QR_CODE_TOKEN_KEY));
         byte[] expectedSignature = hMACSHA3_512.ComputeHash(decodedPayload);
 
         // checking for decoded signature and the expected signature for validity
