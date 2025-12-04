@@ -86,6 +86,18 @@ public class StudentsController(
         });
     }
 
+    [HttpPut("{studentId}/courses/{courseId}/transfer")]
+    public async Task<IActionResult> TransferStudentCourseAsync(TransferStudentAcrossComaniesModel model)
+    {
+        await courseService.MoveStudentCourseAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "Student transferred successfully",
+        });
+    }
+
     [HttpGet("{studentId:int}/courses")]
     public async Task<IActionResult> GetStudentCourses(int studentId)
     {
