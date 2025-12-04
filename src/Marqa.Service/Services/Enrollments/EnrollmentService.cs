@@ -16,7 +16,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                           ?? throw new NotFoundException("Course is not found");
 
-        await validator.ValidateAndThrowAsync(model);
+        //await validator.ValidateAndThrowAsync(model);
 
         var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
@@ -122,7 +122,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
             .SelectAllAsQueryable(predicate: e =>
                     e.StudentId == model.StudentId &&
                     e.Status == EnrollmentStatus.Frozen &&
-                    model.CourseIds.Contains(e.CourseId))
+                    model.CourseIds.Contains(e.CourseId), includes: "EnrollmentFrozen")
             .ToListAsync();
 
         foreach (var enrollment in enrollments)

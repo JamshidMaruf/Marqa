@@ -7,6 +7,7 @@ using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.Employees;
+using Marqa.Service.Services.Enrollments;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Exams;
 using Marqa.Service.Services.Files;
@@ -53,6 +54,7 @@ public static class ServicesExtensions
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<IEnumService, EnumService>();
         services.AddScoped<ITeacherService, TeacherService>();
+        services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 }
