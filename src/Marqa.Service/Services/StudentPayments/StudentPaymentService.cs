@@ -7,6 +7,7 @@ using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Interfaces;
 using Marqa.Service.Services.Exams.Models;
+using Marqa.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 namespace Marqa.Service.Services.StudentPayments;
 
@@ -45,7 +46,7 @@ public class StudentPaymentService(
             Id = payment.Id,
             PaymentNumber = paymentNumberInt,
             Amount = payment.Amount,
-            DateTime = payment.GivenDate,
+            DateTime=DateHelper.ToLocalTimeConverter(payment.GivenDate),
             Description = payment.Description,
             PaymentMethod = payment.PaymentMethod,
             PaymentOperationType = payment.PaymentOperationType,
@@ -251,7 +252,7 @@ public class StudentPaymentService(
             StudentId = payment.StudentId,
             PaymentMethod = new EnumViewModel { Id = (int)payment.PaymentMethod, Name = payment.PaymentMethod.ToString() },
             Amount = payment.Amount,
-            DateTime = payment.GivenDate,
+            DateTime = DateHelper.ToLocalTimeConverter(payment.GivenDate),
             PaymentOperationType = new EnumViewModel { Id = (int)payment.PaymentOperationType, Name = payment.PaymentOperationType.ToString() },
             CourseName = payment.Course?.Name
         };

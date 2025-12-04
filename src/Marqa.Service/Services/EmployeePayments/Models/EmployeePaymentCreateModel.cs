@@ -13,7 +13,7 @@ public class EmployeePaymentCreateModel
 
     public decimal Amount { get; set; }
 
-    public DateTime DateTime { get; set; }
+    public DateTime DateTime { get; set; }= DateTime.Now;
 
     public string Description { get; set; }
 }

@@ -7,6 +7,7 @@ using Marqa.Service.Services.Banners.Models;
 using Marqa.Service.Services.Files;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Marqa.Shared.Helpers;
 
 namespace Marqa.Service.Services.Banners;
 
@@ -73,8 +74,8 @@ public class BannerService(
         existBanner.LinkUrl = model.LinkUrl;
         existBanner.DisplayOrder = model.DisplayOrder;
         existBanner.IsActive = model.IsActive;
-        existBanner.StartDate = model.StartDate;
-        existBanner.EndDate = model.EndDate;
+        existBanner.StartDate = DateHelper.ToLocalTimeConverter(model.StartDate),
+        existBanner.EndDate = DateHelper.ToLocalTimeConverter(model.EndDate),
 
         unitOfWork.Banners.Update(existBanner);
         await unitOfWork.SaveAsync();
