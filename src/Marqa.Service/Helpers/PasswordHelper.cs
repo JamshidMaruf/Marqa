@@ -3,14 +3,13 @@
 public static class PasswordHelper
 {
     /// <summary>
-    /// Berilgan parolni hash qiladi.
+    /// The method hashes the provided plain text password using the BCrypt algorithm.
     /// </summary>
     /// <param name="password">
-    /// Hash qilinishi kerak bo‘lgan parol matni.
+    /// The plain text password to be hashed.
     /// </param>
     /// <returns>
-    /// 12 darajali "salt" qollanilgan holda BCrypt algoritmi yordamida
-    /// yaratilgan Hash qiymati
+    /// The method returns the hashed version of the provided password.
     /// </returns>
     public static string Hash(string password)
     {
@@ -19,18 +18,18 @@ public static class PasswordHelper
     }
 
     /// <summary>
-    /// Hash qilingan parolni kiritilgan (Plain text) li
-    /// parol bilan solishtirib tekshiradi.
+    /// The method verifies whether the plain text password entered by the user
+    /// matches the hashed password stored in the database.
     /// </summary>
     /// <param name="password">
-    /// Foydalanuvchi tomonidan kiritilgan parol matni.
+    /// The plain text password entered by the user.
     /// </param>
     /// <param name="passwordHash">
-    /// DB da saqlangan hash qilingan parol matni.
+    /// The hashed password retrieved from the database.
     /// </param>
     /// <returns>
-    /// Agar parol va hash qilingan parol mos kelsa true,
-    /// aks holda false qiymatini qaytaradi.
+    /// If the password the user entered matches the hashed password from the database,
+    /// the method returns true; otherwise, it returns false.
     /// </returns>
     public static bool Verify(string password, string passwordHash)
     {

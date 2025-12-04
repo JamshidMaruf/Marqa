@@ -8,15 +8,15 @@ namespace Marqa.Shared.Helpers;
 public static class DateHelper
 {
     /// <summary>
-    /// UTC vaqtni lokal vaqtga o'zgartiradi.
+    /// The method converts a UTC date-time value to local time.
     /// </summary>
     /// <param name="utcdateTime">
-    /// UTC farmatda bolishi kerak bolgan sana va vaqt qiymati.
-    /// Agar DateTimeKind noto‘g‘ri bo‘lsa, majburan Utc
-    /// turiga o‘tkaziladi.
+    /// The UTC date-time value to be converted.
+    /// If the provided date-time is not in UTC format,
+    /// The method will first specify it as UTC before conversion.
     /// </param>
     /// <returns>
-    /// Mahalliy vaqt (Local Time) ko‘rinishiga aylantirilgan sana-vaqt.
+    /// The method returns the converted local date-time value.
     /// </returns>
     public static DateTime ToLocalTimeConverter(DateTime utcdateTime)
     {

@@ -5,16 +5,17 @@ namespace Marqa.Service.Services.Enums;
 public class EnumService : IEnumService
 {
     /// <summary>
-    /// Berilgan <typeparamref name="T"/> enum turining barcha qiymatlarini
-    /// <see cref="EnumGetModel"/> modeliga o‘tkazib ro‘yxat ko‘rinishida qaytaradi.
+    /// The given enum type's values are retrieved and returned as a list of <see cref="EnumGetModel"/> objects.
     /// </summary>
-    /// <typeparam name="T">Qiymatlari olinadigan enum turi.</typeparam>
+    /// <typeparam name="T">
+    /// The enum type whose values are to be retrieved.
+    /// </typeparam>
     /// <returns>
-    /// Har bir enum elementining Id va Name maydonlari to‘ldirilgan 
-    /// <see cref="EnumGetModel"/> obyektlari ro‘yxati.
+    /// The method returns a list of <see cref="EnumGetModel"/> objects,
+    /// Where each object contains the integer value and name of each enum member.
     /// </returns>
     /// <exception cref="ArgumentIsNotValidException">
-    /// Agar <typeparamref name="T"/> enum turi bo‘lmasa.
+    /// If the provided type parameter T is not an enum,
     /// </exception>
     public List<EnumGetModel> GetEnumValues<T>() where T : Enum
     {

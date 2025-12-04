@@ -6,25 +6,24 @@ namespace Marqa.Service.Extensions;
 public static class ValidatorExtension
 {
     /// <summary>
-    /// Modelni FluentValidation orqali tekshiradi va agar xatolik bo‘lsa,
-    /// validatsiya xabarlarini o‘z ichiga olgan <see cref="ValidateException"/>
-    /// exception tashlaydi.
+    /// The method validates the provided model using the specified FluentValidation validator.
+    /// If the model fails validation, a ValidateException is thrown.
     /// </summary>
     /// <typeparam name="TModel">
-    /// Validatsiya qilinayotgan model turi.
+    /// The type of the model to be validated.
     /// </typeparam>
     /// <param name="validator">
-    /// FluentValidation validator obyekti.
+    /// The object of the FluentValidation validator to be used for validation.
     /// </param>
     /// <param name="model">
-    /// Validatsiya qilinishi kerak bo‘lgan model.
+    /// The model instance to be validated.
     /// </param>
     /// <returns>
-    /// Asinxron operatsiyasi <see cref="Task"/>.
+    /// Async Task representing the validation operation.
     /// </returns>
     /// <exception cref="ValidateException">
-    /// Agar model validatsiyadan muvaffaqiyatli o‘tmasa,
-    /// xatoliklar ro‘yxati bilan birga ushbu istisno tashlanadi.
+    /// If the model fails validation,
+    /// The method throws a ValidateException containing the validation error messages.
     /// </exception>
     public static async Task EnsureValidatedAsync<TModel>(this IValidator<TModel> validator, TModel model)
     {
