@@ -7,4 +7,5 @@ public interface IEnrollmentService
     Task UnFreezeStudent(UnFreezeModel model);
     Task CreateAsync(EnrollmentCreateModel model);
     Task DeleteAsync(DetachModel model);
+    Task MoveStudentCourseAsync(StudentTransferModel model);
 }

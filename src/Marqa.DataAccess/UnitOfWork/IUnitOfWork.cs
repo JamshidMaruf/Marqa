@@ -79,6 +79,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<Asset> Assets { get; }
     IRepository<EnrollmentFrozen> EnrollmentFrozens { get; }
     IRepository<EnrollmentCancellation> EnrollmentCancellations { get; }
+    IRepository<EnrollmentTransfer> EnrollmentTransfers { get; }
 
 
     Task SaveAsync();

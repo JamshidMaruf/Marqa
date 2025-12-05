@@ -1,6 +1,7 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Enrollments.Models;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
@@ -83,18 +84,6 @@ public class StudentsController(
         {
             StatusCode = 200,
             Message = "Student Course status updated successfully",
-        });
-    }
-
-    [HttpPut("{studentId}/courses/{courseId}/transfer")]
-    public async Task<IActionResult> TransferStudentCourseAsync(TransferStudentAcrossComaniesModel model)
-    {
-        await courseService.MoveStudentCourseAsync(model);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "Student transferred successfully",
         });
     }
 

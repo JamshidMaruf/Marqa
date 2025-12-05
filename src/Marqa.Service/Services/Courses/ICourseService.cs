@@ -21,7 +21,6 @@ public interface ICourseService
     Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); // for dashboard panel
     Task<List<MinimalCourseDataModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
     Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
-    Task MoveStudentCourseAsync(TransferStudentAcrossComaniesModel model);
     Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
 }

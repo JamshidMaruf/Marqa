@@ -31,6 +31,7 @@ public class StudentPointHistoryService(
                     Operation = model.Operation,
                     PreviousPoint = summ,
                     CurrentPoint = summ - model.Point,
+                    GivenDateTime = DateTime.UtcNow
                 });
         }
         else if (model.Operation == PointHistoryOperation.Plus)
@@ -44,6 +45,7 @@ public class StudentPointHistoryService(
                     Operation = model.Operation,
                     PreviousPoint = summ,
                     CurrentPoint = summ + model.Point,
+                    GivenDateTime = DateTime.UtcNow
                 });
         }
 
@@ -63,6 +65,7 @@ public class StudentPointHistoryService(
                CurrentPoint = s.CurrentPoint,
                GivenPoint = s.GivenPoint,
                Operation = s.Operation,
+               GivenDateTime = s.GivenDateTime          
            })
            .ToListAsync();
 
