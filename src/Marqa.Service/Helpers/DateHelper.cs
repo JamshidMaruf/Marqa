@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace Marqa.Service.Helpers;
 
-namespace Marqa.Shared.Helpers;
 public static class DateHelper
 {
     /// <summary>
@@ -20,7 +15,7 @@ public static class DateHelper
     /// </returns>
     public static DateTime ToLocalTimeConverter(DateTime utcdateTime)
     {
-        if(utcdateTime.Kind != DateTimeKind.Utc)
+        if (utcdateTime.Kind != DateTimeKind.Utc)
         {
             utcdateTime = DateTime.SpecifyKind(utcdateTime, DateTimeKind.Utc);
         }

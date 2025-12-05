@@ -16,10 +16,9 @@ public class StudentUpdateModel
     //details
     public StudentDetailUpdateModel StudentDetailUpdateModel { get; set; }
     
-    
     public class StudentCourseData
     {
-        public int CourseId { get; set; }
-        public int CourseStatusId { get; set; }
+        public int? CourseId { get; set; }
+        public int? CourseStatusId { get; set; }
     }
 }

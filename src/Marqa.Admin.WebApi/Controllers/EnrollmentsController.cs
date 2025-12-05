@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using Marqa.Service.Services.Courses;
+﻿using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Enrollments;
 using Marqa.Service.Services.Enrollments.Models;
 using Marqa.Shared.Models;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
@@ -70,6 +68,18 @@ public class EnrollmentsController(
         {
             StatusCode = 201,
             Message = "Enrollment has been unfrozen successfully"
+        });
+    }
+
+    [HttpPost("transfer")]
+    public async Task<IActionResult> TransferAsync(StudentTransferModel model)
+    {
+        await enrollmentService.MoveStudentCourseAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 201,
+            Message = "Student has been transferred successfully"
         });
     }
 

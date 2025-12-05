@@ -15,6 +15,6 @@ public class Enrollment : Auditable
     public Student Student { get; set; }
     public Course Course { get; set; }
     public EnrollmentCancellation EnrollmentCancellation { get; set; }
-    public EnrollmentFrozen EnrollmentFrozen { get; set; }
+    public ICollection<EnrollmentFrozen> EnrollmentFrozens { get; set; }
 }
 

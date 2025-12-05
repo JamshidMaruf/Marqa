@@ -8,14 +8,14 @@ public enum EnrollmentStatus
     Active = 1,
 
     [Description("Chiqib ketgan")]
-    Dropped = 3,
+    Dropped = 2,
 
     [Description("Sinov")]
-    Test = 4,
+    Test = 3,
 
     [Description("Tugatgan")]
-    Completed = 5,
+    Completed = 4,
 
     [Description("Muzlatilgan")]
-    Frozen = 6
+    Frozen = 5
 }   

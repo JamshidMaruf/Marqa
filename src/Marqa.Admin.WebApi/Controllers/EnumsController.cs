@@ -66,7 +66,7 @@ public class EnumsController : ControllerBase
         });
     }
     [HttpGet("enrollment-status")]
-    public async Task<IActionResult> GetEnrollmentStatus()
+    public async Task<IActionResult> GetEnrollmentStatusAsync()
     {
         var result = _enumService.GetEnumValues<EnrollmentStatus>();
         return Ok(new Response<List<EnumGetModel>>
@@ -77,7 +77,7 @@ public class EnumsController : ControllerBase
         });
     }
     [HttpGet("course-payment-type")]
-    public async Task<IActionResult> GetCoursePaymentType()
+    public async Task<IActionResult> GetCoursePaymentTypeAsync()
     {
         var result = _enumService.GetEnumValues<CoursePaymentType>();
         return Ok(new Response<List<EnumGetModel>>

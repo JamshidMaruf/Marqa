@@ -1,18 +1,22 @@
-﻿using FluentValidation;
+﻿using System;
+using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Service.Services.Students.Models.DetailModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using static Marqa.Service.Services.Students.Models.StudentViewModel;
 
 namespace Marqa.Service.Services.Students;
 
 public class StudentService(
     IUnitOfWork unitOfWork,
+    IStudentPointHistoryService studentPointHistoryService,
     IValidator<StudentCreateModel> createValidator,
     IValidator<StudentUpdateModel> updateValidator) : IStudentService
 {
@@ -128,10 +132,29 @@ public class StudentService(
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
 
+        var studentCourses = await unitOfWork.Enrollments
+            .SelectAllAsQueryable(e => e.StudentId == existStudent.Id)
+            .ToListAsync();
+
+
         var transaction = await unitOfWork.BeginTransactionAsync();
 
         try
         {
+            foreach (var studentCourse in studentCourses)
+            {
+                foreach (var course in model.Courses)
+                {
+                    if (studentCourse.CourseId == course.CourseId)
+                    {
+                        studentCourse.Status = (EnrollmentStatus)course.CourseStatusId;
+                        unitOfWork.Enrollments.Update(studentCourse);
+                    }
+                }
+            }
+
+            await unitOfWork.SaveAsync();
+
             existStudent.User.FirstName = model.FirstName;
             existStudent.User.LastName = model.LastName;
             existStudent.Gender = model.Gender;
@@ -204,7 +227,16 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: ["StudentDetail", "User"])
+                includes: [
+                    "StudentDetail",
+                    "User",
+                    "Courses.Course",
+                    "Courses.Course.Teacher.User",
+                    "Courses.Course.Subject",
+                    "PaymentOperations",
+                    "Courses",
+                    "ExamResults",
+                    "PointHistories"])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail == null)
@@ -219,6 +251,9 @@ public class StudentService(
             Gender = existStudent.Gender,
             Phone = existStudent.User.Phone,
             Email = existStudent.User.Email,
+            Balance = existStudent.Balance,
+            Status = existStudent.Status,
+            TotalPoints = await studentPointHistoryService.GetAsync(existStudent.Id),
             Detail = new StudentDetailViewModel
             {
                 StudentId = existStudent.Id,
@@ -228,11 +263,146 @@ public class StudentService(
                 MotherFirstName = existStudent.StudentDetail.MotherFirstName,
                 MotherLastName = existStudent.StudentDetail.MotherLastName,
                 MotherPhone = existStudent.StudentDetail.MotherPhone,
-                RelativeFirstName = existStudent.StudentDetail.GuardianFirstName,
-                RelativeLastName = existStudent.StudentDetail.GuardianLastName,
-                RelativePhone = existStudent.StudentDetail.GuardianPhone
-            }
+                GuardianFirstName = existStudent.StudentDetail.GuardianFirstName,
+                GuardianLastName = existStudent.StudentDetail.GuardianLastName,
+                GuardianPhone = existStudent.StudentDetail.GuardianPhone
+            },
+            Courses = existStudent.Courses.Select(c => new StudentCourseData
+            {
+                CourseName = c.Course.Name,
+                Subject = c.Course.Subject.Name,
+                TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
+                CourseStatusName = Enum.GetName(c.Status),
+                CourseLevel = c.Course.Level
+            })
+            .ToList(),
+            ExamResults = existStudent.ExamResults.Select(r => new ExamResult
+            {
+                Title = r.Exam.Title,
+                Score = r.Score
+            })
+            .ToList(),
+            PaymentOperations = existStudent.PaymentOperations.Select(p => new PaymentOperation
+            {
+                PaymentNumber = p.PaymentNumber,
+                PaymentMethod = p.PaymentMethod,
+                Amount = p.Amount,
+                DateTime = p.GivenDate,
+                Description = p.Description,
+                PaymentOperationType = p.PaymentOperationType,
+                CoursePrice = p.CoursePrice
+            })
+            .ToList(),
+            PointHistories = existStudent.PointHistories.Select(p => new StudentViewModel.StudentPointHistory
+            {
+                CurrentPoint = p.CurrentPoint,
+                GivenDate = p.GivenDateTime,
+                GivenPoint = p.GivenPoint,
+                Note = p.Note,
+                Operation = p.Operation
+            })
+            .ToList()
         };
+    }
+
+    public async Task<StudentViewForUpdateModel> GetForUpdateAsync(int id)
+    {
+        var existStudent = await unitOfWork.Students
+            .SelectAsync(
+                predicate: t => t.Id == id,
+                includes: ["StudentDetail", "User", "Courses"])
+            ?? throw new NotFoundException($"Student is not found");
+
+        if (existStudent.StudentDetail == null)
+            throw new NotFoundException("Student details not found");
+
+        return new StudentViewForUpdateModel
+        {
+            Id = existStudent.Id,
+            FirstName = existStudent.User.FirstName,
+            LastName = existStudent.User.LastName,
+            DateOfBirth = existStudent.DateOfBirth,
+            Gender = existStudent.Gender,
+            Phone = existStudent.User.Phone,
+            Email = existStudent.User.Email,
+            FatherFirstName = existStudent.StudentDetail.FatherFirstName,
+            FatherLastName = existStudent.StudentDetail.FatherLastName,
+            MotherFirstName = existStudent.StudentDetail.MotherFirstName,
+            MotherLastName = existStudent.StudentDetail.MotherLastName,
+            FatherPhone = existStudent.StudentDetail.FatherPhone,
+            MotherPhone = existStudent.StudentDetail.MotherPhone,
+            GuardianFirstName = existStudent.StudentDetail.GuardianFirstName,
+            GuardianLastName = existStudent.StudentDetail.GuardianLastName,
+            GuardianPhone = existStudent.StudentDetail.GuardianPhone,
+            Status = existStudent.Status,
+            Courses = existStudent.Courses.Select(x => new StudentViewForUpdateModel.StudentCourseData
+            {
+                CourseId = x.CourseId,
+                CourseName = x.Course.Name,
+                CourseStatusId = ((int)x.Course.Status),
+                CourseStatusName = Enum.GetName(x.Course.Status),
+            }).ToList()
+        };
+    }
+
+    public async Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel)
+    {
+        var query = unitOfWork.Students
+            .SelectAllAsQueryable(s => !s.IsDeleted);
+
+        query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
+
+
+        if (!string.IsNullOrEmpty(filterModel.SearchText))
+        {
+            var searchText = filterModel.SearchText.ToLower();
+            query = query.Where(s => s.User.FirstName.ToLower().Contains(searchText) ||
+                                     s.User.LastName.ToLower().Contains(searchText) ||
+                                     s.User.Phone.ToLower().Contains(searchText) ||
+                                     s.User.Email.ToLower().Contains(searchText));
+        }
+
+        if (filterModel.CourseId != null && filterModel.CourseId != 0)
+            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
+
+        //    if(filterModel.Status != null)
+        //    {
+        //        if(filterModel.Status == StudentFilteringStatus.Active)
+        //        {
+        //            query = query.Where(s => s.Status == StudentStatus.Active);
+        //        }
+        //        else if(filterModel.Status == StudentFilteringStatus.Completed)
+        //        {
+        //            query = query.Where(s => s.Status == StudentStatus.Completed);
+        //        }
+        //        else if(filterModel.Status == StudentFilteringStatus.Upcoming)
+        //        {
+        //            query = query.Where(s => )
+        //        }
+        //All = 0,
+        //Active = 1,
+        //Upcoming = 2,
+        //Completed = 3,
+        //Closed = 4,
+        //Frozen = 5,
+        //GroupLess = 6,
+        //    }
+
+        return await query.Select(x => new StudentListModel
+        {
+            Id = x.Id,
+            Status = x.Status,
+            Balance = x.Balance,
+            FirstName = x.User.FirstName,
+            LastName = x.User.LastName,
+            Phone = x.User.Phone,
+            Courses = x.Courses.Select(c => new StudentListModel.StudentCourseData
+            {
+                CourseId = c.CourseId,
+                CourseName = c.Course.Name,
+                CourseStatus = Enum.GetName(c.Course.Status)
+            }).ToList()
+        }).ToListAsync();
     }
 
     public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
@@ -258,9 +428,9 @@ public class StudentService(
                     MotherFirstName = sc.Student.StudentDetail.MotherFirstName,
                     MotherLastName = sc.Student.StudentDetail.MotherLastName,
                     MotherPhone = sc.Student.StudentDetail.MotherPhone,
-                    RelativeFirstName = sc.Student.StudentDetail.GuardianFirstName,
-                    RelativeLastName = sc.Student.StudentDetail.GuardianLastName,
-                    RelativePhone = sc.Student.StudentDetail.GuardianPhone
+                    GuardianFirstName = sc.Student.StudentDetail.GuardianFirstName,
+                    GuardianLastName = sc.Student.StudentDetail.GuardianLastName,
+                    GuardianPhone = sc.Student.StudentDetail.GuardianPhone
                 }
             })
             .ToListAsync();
@@ -322,83 +492,5 @@ public class StudentService(
         studentCourse.Status = status;
 
         await unitOfWork.SaveAsync();
-    }
-
-    public async Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel)
-    {
-        var query = unitOfWork.Students
-            .SelectAllAsQueryable(s => !s.IsDeleted);
-
-        query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
-
-
-        if (!string.IsNullOrEmpty(filterModel.SearchText))
-        {
-            var searchText = filterModel.SearchText.ToLower();
-            query = query.Where(s => s.User.FirstName.ToLower().Contains(searchText) ||
-                                     s.User.LastName.ToLower().Contains(searchText) ||
-                                     s.User.Phone.ToLower().Contains(searchText) ||
-                                     s.User.Email.ToLower().Contains(searchText));
-        }
-
-
-        if (filterModel.CourseId != null)
-            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
-
-        return await query.Select(x => new StudentListModel
-        {
-            Id = x.Id,
-            Status = x.Status,
-            Balance = x.Balance,
-            FirstName = x.User.FirstName,
-            LastName = x.User.LastName,
-            Phone = x.User.Phone,
-            Courses = x.Courses.Select(c => new StudentListModel.StudentCourseData
-            {
-                CourseId = c.CourseId,
-                CourseName = c.Course.Name,
-                CourseStatus = Enum.GetName(c.Course.Status)
-            }).ToList()
-        }).ToListAsync();
-    }
-
-    public async Task<StudentViewForUpdateModel> GetForUpdateAsync(int id)
-    {
-        var existStudent = await unitOfWork.Students
-            .SelectAsync(
-                predicate: t => t.Id == id,
-                includes: ["StudentDetail", "User", "Courses"])
-            ?? throw new NotFoundException($"Student is not found");
-
-        if (existStudent.StudentDetail == null)
-            throw new NotFoundException("Student details not found");
-
-        return new StudentViewForUpdateModel
-        {
-            Id = existStudent.Id,
-            FirstName = existStudent.User.FirstName,
-            LastName = existStudent.User.LastName,
-            DateOfBirth = existStudent.DateOfBirth,
-            Gender = existStudent.Gender,
-            Phone = existStudent.User.Phone,
-            Email = existStudent.User.Email,
-            FatherFirstName = existStudent.StudentDetail.FatherFirstName,
-            FatherLastName = existStudent.StudentDetail.FatherLastName,
-            MotherFirstName = existStudent.StudentDetail.MotherFirstName,
-            MotherLastName = existStudent.StudentDetail.MotherLastName,
-            FatherPhone = existStudent.StudentDetail.FatherPhone,
-            MotherPhone = existStudent.StudentDetail.MotherPhone,
-            GuardianFirstName = existStudent.StudentDetail.GuardianFirstName,
-            GuardianLastName = existStudent.StudentDetail.GuardianLastName,
-            GuardianPhone = existStudent.StudentDetail.GuardianPhone,
-            Status = existStudent.Status,
-            Courses = existStudent.Courses.Select(x => new StudentViewForUpdateModel.StudentCourseData
-            {
-                CourseId = x.CourseId,
-                CourseName = x.Course.Name,
-                CourseStatusId = ((int)x.Course.Status),
-                CourseStatusName = Enum.GetName(x.Course.Status),
-            }).ToList()
-        };
     }
 }

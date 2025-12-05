@@ -49,6 +49,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Asset> Assets { get; } = new Repository<Asset>(context);
     public IRepository<EnrollmentFrozen> EnrollmentFrozens => new Repository<EnrollmentFrozen>(context);
     public IRepository<EnrollmentCancellation> EnrollmentCancellations => new Repository<EnrollmentCancellation>(context);
+    public IRepository<EnrollmentTransfer> EnrollmentTransfers => new Repository<EnrollmentTransfer>(context);
 
 
     public async Task SaveAsync()
