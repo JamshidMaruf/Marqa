@@ -1,15 +1,15 @@
-﻿using Marqa.Service.Services.Auth;
+﻿using Hangfire;
+using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Auth.Models;
+using Marqa.Service.Services.Messages;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
-[ApiVersion("1")]
-// TODO: Implement default api versioning
 [Route("api/v1/[controller]")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, ISmsService smsService) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)
