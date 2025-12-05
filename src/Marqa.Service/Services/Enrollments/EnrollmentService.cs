@@ -115,6 +115,20 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
         await unitOfWork.SaveAsync();
 
+        if (!model.IsInDefinite)
+        {
+            var unFreezeModel = new UnFreezeModel
+            {
+                CourseIds = model.CourseIds,
+                StudentId = model.StudentId,
+                ActivateDate = Convert.ToDateTime(model.EndDate)
+            };
+
+            BackgroundJob.Schedule(
+                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
+                Convert.ToDateTime(model.EndDate));
+        }
+
         await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
 
@@ -261,5 +275,30 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 await unitOfWork.SaveAsync();
             }
         }
+    }
+
+    public EnrollmentStatusViewModel GetSpecificEnrollmentStatuses()
+    {
+        var specificEnum = new EnrollmentStatusViewModel();
+        specificEnum.Statuses = new List<EnrollmentStatusViewModel.EnrollmentStatusData>
+        {
+            new EnrollmentStatusViewModel.EnrollmentStatusData{
+                Id = (int)EnrollmentStatus.Active,
+                Name = Enum.GetName(EnrollmentStatus.Active)
+            },
+            new EnrollmentStatusViewModel.EnrollmentStatusData
+            {
+                Id = (int)EnrollmentStatus.Test,
+                Name = Enum.GetName(EnrollmentStatus.Test)
+            },
+            new EnrollmentStatusViewModel.EnrollmentStatusData
+            {
+                Id = (int)EnrollmentStatus.Completed,
+                Name = Enum.GetName(EnrollmentStatus.Completed)
+            }
+        };
+
+
+        return specificEnum;
     }
 }

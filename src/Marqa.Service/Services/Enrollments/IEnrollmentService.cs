@@ -8,4 +8,5 @@ public interface IEnrollmentService
     Task CreateAsync(EnrollmentCreateModel model);
     Task DeleteAsync(DetachModel model);
     Task MoveStudentCourseAsync(StudentTransferModel model);
+    EnrollmentStatusViewModel GetSpecificEnrollmentStatuses();
 }
