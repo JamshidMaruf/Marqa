@@ -131,20 +131,6 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 Convert.ToDateTime(model.EndDate));
         }
 
-        if (!model.IsInDefinite)
-        {
-            var unFreezeModel = new UnFreezeModel
-            {
-                CourseIds = model.CourseIds,
-                StudentId = model.StudentId,
-                ActivateDate = Convert.ToDateTime(model.EndDate)
-            };
-
-            BackgroundJob.Schedule(
-                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
-                Convert.ToDateTime(model.EndDate));
-        }
-
         await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
 
@@ -161,9 +147,6 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         {
             enrollment.Status = EnrollmentStatus.Active;
         }
-
-        // TODO: Add hangfire for activate courses
-
 
         await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozens.Last()));
         await unitOfWork.SaveAsync();
@@ -206,7 +189,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
             if (model.DateOfTransfer > DateTime.UtcNow)
                 throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-            #endregion
+           
 
             // 4. Add new course record
             var newStudentCourse = new Enrollment
