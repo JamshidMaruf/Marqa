@@ -116,7 +116,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         }
 
         await unitOfWork.SaveAsync();
-        
+
         if (!model.IsInDefinite)
         {
             var unFreezeModel = new UnFreezeModel
@@ -125,7 +125,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 StudentId = model.StudentId,
                 ActivateDate = Convert.ToDateTime(model.EndDate)
             };
-            
+
             BackgroundJob.Schedule(
                 () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
                 Convert.ToDateTime(model.EndDate));
@@ -189,8 +189,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
             if (model.DateOfTransfer > DateTime.UtcNow)
                 throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-           
 
+            #endregion
             // 4. Add new course record
             var newStudentCourse = new Enrollment
             {
