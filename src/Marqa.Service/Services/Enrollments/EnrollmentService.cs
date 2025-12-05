@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using FluentValidation;
+using Hangfire;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -112,6 +113,20 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
         }
 
         await unitOfWork.SaveAsync();
+        
+        if (!model.IsInDefinite)
+        {
+            var unFreezeModel = new UnFreezeModel
+            {
+                CourseIds = model.CourseIds,
+                StudentId = model.StudentId,
+                ActivateDate = Convert.ToDateTime(model.EndDate)
+            };
+            
+            BackgroundJob.Schedule(
+                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
+                Convert.ToDateTime(model.EndDate));
+        }
 
         await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
@@ -129,10 +144,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
         {
             enrollment.Status = EnrollmentStatus.Active;
         }
-
-        // TODO: Add hangfire for activate courses
-
-
+        
         await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozen));
         await unitOfWork.SaveAsync();
     }

@@ -1,4 +1,7 @@
-﻿using Marqa.Admin.WebApi.Extensions;
+﻿using Hangfire;
+using Hangfire.PostgreSql;
+using Marqa.Admin.WebApi;
+using Marqa.Admin.WebApi.Extensions;
 using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;
 using Marqa.Service.Helpers;
@@ -21,6 +24,16 @@ builder.Services.AddSwaggerService();
 
 builder.Services.AddDbContext<AppDbContext>(option 
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));
+
+// Add Hangfire services.
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+// Add the processing server as IHostedService
+builder.Services.AddHangfireServer();
 
 builder.Services.AddMarqaServices();
 
@@ -59,6 +72,8 @@ app.UseExceptionHandler();
 app.UseSwagger();
 
 app.UseSwaggerUI();
+
+app.UseHangfireDashboard();
 
 app.UseHttpsRedirection();
 
