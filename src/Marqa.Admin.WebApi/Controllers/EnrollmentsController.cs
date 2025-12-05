@@ -94,4 +94,17 @@ public class EnrollmentsController(
             Data = students
         });
     }
+
+    [HttpGet("specific-enrollment-statuses")]
+    public async Task<IActionResult> GetSpecificEnrollmentStatusesAsync()
+    {
+        var result = enrollmentService.GetSpecificEnrollmentStatuses();
+
+        return Ok(new Response<EnrollmentStatusViewModel>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
 }

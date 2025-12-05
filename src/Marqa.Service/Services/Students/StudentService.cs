@@ -191,13 +191,14 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: s => s.Id == id,
-                includes: "StudentDetail")
+                includes: [ "StudentDetail", "User" ])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail != null)
         {
             unitOfWork.StudentDetails.MarkAsDeleted(existStudent.StudentDetail);
         }
+        unitOfWork.Users.MarkAsDeleted(existStudent.User);
 
         unitOfWork.Students.MarkAsDeleted(existStudent);
         await unitOfWork.SaveAsync();
