@@ -83,7 +83,7 @@ public class SubjectsController(ISubjectService subjectService) : ControllerBase
         });
     }
 
-    [HttpGet("by-company/{companyId}")]
+    [HttpGet("company/{companyId}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var subjects = await subjectService.GetAllAsync(companyId);
