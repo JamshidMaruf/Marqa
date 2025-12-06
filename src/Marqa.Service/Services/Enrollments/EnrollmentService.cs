@@ -1,22 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using FluentValidation;
+using Hangfire;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Enrollments.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Enrollments;
 
-public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCreateModel> validator) : IEnrollmentService
+public class EnrollmentService(IUnitOfWork unitOfWork,
+    IValidator<EnrollmentCreateModel> enrollmentCreateValidator,
+    IValidator<StudentTransferModel> transferValidator) : IEnrollmentService
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
                           ?? throw new NotFoundException("Course is not found");
 
-        await validator.ValidateAndThrowAsync(model);
+        //await validator.ValidateAndThrowAsync(model);
 
         var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
 
@@ -36,7 +40,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
 
         if (model.EnrollmentDate > DateTime.UtcNow)
             throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-//
+        //
         existCourse.EnrolledStudentCount++;
         unitOfWork.Courses.Update(existCourse);
 
@@ -56,12 +60,12 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
     {
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException("Student is not found");
-        
-        await EnsureEnrollmentsExist(model.StudentId, model.CourseIds);
-        
+
+        await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
+
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(e => 
-                e.StudentId == model.StudentId && 
+            .SelectAllAsQueryable(e =>
+                e.StudentId == model.StudentId &&
                 model.CourseIds.Contains(e.CourseId))
             .ToListAsync();
 
@@ -88,11 +92,11 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
         var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException($"No student was not found with ID {model.StudentId}");
 
-        await EnsureEnrollmentsExist(model.StudentId, model.CourseIds);
+        await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
 
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(e => 
-                e.StudentId == model.StudentId && 
+            .SelectAllAsQueryable(e =>
+                e.StudentId == model.StudentId &&
                 model.CourseIds.Contains(e.CourseId))
             .ToListAsync();
 
@@ -113,40 +117,140 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
 
         await unitOfWork.SaveAsync();
 
-        await EnsureStudentStatusUptoDateAfterFrozenAsync(model,student);
+        if (!model.IsInDefinite)
+        {
+            var unFreezeModel = new UnFreezeModel
+            {
+                CourseIds = model.CourseIds,
+                StudentId = model.StudentId,
+                ActivateDate = Convert.ToDateTime(model.EndDate)
+            };
+
+            BackgroundJob.Schedule(
+                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
+                Convert.ToDateTime(model.EndDate));
+        }
+
+        if (!model.IsInDefinite)
+        {
+            var unFreezeModel = new UnFreezeModel
+            {
+                CourseIds = model.CourseIds,
+                StudentId = model.StudentId,
+                ActivateDate = Convert.ToDateTime(model.EndDate)
+            };
+
+            BackgroundJob.Schedule(
+                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
+                Convert.ToDateTime(model.EndDate));
+        }
+
+        await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
 
     public async Task UnFreezeStudent(UnFreezeModel model)
     {
         var enrollments = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(predicate: e => 
+            .SelectAllAsQueryable(predicate: e =>
                     e.StudentId == model.StudentId &&
                     e.Status == EnrollmentStatus.Frozen &&
-                    model.CourseIds.Contains(e.CourseId))
+                    model.CourseIds.Contains(e.CourseId), includes: "EnrollmentFrozens")
             .ToListAsync();
 
         foreach (var enrollment in enrollments)
         {
             enrollment.Status = EnrollmentStatus.Active;
         }
-        
-        // TODO: Add hangfire for activate courses
 
-
-        await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozen));
+        await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozens.Last()));
         await unitOfWork.SaveAsync();
     }
 
-    private async Task EnsureEnrollmentsExist(int studentId, List<int> courseIds)
+    public async Task MoveStudentCourseAsync(StudentTransferModel model)
     {
-        var result = new List<int>();
-        result = await unitOfWork.Enrollments.SelectAllAsQueryable(e => e.StudentId == studentId)
-            .Select(e => e.CourseId)
-            .ToListAsync();
+        await transferValidator.EnsureValidatedAsync(model);
 
-        for (int i = 0; i < courseIds.Count(); i++)
-            if (!result.Contains(courseIds[i]))
-                throw new ArgumentIsNotValidException($"No goup was found with ID {courseIds[i]} for this student");
+        using var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            // 1. Load studentCourse from the source course
+            var studentCourse = await unitOfWork.Enrollments
+                .SelectAsync(sc => sc.StudentId == model.StudentId
+                                   && sc.CourseId == model.FromCourseId)
+                ?? throw new NotFoundException("Student is not enrolled in the source course");
+
+            // 2. Load the target course & ensure NOT finished
+            var targetCourse = await unitOfWork.Courses
+                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
+                ?? throw new NotFoundException("Target course not found or finished");
+
+            // 3. Remove from old course
+            unitOfWork.Enrollments.MarkAsDeleted(studentCourse);
+            await unitOfWork.SaveAsync();
+
+            #region movetovalidator
+            if (targetCourse.MaxStudentCount == targetCourse.EnrolledStudentCount)
+                throw new RequestRefusedException("This course has reached its maximum number of students.");
+
+            if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
+                if (model.Amount > 100 || model.Amount < 0)
+                    throw new ArgumentIsNotValidException("Invalid amount");
+
+                else if (model.PaymentType == CoursePaymentType.Fixed)
+                    if (model.Amount < 0)
+                        throw new ArgumentIsNotValidException("Invalid amount");
+
+            if (model.DateOfTransfer > DateTime.UtcNow)
+                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
+
+            #endregion
+            // 4. Add new course record
+            var newStudentCourse = new Enrollment
+            {
+                StudentId = model.StudentId,
+                CourseId = model.ToCourseId,
+                EnrolledDate = model.DateOfTransfer,
+                Status = model.Status,
+                Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
+                PaymentType = model.PaymentType,
+            };
+
+            unitOfWork.Enrollments.Insert(newStudentCourse);
+            await unitOfWork.SaveAsync();
+
+            var newTransfer = new EnrollmentTransfer
+            {
+                FromEnrollmentId = studentCourse.Id,
+                ToEnrollmentId = newStudentCourse.Id,
+                Reason = model.Reason,
+                TransferTime = model.DateOfTransfer
+            };
+
+            unitOfWork.EnrollmentTransfers.Insert(newTransfer);
+            await unitOfWork.SaveAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    private async Task EnsureEnrollmentsExistAsync(int studentId, List<int> courseIds)
+    {
+        var allStudentCourseIds = new HashSet<int>(
+            await unitOfWork.Enrollments
+            .SelectAllAsQueryable(e => e.StudentId == studentId)
+            .Select(e => e.CourseId)
+            .ToListAsync());
+
+        var missings = courseIds.Where(id => !allStudentCourseIds.Contains(id)).ToList();
+
+        if (missings.Count > 0)
+            throw new ArgumentIsNotValidException($"These groups were not found for this student: {string.Join(", ", missings)}");
     }
 
     private async Task EnsureStudentStatusUptoDateAfterFrozenAsync(FreezeModel model, Student student)
@@ -165,6 +269,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
             await unitOfWork.SaveAsync();
         }
     }
+
     private async Task EnsureStudentStatusUptoDateAfterDeleteAsync(DetachModel model, Student student)
     {
         var haveActiveEnrollments = await unitOfWork.Enrollments
@@ -183,5 +288,30 @@ public class EnrollmentService(IUnitOfWork unitOfWork, IValidator<EnrollmentCrea
                 await unitOfWork.SaveAsync();
             }
         }
+    }
+
+    public EnrollmentStatusViewModel GetSpecificEnrollmentStatuses()
+    {
+        var specificEnum = new EnrollmentStatusViewModel();
+        specificEnum.Statuses = new List<EnrollmentStatusViewModel.EnrollmentStatusData>
+        {
+            new EnrollmentStatusViewModel.EnrollmentStatusData{
+                Id = (int)EnrollmentStatus.Active,
+                Name = Enum.GetName(EnrollmentStatus.Active)
+            },
+            new EnrollmentStatusViewModel.EnrollmentStatusData
+            {
+                Id = (int)EnrollmentStatus.Test,
+                Name = Enum.GetName(EnrollmentStatus.Test)
+            },
+            new EnrollmentStatusViewModel.EnrollmentStatusData
+            {
+                Id = (int)EnrollmentStatus.Completed,
+                Name = Enum.GetName(EnrollmentStatus.Completed)
+            }
+        };
+
+
+        return specificEnum;
     }
 }

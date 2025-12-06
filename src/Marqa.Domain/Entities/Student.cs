@@ -16,8 +16,9 @@ public class Student : Auditable
     public StudentDetail StudentDetail { get; set; }
     public ICollection<Enrollment> Courses { get; set; }
     public ICollection<StudentHomeTask> StudentHomeTasks { get; set; }
-    public ICollection<StudentPointHistory> StudentPointHistories { get; set; }
+    public ICollection<StudentPointHistory> PointHistories { get; set; }
     public ICollection<Order> Orders { get; set; }
     public ICollection<StudentExamResult> ExamResults { get; set; }
+    public ICollection<StudentPaymentOperation> PaymentOperations { get; set; }
     public Asset Asset { get; set; }
 }

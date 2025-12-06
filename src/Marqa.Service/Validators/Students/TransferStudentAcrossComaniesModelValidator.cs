@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Enrollments.Models;
 
 namespace Marqa.Service.Validators.Students;
-public class TransferStudentAcrossComaniesModelValidator : AbstractValidator<TransferStudentAcrossComaniesModel>
+public class TransferStudentModelValidator : AbstractValidator<StudentTransferModel>
 {
-    public TransferStudentAcrossComaniesModelValidator(IUnitOfWork unitOfWork)
+    public TransferStudentModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.StudentId)
             .GreaterThan(0).WithMessage("StudentId must be greater than 0.");

@@ -8,10 +8,10 @@ public class StudentPointHistoryConfiguration : IEntityTypeConfiguration<Student
 {
     public void Configure(EntityTypeBuilder<StudentPointHistory> builder)
     {
-        builder.ToTable("StudentPointHistories");
+        builder.ToTable("PointHistories");
 
         builder.HasOne(sph => sph.Student)
-                .WithMany(s => s.StudentPointHistories)
+                .WithMany(s => s.PointHistories)
                 .HasForeignKey(sph  => sph.StudentId)
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired();

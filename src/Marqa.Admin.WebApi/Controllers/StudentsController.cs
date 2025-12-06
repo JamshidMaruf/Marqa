@@ -1,6 +1,7 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Enrollments.Models;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
@@ -116,7 +117,7 @@ public class StudentsController(
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAllAsync(filterModel);
-        return Ok(new Response<IEnumerable<StudentViewModel>>
+        return Ok(new Response<IEnumerable<StudentListModel>>
         {
             StatusCode = 200,
             Message = "success",

@@ -4,6 +4,7 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Helpers;
 using Marqa.Service.Services.EmployeePayments.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +36,7 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
             PaymentMethod = payment.PaymentMethod,
             EmployeePaymentOperationType = payment.EmployeePaymentOperationType,
             Amount = payment.Amount,
-            DateTime = payment.DateTime,
+            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
             Description = payment.Description
         };
     }
@@ -61,7 +62,7 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
                 Name = payment.EmployeePaymentOperationType.ToString()
             },
             Amount = payment.Amount,
-            DateTime = payment.DateTime,
+            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
             Description = payment.Description
         };
     }
@@ -80,7 +81,6 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
                 EmployeeId = model.EmployeeId,
                 PaymentMethod = model.PaymentMethod,
                 Amount = model.Amount,
-                DateTime = model.DateTime,
                 Description = model.Description,
                 EmployeePaymentOperationType = model.EmployeePaymentOperationType,
             };
@@ -114,7 +114,6 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
             existPayment.Amount = model.Amount;
             existPayment.Description = model.Description;
             existPayment.EmployeePaymentOperationType = model.EmployeePaymentOperationType;
-            existPayment.DateTime = model.DateTime;
 
             unitOfWork.EmployeePayments.Update(existPayment);
             await unitOfWork.SaveAsync();

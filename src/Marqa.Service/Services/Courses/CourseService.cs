@@ -13,8 +13,7 @@ namespace Marqa.Service.Services.Courses;
 
 public class CourseService(IUnitOfWork unitOfWork,
     IValidator<CourseCreateModel> courseCreateValidator,
-    IValidator<CourseUpdateModel> courseUpdateValidator,
-    IValidator<TransferStudentAcrossComaniesModel> transferValidator) : ICourseService
+    IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
@@ -172,8 +171,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
-            predicate: c => !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "Enrollments", "User"])
+            predicate: c => !c.IsDeleted)
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -219,8 +217,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
-            predicate: c => !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "CourseWeekdays", "Enrollments", "User"])
+            predicate: c => !c.IsDeleted)
             .Select(c => new CourseUpdateViewModel
             {
                 Id = c.Id,
@@ -266,7 +263,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(
             predicate: c => c.CompanyId == companyId && !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "Enrollments", "CourseWeekdays", "User"]);
+            includes: ["Subject", "Teacher", "Lessons", "Enrollments", "CourseWeekdays", "Teacher.User"]);
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -377,53 +374,6 @@ public class CourseService(IUnitOfWork unitOfWork,
 
 
 
-
-    public async Task MoveStudentCourseAsync(TransferStudentAcrossComaniesModel model)
-    {
-        await transferValidator.EnsureValidatedAsync(model);
-
-        using var transaction = await unitOfWork.BeginTransactionAsync();
-
-        try
-        {
-            // 1. Load studentCourse from the source course
-            var studentCourse = await unitOfWork.Enrollments
-                .SelectAsync(sc => sc.StudentId == model.StudentId
-                                   && sc.CourseId == model.FromCourseId
-                                   && !sc.IsDeleted)
-                ?? throw new NotFoundException("Student is not enrolled in the source course");
-
-            // 2. Load the target course & ensure NOT finished
-            var targetCourse = await unitOfWork.Courses
-                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
-                ?? throw new NotFoundException("Target course not found or finished");
-
-            // 3. Remove from old course
-            unitOfWork.Enrollments.MarkAsDeleted(studentCourse);
-            await unitOfWork.SaveAsync();
-
-            // 4. Add new course record
-            var newStudentCourse = new Enrollment
-            {
-                StudentId = model.StudentId,
-                CourseId = model.ToCourseId,
-                EnrolledDate = model.DateOfTransfer,
-                Status = EnrollmentStatus.Active,
-                //Reason = model.Reason
-            };
-
-            unitOfWork.Enrollments.Insert(newStudentCourse);
-            await unitOfWork.SaveAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
-    }
-
     public async Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId)
     {
         return await unitOfWork.Enrollments
@@ -450,7 +400,10 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Course.Name,
-                Level = c.Course.Level
+                Level = c.Course.Level,
+                EndDate = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().EndDate,
+                FrozenDate = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().StartDate,
+                Reason = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().Reason
             }).ToListAsync();
     }
 
@@ -464,7 +417,7 @@ public class CourseService(IUnitOfWork unitOfWork,
      int teacherId,
      List<DayOfWeek> weekDays)
     {
-        List<Lesson> lessons = new List<Lesson>
+        var lessons = new List<Lesson>
         {
             new Lesson
             {
@@ -507,6 +460,4 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
-
-
 }

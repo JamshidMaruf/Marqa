@@ -1,4 +1,4 @@
-namespace Marqa.Service.Helpers;
+﻿namespace Marqa.Service.Helpers;
 
 public static class EnvironmentHelper
 {

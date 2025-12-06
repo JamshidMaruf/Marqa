@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Marqa.DataAccess.Extensions;
+using Marqa.DataAccess.Helpers;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -9,7 +10,12 @@ namespace Marqa.DataAccess.Contexts;
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-    
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(new ConcurrencyTokenInterceptor());
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Ensures each concrete class that inherit from Auditable is registered in the Model

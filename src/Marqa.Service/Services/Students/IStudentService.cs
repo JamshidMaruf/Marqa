@@ -9,11 +9,11 @@ public interface IStudentService
     Task UpdateAsync(int id, StudentUpdateModel model);
     Task DeleteAsync(int id);
     Task<StudentViewModel> GetAsync(int id);
+    Task<StudentViewForUpdateModel> GetForUpdateAsync(int id);
     Task<int> GetByPhoneAsync(string phone);
     Task<int> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
-    Task<List<StudentViewModel>> GetAllAsync(StudentFilterModel filterModel);
+    Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel);
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
-
 }
