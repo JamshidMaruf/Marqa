@@ -19,4 +19,5 @@ public class TeacherCreateModel
     public string Info { get; set; }
     public int RoleId { get; set; }
     public List<int> SubjectIds { get; set; }
+    public TeacherPaymentType PaymentType { get; set; }
 }
