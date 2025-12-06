@@ -413,3 +413,18 @@ FodyWeavers.xsd
 /docker-compose.yml
 /.github/workflows/pipeline.yml
 /src/Presentation/Nop.Web/App_Data/appsettings.json
+
+
+# Avoiding appsettings.json from ALL projects
+**/appsettings.json
+
+# Avoid constants with secrets
+**/Helpers/SettingConstant.cs
+**/Helpers/PointSettingConstant.cs
+
+# Avoid any secret files in future
+**/*secret*
+**/*private*
+**/*.key
+**/*.pem
+
