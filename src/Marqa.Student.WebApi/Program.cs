@@ -19,6 +19,7 @@ builder.Services.AddControllers(options =>
         new LowerCaseControllerName()));
 });
 
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerService();
