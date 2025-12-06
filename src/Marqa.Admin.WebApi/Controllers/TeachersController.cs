@@ -71,7 +71,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         });
     }
 
-    [HttpGet("by-company/{companyId:int}")]
+    [HttpGet("company/{companyId:int}")]
     public async Task<IActionResult> GetAllTeachersAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
     {
         var result = await teacherService.GetAllAsync(companyId, search, subjectId);
