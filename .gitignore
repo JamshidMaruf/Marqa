@@ -413,3 +413,8 @@ FodyWeavers.xsd
 /docker-compose.yml
 /.github/workflows/pipeline.yml
 /src/Presentation/Nop.Web/App_Data/appsettings.json
+
+appsettings.json
+appsettings.Development.json
+appsettings.*.json
+!appsettings.example.json
