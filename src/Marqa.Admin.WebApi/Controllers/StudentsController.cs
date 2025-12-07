@@ -8,16 +8,17 @@ using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
- 
+
 public class StudentsController(
-    IStudentService studentService, 
+    IStudentService studentService,
     ICourseService courseService) : BaseController
-{ 
+{
+    
     [HttpPost]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
         await studentService.CreateAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -26,10 +27,10 @@ public class StudentsController(
     }
 
     [HttpPut("{id:int}")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
     {
         await studentService.UpdateAsync(id, model);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -38,10 +39,10 @@ public class StudentsController(
     }
 
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await studentService.DeleteAsync(id);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -49,11 +50,12 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAsync(int id)
     {
         var student = await studentService.GetAsync(id);
-
         return Ok(new Response<StudentViewModel>
         {
             StatusCode = 200,
@@ -63,10 +65,10 @@ public class StudentsController(
     }
 
     [HttpGet("{id}/update")]
+    [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetForUpdate(int id)
     {
         var student = await studentService.GetAsync(id);
-
         return Ok(new Response<StudentViewModel>
         {
             StatusCode = 200,
@@ -75,11 +77,11 @@ public class StudentsController(
         });
     }
 
-    [HttpPut("{studentId}/courses/{courseId}/status{statusId}")]
+    [HttpPut("{studentId}/courses/{courseId}/status/{statusId}")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)
     {
         await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -87,11 +89,12 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet("{studentId:int}/courses")]
+    [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStudentCourses(int studentId)
     {
         var result = await courseService.GetAllStudentCourseNamesAsync(studentId);
-
         return Ok(new Response<IEnumerable<CourseNamesModel>>
         {
             StatusCode = 200,
@@ -101,10 +104,10 @@ public class StudentsController(
     }
 
     [HttpGet("{studentId:int}/unenrolled-courses")]
+    [ProducesResponseType(typeof(Response<List<MinimalCourseDataModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
     {
         var result = await courseService.GetUnEnrolledStudentCoursesAsync(companyId, studentId);
-
         return Ok(new Response<List<MinimalCourseDataModel>>
         {
             StatusCode = 200,
@@ -113,7 +116,9 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet]
+    [ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAllAsync(filterModel);
