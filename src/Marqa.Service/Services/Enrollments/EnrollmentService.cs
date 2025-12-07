@@ -131,20 +131,6 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 Convert.ToDateTime(model.EndDate));
         }
 
-        if (!model.IsInDefinite)
-        {
-            var unFreezeModel = new UnFreezeModel
-            {
-                CourseIds = model.CourseIds,
-                StudentId = model.StudentId,
-                ActivateDate = Convert.ToDateTime(model.EndDate)
-            };
-
-            BackgroundJob.Schedule(
-                () => UnFreezeStudent(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
-                Convert.ToDateTime(model.EndDate));
-        }
-
         await EnsureStudentStatusUptoDateAfterFrozenAsync(model, student);
     }
 

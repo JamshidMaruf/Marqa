@@ -15,7 +15,7 @@ public class TeacherViewModel
     public string Specialization { get; set; }
     public StatusInfo Status { get; set; }
     public DateOnly JoiningDate { get; set; }
-    public decimal Salary { get; set; }
+    public decimal Amount { get; set; }
     public string Info { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }

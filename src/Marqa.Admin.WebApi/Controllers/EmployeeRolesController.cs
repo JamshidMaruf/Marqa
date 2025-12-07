@@ -48,26 +48,26 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
-        var company = await employeeRoleService.GetAsync(id);
+        var role = await employeeRoleService.GetAsync(id);
 
         return Ok(new Response<EmployeeRoleViewModel>
         {
             StatusCode = 200,
             Message = "success",
-            Data = company
+            Data = role
         });
     }
 
-    [HttpGet("by-company/{companyId}")]
+    [HttpGet("company/{companyId}")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] bool? canTeach = null)
     {
-        var companies = await employeeRoleService.GetAllAsync(companyId, canTeach);
+        var roles = await employeeRoleService.GetAllAsync(companyId, canTeach);
 
         return Ok(new Response<List<EmployeeRoleViewModel>>
         {
             StatusCode = 200,
             Message = "success",
-            Data = companies
+            Data = roles
         });
     }
 }

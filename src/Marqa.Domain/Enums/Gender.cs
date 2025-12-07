@@ -1,7 +1,9 @@
-﻿namespace Marqa.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Marqa.Domain.Enums;
 
 public enum Gender
 {
-    Male = 1,
-    Female = 2
+    [Description("Erkak")] Male = 1,
+    [Description("Ayol")] Female = 2
 }
