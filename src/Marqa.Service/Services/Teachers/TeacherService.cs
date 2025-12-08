@@ -303,30 +303,6 @@ public class TeacherService(
         return teachers.ToList();
     }
 
-    public async Task<List<TeacherPaymentTypeViewModel>> TeacherPaymentTypesAsync()
-    {
-        var paymentTypes = unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => !ts.IsDeleted)
-            .Select(ts => ts.Teacher.PaymentType)
-            .Distinct();
-
-        var result = new List<TeacherPaymentTypeViewModel>();
-
-        await foreach (var paymentType in paymentTypes.AsAsyncEnumerable())
-        {
-            if (paymentType != null)
-            {
-                result.Add(new TeacherPaymentTypeViewModel
-                {
-                    Id = (int)paymentType,
-                    Name = Enum.GetName(paymentType)
-                });
-            }
-        }
-
-        return result;
-    }
-
     #region lab
 
     //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)

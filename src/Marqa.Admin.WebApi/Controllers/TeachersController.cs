@@ -83,17 +83,5 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
             Data = result
         });
     }
-
-    [HttpGet("payment-types")]
-    public Task<IActionResult> GetTeacherPaymentTypes()
-    {
-        var result = teacherService.TeacherPaymentTypesAsync();
-        return Task.FromResult<IActionResult>(Ok(new Response<IEnumerable<TeacherPaymentTypeViewModel>>
-        {
-            StatusCode = 200,
-            Message = "success",
-            Data = result.Result
-        }));
-    }
 }
 

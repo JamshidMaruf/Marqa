@@ -486,7 +486,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             Students = course.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
             {
                 FullName = $"{e.Student.User.FirstName} {e.Student.User.LastName}",
-                DateOfEnrollment = e.EnrollmentDate
+                DateOfEnrollment = e.EnrolledDate
             }).ToList()
         };
     }
