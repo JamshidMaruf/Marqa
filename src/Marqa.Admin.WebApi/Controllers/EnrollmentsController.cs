@@ -12,7 +12,9 @@ public class EnrollmentsController(
     ICourseService courseService) : BaseController
 {
     [HttpPost("attach")]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AttachAsync(EnrollmentCreateModel model)
     {
         await enrollmentService.CreateAsync(model);
@@ -24,7 +26,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("detach")]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DetachAsync(DetachModel model)
     {
         await enrollmentService.DeleteAsync(model);
@@ -36,7 +40,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("freeze")]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Freeze(FreezeModel model)
     {
         await enrollmentService.FreezeStudent(model);
@@ -49,6 +55,7 @@ public class EnrollmentsController(
 
     [HttpGet("frozen-courses")]
     [ProducesResponseType(typeof(Response<List<FrozenEnrollmentModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFrozenCoursesAsync(int studentId)
     {
         var result = await courseService.GetFrozenCoursesAsync(studentId);
@@ -61,7 +68,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("unfreeze")]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Unfreeze(UnFreezeModel model)
     {
         await enrollmentService.UnFreezeStudent(model);
@@ -73,7 +82,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("transfer")]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> TransferAsync(StudentTransferModel model)
     {
         await enrollmentService.MoveStudentCourseAsync(model);
@@ -86,6 +97,7 @@ public class EnrollmentsController(
 
     [HttpGet("{studentId:int}/active-courses")]
     [ProducesResponseType(typeof(Response<IEnumerable<NonFrozenEnrollmentModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
     {
         var students = await courseService.GetActiveStudentCoursesAsync(studentId);
