@@ -460,4 +460,25 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
+
+    public async Task<List<UpcomingCourseViewModel>> GetUpcomingCoursesAsync()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var courses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.StartDate >= today && !c.IsDeleted)
+            .Where(c => c.Status == CourseStatus.Upcoming)
+            .ToListAsync();
+
+        return courses.Select(c => new UpcomingCourseViewModel
+        {
+            EnrolledStudentCount = c.Enrollments.Count,
+            AvailableSeats = c.MaxStudentCount - c.Enrollments.Count,
+            MaxStudentCount = c.MaxStudentCount,
+            Students = c.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
+            {
+                FullName = $"{e.Student.User.FirstName} {e.Student.User.LastName}",
+                DateOfEnrollment = e.CreatedAt
+            }).ToList()
+        }).ToList();
+    }
 }

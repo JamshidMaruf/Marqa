@@ -88,4 +88,16 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Data = courses
         });
     }
+
+    [HttpGet("upcoming")]
+    public async Task<IActionResult> GetUpcomingCoursesAsync()
+    {
+        var courses = await courseService.GetUpcomingCoursesAsync();
+        return Ok(new Response<List<UpcomingCourseViewModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = courses
+        });
+    }
 }
