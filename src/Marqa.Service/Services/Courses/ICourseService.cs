@@ -23,5 +23,5 @@ public interface ICourseService
     Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
     Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
-    Task<List<UpcomingCourseViewModel>> GetUpcomingCoursesAsync();
+    Task<UpcomingCourseViewModel> GetUpcomingCoursesAsync(int courseId);
 }
