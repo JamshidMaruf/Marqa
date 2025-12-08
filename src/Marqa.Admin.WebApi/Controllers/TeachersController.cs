@@ -84,7 +84,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         });
     }
 
-    [HttpGet("teachers/payment-types")]
+    [HttpGet("payment-types")]
     public Task<IActionResult> GetTeacherPaymentTypes()
     {
         var result = teacherService.TeacherPaymentTypesAsync();
