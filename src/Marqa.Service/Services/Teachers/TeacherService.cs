@@ -39,7 +39,8 @@ public class TeacherService(
                 Info = model.Info,
                 RoleId = model.RoleId
             });
-
+            
+            
             await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
             await transaction.CommitAsync();
@@ -130,7 +131,7 @@ public class TeacherService(
                    Id = Convert.ToInt32(ts.Teacher.Status),
                    Name = Enum.GetName(ts.Teacher.Status),
                },
-               Amount = ts.Teacher.Amount,
+               Amount = ts.Teacher.Salary,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization,
                Info = ts.Teacher.Info,     
@@ -195,7 +196,7 @@ public class TeacherService(
                     Id = Convert.ToInt32(ts.Teacher.Status),
                     Name = Enum.GetName(ts.Teacher.Status),
                 },
-                Amount = ts.Teacher.Amount,
+                Amount = ts.Teacher.Salary,
                 JoiningDate = ts.Teacher.JoiningDate,
                 Specialization = ts.Teacher.Specialization,
                 Info = ts.Teacher.Info,
@@ -219,20 +220,6 @@ public class TeacherService(
 
         teacher.Subjects = subjects;
 
-        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: "Subject")
-            .Where(c => c.TeacherId == id)
-            .Select(c => new TeacherUpdateViewModel.CourseInfo
-            {
-                Id = c.Id,
-                Name = c.Name,
-                SubjectId = c.Subject.Id,
-                SubjectName = c.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Courses = courses;
-
         return teacher;
     }
 
@@ -255,7 +242,7 @@ public class TeacherService(
         }
         
         var teacherWithoutCourses = await teacherQuery.GroupJoin(
-                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
+                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: "Subject" ),
                 t => t.Id,
                 ts => ts.TeacherId,
                 (t, ts) => new TeacherTableViewModel

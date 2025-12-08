@@ -1,6 +1,5 @@
 ﻿using Hangfire;
 using Hangfire.PostgreSql;
-using Marqa.Admin.WebApi;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;

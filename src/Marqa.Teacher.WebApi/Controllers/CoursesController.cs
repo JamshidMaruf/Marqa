@@ -22,29 +22,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         });
     }
 
-    [HttpPost("attach-student")]
-    public async Task<IActionResult> AttachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId, [FromQuery] StudentStatus status)
-    {
-      //  await courseService.AttachStudentAsync(courseId, studentId, status);
-         
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
-
-    [HttpPost("detach-student")]
-    public async Task<IActionResult> DetachStudentAsync([FromQuery] int courseId, [FromQuery] int studentId)
-    {
-       // await courseService.DetachStudentAsync(courseId, studentId);
-
-        return Ok(new Response
-        {
-            StatusCode = 200,
-            Message = "success"
-        });
-    }
+  
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)

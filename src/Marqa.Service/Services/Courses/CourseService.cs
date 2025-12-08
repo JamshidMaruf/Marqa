@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.Design;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Validators.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
@@ -20,7 +18,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         await courseCreateValidator.EnsureValidatedAsync(model);
 
         var transaction = await unitOfWork.BeginTransactionAsync();
-        
+
         try
         {
             Course createdCourse = new Course
@@ -372,14 +370,12 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToListAsync();
     }
 
-
-
     public async Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId)
     {
         return await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c =>
                 c.StudentId == studentId &&
-                c.Status == EnrollmentStatus.Active && 
+                c.Status == EnrollmentStatus.Active &&
                 (c.Course.Status == CourseStatus.Active ||
                 c.Course.Status == CourseStatus.Upcoming))
             .Select(c => new NonFrozenEnrollmentModel
@@ -392,19 +388,34 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId)
     {
-        return await unitOfWork.Enrollments
+        var enrollments = await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c =>
                 c.StudentId == studentId &&
-                c.Status == EnrollmentStatus.Frozen)
-            .Select(c => new FrozenEnrollmentModel
+                c.Status == EnrollmentStatus.Frozen,
+                includes: [ "Course", "EnrollmentFrozens" ]).ToListAsync();
+
+        var mappedFrozenModels = new List<FrozenEnrollmentModel>();
+        foreach(var enrollment in enrollments)
+        {
+            if(enrollment.Status == EnrollmentStatus.Frozen)
             {
-                Id = c.Id,
-                Name = c.Course.Name,
-                Level = c.Course.Level,
-                EndDate = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().EndDate,
-                FrozenDate = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().StartDate,
-                Reason = c.EnrollmentFrozens.OrderByDescending(e => e.CreatedAt).First().Reason
-            }).ToListAsync();
+                var last = enrollment.EnrollmentFrozens
+                    .OrderByDescending(e => e.CreatedAt)
+                    .FirstOrDefault();
+
+                mappedFrozenModels.Add(new FrozenEnrollmentModel
+                {
+                    Id = enrollment.Id,
+                    Name = enrollment.Course.Name,
+                    Level = enrollment.Course.Level,
+                    FrozenDate = last.StartDate,
+                    EndDate = last.EndDate,
+                    Reason = last.Reason
+                });
+            }
+        }
+
+        return mappedFrozenModels;
     }
 
     private async Task GenerateLessonAsync(

@@ -6,7 +6,7 @@ public class Employee : Auditable
 {
     public int UserId { get; set; }
     public DateOnly DateOfBirth { get; set; }
-    public decimal Amount { get; set; }
+    public decimal Salary { get; set; }
     public Gender Gender { get; set; }
     public decimal Salary { get; set; }
     public EmployeeStatus Status { get; set; }
@@ -14,15 +14,8 @@ public class Employee : Auditable
     public string Specialization { get; set; }
     public string Info { get; set; }
     public int RoleId { get; set; }
-    public TeacherPaymentType? PaymentType { get; set; }
-
-    /// <summary>
-    /// This is for assistant teacher showing to whom he assists
-    /// </summary>
-    public int? ParentId { get; set; }
 
     // Navigation
     public User User { get; set; }
     public EmployeeRole Role { get; set; }
-    public Employee Parent { get; set; }
 }

@@ -43,9 +43,9 @@ public class EnrollmentsController(
     [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Freeze(FreezeModel model)
+    public async Task<IActionResult> FreezeAsync(FreezeModel model)
     {
-        await enrollmentService.FreezeStudent(model);
+        await enrollmentService.FreezeStudentAsync(model);
         return Ok(new Response
         {
             StatusCode = 201,
@@ -59,6 +59,7 @@ public class EnrollmentsController(
     public async Task<IActionResult> GetFrozenCoursesAsync(int studentId)
     {
         var result = await courseService.GetFrozenCoursesAsync(studentId);
+
         return Ok(new Response<List<FrozenEnrollmentModel>>
         {
             StatusCode = 200,
@@ -71,9 +72,9 @@ public class EnrollmentsController(
     [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Unfreeze(UnFreezeModel model)
+    public async Task<IActionResult> UnfreezeAsync(UnFreezeModel model)
     {
-        await enrollmentService.UnFreezeStudent(model);
+        await enrollmentService.UnFreezeStudentAsync(model);
         return Ok(new Response
         {
             StatusCode = 201,
