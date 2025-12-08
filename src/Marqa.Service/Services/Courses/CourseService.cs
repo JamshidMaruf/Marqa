@@ -471,4 +471,23 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
+
+    public async Task<UpcomingCourseViewModel> GetUpcomingCoursesAsync(int courseId)
+    {
+        var course = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)
+            .FirstOrDefaultAsync();
+
+        return new UpcomingCourseViewModel
+        {
+            EnrolledStudentCount = course.Enrollments.Count,
+            AvailableSeats = course.MaxStudentCount - course.Enrollments.Count,
+            MaxStudentCount = course.MaxStudentCount,
+            Students = course.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
+            {
+                FullName = $"{e.Student.User.FirstName} {e.Student.User.LastName}",
+                DateOfEnrollment = e.EnrollmentDate
+            }).ToList()
+        };
+    }
 }

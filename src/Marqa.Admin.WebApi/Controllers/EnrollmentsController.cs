@@ -12,10 +12,12 @@ public class EnrollmentsController(
     ICourseService courseService) : BaseController
 {
     [HttpPost("attach")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AttachAsync(EnrollmentCreateModel model)
     {
         await enrollmentService.CreateAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 201,
@@ -24,10 +26,12 @@ public class EnrollmentsController(
     }
 
     [HttpPost("detach")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DetachAsync(DetachModel model)
     {
         await enrollmentService.DeleteAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 201,
@@ -36,10 +40,12 @@ public class EnrollmentsController(
     }
 
     [HttpPost("freeze")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> FreezeAsync(FreezeModel model)
     {
         await enrollmentService.FreezeStudentAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 201,
@@ -48,12 +54,14 @@ public class EnrollmentsController(
     }
 
     [HttpGet("frozen-courses")]
+    [ProducesResponseType(typeof(Response<List<FrozenEnrollmentModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFrozenCoursesAsync(int studentId)
     {
         var result = await courseService.GetFrozenCoursesAsync(studentId);
 
         return Ok(new Response<List<FrozenEnrollmentModel>>
-        { 
+        {
             StatusCode = 200,
             Message = "success",
             Data = result
@@ -61,10 +69,12 @@ public class EnrollmentsController(
     }
 
     [HttpPost("unfreeze")]
-    public async Task<IActionResult> UnfreezeASync(UnFreezeModel model)
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UnfreezeAsync(UnFreezeModel model)
     {
         await enrollmentService.UnFreezeStudentAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 201,
@@ -73,10 +83,12 @@ public class EnrollmentsController(
     }
 
     [HttpPost("transfer")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> TransferAsync(StudentTransferModel model)
     {
         await enrollmentService.MoveStudentCourseAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 201,
@@ -85,6 +97,8 @@ public class EnrollmentsController(
     }
 
     [HttpGet("{studentId:int}/active-courses")]
+    [ProducesResponseType(typeof(Response<IEnumerable<NonFrozenEnrollmentModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
     {
         var students = await courseService.GetActiveStudentCoursesAsync(studentId);
@@ -97,10 +111,10 @@ public class EnrollmentsController(
     }
 
     [HttpGet("specific-enrollment-statuses")]
-    public IActionResult GetSpecificEnrollmentStatuses()
+    [ProducesResponseType(typeof(Response<EnrollmentStatusViewModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSpecificEnrollmentStatusesAsync()
     {
         var result = enrollmentService.GetSpecificEnrollmentStatuses();
-
         return Ok(new Response<EnrollmentStatusViewModel>
         {
             StatusCode = 200,
