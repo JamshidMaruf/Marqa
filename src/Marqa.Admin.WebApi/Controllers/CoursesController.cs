@@ -90,14 +90,14 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     }
 
     [HttpGet("upcoming")]
-    public async Task<IActionResult> GetUpcomingCoursesAsync()
+    public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
     {
-        var courses = await courseService.GetUpcomingCoursesAsync();
-        return Ok(new Response<List<UpcomingCourseViewModel>>
+        var course = await courseService.GetUpcomingCoursesAsync(courseId);
+        return Ok(new Response<UpcomingCourseViewModel>
         {
             StatusCode = 200,
             Message = "success",
-            Data = courses
+            Data = course
         });
     }
 }
