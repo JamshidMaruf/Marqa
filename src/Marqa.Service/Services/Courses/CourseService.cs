@@ -25,10 +25,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Name = model.Name,
                 SubjectId = model.SubjectId,
-                EndTime = model.EndTime,
-                LessonCount = model.LessonCount,
                 StartDate = model.StartDate,
-                StartTime = model.StartTime,
                 TeacherId = model.TeacherId,
                 Level = model.Level,
                 Price = model.Price,
@@ -42,14 +39,16 @@ public class CourseService(IUnitOfWork unitOfWork,
             await unitOfWork.SaveAsync();
 
 
-            var weekDays = new List<DayOfWeek>();
+            var weekDays = new List<CourseCreateModel.Weekday>();
             var courseWeekDays = new List<CourseWeekday>();
 
             foreach (var weekDay in model.Weekdays)
             {
                 courseWeekDays.Add(new CourseWeekday
                 {
-                    Weekday = weekDay,
+                    Weekday = weekDay.DayOfWeek,
+                    StartTime =  weekDay.StartTime,
+                    EndTime =  weekDay.EndTime,
                     CourseId = createdCourse.Id
                 });
 
@@ -63,10 +62,8 @@ public class CourseService(IUnitOfWork unitOfWork,
             await GenerateLessonAsync(
                 createdCourse.Id,
                 model.StartDate,
-                model.StartTime,
-                model.EndTime,
+                model.EndDate,
                 model.Room,
-                model.LessonCount,
                 model.TeacherId,
                 weekDays);
             await unitOfWork.SaveAsync();
@@ -89,11 +86,9 @@ public class CourseService(IUnitOfWork unitOfWork,
             includes: ["Lessons", "CourseWeekdays"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-
-        existCourse.EndTime = model.EndTime;
+        
         existCourse.TeacherId = model.TeacherId;
         existCourse.Price = model.Price;
-        existCourse.StartTime = model.StartTime;
         existCourse.StartDate = model.StartDate;
         existCourse.Status = model.Status;
         existCourse.MaxStudentCount = model.MaxStudentCount;
@@ -117,7 +112,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 unitOfWork.CourseWeekdays.Insert(new CourseWeekday
                 {
                     CourseId = id,
-                    Weekday = weekDay,
+                    StartTime =  weekDay.StartTime,
+                    EndTime =  weekDay.EndTime,
+                    Weekday = weekDay.DayOfWeek,
                 });
 
             await unitOfWork.SaveAsync();
@@ -126,10 +123,8 @@ public class CourseService(IUnitOfWork unitOfWork,
             await GenerateLessonAsync(
                existCourse.Id,
                model.StartDate,
-               model.StartTime,
-               model.EndTime,
+               model.EndDate,
                model.Room,
-               model.LessonCount,
                model.TeacherId,
                model.Weekdays);
             await unitOfWork.SaveAsync();
@@ -174,10 +169,8 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                EndTime = c.EndTime,
                 LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
-                StartTime = c.StartTime,
                 Status = c.Status,
                 Description = c.Description,
                 AvailableStudentCount = c.Enrollments.Count,
@@ -220,10 +213,8 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                EndTime = c.EndTime,
                 LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
-                StartTime = c.StartTime,
                 Status = c.Status,
                 Description = c.Description,
                 AvailableStudentCount = c.Enrollments.Count,
@@ -274,10 +265,8 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                EndTime = c.EndTime,
                 LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
-                StartTime = c.StartTime,
                 Status = c.Status,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
@@ -365,7 +354,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = c.Name,
                 TeacherFullName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
                 MaxStudentCount = c.MaxStudentCount,
-                EnrolledStudentCount = c.EnrolledStudentCount,
                 CoursePrice = c.Price
             }).ToListAsync();
     }
@@ -421,20 +409,18 @@ public class CourseService(IUnitOfWork unitOfWork,
     private async Task GenerateLessonAsync(
      int courseId,
      DateOnly startDate,
-     TimeOnly startTime,
-     TimeOnly endTime,
+     DateOnly endDate,
      string room,
-     int lessonCount,
      int teacherId,
-     List<DayOfWeek> weekDays)
+     List<CourseCreateModel.Weekday> weekDays)
     {
         var lessons = new List<Lesson>
         {
             new Lesson
             {
                 CourseId = courseId,
-                StartTime = startTime,
-                EndTime = endTime,
+                StartTime = weekDays[0].StartTime,
+                EndTime = weekDays[0].EndTime,
                 Room = room,
                 Number = 1,
                 Date = startDate,
@@ -447,24 +433,24 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         await Task.Run(() =>
         {
-            while (count <= lessonCount)
+            while (currentDate <= endDate)
             {
-                currentDate = currentDate.AddDays(1);
-
-                if (weekDays.Contains(currentDate.DayOfWeek))
+                for (int i = count; i < weekDays.Count; i++)
                 {
+                    while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
+                    {
+                        currentDate = currentDate.AddDays(1);
+                    }
                     lessons.Add(new Lesson
                     {
-                        CourseId = courseId,
-                        StartTime = startTime,
-                        EndTime = endTime,
+                        CourseId =  courseId,
+                        StartTime = weekDays[i].StartTime,
+                        EndTime = weekDays[i].EndTime,
                         Room = room,
-                        Number = count,
+                        Number = i,
                         Date = currentDate,
                         TeacherId = teacherId
                     });
-
-                    count++;
                 }
             }
         });
