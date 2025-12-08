@@ -1,21 +1,20 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Services.Enrollments.Models;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Marqa.Admin.WebApi.Controllers;
-
 public class StudentsController(
     IStudentService studentService,
     ICourseService courseService) : BaseController
 {
-    
     [HttpPost]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
         await studentService.CreateAsync(model);
@@ -28,6 +27,10 @@ public class StudentsController(
 
     [HttpPut("{id:int}")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
     {
         await studentService.UpdateAsync(id, model);
@@ -40,6 +43,8 @@ public class StudentsController(
 
     [HttpDelete("{id:int}")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await studentService.DeleteAsync(id);
@@ -53,6 +58,8 @@ public class StudentsController(
     
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAsync(int id)
     {
         var student = await studentService.GetAsync(id);
@@ -65,11 +72,14 @@ public class StudentsController(
     }
 
     [HttpGet("{id}/update")]
-    [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<StudentViewForUpdateModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetForUpdate(int id)
     {
-        var student = await studentService.GetAsync(id);
-        return Ok(new Response<StudentViewModel>
+        var student = await studentService.GetForUpdateAsync(id);
+
+        return Ok(new Response<StudentViewForUpdateModel>
         {
             StatusCode = 200,
             Message = "success",
@@ -79,7 +89,12 @@ public class StudentsController(
 
     [HttpPut("{studentId}/courses/{courseId}/status/{statusId}")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UpdateStudentCourseStatusAsync(
+        int studentId,
+        int courseId,
+        EnrollmentStatus status)
     {
         await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
         return Ok(new Response
@@ -92,6 +107,8 @@ public class StudentsController(
     
     [HttpGet("{studentId:int}/courses")]
     [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStudentCourses(int studentId)
     {
         var result = await courseService.GetAllStudentCourseNamesAsync(studentId);
@@ -105,6 +122,7 @@ public class StudentsController(
 
     [HttpGet("{studentId:int}/unenrolled-courses")]
     [ProducesResponseType(typeof(Response<List<MinimalCourseDataModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
     {
         var result = await courseService.GetUnEnrolledStudentCoursesAsync(companyId, studentId);
@@ -119,9 +137,11 @@ public class StudentsController(
     
     [HttpGet]
     [ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {
         var students = await studentService.GetAllAsync(filterModel);
+
         return Ok(new Response<IEnumerable<StudentListModel>>
         {
             StatusCode = 200,
