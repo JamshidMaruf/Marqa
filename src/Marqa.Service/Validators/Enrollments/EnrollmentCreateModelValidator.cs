@@ -7,48 +7,48 @@ namespace Marqa.Service.Validators.Enrollments;
 
 public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreateModel>
 {
-    public EnrollmentCreateModelValidator(IUnitOfWork unitOfWork)
+    public EnrollmentCreateModelValidator()
     {
-        RuleFor(model => model.StudentId)
-            .NotEmpty()
-            .GreaterThan(0);
+        RuleFor(x => x.StudentId)
+            .NotEmpty().WithMessage("Student ID is required")
+            .GreaterThan(0).WithMessage("Student ID must be greater than 0");
 
-        RuleFor(model => model.StudentId)
-            .Must(studentId => unitOfWork.Students.CheckExist(s => s.Id == studentId))
-            .WithMessage("Student is not found.");
+        RuleFor(x => x.CourseId)
+            .NotEmpty().WithMessage("Course ID is required")
+            .GreaterThan(0).WithMessage("Course ID must be greater than 0");
 
-        RuleFor(model => model.CourseId)
-            .NotEmpty()
-            .GreaterThan(0);
+        RuleFor(x => x.EnrollmentDate)
+            .NotEmpty().WithMessage("Enrollment date is required")
+            .LessThanOrEqualTo(DateTime.UtcNow)
+            .WithMessage("Enrollment date cannot be in the future");
 
-        RuleFor(model => model.CourseId)
-            .Must(courseId => unitOfWork.Courses.CheckExist(c => c.Id == courseId))
-            .WithMessage("Course is not found.");
+        RuleFor(x => x.PaymentType)
+            .IsInEnum()
+            .WithMessage("Invalid payment type");
 
-        RuleFor(model => model.EnrollmentDate)
-            .NotEmpty()
-            .Must(date => date.Date <= DateTime.UtcNow.Date)
-            .WithMessage("Enrollment date cannot be in the future.");
+        When(x => x.PaymentType == CoursePaymentType.DiscountInPercentage, () =>
+        {
+            RuleFor(x => x.Amount)
+                .InclusiveBetween(0, 100)
+                .WithMessage("Amount must be between 0 and 100 for percentage discount");
+        });
 
-        RuleFor(model => model.Status)
-            .NotNull();
+        When(x => x.PaymentType == CoursePaymentType.Fixed, () =>
+        {
+            RuleFor(x => x.Amount)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Amount must be non-negative for fixed payment");
+        });
 
-        RuleFor(model => model.PaymentType)
-            .NotNull();
+        When(x => x.PaymentType == CoursePaymentType.DiscountFree, () =>
+        {
+            RuleFor(x => x.Amount)
+                .Equal(0)
+                .WithMessage("Amount must be 0 for discount-free payment type");
+        });
 
-        RuleFor(model => model.Amount)
-            .NotEmpty()
-            .Must(amount => amount >= 0)
-            .WithMessage("Amount must be greater than or equal to 0.");
-
-        RuleFor(e => e.Amount)
-           .Must((model, amount) => EnrollmentValidatorHelper.ValidateAmount(model, amount))
-           .WithMessage(model => model.PaymentType == CoursePaymentType.DiscountInPercentage
-               ? "Amount must be between 0 and 100 for discount"
-               : "Amount must be positive");
-
-        RuleFor(e => new { e.CourseId, e.StudentId })
-             .MustAsync(async (x, cancellation) => await EnrollmentValidatorHelper.ValidateCourseCapacityAsync(unitOfWork, x.CourseId, x.StudentId))
-             .WithMessage("This course has reached its maximum number of students.");
+        RuleFor(x => x.Amount)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Amount cannot be negative");
     }
 }

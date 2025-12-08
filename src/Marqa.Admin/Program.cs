@@ -1,5 +1,7 @@
+﻿using FluentValidation;
 using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
+using Marqa.Service.Validators.Enrollments;
 using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,8 @@ builder.Services.AddControllers(options =>
 });
 
 builder.Services.AddAuthorization();
+    
+builder.Services.AddValidatorsFromAssemblyContaining<EnrollmentCreateModelValidator>();
 
 var app = builder.Build();
 
