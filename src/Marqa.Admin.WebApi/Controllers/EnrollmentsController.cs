@@ -36,9 +36,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("freeze")]
-    public async Task<IActionResult> Freeze(FreezeModel model)
+    public async Task<IActionResult> FreezeAsync(FreezeModel model)
     {
-        await enrollmentService.FreezeStudent(model);
+        await enrollmentService.FreezeStudentAsync(model);
 
         return Ok(new Response
         {
@@ -51,6 +51,7 @@ public class EnrollmentsController(
     public async Task<IActionResult> GetFrozenCoursesAsync(int studentId)
     {
         var result = await courseService.GetFrozenCoursesAsync(studentId);
+
         return Ok(new Response<List<FrozenEnrollmentModel>>
         { 
             StatusCode = 200,
@@ -60,9 +61,9 @@ public class EnrollmentsController(
     }
 
     [HttpPost("unfreeze")]
-    public async Task<IActionResult> Unfreeze(UnFreezeModel model)
+    public async Task<IActionResult> UnfreezeASync(UnFreezeModel model)
     {
-        await enrollmentService.UnFreezeStudent(model);
+        await enrollmentService.UnFreezeStudentAsync(model);
 
         return Ok(new Response
         {
@@ -96,7 +97,7 @@ public class EnrollmentsController(
     }
 
     [HttpGet("specific-enrollment-statuses")]
-    public async Task<IActionResult> GetSpecificEnrollmentStatusesAsync()
+    public IActionResult GetSpecificEnrollmentStatuses()
     {
         var result = enrollmentService.GetSpecificEnrollmentStatuses();
 

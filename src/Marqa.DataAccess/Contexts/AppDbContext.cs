@@ -50,4 +50,9 @@ public class AppDbContext : DbContext
             }
         }
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.ApplyDefaultConventions();
+    }
 }

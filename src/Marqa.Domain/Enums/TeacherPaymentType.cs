@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
 
 namespace Marqa.Domain.Enums;
 
 public enum TeacherPaymentType
 {
     [Description("Qat'iy oylik")]
-    Fixed = 1,
+    Fixed = 1, 
 
     [Description("Foiz (o'quvchilardan)")]
     Percentage = 2,
@@ -14,5 +14,5 @@ public enum TeacherPaymentType
     Hourly = 3,
 
     [Description("Aralash (oylik + foiz")]
-    Mixed = 4
+    Mixed = 4   
 }
