@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
@@ -313,6 +314,30 @@ public class TeacherService(
             );
 
         return teachers.ToList();
+    }
+
+    public async Task<List<TeacherPaymentTypeViewModel>> TeacherPaymentTypesAsync()
+    {
+        var paymentTypes = unitOfWork.TeacherSubjects
+            .SelectAllAsQueryable(ts => !ts.IsDeleted)
+            .Select(ts => ts.Teacher.PaymentType)
+            .Distinct();
+
+        var result = new List<TeacherPaymentTypeViewModel>();
+
+        await foreach (var paymentType in paymentTypes.AsAsyncEnumerable())
+        {
+            if (paymentType != null)
+            {
+                result.Add(new TeacherPaymentTypeViewModel
+                {
+                    Id = (int)paymentType,
+                    Name = paymentType.ToString()
+                });
+            }
+        }
+
+        return result;
     }
 
     #region lab
