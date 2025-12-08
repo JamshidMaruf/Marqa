@@ -332,7 +332,7 @@ public class TeacherService(
                 result.Add(new TeacherPaymentTypeViewModel
                 {
                     Id = (int)paymentType,
-                    Name = paymentType.ToString()
+                    Name = Enum.GetName(paymentType)
                 });
             }
         }
