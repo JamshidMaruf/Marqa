@@ -7,12 +7,10 @@ public class Course : Auditable
     public string Name { get; set; }
     public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public DateOnly EndDate { get; set; }
     public CourseStatus Status { get; set; }
     public string Level { get; set; }
     public int MaxStudentCount { get; set; }
-    public int EnrolledStudentCount { get; set; }
     public decimal Price { get; set; }
     public string Description { get; set; }
     public int CompanyId { get; set; }
