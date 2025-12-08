@@ -18,7 +18,6 @@ public class StudentsController(
     public async Task<IActionResult> PostAsync([FromBody] StudentCreateModel model)
     {
         await studentService.CreateAsync(model);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -35,7 +34,6 @@ public class StudentsController(
     public async Task<IActionResult> PutAsync(int id, [FromBody] StudentUpdateModel model)
     {
         await studentService.UpdateAsync(id, model);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -50,7 +48,6 @@ public class StudentsController(
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await studentService.DeleteAsync(id);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -58,6 +55,7 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
@@ -65,7 +63,6 @@ public class StudentsController(
     public async Task<IActionResult> GetAsync(int id)
     {
         var student = await studentService.GetAsync(id);
-
         return Ok(new Response<StudentViewModel>
         {
             StatusCode = 200,
@@ -100,7 +97,6 @@ public class StudentsController(
         EnrollmentStatus status)
     {
         await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
-
         return Ok(new Response
         {
             StatusCode = 200,
@@ -108,6 +104,7 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet("{studentId:int}/courses")]
     [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
@@ -115,7 +112,6 @@ public class StudentsController(
     public async Task<IActionResult> GetStudentCourses(int studentId)
     {
         var result = await courseService.GetAllStudentCourseNamesAsync(studentId);
-
         return Ok(new Response<IEnumerable<CourseNamesModel>>
         {
             StatusCode = 200,
@@ -130,7 +126,6 @@ public class StudentsController(
     public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
     {
         var result = await courseService.GetUnEnrolledStudentCoursesAsync(companyId, studentId);
-
         return Ok(new Response<List<MinimalCourseDataModel>>
         {
             StatusCode = 200,
@@ -139,6 +134,7 @@ public class StudentsController(
         });
     }
 
+    
     [HttpGet]
     [ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
