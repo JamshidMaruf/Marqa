@@ -1,4 +1,5 @@
-﻿using Marqa.Domain.Enums;
+﻿using System.ComponentModel;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Enums.Models;
 
@@ -7,19 +8,27 @@ public class EnumService : IEnumService
 {
     public List<EnumGetModel> GetEnumValues<T>() where T : Enum
     {
+        var memberInfo = typeof(T).GetMembers();
         if (!typeof(T).IsEnum)
-            throw new ArgumentIsNotValidException("Argument must be an enum");
-
-        return Enum.GetValues(typeof(T))
-            .Cast<T>()
-            .Select(x => new EnumGetModel
+        {
+            throw new ArgumentIsNotValidException("The provided type parameter T is not an enum.");
+        }
+        var attributes = memberInfo
+            .Where(mi => mi.MemberType == System.Reflection.MemberTypes.Field)
+            .Select(mi =>
             {
-                Id = Convert.ToInt32(x),
-                Name = x.ToString()
+                var descriptionAttribute = mi.GetCustomAttributes(typeof(DescriptionAttribute), false)
+                    .FirstOrDefault() as DescriptionAttribute;
+                var enumValue = (T)Enum.Parse(typeof(T), mi.Name);
+                return new EnumGetModel
+                {
+                    Id = Convert.ToInt32(enumValue),
+                    Name = descriptionAttribute != null ? descriptionAttribute.Description : mi.Name
+                };
             })
             .ToList();
+        return attributes;
     }
-
     public YearlyMonths GetYearlyMonths()
     {
         return new YearlyMonths

@@ -1,10 +1,12 @@
-﻿using System.Data;
+﻿using System.ComponentModel;
+using System.Data;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,8 @@ namespace Marqa.Service.Services.Teachers;
 public class TeacherService(
     IUnitOfWork unitOfWork,
     ISubjectService subjectService,
-    IEmployeeService employeeService) : ITeacherService
+    IEmployeeService employeeService,
+    IEnumService enumService) : ITeacherService
 {
     public async Task CreateAsync(TeacherCreateModel model)
     {
@@ -39,8 +42,8 @@ public class TeacherService(
                 Info = model.Info,
                 RoleId = model.RoleId
             });
-            
-            
+
+
             await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
             await transaction.CommitAsync();
@@ -131,14 +134,14 @@ public class TeacherService(
                    Id = Convert.ToInt32(ts.Teacher.Status),
                    Name = Enum.GetName(ts.Teacher.Status),
                },
-              // Amount = ts.Teacher.Salary,
+               // Amount = ts.Teacher.Salary,
                JoiningDate = ts.Teacher.JoiningDate,
-            //   Specialization = ts.Teacher.Specialization,
-               Info = ts.Teacher.Info,     
+               //   Specialization = ts.Teacher.Specialization,
+               Info = ts.Teacher.Info,
                Role = new TeacherViewModel.RoleInfo
                {
-               //    Id = ts.Teacher.RoleId,
-                //   Name = ts.Teacher.Role.Name
+                   //    Id = ts.Teacher.RoleId,
+                   //   Name = ts.Teacher.Role.Name
                }
            })
            .FirstOrDefaultAsync()
@@ -157,7 +160,7 @@ public class TeacherService(
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
             includes: "Subject")
-           // .Where(c => c.TeacherId == id)
+            // .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
                 Id = c.Id,
@@ -196,14 +199,14 @@ public class TeacherService(
                     Id = Convert.ToInt32(ts.Teacher.Status),
                     Name = Enum.GetName(ts.Teacher.Status),
                 },
-               // Amount = ts.Teacher.Salary,
+                // Amount = ts.Teacher.Salary,
                 JoiningDate = ts.Teacher.JoiningDate,
-              //  Specialization = ts.Teacher.Specialization,
+                //  Specialization = ts.Teacher.Specialization,
                 Info = ts.Teacher.Info,
                 Role = new TeacherUpdateViewModel.RoleInfo
                 {
-               //     Id = ts.Teacher.RoleId,
-                 //   Name = ts.Teacher.Role.Name
+                    //     Id = ts.Teacher.RoleId,
+                    //   Name = ts.Teacher.Role.Name
                 }
             })
             .FirstOrDefaultAsync()
@@ -240,9 +243,9 @@ public class TeacherService(
                 t.User.Phone.Contains(search) ||
                 t.User.Email.Contains(search));
         }
-        
+
         var teacherWithoutCourses = await teacherQuery.GroupJoin(
-                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: "Subject" ),
+                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: "Subject"),
                 t => t.Id,
                 ts => ts.TeacherId,
                 (t, ts) => new TeacherTableViewModel
@@ -301,7 +304,7 @@ public class TeacherService(
         //     );
         //
         // return teachers.ToList();
-        
+
         throw new NotImplementedException();
     }
 
@@ -339,73 +342,85 @@ public class TeacherService(
         return new CalculatedTeacherSalaryModel();
     }
 
-    #region lab
+    public async Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes()
+    {
+        var enumValues = enumService.GetEnumValues<TeacherPaymentType>();
+        var paymentTypes = enumValues.Select(ev => new TeacherPaymentGetModel
+        {
+            Id = ev.Id,
+            Name = ev.Name
+        }).ToList();
 
-    //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
-    //{
-    //    var teacherQuery = unitOfWork.Employees
-    //        .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
-    //        includes: ["Role"])
-    //        .GroupJoin(
-    //            unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
-    //            t => t.Id,
-    //            ts => ts.TeacherId,
-    //            (t, ts) => new
-    //            {
-    //                Id = t.Id,
-    //                DateOfBirth = t.DateOfBirth,
-    //                Gender = t.Gender,
-    //                FirstName = t.FirstName,
-    //                LastName = t.LastName,
-    //                Email = t.Email,
-    //                Phone = t.Phone,
-    //                Status = t.Status,
-    //                JoiningDate = t.JoiningDate,
-    //                Specialization = t.Specialization,
-    //                Subjects = ts,
-    //                Role = t.Role
-    //            });
+        return paymentTypes;
+    }
 
-    //    if (subjectId is not null)
-    //        teacherQuery = teacherQuery.Where(t => t.Subjects.Select(t => t.Id).Contains(subjectId.Value));
+        #region lab
 
-    //    var teachers = await teacherQuery.GroupJoin(
-    //             unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
-    //            t => t.Id,
-    //            c => c.TeacherId,
-    //            (t, courses) => new TeacherViewModel
-    //            {
-    //                Id = t.Id,
-    //                DateOfBirth = t.DateOfBirth,
-    //                Gender = t.Gender,
-    //                FirstName = t.FirstName,
-    //                LastName = t.LastName,
-    //                Email = t.Email,
-    //                Phone = t.Phone,
-    //                Status = t.Status,
-    //                JoiningDate = t.JoiningDate,
-    //                Specialization = t.Specialization,
-    //                Subjects = t.Subjects.Select(t => new SubjectInfo
-    //                {
-    //                    Id = t.Id,
-    //                    Name = t.Subject.Name,
-    //                }),
-    //                Courses = courses.Select(c => new CourseInfo
-    //                {
-    //                    Id = c.Id,
-    //                    Name = c.Name,
-    //                    SubjectId = c.Subject.Id,
-    //                    SubjectName = c.Subject.Name
-    //                }),
-    //                Role = new RoleInfo
-    //                {
-    //                    Id = t.Role.Id,
-    //                    Name = t.Role.Name
-    //                }
-    //            }
-    //        ).ToListAsync();
+        //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
+        //{
+        //    var teacherQuery = unitOfWork.Employees
+        //        .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
+        //        includes: ["Role"])
+        //        .GroupJoin(
+        //            unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
+        //            t => t.Id,
+        //            ts => ts.TeacherId,
+        //            (t, ts) => new
+        //            {
+        //                Id = t.Id,
+        //                DateOfBirth = t.DateOfBirth,
+        //                Gender = t.Gender,
+        //                FirstName = t.FirstName,
+        //                LastName = t.LastName,
+        //                Email = t.Email,
+        //                Phone = t.Phone,
+        //                Status = t.Status,
+        //                JoiningDate = t.JoiningDate,
+        //                Specialization = t.Specialization,
+        //                Subjects = ts,
+        //                Role = t.Role
+        //            });
 
-    //    return teachers;
-    //}
-    #endregion
-}
+        //    if (subjectId is not null)
+        //        teacherQuery = teacherQuery.Where(t => t.Subjects.Select(t => t.Id).Contains(subjectId.Value));
+
+        //    var teachers = await teacherQuery.GroupJoin(
+        //             unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
+        //            t => t.Id,
+        //            c => c.TeacherId,
+        //            (t, courses) => new TeacherViewModel
+        //            {
+        //                Id = t.Id,
+        //                DateOfBirth = t.DateOfBirth,
+        //                Gender = t.Gender,
+        //                FirstName = t.FirstName,
+        //                LastName = t.LastName,
+        //                Email = t.Email,
+        //                Phone = t.Phone,
+        //                Status = t.Status,
+        //                JoiningDate = t.JoiningDate,
+        //                Specialization = t.Specialization,
+        //                Subjects = t.Subjects.Select(t => new SubjectInfo
+        //                {
+        //                    Id = t.Id,
+        //                    Name = t.Subject.Name,
+        //                }),
+        //                Courses = courses.Select(c => new CourseInfo
+        //                {
+        //                    Id = c.Id,
+        //                    Name = c.Name,
+        //                    SubjectId = c.Subject.Id,
+        //                    SubjectName = c.Subject.Name
+        //                }),
+        //                Role = new RoleInfo
+        //                {
+        //                    Id = t.Role.Id,
+        //                    Name = t.Role.Name
+        //                }
+        //            }
+        //        ).ToListAsync();
+
+        //    return teachers;
+        //}
+        #endregion
+    }

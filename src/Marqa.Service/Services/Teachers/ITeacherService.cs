@@ -12,4 +12,5 @@ public interface ITeacherService
     Task<TeacherUpdateViewModel> GetForUpdateAsync(int id);
     Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null);
     Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month);
+    Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes();
 }
