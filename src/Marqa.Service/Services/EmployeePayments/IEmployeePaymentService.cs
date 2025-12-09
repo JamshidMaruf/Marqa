@@ -34,7 +34,7 @@ public interface IEmployeePaymentService
     /// <param name="pageSize"></param>
     /// <returns></returns>
     Task<List<EmployeePaymentListViewModel>> GetAllAsync(
-        string? search = null,
+        string search = null,
         int? employeeId = null,
         int pageIndex = 1,
         int pageSize = 10);

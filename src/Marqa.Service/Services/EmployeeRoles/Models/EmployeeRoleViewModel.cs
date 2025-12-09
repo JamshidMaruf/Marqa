@@ -4,7 +4,6 @@ public class EmployeeRoleViewModel
 {
     public int Id {  get; set; }
     public string Name { get; set; }
-    public bool CanTeach { get; set; }
     public CompanyInfo Company { get; set; }
 
     public class CompanyInfo

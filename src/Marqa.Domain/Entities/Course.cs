@@ -15,13 +15,12 @@ public class Course : Auditable
     public string Description { get; set; }
     public int CompanyId { get; set; }
     public int SubjectId { get; set; }
-    public int TeacherId { get; set; }
 
     // Navigation
     public Company Company { get; set; }
     public Subject Subject { get; set; }
-    public Teacher Teacher { get; set; }
     public ICollection<CourseWeekday> CourseWeekdays { get; set; }
+    public ICollection<CourseTeacher> CourseTeachers { get; set; }
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; }

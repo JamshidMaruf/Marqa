@@ -96,7 +96,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var employeeForDeletion = await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach)
+            .SelectAllAsQueryable(e => !e.IsDeleted)
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Employee was not found with ID = {id}");
 
@@ -108,7 +108,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach,
+            .SelectAllAsQueryable(e => !e.IsDeleted,
             includes: ["Role", "User"])
             .Select(e => new EmployeeViewModel
             {
@@ -138,7 +138,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetForUpdateAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted && !e.Role.CanTeach,
+            .SelectAllAsQueryable(e => !e.IsDeleted,
             includes: ["Role", "User"])
             .Select(e => new EmployeeViewModel
             {
@@ -175,7 +175,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
         var employees = unitOfWork.Employees
-            .SelectAllAsQueryable(e => e.User.CompanyId == companyId && !e.IsDeleted && !e.Role.CanTeach);
+            .SelectAllAsQueryable(e => e.User.CompanyId == companyId && !e.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
@@ -206,34 +206,5 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 Name = e.Role.Name
             }
         }).ToListAsync();
-    }
-
-    public async Task<EmployeeLoginViewModel> LoginAsync(EmployeeLoginModel model)
-    {
-        var employee = await unitOfWork.Employees
-            .SelectAsync(predicate: e => e.User.Phone == model.Phone, includes: ["Role", "User"])
-            ?? throw new ArgumentIsNotValidException("Phone or Password is invalid.");
-
-        if (!PasswordHelper.Verify(model.Password, employee.User.PasswordHash))
-            throw new ArgumentIsNotValidException("Phone or Password is invalid.");
-
-        //var token = await authService.GenerateEmployeeTokenAsync(employee.Id, employee.Role.Name);
-
-        var employeePermissions = await unitOfWork.RolePermissions
-            .SelectAllAsQueryable(predicate: r => r.RoleId == employee.RoleId, includes: "Permission")
-            .Select(r => new EmployeeLoginViewModel.PermissionInfo { Name = r.Permission.Name })
-            .ToListAsync();
-
-        return new EmployeeLoginViewModel
-        {
-            Id = employee.Id,
-            FirstName = employee.User.Phone,
-            LastName = employee.User.LastName,
-            Phone = employee.User.Phone,
-            CompanyId = employee.User.CompanyId,
-            Role = employee.Role.Name,
-            //Token = token,
-            Permissions = employeePermissions
-        };
     }
 }

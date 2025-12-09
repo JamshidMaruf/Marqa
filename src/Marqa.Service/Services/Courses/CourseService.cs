@@ -26,7 +26,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = model.Name,
                 SubjectId = model.SubjectId,
                 StartDate = model.StartDate,
-                TeacherId = model.TeacherId,
+            //    TeacherId = model.TeacherId,
                 Level = model.Level,
                 Price = model.Price,
                 Status = model.Status,
@@ -87,7 +87,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
-        existCourse.TeacherId = model.TeacherId;
+      //  existCourse.TeacherId = model.TeacherId;
         existCourse.Price = model.Price;
         existCourse.StartDate = model.StartDate;
         existCourse.Status = model.Status;
@@ -182,9 +182,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 },
                 Teacher = new CourseViewModel.TeacherInfo
                 {
-                    Id = c.TeacherId,
-                    FirstName = c.Teacher.User.FirstName,
-                    LastName = c.Teacher.User.LastName,
+                 //   Id = c.TeacherId,
+                 //   FirstName = c.Teacher.User.FirstName,
+                  //  LastName = c.Teacher.User.LastName,
                 },
                 Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {
@@ -229,9 +229,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 },
                 Teacher = new CourseUpdateViewModel.TeacherInfo
                 {
-                    Id = c.TeacherId,
-                    FirstName = c.Teacher.User.FirstName,
-                    LastName = c.Teacher.User.LastName,
+                    // Id = c.TeacherId,
+                    // FirstName = c.Teacher.User.FirstName,
+                    // LastName = c.Teacher.User.LastName,
                 },
                 Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
                 {
@@ -285,9 +285,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 },
                 Teacher = new CourseViewModel.TeacherInfo
                 {
-                    Id = c.TeacherId,
-                    FirstName = c.Teacher.User.FirstName,
-                    LastName = c.Teacher.User.LastName,
+                    // Id = c.TeacherId,
+                    // FirstName = c.Teacher.User.FirstName,
+                    // LastName = c.Teacher.User.LastName,
                 },
                 Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {
@@ -359,7 +359,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                TeacherFullName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
+               // TeacherFullName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
                 MaxStudentCount = c.MaxStudentCount,
                 CoursePrice = c.Price
             }).ToListAsync();

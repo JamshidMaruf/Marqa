@@ -46,12 +46,12 @@ public class StudentPaymentService(
             Id = payment.Id,
             PaymentNumber = paymentNumberInt,
             Amount = payment.Amount,
-            DateTime = DateHelper.ToLocalTimeConverter(payment.GivenDate),
+            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
             Description = payment.Description,
             PaymentMethod = payment.PaymentMethod,
             PaymentOperationType = payment.PaymentOperationType,
-            CourseId = payment.CourseId,
-            CoursePrice = payment.CoursePrice,
+          //  CourseId = payment.CourseId,
+          //  CoursePrice = payment.CoursePrice,
             StudentId = payment.StudentId
         };
     }
@@ -73,10 +73,10 @@ public class StudentPaymentService(
                 CourseId = model.CourseId,
                 PaymentMethod = model.PaymentMethod,
                 Amount = model.Amount,
-                GivenDate = DateTime.UtcNow,
+                DateTime = DateTime.UtcNow,
                 Description = model.Description,
                 PaymentOperationType = model.PaymentOperationType,
-                CoursePrice = model.CoursePrice
+             //   CoursePrice = model.CoursePrice
             };
 
             unitOfWork.StudentPaymentOperations.Insert(createdPayment);
@@ -109,7 +109,7 @@ public class StudentPaymentService(
             existPayment.Amount = model.Amount;
             existPayment.Description = model.Description;
             existPayment.PaymentOperationType = model.PaymentOperationType;
-            existPayment.CoursePrice = model.CoursePrice;
+          //  existPayment.CoursePrice = model.CoursePrice;
 
             unitOfWork.StudentPaymentOperations.Update(existPayment);
             await unitOfWork.SaveAsync();
@@ -181,10 +181,10 @@ public class StudentPaymentService(
                 CourseId = originalPayment.CourseId,
                 PaymentMethod = originalPayment.PaymentMethod,
                 Amount = originalPayment.Amount,
-                GivenDate = DateTime.UtcNow,
+                DateTime = DateTime.UtcNow,
                 Description = $"REFUND for {originalPayment.PaymentNumber}: {model.Description}",
                 PaymentOperationType = PaymentOperationType.Expense,
-                CoursePrice = originalPayment.CoursePrice
+              //  CoursePrice = originalPayment.CoursePrice
             };
 
             unitOfWork.StudentPaymentOperations.Insert(refundPayment);
@@ -252,7 +252,7 @@ public class StudentPaymentService(
             StudentId = payment.StudentId,
             PaymentMethod = new EnumViewModel { Id = (int)payment.PaymentMethod, Name = payment.PaymentMethod.ToString() },
             Amount = payment.Amount,
-            DateTime = DateHelper.ToLocalTimeConverter(payment.GivenDate),
+            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
             PaymentOperationType = new EnumViewModel { Id = (int)payment.PaymentOperationType, Name = payment.PaymentOperationType.ToString() },
             CourseName = payment.Course?.Name
         };
@@ -279,7 +279,7 @@ public class StudentPaymentService(
             );
         }
 
-        query = query.OrderByDescending(p => p.GivenDate);
+        query = query.OrderByDescending(p => p.DateTime);
 
         if (pageIndex > 0 && pageSize > 0)
         {

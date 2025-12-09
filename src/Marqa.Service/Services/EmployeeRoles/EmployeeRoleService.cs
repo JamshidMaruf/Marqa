@@ -10,7 +10,7 @@ namespace Marqa.Service.Services.EmployeeRoles;
 
 public class EmployeeRoleService(IUnitOfWork unitOfWork,
     IValidator<EmployeeRoleCreateModel> employeeRoleCreateValidator,
-    IValidator<EmployeeRoleUpdateModel> employeeUpdateValdator) : IEmployeeRoleService
+    IValidator<EmployeeRoleUpdateModel> employeeUpdateValidator) : IEmployeeRoleService
 {
     public async Task CreateAsync(EmployeeRoleCreateModel model)
     {
@@ -26,7 +26,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         unitOfWork.EmployeeRoles.Insert(new EmployeeRole
         {
             Name = model.Name,
-            CanTeach = model.CanTeach,
             CompanyId = model.CompanyId
         });
 
@@ -35,7 +34,7 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
 
     public async Task UpdateAsync(int id, EmployeeRoleUpdateModel model)
     {
-        await employeeUpdateValdator.EnsureValidatedAsync(model);
+        await employeeUpdateValidator.EnsureValidatedAsync(model);
 
         var existEmployeeRole = await unitOfWork.EmployeeRoles.SelectAsync(e => e.Id == id)
              ?? throw new NotFoundException("Role not found");
@@ -48,7 +47,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             throw new AlreadyExistException("This role already exists");
 
         existEmployeeRole.Name = model.Name;
-        existEmployeeRole.CanTeach = model.CanTeach;
 
         await unitOfWork.SaveAsync();
     }
@@ -72,7 +70,6 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
             {
                 Id = s.Id,
                 Name = s.Name,
-                CanTeach = s.CanTeach,
                 Company = new EmployeeRoleViewModel.CompanyInfo
                 {
                     Id = s.CompanyId,
@@ -84,42 +81,21 @@ public class EmployeeRoleService(IUnitOfWork unitOfWork,
         return existRole;
     }
 
-    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId, bool? canTeach)
+    public async Task<List<EmployeeRoleViewModel>> GetAllAsync(int companyId)
     {
-        if (canTeach != null)
-        {
-            return await unitOfWork.EmployeeRoles
-                .SelectAllAsQueryable(x => x.CompanyId == companyId && x.CanTeach == canTeach,
+        return await unitOfWork.EmployeeRoles
+            .SelectAllAsQueryable(x => x.CompanyId == companyId,
                 includes: "Company")
-                .Select(s => new EmployeeRoleViewModel
+            .Select(s => new EmployeeRoleViewModel
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Company = new EmployeeRoleViewModel.CompanyInfo
                 {
-                    Id = s.Id,
-                    Name = s.Name,
-                    CanTeach = s.CanTeach,
-                    Company = new EmployeeRoleViewModel.CompanyInfo
-                    {
-                        Id = s.CompanyId,
-                        Name = s.Company.Name
-                    }
-                }).ToListAsync();
-        }
-        else
-        {
-            return await unitOfWork.EmployeeRoles
-                .SelectAllAsQueryable(x => x.CompanyId == companyId,
-                includes: "Company")
-                .Select(s => new EmployeeRoleViewModel
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    CanTeach = s.CanTeach,
-                    Company = new EmployeeRoleViewModel.CompanyInfo
-                    {
-                        Id = s.CompanyId,
-                        Name = s.Company.Name
-                    }
-                }).ToListAsync();
-        }
+                    Id = s.CompanyId,
+                    Name = s.Company.Name
+                }
+            }).ToListAsync();
     }
 
     public async Task AttachPermissionsAsync(int id, List<int> permissionIds)

@@ -287,11 +287,8 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(5000)
                         .HasColumnType("character varying(5000)");
 
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time without time zone");
-
-                    b.Property<int>("EnrolledStudentCount")
-                        .HasColumnType("integer");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -323,16 +320,13 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time without time zone");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TeacherId")
+                    b.Property<int?>("TeacherId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -347,6 +341,41 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Courses", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.CourseTeacher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("CourseTeachers", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.CourseWeekday", b =>
@@ -366,8 +395,14 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<DateTime>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time without time zone");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time without time zone");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -446,7 +481,7 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("Employees", (string)null);
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.EmployeePayment", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.EmployeePaymentOperation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -474,11 +509,11 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("EmployeePaymentOperationType")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("OperationType")
+                        .HasColumnType("integer");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("integer");
@@ -494,7 +529,7 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeePayments", (string)null);
+                    b.ToTable("EmployeePaymentOperations", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.EmployeeRole", b =>
@@ -504,9 +539,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("CanTeach")
-                        .HasColumnType("boolean");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
@@ -533,66 +565,6 @@ namespace Marqa.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("EmployeeRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Marqa.Domain.Entities.EmployeeSalary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("numeric(18,3)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PaymentNumber")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<int>("PaymentType")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bigint")
-                        .HasDefaultValue(1L);
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("PaymentNumber")
-                        .IsUnique();
-
-                    b.ToTable("EmployeeSalarys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
@@ -887,6 +859,89 @@ namespace Marqa.DataAccess.Migrations
                     b.HasIndex("ExamSettingId");
 
                     b.ToTable("ExamSettingItems", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.Expense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Expenses", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.ExpenseCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("ExpenseCategorys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.HomeTask", b =>
@@ -2047,14 +2102,13 @@ namespace Marqa.DataAccess.Migrations
                         .HasPrecision(18, 3)
                         .HasColumnType("numeric(18,3)");
 
-                    b.Property<int>("CourseId")
+                    b.Property<int?>("CourseId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("CoursePrice")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("numeric(18,3)");
-
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DeletedAt")
@@ -2064,11 +2118,11 @@ namespace Marqa.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime>("GivenDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("PaymentCategory")
+                        .HasColumnType("integer");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("integer");
@@ -2207,6 +2261,125 @@ namespace Marqa.DataAccess.Migrations
                             Name = "Ona tili",
                             UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("FixSalary")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Info")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateOnly>("JoiningDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Qualification")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal?>("SalaryAmountPerHour")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<decimal?>("SalaryPercentPerStudent")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Teachers", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherPaymentOperation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("OperationType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PaymentNumber")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("TeacherPaymentOperations", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.TeacherSubject", b =>
@@ -2361,15 +2534,30 @@ namespace Marqa.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Marqa.Domain.Entities.Employee", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasOne("Marqa.Domain.Entities.Teacher", null)
+                        .WithMany("Courses")
+                        .HasForeignKey("TeacherId");
 
                     b.Navigation("Company");
 
                     b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.CourseTeacher", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Course", "Course")
+                        .WithMany("CourseTeachers")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marqa.Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("Teacher");
                 });
@@ -2408,7 +2596,7 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Marqa.Domain.Entities.EmployeePayment", b =>
+            modelBuilder.Entity("Marqa.Domain.Entities.EmployeePaymentOperation", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Employee", "Employee")
                         .WithMany()
@@ -2428,17 +2616,6 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("Marqa.Domain.Entities.EmployeeSalary", b =>
-                {
-                    b.HasOne("Marqa.Domain.Entities.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.Enrollment", b =>
@@ -2540,6 +2717,36 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Setting");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.Expense", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.ExpenseCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.ExpenseCategory", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.HomeTask", b =>
@@ -2824,9 +3031,7 @@ namespace Marqa.DataAccess.Migrations
                 {
                     b.HasOne("Marqa.Domain.Entities.Course", "Course")
                         .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CourseId");
 
                     b.HasOne("Marqa.Domain.Entities.Student", "Student")
                         .WithMany("PaymentOperations")
@@ -2861,16 +3066,38 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherPaymentOperation", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Teacher", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.TeacherSubject", b =>
                 {
                     b.HasOne("Marqa.Domain.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Marqa.Domain.Entities.Employee", "Teacher")
-                        .WithMany()
+                    b.HasOne("Marqa.Domain.Entities.Teacher", "Teacher")
+                        .WithMany("TeacherSubjects")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2909,6 +3136,8 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Course", b =>
                 {
+                    b.Navigation("CourseTeachers");
+
                     b.Navigation("CourseWeekdays");
 
                     b.Navigation("Enrollments");
@@ -2978,6 +3207,13 @@ namespace Marqa.DataAccess.Migrations
                     b.Navigation("StudentDetail");
 
                     b.Navigation("StudentHomeTasks");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
+                {
+                    b.Navigation("Courses");
+
+                    b.Navigation("TeacherSubjects");
                 });
 #pragma warning restore 612, 618
         }

@@ -272,7 +272,7 @@ public class StudentService(
             {
                 CourseName = c.Course.Name,
                 Subject = c.Course.Subject.Name,
-                TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
+              //  TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
                 CourseStatusName = Enum.GetName(c.Status),
                 CourseLevel = c.Course.Level
             })
@@ -288,10 +288,10 @@ public class StudentService(
                 PaymentNumber = p.PaymentNumber,
                 PaymentMethod = p.PaymentMethod,
                 Amount = p.Amount,
-                DateTime = p.GivenDate,
+                DateTime = p.DateTime,
                 Description = p.Description,
                 PaymentOperationType = p.PaymentOperationType,
-                CoursePrice = p.CoursePrice
+              //  CoursePrice = p.CoursePrice
             })
             .ToList(),
             PointHistories = existStudent.PointHistories.Select(p => new StudentViewModel.StudentPointHistory
@@ -365,7 +365,7 @@ public class StudentService(
 
         if (filterModel.CourseId != null && filterModel.CourseId != 0)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
-
+        
         //    if(filterModel.Status != null)
         //    {
         //        if(filterModel.Status == StudentFilteringStatus.Active)
