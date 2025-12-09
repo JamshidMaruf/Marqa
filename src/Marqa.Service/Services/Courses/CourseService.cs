@@ -190,7 +190,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
-                }).ToList(),
+                })
+                .ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
                 {
                     Id = cl.Id,
@@ -198,7 +199,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                     EndTime = cl.EndTime,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
-                }).OrderBy(l => l.Date).ToList(),
+                })
+                .OrderBy(l => l.Date)
+                .ToList(),
             })
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
@@ -217,7 +220,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                 EndDate = c.EndDate,
                 Status = c.Status,
                 MaxStudentCount = c.MaxStudentCount,
-                AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Description = c.Description,
                 Subject = new CourseUpdateViewModel.SubjectInfo

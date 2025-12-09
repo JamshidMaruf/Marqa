@@ -50,7 +50,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<EnrollmentFrozen> EnrollmentFrozens => new Repository<EnrollmentFrozen>(context);
     public IRepository<EnrollmentCancellation> EnrollmentCancellations => new Repository<EnrollmentCancellation>(context);
     public IRepository<EnrollmentTransfer> EnrollmentTransfers => new Repository<EnrollmentTransfer>(context);
-
+    public IRepository<Teacher> Teachers => new Repository<Teacher>(context);
 
     public async Task SaveAsync()
     {

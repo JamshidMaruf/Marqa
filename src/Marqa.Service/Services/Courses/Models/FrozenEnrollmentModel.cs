@@ -1,6 +1,4 @@
-﻿using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
-
-namespace Marqa.Service.Services.Courses.Models;
+﻿namespace Marqa.Service.Services.Courses.Models;
 
 public class FrozenEnrollmentModel
 {

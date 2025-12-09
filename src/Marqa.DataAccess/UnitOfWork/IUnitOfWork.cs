@@ -69,17 +69,31 @@ public interface IUnitOfWork : IDisposable
     IRepository<Basket> Baskets { get; }
 
     IRepository<BasketItem> BasketItems { get; }
+
     IRepository<ExamSetting> ExamSettings { get; }
+
     IRepository<ExamSettingItem> ExamSettingItems { get; }
+
     IRepository<Permission> Permissions { get; }
+
     IRepository<RolePermission> RolePermissions { get; }
+
     IRepository<RefreshToken> RefreshTokens { get; }
+
     IRepository<StudentPaymentOperation> StudentPaymentOperations { get; }
+
     IRepository<User> Users { get; }
+
     IRepository<Asset> Assets { get; }
+
     IRepository<EnrollmentFrozen> EnrollmentFrozens { get; }
+
     IRepository<EnrollmentCancellation> EnrollmentCancellations { get; }
+
     IRepository<EnrollmentTransfer> EnrollmentTransfers { get; }
+
+    IRepository<Teacher> Teachers { get; }
+    IRepository<TeacherSalary> TeacherSalaries { get; }
 
 
     Task SaveAsync();

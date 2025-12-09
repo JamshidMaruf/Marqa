@@ -303,6 +303,40 @@ public class TeacherService(
         return teachers.ToList();
     }
 
+    public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)
+    {
+        //var teacherSalary = await unitOfWork.TeacherSalaries.SelectAsync(t => t.TeacherId == teacherId)
+        //    ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
+
+        //var teacher = await unitOfWork.Teachers.SelectAllAsQueryable(t =>
+        //        t.Id == teacherId)
+        //    .Include(t => t.Courses.Where(c =>
+        //    c.StartDate.Year == year &&)
+        //    .FirstOrDefaultAsync();
+
+        //var paymentType = teacherSalary.PaymentType;
+        //var studentCount = teacher.Courses.Select(c => c.Enrollments.Count).Sum();
+        //var currentCourses = teacher.Courses.Where(c => c.Status == CourseStatus.Active).Count();
+        //var calculatedModel = new CalculatedTeacherSalaryModel();
+
+        //if (paymentType == TeacherPaymentType.Fixed)
+        //{
+        //    calculatedModel.StudentsCount = studentCount;
+        //    calculatedModel.GroupsCount = teacher.Courses.Count;
+        //    calculatedModel.Total = teacherSalary.Amount;
+
+        //}
+        //else if(paymentType ==TeacherPaymentType.Percentage)
+        //{
+        //    calculatedModel.StudentsCount = studentCount;
+        //    calculatedModel.GroupsCount = teacher.Courses.Count;
+        //    calculatedModel.Percent = teacherSalary.Percent;
+        //    calculatedModel.Total = studentCount * currentCourses;
+        //}
+
+        return new CalculatedTeacherSalaryModel();
+    }
+
     #region lab
 
     //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
