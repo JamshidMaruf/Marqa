@@ -8,27 +8,29 @@ public class EnumService : IEnumService
 {
     public List<EnumGetModel> GetEnumValues<T>() where T : Enum
     {
-        var memberInfo = typeof(T).GetMembers();
         if (!typeof(T).IsEnum)
-        {
             throw new ArgumentIsNotValidException("The provided type parameter T is not an enum.");
-        }
-        var attributes = memberInfo
-            .Where(mi => mi.MemberType == System.Reflection.MemberTypes.Field)
-            .Select(mi =>
+
+        return typeof(T)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Select(field =>
             {
-                var descriptionAttribute = mi.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                    .FirstOrDefault() as DescriptionAttribute;
-                var enumValue = (T)Enum.Parse(typeof(T), mi.Name);
+                var value = (T)field.GetValue(null);
+
+                var description = field
+                    .GetCustomAttributes(typeof(DescriptionAttribute), false)
+                    .Cast<DescriptionAttribute>()
+                    .FirstOrDefault()?.Description ?? field.Name;
+
                 return new EnumGetModel
                 {
-                    Id = Convert.ToInt32(enumValue),
-                    Name = descriptionAttribute != null ? descriptionAttribute.Description : mi.Name
+                    Id = Convert.ToInt32(value),
+                    Name = description
                 };
             })
             .ToList();
-        return attributes;
     }
+
     public YearlyMonths GetYearlyMonths()
     {
         return new YearlyMonths
