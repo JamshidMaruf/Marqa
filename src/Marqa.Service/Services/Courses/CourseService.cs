@@ -490,4 +490,52 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToList()
         };
     }
+    public async Task BulkEnrollStudentsAsync(int courseId, List<int> studentIds, DateTime enrollmentDate)
+    {
+        var transaction = await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var students = await unitOfWork.Students
+                .SelectAllAsQueryable(s => studentIds.Contains(s.Id) && !s.IsDeleted)
+                .ToListAsync();
+
+            if (students.Count != studentIds.Count)
+            {
+                var foundIds = students.Select(s => s.Id).ToList();
+                var notFoundIds = studentIds.Except(foundIds).ToList();
+                throw new NotFoundException($"{notFoundIds.Count} student(s) not found");
+            }
+
+            var existingEnrollments = await unitOfWork.Enrollments
+                .SelectAllAsQueryable(e =>
+                    e.CourseId == courseId &&
+                    studentIds.Contains(e.StudentId) &&
+                    !e.IsDeleted)
+                .Select(e => e.StudentId)
+                .ToListAsync();
+
+            if (existingEnrollments.Any())
+                throw new AlreadyExistException($"{existingEnrollments.Count} student(s) already enrolled in this course");
+
+            var enrollments = studentIds.Select(studentId => new Enrollment
+            {
+                StudentId = studentId,
+                CourseId = courseId,
+                EnrolledDate = enrollmentDate,
+                Status = EnrollmentStatus.Active,
+                PaymentType = CoursePaymentType.DiscountFree,
+                Amount = 0
+            }).ToList();
+
+            await unitOfWork.Enrollments.InsertRangeAsync(enrollments);
+            await unitOfWork.SaveAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
 }
