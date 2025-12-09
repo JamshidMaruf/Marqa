@@ -169,7 +169,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                LessonCount = c.Lessons.Count,
+                LessonCount = c.LessonCount,
                 StartDate = c.StartDate,
                 Status = c.Status,
                 Description = c.Description,
@@ -213,12 +213,13 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                LessonCount = c.Lessons.Count,
                 StartDate = c.StartDate,
+                EndDate = c.EndDate,
                 Status = c.Status,
-                Description = c.Description,
+                MaxStudentCount = c.MaxStudentCount,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
+                Description = c.Description,
                 Subject = new CourseUpdateViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -233,7 +234,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
-                    Name = Enum.GetName(w.Weekday)
+                    Name = Enum.GetName(w.Weekday),
+                    StartTime = w.StartTime,
+                    EndTime = w.EndTime
                 }).ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseUpdateViewModel.LessonInfo
                 {
@@ -265,12 +268,14 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-                LessonCount = c.Lessons.Count,
+                LessonCount = c.LessonCount,
                 StartDate = c.StartDate,
+                EndDate = c.EndDate,
                 Status = c.Status,
+                MaxStudentCount = c.MaxStudentCount,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
-                Description = c.Description,
+                Description = c.Description,                
                 Subject = new CourseViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
@@ -428,6 +433,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             }
         };
 
+        var lessonCount = 1;
         var count = 2;
         var currentDate = startDate;
 
@@ -451,14 +457,20 @@ public class CourseService(IUnitOfWork unitOfWork,
                         Date = currentDate,
                         TeacherId = teacherId
                     });
+                    lessonCount++;
                 }
             }
         });
 
+        var course = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId);
+        
+        course.LessonCount = lessonCount;
+        unitOfWork.Courses.Update(course);
+
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
 
-    public async Task<UpcomingCourseViewModel> GetUpcomingCoursesAsync(int courseId)
+    public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
         var course = await unitOfWork.Courses
             .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)

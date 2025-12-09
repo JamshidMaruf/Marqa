@@ -54,8 +54,8 @@ public class PointSettingsController(IPointSettingService pointSettingService) :
         });
     }
 
-    [HttpGet("getAll")]
-    public async Task<IActionResult> GetAllAsync(string search)
+    [HttpGet]
+    public async Task<IActionResult> GetAllAsync([FromQuery] string? search = null)
     {
         var pointSettings = await pointSettingService.GetAllAsync(search);
 

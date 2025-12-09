@@ -5,6 +5,7 @@ using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+
 namespace Marqa.Admin.WebApi.Controllers;
 public class StudentsController(
     IStudentService studentService,
@@ -55,9 +56,9 @@ public class StudentsController(
         });
     }
 
-    
+
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAsync(int id)
@@ -72,7 +73,7 @@ public class StudentsController(
     }
 
     [HttpGet("{id}/update")]
-    [ProducesResponseType(typeof(Response<StudentViewForUpdateModel>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Response<StudentViewForUpdateModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetForUpdate(int id)
@@ -104,9 +105,9 @@ public class StudentsController(
         });
     }
 
-    
+
     [HttpGet("{studentId:int}/courses")]
-    [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStudentCourses(int studentId)
@@ -121,7 +122,7 @@ public class StudentsController(
     }
 
     [HttpGet("{studentId:int}/unenrolled-courses")]
-    [ProducesResponseType(typeof(Response<List<MinimalCourseDataModel>>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Response<List<MinimalCourseDataModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
     {
@@ -134,9 +135,9 @@ public class StudentsController(
         });
     }
 
-    
+
     [HttpGet]
-    [ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
+    //[ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
     {

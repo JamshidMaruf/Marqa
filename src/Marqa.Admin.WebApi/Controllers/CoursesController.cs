@@ -92,7 +92,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("upcoming")]
     public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
     {
-        var course = await courseService.GetUpcomingCoursesAsync(courseId);
+        var course = await courseService.GetUpcomingCourseStudentsAsync(courseId);
         return Ok(new Response<UpcomingCourseViewModel>
         {
             StatusCode = 200,

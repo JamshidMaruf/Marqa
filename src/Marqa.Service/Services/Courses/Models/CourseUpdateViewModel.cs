@@ -8,10 +8,8 @@ public partial class CourseUpdateViewModel
     public string Name { get; set; }
     public SubjectInfo Subject { get; set; }
     public TeacherInfo Teacher { get; set; }
-    public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public DateOnly EndDate { get; set; }
     public decimal Price { get; set; }
     public CourseStatus Status  { get; set; }
     public int MaxStudentCount { get; set; }
@@ -24,6 +22,8 @@ public partial class CourseUpdateViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
     }
 
     public class TeacherInfo

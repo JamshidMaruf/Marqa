@@ -2,8 +2,6 @@
 using Marqa.Service.DTOs.StudentPaymentOperations;
 using Marqa.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
@@ -86,5 +84,4 @@ public class StudentPaymentController : ControllerBase
 
         return Ok(new { status = 200, message = "success", data = results });
     }
-
 }

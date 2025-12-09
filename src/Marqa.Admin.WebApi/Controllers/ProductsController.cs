@@ -9,7 +9,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 [Route("api/[controller]")]
 public class ProductsController(IProductService productService) : ControllerBase
 {
-    [HttpPost("create")]
+    [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] ProductCreateModel model)
     {
         await productService.CreateAsync(model);
@@ -21,7 +21,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         });
     }
 
-    [HttpPut("update/{id:int}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] ProductUpdateModel model)
     {
         await productService.UpdateAsync(id, model);
@@ -33,7 +33,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         });
     }
 
-    [HttpDelete("delete/{id:int}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
         await productService.DeleteAsync(id);
@@ -46,7 +46,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     
-    [HttpGet("getById/{id:int}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
         var product = await productService.GetAsync(id);
@@ -59,8 +59,8 @@ public class ProductsController(IProductService productService) : ControllerBase
         });
     }
 
-    [HttpGet("getAll/{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string search = null)
+    [HttpGet("by-company/{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search = null)
     {
         var products = await productService.GetAllAsync(companyId, search);
         
