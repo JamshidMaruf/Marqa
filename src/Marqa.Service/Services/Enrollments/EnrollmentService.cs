@@ -25,7 +25,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
         if (!existStudent)
             throw new NotFoundException("Student is not found");
-
+        
         if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
             throw new RequestRefusedException("This course has reached its maximum number of students.");
 
@@ -182,9 +182,10 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             await unitOfWork.SaveAsync();
 
             #region movetovalidator
+
             if (targetCourse.MaxStudentCount == targetCourse.EnrolledStudentCount)
                 throw new RequestRefusedException("This course has reached its maximum number of students.");
-
+                
             if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
                 if (model.Amount > 100 || model.Amount < 0)
                     throw new ArgumentIsNotValidException("Invalid amount");
@@ -194,8 +195,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                         throw new ArgumentIsNotValidException("Invalid amount");
 
             if (model.DateOfTransfer > DateTime.UtcNow)
-                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-
+                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");                
             #endregion
             // 4. Add new course record
             var newStudentCourse = new Enrollment

@@ -22,8 +22,6 @@ public static class EnrollmentValidatorHelper
         if (course == null)
             return false;
 
-        if (course.MaxStudentCount <= course.EnrolledStudentCount)
-            return false;
 
         var existingEnrollment = await unitOfWork.Enrollments.CheckExistAsync(
             e => e.StudentId == studentId && e.CourseId == courseId);

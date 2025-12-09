@@ -9,14 +9,19 @@ public class CourseCreateModel
     public int SubjectId { get; set; } 
     public int TeacherId { get; set; }
     public int CompanyId { get; set; } 
-    public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
     public decimal Price { get; set; }
     public string Level { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
     public CourseStatus Status  { get; set; }
     public int MaxStudentCount { get; set; }
     public string Description { get; set; }
-    public List<DayOfWeek> Weekdays { get; set; } = new();
+    public List<Weekday> Weekdays { get; set; } = new();
+    
+    public class  Weekday
+    {
+        public  DayOfWeek DayOfWeek { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
+    }
 }
