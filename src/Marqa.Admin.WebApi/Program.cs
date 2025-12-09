@@ -62,11 +62,25 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddAuthorization();
 
+// Cross-Origin-Resource-Sharing
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 
 app.UseExceptionHandler();
+
+app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 
