@@ -2,6 +2,7 @@
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Service.Services.Settings;
@@ -13,7 +14,8 @@ public class AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, ISettin
 {
     public async ValueTask<LoginResponseModel> LoginAsync(LoginModel model, string ipAddress)
     {
-        var existUser = await unitOfWork.Users.SelectAsync(u => u.Phone == model.Phone)
+        var trimedPhoneResult = model.Phone.TrimPhoneNumber();
+        var existUser = await unitOfWork.Users.SelectAsync(u => u.Phone == trimedPhoneResult.Phone)
             ?? throw new NotFoundException("User not found with this phone");
         
         if(!PasswordHelper.Verify(model.Password, existUser.PasswordHash))

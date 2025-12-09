@@ -97,17 +97,6 @@ Foydalanuvchi hisobiga kirish. Telefon raqami va parol orqali authentication qil
 }
 ```
 
-#### Example cURL
-```bash
-curl -X POST "https://localhost/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "phone": "+998901234567",
-    "password": "SecurePassword123",
-    "rememberMe": true
-  }'
-```
-
 #### Muhim Nuqtalar
 - 🔒 Parol BCrypt bilan xotirlangan bo'ladi
 - 📍 Client IP manzili database'ga saqlana oladi
@@ -155,16 +144,6 @@ Foydalanuvchi akkauntidan chiqish. Refresh token'ni revoke qiladi (bekor qiladi)
   "message": "Invalid or expired token",
   "data": false
 }
-```
-
-#### Example cURL
-```bash
-curl -X POST "https://localhost/api/auth/logout" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
-  -d '{
-    "token": "k8Fj2L9mNpQrStUvWxYz1A2B3C4D5E6F7G8H9I0J..."
-  }'
 ```
 
 #### Muhim Nuqtalar
@@ -228,32 +207,6 @@ Yangi access token olish uchun refresh token'dan foydalanish. Access token'ning 
 }
 ```
 
-#### Response - Error (401 Unauthorized)
-```json
-{
-  "statusCode": 401,
-  "message": "Invalid or expired refresh token",
-  "data": null
-}
-```
-
-#### Example cURL
-```bash
-curl -X POST "https://localhost/api/auth/refresh-token" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "token": "k8Fj2L9mNpQrStUvWxYz1A2B3C4D5E6F7G8H9I0J..."
-  }'
-```
-
-#### Muhim Nuqtalar
-- 🔄 Yangi access token + refresh token qaytariladi
-- ⏰ Refresh token'ning muddati tugamagan bo'lishi kerak
-- 🚫 Revoke qilingan token'dan foydalan bo'lmaydi
-- 🔑 Permissions yangilangan bo'ladi
-
----
-
 ### 4. **Current User Endpoint**
 
 #### Endpoint
@@ -309,52 +262,6 @@ Hozirgi login qilgan foydalanuvchining ma'lumotlarini olish.
 }
 ```
 
-#### Example cURL
-```bash
-curl -X POST "https://localhost/api/auth/current-user" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }'
-```
-
-#### Muhim Nuqtalar
-- 👤 Foydalanuvchining hozirgi ma'lumotlarini olish
-- 🔐 Token o'qirish va validatsiya qilish
-- 📋 Roli va vakolatlarini qaytarish
-
----
-
-## 🔑 JWT Token Tuzilishi
-
-### Access Token
-```
-Header:
-{
-  "alg": "HS256",
-  "typ": "JWT"
-}
-
-Payload:
-{
-  "nameid": "1",                          // User ID
-  "unique_name": "Admin User",            // Full Name
-  "phone": "+998901234567",               // Phone
-  "role": "admin",                        // Role
-  "jti": "550e8400-e29b-41d4-a716-446655440000", // JWT ID
-  "exp": 1732889400,                      // Expiration Time
-  "iss": "https://marqa.uz",              // Issuer
-  "aud": "https://marqa.uz"               // Audience
-}
-
-Signature:
-HMACSHA256(
-  base64UrlEncode(header) + "." +
-  base64UrlEncode(payload),
-  secret
-)
-```
-
 ### Token Validity
 - **Access Token:** 24 soat (86,400 soniya)
 - **Refresh Token:** 
@@ -372,117 +279,6 @@ Authorization: Bearer {accessToken}
 Content-Type: application/json
 ```
 
----
-
-## ⚠️ Error Codes
-
-| Code | Message | Tavsif |
-|------|---------|--------|
-| 200 | Success | Muvaffaqiyatli so'rov |
-| 400 | Bad Request | Noto'g'ri request body |
-| 401 | Unauthorized | Token noto'g'ri yoki muddati tugagan |
-| 403 | Forbidden | Foydalanuvchi blok qilingan |
-| 404 | Not Found | Foydalanuvchi topilmadi |
-| 500 | Internal Server Error | Server xatosi |
-
----
-
-## 📊 User Roles
-
-| Role | Tavsif | Misol |
-|------|--------|-------|
-| `admin` | Tizim administratori | Barcha funksiyalar |
-| `teacher` | O'qituvchi | Kurslar, darslar, imtihonlar |
-| `student` | O'quvchi | Kurslar, darslar, vazifalar |
-| `parent` | Ota-ona | Farzandi natijalarini ko'rish |
-
----
-
-## 📝 Example Flows
-
-### Flow 1: Login va API call
-```
-1. POST /auth/login
-   ↓
-2. Response: { accessToken, refreshToken }
-   ↓
-3. GET /api/courses (Header: Authorization: Bearer {accessToken})
-   ↓
-4. Response: Courses list
-```
-
-### Flow 2: Token refresh
-```
-1. Access token muddati tugadi (401 error)
-   ↓
-2. POST /auth/refresh-token { refreshToken }
-   ↓
-3. Response: { newAccessToken, newRefreshToken }
-   ↓
-4. GET /api/courses (Header: Authorization: Bearer {newAccessToken})
-   ↓
-5. Response: Courses list
-```
-
-### Flow 3: Logout
-```
-1. POST /auth/logout { refreshToken }
-   ↓
-2. Response: { success: true }
-   ↓
-3. POST /auth/refresh-token { refreshToken } ← Endi fail bo'ladi
-   ↓
-4. Response: { statusCode: 401, message: "Invalid token" }
-```
-
----
-
-## 🔄 Integration Guide
-
-### Step 1: Login qilish
-```javascript
-const loginResponse = await fetch('/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    phone: '+998901234567',
-    password: 'password123',
-    rememberMe: true
-  })
-});
-
-const { data } = await loginResponse.json();
-localStorage.setItem('accessToken', data.token.accessToken);
-localStorage.setItem('refreshToken', data.token.refreshToken);
-```
-
-### Step 2: API call qilish
-```javascript
-const response = await fetch('/api/courses', {
-  headers: {
-    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-  }
-});
-```
-
-### Step 3: Token refresh qilish (agar 401 bo'lsa)
-```javascript
-if (response.status === 401) {
-  const refreshResponse = await fetch('/api/auth/refresh-token', {
-    method: 'POST',
-    body: JSON.stringify({
-      token: localStorage.getItem('refreshToken')
-    })
-  });
-  
-  const { data } = await refreshResponse.json();
-  localStorage.setItem('accessToken', data.token.accessToken);
-  // Retry original request
-}
-```
-
----
-
 ## 💡 Best Practices
 
 1. ✅ Access token'ni localStorage ga saqlamang, memory ga saqla
@@ -492,36 +288,3 @@ if (response.status === 401) {
 5. ✅ Token'ni request header'ga qo'yishdan oldin validate qil
 6. ✅ HTTPS dan foydalanish majburiy
 7. ✅ CORS nazoratini to'g'ri sozla
-
----
-
-## 🧪 Testing
-
-### Postman Collection
-```json
-{
-  "info": {
-    "name": "Marqa Auth API",
-    "version": "1.0.0"
-  },
-  "item": [
-    {
-      "name": "Login",
-      "request": {
-        "method": "POST",
-        "url": "{{baseUrl}}/api/auth/login",
-        "body": {
-          "mode": "raw",
-          "raw": "{\"phone\": \"+998901234567\", \"password\": \"password\", \"rememberMe\": true}"
-        }
-      }
-    }
-  ]
-}
-```
-
----
-
-**Oxirgi yangilash:** 29 Noyabr 2025  
-**Versiya:** 1.0.0  
-**Mualliflik:** API Documentation

@@ -9,9 +9,10 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AuthController(IAuthService authService, ISmsService smsService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]
+    [ProducesResponseType(typeof(LoginResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)
     {
         var ipAddress = HttpContext?.Connection?.RemoteIpAddress?.ToString();
