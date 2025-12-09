@@ -40,4 +40,5 @@ public interface IRepository<TEntity> where TEntity : Auditable
         params string[] includes);
     Task<bool> CheckExistAsync(Expression<Func<TEntity, bool>> predicate);
     bool CheckExist(Expression<Func<TEntity, bool>> predicate);
+    void DetachFromChangeTracker(TEntity entity);
 }

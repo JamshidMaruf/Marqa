@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
@@ -30,7 +31,7 @@ public class TeacherService(
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
-                Salary = model.Salary,
+                Salary = model.Amount,
                 Status = model.Status,
                 Password = model.Password,
                 JoiningDate = model.JoiningDate,
@@ -38,7 +39,8 @@ public class TeacherService(
                 Info = model.Info,
                 RoleId = model.RoleId
             });
-
+            
+            
             await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
             await transaction.CommitAsync();
@@ -64,7 +66,7 @@ public class TeacherService(
                 Gender = model.Gender,
                 Phone = model.Phone,
                 Email = model.Email,
-                Salary = model.Salary,
+                Salary = model.Amount,
                 Status = model.Status,
                 JoiningDate = model.JoiningDate,
                 Specialization = model.Specialization,
@@ -129,7 +131,7 @@ public class TeacherService(
                    Id = Convert.ToInt32(ts.Teacher.Status),
                    Name = Enum.GetName(ts.Teacher.Status),
                },
-               Salary = ts.Teacher.Salary,
+               Amount = ts.Teacher.Salary,
                JoiningDate = ts.Teacher.JoiningDate,
                Specialization = ts.Teacher.Specialization,
                Info = ts.Teacher.Info,     
@@ -194,7 +196,7 @@ public class TeacherService(
                     Id = Convert.ToInt32(ts.Teacher.Status),
                     Name = Enum.GetName(ts.Teacher.Status),
                 },
-                Salary = ts.Teacher.Salary,
+                Amount = ts.Teacher.Salary,
                 JoiningDate = ts.Teacher.JoiningDate,
                 Specialization = ts.Teacher.Specialization,
                 Info = ts.Teacher.Info,
@@ -218,20 +220,6 @@ public class TeacherService(
 
         teacher.Subjects = subjects;
 
-        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: "Subject")
-            .Where(c => c.TeacherId == id)
-            .Select(c => new TeacherUpdateViewModel.CourseInfo
-            {
-                Id = c.Id,
-                Name = c.Name,
-                SubjectId = c.Subject.Id,
-                SubjectName = c.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Courses = courses;
-
         return teacher;
     }
 
@@ -254,7 +242,7 @@ public class TeacherService(
         }
         
         var teacherWithoutCourses = await teacherQuery.GroupJoin(
-                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
+                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: "Subject" ),
                 t => t.Id,
                 ts => ts.TeacherId,
                 (t, ts) => new TeacherTableViewModel
@@ -313,6 +301,40 @@ public class TeacherService(
             );
 
         return teachers.ToList();
+    }
+
+    public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)
+    {
+        //var teacherSalary = await unitOfWork.TeacherSalaries.SelectAsync(t => t.TeacherId == teacherId)
+        //    ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
+
+        //var teacher = await unitOfWork.Teachers.SelectAllAsQueryable(t =>
+        //        t.Id == teacherId)
+        //    .Include(t => t.Courses.Where(c =>
+        //    c.StartDate.Year == year &&)
+        //    .FirstOrDefaultAsync();
+
+        //var paymentType = teacherSalary.PaymentType;
+        //var studentCount = teacher.Courses.Select(c => c.Enrollments.Count).Sum();
+        //var currentCourses = teacher.Courses.Where(c => c.Status == CourseStatus.Active).Count();
+        //var calculatedModel = new CalculatedTeacherSalaryModel();
+
+        //if (paymentType == TeacherPaymentType.Fixed)
+        //{
+        //    calculatedModel.StudentsCount = studentCount;
+        //    calculatedModel.GroupsCount = teacher.Courses.Count;
+        //    calculatedModel.Total = teacherSalary.Amount;
+
+        //}
+        //else if(paymentType ==TeacherPaymentType.Percentage)
+        //{
+        //    calculatedModel.StudentsCount = studentCount;
+        //    calculatedModel.GroupsCount = teacher.Courses.Count;
+        //    calculatedModel.Percent = teacherSalary.Percent;
+        //    calculatedModel.Total = studentCount * currentCourses;
+        //}
+
+        return new CalculatedTeacherSalaryModel();
     }
 
     #region lab

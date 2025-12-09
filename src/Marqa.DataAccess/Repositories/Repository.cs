@@ -116,5 +116,8 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         return _context.Set<TEntity>().Any(predicate);
     }
 
-
+    public void DetachFromChangeTracker(TEntity entity)
+    {
+        _context.Entry(entity).State = EntityState.Detached;
+    }
 }

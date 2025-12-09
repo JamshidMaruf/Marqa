@@ -8,14 +8,12 @@ public class CourseUpdateModel
     public string Room { get; set; }
     public int TeacherId { get; set; }
     public decimal Price { get; set; }
-    public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
-    public TimeOnly StartTime { get; set; }
-    public TimeOnly EndTime { get; set; }
+    public DateOnly EndDate { get; set; }   
     public string Level { get; set; }
     public CourseStatus Status  { get; set; }
     public int MaxStudentCount { get; set; }
     public string Description { get; set; }
-    public List<DayOfWeek> Weekdays { get; set; } = new();
+    public List<CourseCreateModel.Weekday> Weekdays { get; set; } = new();
 
 }

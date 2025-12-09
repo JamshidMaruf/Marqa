@@ -22,7 +22,7 @@ public class LessonsController(ILessonService lessonService) : Controller
         });
     }
    
-    [HttpPost("CheckUp")]
+    [HttpPost("Check-up")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {
         await lessonService.CheckUpAsync(model);

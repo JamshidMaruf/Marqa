@@ -2,11 +2,11 @@
 
 namespace Marqa.Domain.Entities;
 
-public class Employee : Auditable
+public class Teacher : Auditable
 {
     public int UserId { get; set; }
     public DateOnly DateOfBirth { get; set; }
-    public decimal Salary { get; set; }
+    public decimal Amount { get; set; }
     public Gender Gender { get; set; }
     public EmployeeStatus Status { get; set; }
     public DateOnly JoiningDate { get; set; }
@@ -14,7 +14,11 @@ public class Employee : Auditable
     public string Info { get; set; }
     public int RoleId { get; set; }
 
+    public int? LeadTeacherId { get; set; }
+
     // Navigation
     public User User { get; set; }
     public EmployeeRole Role { get; set; }
+    public Teacher LeadTeacher { get; set; }
+    public ICollection<Course> Courses { get; set; }
 }

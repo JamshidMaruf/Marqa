@@ -20,10 +20,6 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
             .WithMessage("Subject does not exist.");
 
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
-        RuleFor(c => c.LessonCount).GreaterThan(0);
-        RuleFor(x => x.EndTime)
-            .GreaterThan(x => x.StartTime)
-            .WithMessage("End time must be greater than start time.");
         RuleFor(c => c.MaxStudentCount).GreaterThan(0);
         RuleFor(c => c.Weekdays).ForEach(c => c.IsInEnum());
     }

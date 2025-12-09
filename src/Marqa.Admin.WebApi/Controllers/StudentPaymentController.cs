@@ -2,8 +2,6 @@
 using Marqa.Service.DTOs.StudentPaymentOperations;
 using Marqa.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
@@ -55,7 +53,7 @@ public class StudentPaymentController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.OK)]
     public async Task<IActionResult> Transfer([FromBody] TransferPaymentModel model)
     {
-        await _studentPaymentService.TransferAsync( model);
+        await _studentPaymentService.TransferAsync(model);
         return Ok(new { status = 200, message = "success" });
     }
 
@@ -86,5 +84,4 @@ public class StudentPaymentController : ControllerBase
 
         return Ok(new { status = 200, message = "success", data = results });
     }
-
 }

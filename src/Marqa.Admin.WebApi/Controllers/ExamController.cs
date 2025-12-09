@@ -88,7 +88,7 @@ public class ExamController(IExamService examService) : ControllerBase
         });
     }
 
-    [HttpGet("examResults/{studentId:int}")]
+    [HttpGet("exam-results/{studentId:int}")]
     public async Task<IActionResult> GetExamResultsAsync(int studentId)
     {
         var examResults = await examService.GetExamResultsByStudentIdAsync(studentId);

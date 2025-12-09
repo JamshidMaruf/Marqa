@@ -125,4 +125,17 @@ public class EnumsController : ControllerBase
             Data = result
         });
     }
+
+    [HttpGet("current-yearly-months")]
+    public async Task<IActionResult> GetYearlyMonths()
+    {
+        var result = _enumService.GetYearlyMonths();
+
+        return Ok(new Response<YearlyMonths>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
 }
