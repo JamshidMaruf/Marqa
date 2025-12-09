@@ -490,26 +490,27 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToList()
         };
     }
-    public async Task BulkEnrollStudentsAsync(int courseId, List<int> studentIds, DateTime enrollmentDate)
+    public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)
     {
         var transaction = await unitOfWork.BeginTransactionAsync();
+
         try
         {
             var students = await unitOfWork.Students
-                .SelectAllAsQueryable(s => studentIds.Contains(s.Id) && !s.IsDeleted)
+                .SelectAllAsQueryable(s => model.StudentIds.Contains(s.Id) && !s.IsDeleted)
                 .ToListAsync();
 
-            if (students.Count != studentIds.Count)
+            if (students.Count != model.StudentIds.Count)
             {
                 var foundIds = students.Select(s => s.Id).ToList();
-                var notFoundIds = studentIds.Except(foundIds).ToList();
+                var notFoundIds = model.StudentIds.Except(foundIds).ToList();
                 throw new NotFoundException($"{notFoundIds.Count} student(s) not found");
             }
 
             var existingEnrollments = await unitOfWork.Enrollments
                 .SelectAllAsQueryable(e =>
-                    e.CourseId == courseId &&
-                    studentIds.Contains(e.StudentId) &&
+                    e.CourseId == model.CourseId &&
+                    model.StudentIds.Contains(e.StudentId) &&
                     !e.IsDeleted)
                 .Select(e => e.StudentId)
                 .ToListAsync();
@@ -517,11 +518,11 @@ public class CourseService(IUnitOfWork unitOfWork,
             if (existingEnrollments.Any())
                 throw new AlreadyExistException($"{existingEnrollments.Count} student(s) already enrolled in this course");
 
-            var enrollments = studentIds.Select(studentId => new Enrollment
+            var enrollments = model.StudentIds.Select(studentId => new Enrollment
             {
                 StudentId = studentId,
-                CourseId = courseId,
-                EnrolledDate = enrollmentDate,
+                CourseId = model.CourseId,
+                EnrolledDate = model.EnrollmentDate,
                 Status = EnrollmentStatus.Active,
                 PaymentType = CoursePaymentType.DiscountFree,
                 Amount = 0

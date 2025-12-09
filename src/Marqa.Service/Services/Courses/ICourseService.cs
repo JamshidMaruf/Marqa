@@ -24,4 +24,11 @@ public interface ICourseService
     Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
     Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId);
+
+    /// <summary>
+    /// This method bulk enrolls students into a course based on the provided model.
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model);
 }
