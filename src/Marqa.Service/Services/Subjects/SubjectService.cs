@@ -22,8 +22,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
         if (alreadyExistSubject)
             throw new AlreadyExistException("This subject already exist!");
-
-
+        
         unitOfWork.Subjects.Insert(new Subject
         {
             Name = model.Name,
@@ -117,21 +116,21 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task BulkAttachAsync(int teacherId, List<int> subjectIds)
     {
-        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId && e.Role.CanTeach)
+        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
-
+        
         List<int> existSubjects = await unitOfWork.Subjects
             .SelectAllAsQueryable(s => s.CompanyId == teacher.User.CompanyId && !s.IsDeleted)
             .Select(s => s.Id)
             .Distinct()
             .ToListAsync();
-
+        
         for (int i = 0; i < subjectIds.Count; i++)
         {
             if (!existSubjects.Contains(subjectIds[i]))
                 throw new NotFoundException($"There is no subject with ID = {subjectIds[i]}");
         }
-
+        
         var alreadyAttachedSubjects = await unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(s => s.TeacherId == teacherId && !s.IsDeleted)
             .Select(s => new TeacherSubject

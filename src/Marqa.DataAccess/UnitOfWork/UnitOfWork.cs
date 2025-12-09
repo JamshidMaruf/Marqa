@@ -21,6 +21,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<LessonAttendance> LessonAttendances { get; } = new Repository<LessonAttendance>(context);
     public IRepository<OTP> OTPs { get; } = new Repository<OTP>(context);
     public IRepository<Enrollment> Enrollments { get; } = new Repository<Enrollment>(context);
+    public IRepository<Expense> Expenses { get; }
+    public IRepository<ExpenseCategory> ExpenseCategories { get; }
     public IRepository<StudentExamResult> StudentExamResults { get; } = new Repository<StudentExamResult>(context);
     public IRepository<Subject> Subjects { get; } = new Repository<Subject>(context);
     public IRepository<StudentHomeTask> StudentHomeTasks { get; } = new Repository<StudentHomeTask>(context);
@@ -40,7 +42,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Basket> Baskets { get; } = new Repository<Basket>(context);
     public IRepository<BasketItem> BasketItems { get; } = new Repository<BasketItem>(context);
     public IRepository<ExamSetting> ExamSettings { get; } = new Repository<ExamSetting>(context);
-    public IRepository<EmployeePayment> EmployeePayments { get; } = new Repository<EmployeePayment>(context);
+    public IRepository<EmployeePaymentOperation> EmployeePaymentOperations { get; } = new Repository<EmployeePaymentOperation>(context);
     public IRepository<ExamSettingItem> ExamSettingItems { get; } = new Repository<ExamSettingItem>(context);
     public IRepository<Permission> Permissions { get; }  = new Repository<Permission>(context);
     public IRepository<RolePermission> RolePermissions { get; } = new Repository<RolePermission>(context);
@@ -51,7 +53,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<EnrollmentCancellation> EnrollmentCancellations => new Repository<EnrollmentCancellation>(context);
     public IRepository<EnrollmentTransfer> EnrollmentTransfers => new Repository<EnrollmentTransfer>(context);
     public IRepository<Teacher> Teachers => new Repository<Teacher>(context);
+    public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; }
 
+    
     public async Task SaveAsync()
     {
         await context.SaveChangesAsync();

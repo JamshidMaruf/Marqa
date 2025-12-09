@@ -61,13 +61,13 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
     [HttpGet("{companyId}")]
     public async Task<IActionResult> GetAllAsync(int companyId, bool? canTeach = null)
     {
-        var companies = await employeeRoleService.GetAllAsync(companyId,canTeach);
+       // var companies = await employeeRoleService.GetAllAsync(companyId,canTeach);
 
         return Ok(new Response<List<EmployeeRoleViewModel>>
         {
             StatusCode = 200,
             Message = "success",
-            Data = companies
+          //  Data = companies
         });
     }
 }

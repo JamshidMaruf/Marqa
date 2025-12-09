@@ -71,7 +71,6 @@ public class EnumsController : ControllerBase
     public async Task<IActionResult> GetEnrollmentStatusAsync()
     {
         var r = EnrollmentStatus.Active;
-
         r.GetDisplayName();
         var result = _enumService.GetEnumValues<EnrollmentStatus>();
         return Ok(new Response<List<EnumGetModel>>

@@ -26,44 +26,44 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
     /// <summary>
     /// This method maps EmployeePayment Entity to EmployeePaymentViewModel for detail view.
     /// </summary>
-    private static EmployeePaymentViewModel MapToViewModel(EmployeePayment payment)
+    private static EmployeePaymentViewModel MapToViewModel(EmployeePaymentOperation paymentOperation)
     {
         return new EmployeePaymentViewModel
         {
-            Id = payment.Id,
-            EmployeeId = payment.EmployeeId,
-            PaymentNumber = payment.PaymentNumber,
-            PaymentMethod = payment.PaymentMethod,
-            EmployeePaymentOperationType = payment.EmployeePaymentOperationType,
-            Amount = payment.Amount,
-            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
-            Description = payment.Description
+            Id = paymentOperation.Id,
+            EmployeeId = paymentOperation.EmployeeId,
+            PaymentNumber = paymentOperation.PaymentNumber,
+            PaymentMethod = paymentOperation.PaymentMethod,
+            EmployeePaymentOperationType = paymentOperation.OperationType,
+            Amount = paymentOperation.Amount,
+            DateTime = DateHelper.ToLocalTimeConverter(paymentOperation.DateTime),
+            Description = paymentOperation.Description
         };
     }
 
     /// <summary>
     /// This method maps EmployeePayment Entity to EmployeePaymentListViewModel for list view.
     /// </summary>
-    private static EmployeePaymentListViewModel MapToListViewModel(EmployeePayment payment)
+    private static EmployeePaymentListViewModel MapToListViewModel(EmployeePaymentOperation paymentOperation)
     {
         return new EmployeePaymentListViewModel
         {
-            Id = payment.Id,
-            EmployeeId = payment.EmployeeId,
-            PaymentNumber = payment.PaymentNumber,
+            Id = paymentOperation.Id,
+            EmployeeId = paymentOperation.EmployeeId,
+            PaymentNumber = paymentOperation.PaymentNumber,
             PaymentMethod = new EnumViewModel
             {
-                Id = (int)payment.PaymentMethod,
-                Name = payment.PaymentMethod.ToString()
+                Id = (int)paymentOperation.PaymentMethod,
+                Name = paymentOperation.PaymentMethod.ToString()
             },
             EmployeePaymentOperationType = new EnumViewModel
             {
-                Id = (int)payment.EmployeePaymentOperationType,
-                Name = payment.EmployeePaymentOperationType.ToString()
+                Id = (int)paymentOperation.OperationType,
+                Name = paymentOperation.OperationType.ToString()
             },
-            Amount = payment.Amount,
-            DateTime = DateHelper.ToLocalTimeConverter(payment.DateTime),
-            Description = payment.Description
+            Amount = paymentOperation.Amount,
+            DateTime = DateHelper.ToLocalTimeConverter(paymentOperation.DateTime),
+            Description = paymentOperation.Description
         };
     }
 
@@ -75,17 +75,17 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
 
         try
         {
-            var createdPayment = new EmployeePayment
+            var createdPayment = new EmployeePaymentOperation
             {
                 PaymentNumber = GeneratePaymentNumber(),
                 EmployeeId = model.EmployeeId,
                 PaymentMethod = model.PaymentMethod,
                 Amount = model.Amount,
                 Description = model.Description,
-                EmployeePaymentOperationType = model.EmployeePaymentOperationType,
+                OperationType = model.EmployeePaymentOperationType,
             };
 
-            unitOfWork.EmployeePayments.Insert(createdPayment);
+            unitOfWork.EmployeePaymentOperations.Insert(createdPayment);
             await unitOfWork.SaveAsync();
             await transaction.CommitAsync();
         }
@@ -100,7 +100,7 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
     {
         await updateValidator.EnsureValidatedAsync(model);
 
-        var existPayment = await unitOfWork.EmployeePayments
+        var existPayment = await unitOfWork.EmployeePaymentOperations
             .SelectAsync(p => p.Id == model.Id && !p.IsDeleted)
             ??throw new NotFoundException($"Payment not found with ID: {model.Id}");
 
@@ -113,9 +113,9 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
             existPayment.PaymentMethod = model.PaymentMethod;
             existPayment.Amount = model.Amount;
             existPayment.Description = model.Description;
-            existPayment.EmployeePaymentOperationType = model.EmployeePaymentOperationType;
+            existPayment.OperationType = model.EmployeePaymentOperationType;
 
-            unitOfWork.EmployeePayments.Update(existPayment);
+            unitOfWork.EmployeePaymentOperations.Update(existPayment);
             await unitOfWork.SaveAsync();
             await transaction.CommitAsync();
         }
@@ -135,7 +135,7 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
 
     public async Task<EmployeePaymentViewModel> GetByPaymentIdAsync(int paymentId)
     {
-        var existPayment = await unitOfWork.EmployeePayments
+        var existPayment = await unitOfWork.EmployeePaymentOperations
             .SelectAsync(
                 predicate: p => p.Id == paymentId && !p.IsDeleted,
                 includes: new[] { "Employee" })
@@ -145,12 +145,12 @@ public class EmployeePaymentService(IUnitOfWork unitOfWork,
     }
 
     public async Task<List<EmployeePaymentListViewModel>> GetAllAsync(
-        string? search = null,
+        string search = null,
         int? employeeId = null,
         int pageIndex = 1,
         int pageSize = 10)
     {
-        var query = unitOfWork.EmployeePayments
+        var query = unitOfWork.EmployeePaymentOperations
             .SelectAllAsQueryable(p => !p.IsDeleted)
             .Include(p => p.Employee)
             .AsQueryable();

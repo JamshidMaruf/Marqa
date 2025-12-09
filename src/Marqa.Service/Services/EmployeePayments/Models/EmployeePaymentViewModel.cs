@@ -11,5 +11,5 @@ public class EmployeePaymentViewModel
     public EmployeePaymentOperationType EmployeePaymentOperationType { get; set; }
     public decimal Amount { get; set; }
     public DateTime DateTime { get; set; }
-    public string? Description { get; set; }
+    public string Description { get; set; }
 }

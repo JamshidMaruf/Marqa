@@ -28,13 +28,15 @@ public interface IUnitOfWork : IDisposable
     IRepository<HomeTask> HomeTasks { get; }
 
     IRepository<Lesson> Lessons { get; }
-    IRepository<EmployeePayment> EmployeePayments { get; }
+    IRepository<EmployeePaymentOperation> EmployeePaymentOperations { get; }
 
     IRepository<LessonAttendance> LessonAttendances { get; }
 
     IRepository<OTP> OTPs { get; }
 
     IRepository<Enrollment> Enrollments { get; }
+    IRepository<Expense> Expenses { get; }
+    IRepository<ExpenseCategory> ExpenseCategories { get; }
 
     IRepository<StudentExamResult> StudentExamResults { get; }
 
@@ -93,8 +95,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<EnrollmentTransfer> EnrollmentTransfers { get; }
 
     IRepository<Teacher> Teachers { get; }
-    IRepository<TeacherSalary> TeacherSalaries { get; }
-
+    IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; }
 
     Task SaveAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();

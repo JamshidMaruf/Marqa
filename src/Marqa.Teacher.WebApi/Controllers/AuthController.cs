@@ -14,7 +14,7 @@ public class AuthController(IEmployeeService employeeService) : ControllerBase
     {
         return Ok(new Response<EmployeeLoginViewModel>
         {
-            StatusCode = 200, Message = "success", Data = await employeeService.LoginAsync(model)
+           // StatusCode = 200, Message = "success", Data = await employeeService.LoginAsync(model)
         });
     }
 }

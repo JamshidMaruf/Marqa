@@ -39,7 +39,7 @@ public static class ServicesExtension
         services.AddScoped<IHomeTaskService, HomeTaskService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<IStudentService, StudentService>();
+       // services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IPointSettingService, PointSettingService>();
         services.AddScoped<IExamService, ExamService>();

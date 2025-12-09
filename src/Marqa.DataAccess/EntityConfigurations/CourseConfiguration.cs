@@ -29,13 +29,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasForeignKey(c => c.SubjectId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
-
-        builder.HasOne(c => c.Teacher)
-            .WithMany()
-            .HasForeignKey(c => c.TeacherId)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
-
+        
         builder.HasMany(c => c.CourseWeekdays)
             .WithOne(cw => cw.Course)
             .HasForeignKey(cw => cw.CourseId)
