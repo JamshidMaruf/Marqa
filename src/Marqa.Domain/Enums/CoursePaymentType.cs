@@ -10,6 +10,6 @@ public enum CoursePaymentType
     [Description("Chegirmasiz")]
     DiscountFree = 2,
 
-    [Description("Foiz")] 
+    [Description("Foizli Chegirma")] 
     DiscountInPercentage = 3
 }

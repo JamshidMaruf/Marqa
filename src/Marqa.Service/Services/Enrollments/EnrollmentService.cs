@@ -16,8 +16,10 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
-        var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
-                          ?? throw new NotFoundException("Course is not found");
+        var existCourse = await unitOfWork.Courses
+            .SelectAsync(c => c.Id == model.CourseId,
+             includes: "Enrollments")
+                ?? throw new NotFoundException("Course is not found");
 
         //await enrollmentCreateValidator.ValidateAndThrowAsync(model);
 
@@ -26,7 +28,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         if (!existStudent)
             throw new NotFoundException("Student is not found");
         
-        if (existCourse.MaxStudentCount == existCourse.EnrolledStudentCount)
+        if (existCourse.MaxStudentCount == existCourse.Enrollments.Count)
             throw new RequestRefusedException("This course has reached its maximum number of students.");
 
         if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
@@ -174,7 +176,9 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
             // 2. Load the target course & ensure NOT finished
             var targetCourse = await unitOfWork.Courses
-                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed)
+                .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed
+                || c.Status != CourseStatus.Completed,
+                includes: "Enrollments")
                 ?? throw new NotFoundException("Target course not found or finished");
 
             // 3. Remove from old course
@@ -183,7 +187,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
             #region movetovalidator
 
-            if (targetCourse.MaxStudentCount == targetCourse.EnrolledStudentCount)
+            if (targetCourse.MaxStudentCount == targetCourse.Enrollments.Count)
                 throw new RequestRefusedException("This course has reached its maximum number of students.");
                 
             if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
@@ -197,6 +201,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             if (model.DateOfTransfer > DateTime.UtcNow)
                 throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");                
             #endregion
+
             // 4. Add new course record
             var newStudentCourse = new Enrollment
             {
