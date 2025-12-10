@@ -1,8 +1,13 @@
-﻿namespace Marqa.Domain.Enums;
+﻿using System.ComponentModel;
+
+namespace Marqa.Domain.Enums;
 
 public enum IsActive
 {
+    [Description("Faol")]
     Active=1,
-    Inactive=2
+
+    [Description("Nofaol")]
+    Inactive =2
 }
 

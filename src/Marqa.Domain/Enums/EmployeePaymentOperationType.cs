@@ -1,9 +1,18 @@
+﻿using System.ComponentModel;
+
 namespace Marqa.Domain.Enums;
 
 public enum EmployeePaymentOperationType
 {
-    Salary = 1,      
-    Advance = 2,     
-    Bonus = 3,       
-    Compensation = 4 
+    [Description("Oylik")]
+    Salary = 1,
+
+    [Description("Avans")]
+    Advance = 2,
+
+    [Description("Bonus")]
+    Bonus = 3,
+
+    [Description("Kompensatsiya")]
+    Compensation = 4
 }
