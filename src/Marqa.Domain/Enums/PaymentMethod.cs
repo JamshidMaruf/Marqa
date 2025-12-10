@@ -10,6 +10,6 @@ public enum PaymentMethod
     [Description("Naqd pul")]
     Cash = 2,
 
-    [Description("Bank o'tkazmasi")]
+    [Description("O'tkazma")]
     Transfer = 3
 }
