@@ -100,4 +100,17 @@ public class CoursesController(ICourseService courseService) : ControllerBase
             Data = course
         });
     }
+
+    [HttpPost("bulk-enroll-students")]
+    public async Task<IActionResult> BulkEnrollStudentsAsync([FromBody] BulkEnrollStudentsModel model)
+    {
+        await courseService.BulkEnrollStudentsAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "success"
+        });
+    }
+
 }
