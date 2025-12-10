@@ -474,20 +474,29 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
-        var course = await unitOfWork.Courses
+        var courseQuery = unitOfWork.Courses
             .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)
-            .FirstOrDefaultAsync();
+            .Include(c => c.Enrollments)
+                .ThenInclude(e => e.Student)
+                    .ThenInclude(s => s.User);
+
+        var course = await courseQuery.FirstOrDefaultAsync();
+
+        if (course == null)
+            throw new Exception("Upcoming course not found.");
 
         return new UpcomingCourseViewModel
         {
             EnrolledStudentCount = course.Enrollments.Count,
             AvailableSeats = course.MaxStudentCount - course.Enrollments.Count,
             MaxStudentCount = course.MaxStudentCount,
+
             Students = course.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
             {
-                FullName = $"{e.Student.User.FirstName} {e.Student.User.LastName}",
+                FullName = $"{e.Student?.User?.FirstName} {e.Student?.User?.LastName}".Trim(),
                 DateOfEnrollment = e.EnrolledDate
             }).ToList()
         };
     }
+
 }
