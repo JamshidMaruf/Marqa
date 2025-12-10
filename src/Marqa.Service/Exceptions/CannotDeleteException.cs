@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Marqa.Service.Exceptions;
 
-namespace Marqa.Service.Exceptions
+public class CannotDeleteException : Exception
 {
-    class CannotDeleteException
+    public CannotDeleteException(string message) : base(message)
+    {
+    }
+
+    public CannotDeleteException(string message, Exception innerException)
+        : base(message, innerException)
     {
     }
 }

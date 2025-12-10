@@ -86,10 +86,25 @@ public class TeacherService(
     public async Task DeleteAsync(int id)
     {
         var teacherForDeletion = await unitOfWork.Employees
-            .SelectAllAsQueryable(b => !b.IsDeleted && b.Role.CanTeach,
+            .SelectAllAsQueryable(b => b.Id == id && !b.IsDeleted && b.Role.CanTeach,
             includes: "Role")
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Teacher was not found with ID = {id}");
+
+        var hasCourses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => !c.IsDeleted && c.TeacherId == id)
+            .AnyAsync();
+
+        if (hasCourses)
+        {
+            var courseCount = await unitOfWork.Courses
+                .SelectAllAsQueryable(c => !c.IsDeleted && c.TeacherId == id)
+                .CountAsync();
+
+            throw new CannotDeleteException(
+                $"Cannot delete teacher because they have {courseCount} assigned course(s). " +
+                "Please reassign or delete the courses first.");
+        }
 
         var teacherSubjects = await unitOfWork.TeacherSubjects
             .SelectAllAsQueryable(ts => ts.TeacherId == id)
