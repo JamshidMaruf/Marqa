@@ -1,6 +1,5 @@
 ﻿using System;
 using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;

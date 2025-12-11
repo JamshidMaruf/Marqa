@@ -1,19 +1,24 @@
-﻿using Marqa.DataAccess.UnitOfWork;
+﻿using Hangfire;
+using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks.Models;
+using Marqa.Service.Services.Messages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.HomeTasks;
 
-public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) : IHomeTaskService
+public class HomeTaskService(
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
+    ISmsService smsService
+    ) : IHomeTaskService
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
     {
-
         unitOfWork.HomeTasks.Insert(new HomeTask
         {
             LessonId = model.LessonId,
@@ -22,9 +27,19 @@ public class HomeTaskService(IUnitOfWork unitOfWork, IFileService fileService) :
         });
 
         await unitOfWork.SaveAsync();
-        // Send Notification
-    }
 
+        var students = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId,
+            includes: ["Course.Students", "Course.Students.Student.User"]);
+
+        var message = "Homework has been uploaded!";
+
+        //foreach (var student in students.Course.Enrollments)
+        //{
+        //    BackgroundJob.Enqueue(() =>
+        //    smsService.SendNotificationAsync(student.Student.User.Phone, message));
+        //}
+    }
+    
     public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)
     {
         var existHomeTask = await unitOfWork.HomeTasks.CheckExistAsync(l => l.Id == homeTaskId);

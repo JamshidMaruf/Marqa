@@ -1,4 +1,4 @@
-using Marqa.Service.Services.Settings;
+﻿using Marqa.Service.Services.Settings;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.Controllers;
