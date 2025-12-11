@@ -119,6 +119,30 @@ public class SmsService(
         return result.Data.Token;
     }
 
+    public async Task SendNotificationAsync(string phone, string message)
+    {
+        var settings = await settingService.GetByCategoryAsync("Eskiz");
+
+        var url = settings["Eskiz.SendMessageUrl"];
+
+        var payload = new SendMessageModel
+        {
+            Phone = phone,
+            Message = message,
+            From = settings["Eskiz.From"],
+        };
+
+        var json = JsonConvert.SerializeObject(payload);
+
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var httpClient = new HttpClient();
+
+        var response = await httpClient.PostAsync(url, content);
+
+        response.EnsureSuccessStatusCode();
+    }
+
     private async Task SendMessageAsync(string phone, string otp)
     {
         var settings = await settingService.GetByCategoryAsync("Eskiz");

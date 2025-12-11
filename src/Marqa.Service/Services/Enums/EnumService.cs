@@ -1,4 +1,5 @@
-﻿using Marqa.Domain.Enums;
+﻿using System.ComponentModel;
+using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Enums.Models;
 
@@ -8,14 +9,24 @@ public class EnumService : IEnumService
     public List<EnumGetModel> GetEnumValues<T>() where T : Enum
     {
         if (!typeof(T).IsEnum)
-            throw new ArgumentIsNotValidException("Argument must be an enum");
+            throw new ArgumentIsNotValidException("The provided type parameter T is not an enum.");
 
-        return Enum.GetValues(typeof(T))
-            .Cast<T>()
-            .Select(x => new EnumGetModel
+        return typeof(T)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Select(field =>
             {
-                Id = Convert.ToInt32(x),
-                Name = x.ToString()
+                var value = (T)field.GetValue(null);
+
+                var description = field
+                    .GetCustomAttributes(typeof(DescriptionAttribute), false)
+                    .Cast<DescriptionAttribute>()
+                    .FirstOrDefault()?.Description ?? field.Name;
+
+                return new EnumGetModel
+                {
+                    Id = Convert.ToInt32(value),
+                    Name = description
+                };
             })
             .ToList();
     }

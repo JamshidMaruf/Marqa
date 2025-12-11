@@ -9,6 +9,7 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
@@ -183,7 +184,7 @@ public class TeacherService(
 
         var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
             includes: "Subject")
-           // .Where(c => c.TeacherId == id)
+            // .Where(c => c.TeacherId == id)
             .Select(c => new TeacherViewModel.CourseInfo
             {
                 Id = c.Id,
@@ -341,73 +342,15 @@ public class TeacherService(
         return new CalculatedTeacherSalaryModel();
     }
 
-    #region lab
+    public async Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes()
+    {
+        var enumValues = enumService.GetEnumValues<TeacherPaymentType>();
+        var paymentTypes = enumValues.Select(ev => new TeacherPaymentGetModel
+        {
+            Id = ev.Id,
+            Name = ev.Name
+        }).ToList();
 
-    //public async Task<List<TeacherViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
-    //{
-    //    var teacherQuery = unitOfWork.Employees
-    //        .SelectAllAsQueryable(t => !t.IsDeleted && t.CompanyId == companyId,
-    //        includes: ["Role"])
-    //        .GroupJoin(
-    //            unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
-    //            t => t.Id,
-    //            ts => ts.TeacherId,
-    //            (t, ts) => new
-    //            {
-    //                Id = t.Id,
-    //                DateOfBirth = t.DateOfBirth,
-    //                Gender = t.Gender,
-    //                FirstName = t.FirstName,
-    //                LastName = t.LastName,
-    //                Email = t.Email,
-    //                Phone = t.Phone,
-    //                Status = t.Status,
-    //                JoiningDate = t.JoiningDate,
-    //                Specialization = t.Specialization,
-    //                Subjects = ts,
-    //                Role = t.Role
-    //            });
-
-    //    if (subjectId is not null)
-    //        teacherQuery = teacherQuery.Where(t => t.Subjects.Select(t => t.Id).Contains(subjectId.Value));
-
-    //    var teachers = await teacherQuery.GroupJoin(
-    //             unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }),
-    //            t => t.Id,
-    //            c => c.TeacherId,
-    //            (t, courses) => new TeacherViewModel
-    //            {
-    //                Id = t.Id,
-    //                DateOfBirth = t.DateOfBirth,
-    //                Gender = t.Gender,
-    //                FirstName = t.FirstName,
-    //                LastName = t.LastName,
-    //                Email = t.Email,
-    //                Phone = t.Phone,
-    //                Status = t.Status,
-    //                JoiningDate = t.JoiningDate,
-    //                Specialization = t.Specialization,
-    //                Subjects = t.Subjects.Select(t => new SubjectInfo
-    //                {
-    //                    Id = t.Id,
-    //                    Name = t.Subject.Name,
-    //                }),
-    //                Courses = courses.Select(c => new CourseInfo
-    //                {
-    //                    Id = c.Id,
-    //                    Name = c.Name,
-    //                    SubjectId = c.Subject.Id,
-    //                    SubjectName = c.Subject.Name
-    //                }),
-    //                Role = new RoleInfo
-    //                {
-    //                    Id = t.Role.Id,
-    //                    Name = t.Role.Name
-    //                }
-    //            }
-    //        ).ToListAsync();
-
-    //    return teachers;
-    //}
-    #endregion
-}
+        return paymentTypes;
+    }
+    }

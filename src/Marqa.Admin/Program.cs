@@ -1,4 +1,4 @@
-using Marqa.Admin.Extensions;
+﻿using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
 using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -43,7 +43,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Permissions}/{action=Index}/{id?}")
+        pattern: "{controller=Auth}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 app.Run();

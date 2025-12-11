@@ -474,20 +474,77 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
-        var course = await unitOfWork.Courses
+        var courseQuery = unitOfWork.Courses
             .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)
-            .FirstOrDefaultAsync();
+            .Include(c => c.Enrollments)
+                .ThenInclude(e => e.Student)
+                    .ThenInclude(s => s.User);
+
+        var course = await courseQuery.FirstOrDefaultAsync();
+
+        if (course == null)
+            throw new Exception("Upcoming course not found.");
 
         return new UpcomingCourseViewModel
         {
             EnrolledStudentCount = course.Enrollments.Count,
             AvailableSeats = course.MaxStudentCount - course.Enrollments.Count,
             MaxStudentCount = course.MaxStudentCount,
+
             Students = course.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
             {
-                FullName = $"{e.Student.User.FirstName} {e.Student.User.LastName}",
+                FullName = $"{e.Student?.User?.FirstName} {e.Student?.User?.LastName}".Trim(),
                 DateOfEnrollment = e.EnrolledDate
             }).ToList()
         };
+    }
+    public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)
+    {
+        var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            var students = await unitOfWork.Students
+                .SelectAllAsQueryable(s => model.StudentIds.Contains(s.Id) && !s.IsDeleted)
+                .ToListAsync();
+
+            if (students.Count != model.StudentIds.Count)
+            {
+                var foundIds = students.Select(s => s.Id).ToList();
+                var notFoundIds = model.StudentIds.Except(foundIds).ToList();
+                throw new NotFoundException($"{notFoundIds.Count} student(s) not found");
+            }
+
+            var existingEnrollments = await unitOfWork.Enrollments
+                .SelectAllAsQueryable(e =>
+                    e.CourseId == model.CourseId &&
+                    model.StudentIds.Contains(e.StudentId) &&
+                    !e.IsDeleted)
+                .Select(e => e.StudentId)
+                .ToListAsync();
+
+            if (existingEnrollments.Any())
+                throw new AlreadyExistException($"{existingEnrollments.Count} student(s) already enrolled in this course");
+
+            var enrollments = model.StudentIds.Select(studentId => new Enrollment
+            {
+                StudentId = studentId,
+                CourseId = model.CourseId,
+                EnrolledDate = model.EnrollmentDate,
+                Status = EnrollmentStatus.Active,
+                PaymentType = CoursePaymentType.DiscountFree,
+                Amount = 0
+            }).ToList();
+
+            await unitOfWork.Enrollments.InsertRangeAsync(enrollments);
+            await unitOfWork.SaveAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }
