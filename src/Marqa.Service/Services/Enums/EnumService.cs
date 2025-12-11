@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using System.Reflection;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Enums.Models;
+using Newtonsoft.Json.Linq;
 
 namespace Marqa.Service.Services.Enums;
 public class EnumService : IEnumService
@@ -12,7 +14,7 @@ public class EnumService : IEnumService
             throw new ArgumentIsNotValidException("The provided type parameter T is not an enum.");
 
         return typeof(T)
-            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
             .Select(field =>
             {
                 var value = (T)field.GetValue(null);
@@ -31,7 +33,7 @@ public class EnumService : IEnumService
             .ToList();
     }
 
-    public YearlyMonths GetYearlyMonths()
+    public YearlyMonths GetCurrentYearlyMonths()
     {
         return new YearlyMonths
         {
@@ -45,5 +47,15 @@ public class EnumService : IEnumService
                 Name = m.ToString()
             }).ToList()
         };
+    }
+
+    public string GetEnumDescription(Enum value)
+    {
+        FieldInfo fieldInfo = value.GetType().GetField(value.ToString());
+
+        var attributes = (DescriptionAttribute[])fieldInfo
+            .GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+        return attributes.Length > 0 ? attributes[0].Description : value.ToString();
     }
 }

@@ -1,18 +1,19 @@
 ﻿using FluentValidation;
 using Hangfire;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Enrollments.Models;
+using Marqa.Service.Services.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Enrollments;
 
 public class EnrollmentService(IUnitOfWork unitOfWork,
     IValidator<EnrollmentCreateModel> enrollmentCreateValidator,
-    IValidator<StudentTransferModel> transferValidator) : IEnrollmentService
+    IValidator<StudentTransferModel> transferValidator,
+    IEnumService enumService) : IEnrollmentService
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
@@ -134,7 +135,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             };
             
             BackgroundJob.Schedule(
-                () => UnFreezeStudentAsync(unFreezeModel).ConfigureAwait(true).GetAwaiter(),
+                () => UnFreezeStudentAsync(unFreezeModel),
                 model.EndDate.Value);
         }
 
@@ -243,20 +244,19 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         {
             new EnrollmentStatusViewModel.EnrollmentStatusData{
                 Id = (int)EnrollmentStatus.Active,
-                Name = Enum.GetName(EnrollmentStatus.Active)
+                Name = enumService.GetEnumDescription(EnrollmentStatus.Active)
             },
             new EnrollmentStatusViewModel.EnrollmentStatusData
             {
                 Id = (int)EnrollmentStatus.Test,
-                Name = Enum.GetName(EnrollmentStatus.Test)
+                Name = enumService.GetEnumDescription(EnrollmentStatus.Test)
             },
             new EnrollmentStatusViewModel.EnrollmentStatusData
             {
                 Id = (int)EnrollmentStatus.Completed,
-                Name = Enum.GetName(EnrollmentStatus.Completed)
+                Name = enumService.GetEnumDescription(EnrollmentStatus.Completed)
             }
         };
-
 
         return specificEnum;
     }

@@ -128,7 +128,7 @@ public class EnumsController : ControllerBase
     [HttpGet("current-yearly-months")]
     public async Task<IActionResult> GetYearlyMonths()
     {
-        var result = _enumService.GetYearlyMonths();
+        var result = _enumService.GetCurrentYearlyMonths();
 
         return Ok(new Response<YearlyMonths>
         {
