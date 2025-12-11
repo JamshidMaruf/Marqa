@@ -10,7 +10,7 @@ public class Teacher : Auditable
     public DateOnly JoiningDate { get; set; }
     public string Qualification { get; set; }
     public string Info { get; set; }
-    public TeacherType Type { get; set; }
+    public TeacherType Type { get; set; }   
     public TeacherStatus Status { get; set; }
     
     // Salary

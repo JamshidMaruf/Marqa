@@ -1,4 +1,6 @@
-﻿namespace Marqa.Service.Services.Teachers.Models;
+﻿using Marqa.Domain.Enums;
+
+namespace Marqa.Service.Services.Teachers.Models;
 
 public class TeacherViewModel
 {
@@ -9,14 +11,14 @@ public class TeacherViewModel
     public string Email { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public GenderInfo Gender { get; set; }
-    public string Specialization { get; set; }
     public StatusInfo Status { get; set; }
     public DateOnly JoiningDate { get; set; }
-    public decimal Amount { get; set; }
+    public TeacherPayment Payment { get; set; }
     public string Info { get; set; }
+    public string Qualification { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
-    public RoleInfo Role { get; set; }
+    public TeacherTypeInfo TypeInfo { get; set; }
 
     public class GenderInfo
     {
@@ -34,6 +36,16 @@ public class TeacherViewModel
         public string Name { get; set; }
     }
     
+    public class TeacherPayment
+    {
+        public int Id { get; set; }
+        public TeacherPaymentType Type { get; set; }
+        public string Name{get;set;}
+        public decimal? FixSalary { get; set; }
+        public decimal? SalaryPercentPerStudent {  get; set; }
+        public decimal? SalaryAmountPerHour { get; set; }
+    }
+    
     public class CourseInfo
     {
         public int Id { get; set; }
@@ -42,9 +54,9 @@ public class TeacherViewModel
         public string SubjectName { get; set; }
     }
 
-    public class RoleInfo
+    public class TeacherTypeInfo
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Type { get; set; }
     }
 }
