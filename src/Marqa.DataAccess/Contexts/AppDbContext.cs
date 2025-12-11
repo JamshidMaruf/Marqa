@@ -37,18 +37,18 @@ public class AppDbContext : DbContext
 
         // Comment out foreach loop if generating migration while you don't have corresponding database
         // Global query applied for all entities        
-        // Expression<Func<Auditable, bool>> filterExpr = bm => !bm.IsDeleted;
-        // foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
-        // {
-        //     if (mutableEntityType.ClrType.IsAssignableTo(typeof(Auditable)))
-        //     {
-        //         var parameter = Expression.Parameter(mutableEntityType.ClrType);
-        //         var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
-        //         var lambdaExpression = Expression.Lambda(body, parameter);
-        //
-        //         mutableEntityType.SetQueryFilter(lambdaExpression);
-        //     }
-        // }
+        Expression<Func<Auditable, bool>> filterExpr = bm => !bm.IsDeleted;
+        foreach (var mutableEntityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (mutableEntityType.ClrType.IsAssignableTo(typeof(Auditable)))
+            {
+                var parameter = Expression.Parameter(mutableEntityType.ClrType);
+                var body = ReplacingExpressionVisitor.Replace(filterExpr.Parameters.First(), parameter, filterExpr.Body);
+                var lambdaExpression = Expression.Lambda(body, parameter);
+
+                mutableEntityType.SetQueryFilter(lambdaExpression);
+            }
+        }
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

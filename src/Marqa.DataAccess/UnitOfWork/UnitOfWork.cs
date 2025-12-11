@@ -21,7 +21,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     // 3. Teacher Management
     public IRepository<Teacher> Teachers => new Repository<Teacher>(context);
     public IRepository<TeacherSubject> TeacherSubjects { get; } = new Repository<TeacherSubject>(context);
-    public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; } // TODO: Add implementation
+    public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; }= new Repository<TeacherPaymentOperation>(context);
 
     // 4. Student Management
     public IRepository<Student> Students { get; } = new Repository<Student>(context);
@@ -70,8 +70,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<BasketItem> BasketItems { get; } = new Repository<BasketItem>(context);
 
     // 12. Finance and Expenses
-    public IRepository<Expense> Expenses { get; } // TODO: Add implementation
-    public IRepository<ExpenseCategory> ExpenseCategories { get; } // TODO: Add implementation
+    public IRepository<Expense> Expenses { get; } = new Repository<Expense>(context);
+    public IRepository<ExpenseCategory> ExpenseCategories { get; } = new Repository<ExpenseCategory>(context);
 
     // 13. Company and Settings
     public IRepository<Company> Companies { get; } = new Repository<Company>(context);
