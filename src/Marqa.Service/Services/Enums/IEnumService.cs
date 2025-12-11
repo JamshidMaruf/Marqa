@@ -1,4 +1,6 @@
-﻿using Marqa.Service.Services.Enums.Models;
+﻿using System.ComponentModel;
+using System.Reflection;
+using Marqa.Service.Services.Enums.Models;
 
 namespace Marqa.Service.Services.Enums;
 public interface IEnumService
@@ -17,7 +19,7 @@ public interface IEnumService
     /// <exception cref="ArgumentIsNotValidException">
     /// If the provided type parameter T is not an enum,
     /// </exception>
-    public List<EnumGetModel> GetEnumValues<T>() where T : Enum;
+    List<EnumGetModel> GetEnumValues<T>() where T : Enum;
 
     /// <summary>
     /// The method gets year and month data which is internal number + name as int and string data types
@@ -25,5 +27,15 @@ public interface IEnumService
     /// <returns>
     /// Returns current year and name + id for each month in the enum <see cref="YearlyMonths"/> 
     /// </returns>
-    public YearlyMonths GetYearlyMonths();
+    YearlyMonths GetCurrentYearlyMonths();
+
+    /// <summary>
+    /// Gets an enum value's Description value if exists, otherwise the given enum value itself
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>
+    /// Returns:
+    ///   A string value represented in a specified enum field's <see cref="DescriptionAttribute" />
+    /// </returns>
+    string GetEnumDescription(Enum value);
 }
