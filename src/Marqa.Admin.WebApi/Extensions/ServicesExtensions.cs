@@ -25,6 +25,7 @@ using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers;
 using Marqa.Service.Validators.Companies;
+using Marqa.Service.Validators.Teachers;
 
 namespace Marqa.Admin.WebApi.Extensions;
 
@@ -58,5 +59,6 @@ public static class ServicesExtensions
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
+        services.AddValidatorsFromAssemblyContaining<TeacherCreateModelValidator>();
     }
 }

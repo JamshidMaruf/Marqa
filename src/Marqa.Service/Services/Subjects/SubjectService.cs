@@ -116,7 +116,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
 
     public async Task BulkAttachAsync(int teacherId, List<int> subjectIds)
     {
-        var teacher = await unitOfWork.Employees.SelectAsync(e => e.Id == teacherId)
+        var teacher = await unitOfWork.Teachers.SelectAsync(e => e.Id == teacherId)
             ?? throw new NotFoundException($"No teacher was found with ID = {teacherId}.");
         
         List<int> existSubjects = await unitOfWork.Subjects

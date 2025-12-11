@@ -1,9 +1,12 @@
-﻿using System.ComponentModel;
-using System.Data;
+﻿using System.Data;
+using System.Diagnostics;
 using FluentValidation;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
+using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
 using Marqa.Service.Services.Enums;
@@ -16,81 +19,94 @@ namespace Marqa.Service.Services.Teachers;
 public class TeacherService(
     IUnitOfWork unitOfWork,
     ISubjectService subjectService,
-    IEmployeeService employeeService,
-    IEnumService enumService) : ITeacherService
+    IValidator<TeacherCreateModel> validatorTeacherCreate,
+    IValidator<TeacherUpdateModel> validatorTeacherUpdate) : ITeacherService
 {
     public async Task CreateAsync(TeacherCreateModel model)
     {
-        var transaction = await unitOfWork.BeginTransactionAsync();
+        await validatorTeacherCreate.EnsureValidatedAsync(model);
+        var alreadyExistTeacher =
+            await unitOfWork.Teachers.CheckExistAsync(t =>
+                t.User.Phone == model.Phone && t.User.CompanyId == model.CompanyId);
 
-        try
+        if (alreadyExistTeacher)
+            throw new AlreadyExistException($"Teacher with this phone {model.Phone} already exists");
+
+        var teacherPhone = model.Phone.TrimPhoneNumber();
+        if (!teacherPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+
+        var teacher = unitOfWork.Teachers.Insert(new Teacher
         {
-            var teacher = await employeeService.CreateAsync(new EmployeeCreateModel
+            User = new User()
             {
-                CompanyId = model.CompanyId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                Gender = model.Gender,
-                Phone = model.Phone,
+                Phone = teacherPhone.Phone,
                 Email = model.Email,
-                Salary = model.Amount,
-                Status = model.Status,
-                Password = model.Password,
-                JoiningDate = model.JoiningDate,
-                Specialization = model.Specialization,
-                Info = model.Info,
-                RoleId = model.RoleId
-            });
+                PasswordHash = PasswordHelper.Hash(model.Password),
+                Role = UserRole.Employee,
+                CompanyId = model.CompanyId,
+            },
+            DateOfBirth = model.DateOfBirth,
+            Gender = model.Gender,
+            JoiningDate = model.JoiningDate,
+            Qualification = model.Qualiification,
+            Info = model.Info,
+            Type = model.Type,
+            Status = model.Status,
+            PaymentType = model.PaymentType,
+            FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
+            SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
+            SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
+        });
+        
+        await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
-
-            await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateAsync(int id, TeacherUpdateModel model)
     {
-        var transaction = await unitOfWork.BeginTransactionAsync();
-
-        try
-        {
-            await employeeService.UpdateAsync(id, new EmployeeUpdateModel
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                DateOfBirth = model.DateOfBirth,
-                Gender = model.Gender,
-                Phone = model.Phone,
-                Email = model.Email,
-                Salary = model.Amount,
-                Status = model.Status,
-                JoiningDate = model.JoiningDate,
-                Specialization = model.Specialization,
-                RoleId = model.RoleId
-            });
-
-            await subjectService.BulkAttachAsync(id, model.SubjectIds);
-            await unitOfWork.SaveAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        await validatorTeacherUpdate.EnsureValidatedAsync(model);
+        var existTeacher = await unitOfWork.Teachers.SelectAsync(t => t.Id == id, includes: "User")
+            ?? throw new NotFoundException($"Teacher was not found with ID = {id}");
+        var existPhone = await unitOfWork.Teachers.SelectAsync(e =>
+            e.User.Phone == model.Phone &&
+            e.User.CompanyId == existTeacher.User.CompanyId &&
+            e.Id != id, includes: "User");
+        
+        if (existPhone != null)
+            throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+        
+        
+        var teacherPhone = model.Phone.TrimPhoneNumber();
+        if (!teacherPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Invalid phone number!");
+        
+        existTeacher.User.FirstName = model.FirstName;
+        existTeacher.User.LastName = model.LastName;
+        existTeacher.User.Email = model.Email;
+        existTeacher.User.Phone = model.Phone;
+        existTeacher.DateOfBirth = model.DateOfBirth;
+        existTeacher.Qualification = model.Qualification;
+        existTeacher.Info = model.Info;
+        existTeacher.Gender = model.Gender;
+        existTeacher.JoiningDate = model.JoiningDate;
+        existTeacher.PaymentType = model.PaymentType;
+        existTeacher.Status = model.Status;
+        existTeacher.Type = model.Type;
+        existTeacher.FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0;
+        existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0;
+        existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0;
+        
+        await subjectService.BulkAttachAsync(existTeacher.Id, model.SubjectIds);
+        await unitOfWork.SaveAsync();   
     }
 
     public async Task DeleteAsync(int id)
     {
-        var teacherForDeletion = await unitOfWork.Employees
+        var teacherForDeletion = await unitOfWork.Teachers
             .SelectAllAsQueryable(b => !b.IsDeleted,
             includes: "Role")
             .FirstOrDefaultAsync()
@@ -105,7 +121,7 @@ public class TeacherService(
             unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
         }
 
-        unitOfWork.Employees.MarkAsDeleted(teacherForDeletion);
+        unitOfWork.Teachers.MarkAsDeleted(teacherForDeletion);
 
         await unitOfWork.SaveAsync();
     }
@@ -129,20 +145,28 @@ public class TeacherService(
                LastName = ts.Teacher.User.LastName,
                Email = ts.Teacher.User.Email,
                Phone = ts.Teacher.User.Phone,
+               Qualification = ts.Teacher.Qualification,
                Status = new TeacherViewModel.StatusInfo
                {
                    Id = Convert.ToInt32(ts.Teacher.Status),
                    Name = Enum.GetName(ts.Teacher.Status),
                },
-               // Amount = ts.Teacher.Salary,
-               JoiningDate = ts.Teacher.JoiningDate,
-               //   Specialization = ts.Teacher.Specialization,
-               Info = ts.Teacher.Info,
-               Role = new TeacherViewModel.RoleInfo
+               TypeInfo = new TeacherViewModel.TeacherTypeInfo
                {
-                   //    Id = ts.Teacher.RoleId,
-                   //   Name = ts.Teacher.Role.Name
-               }
+                   Id =  Convert.ToInt32(ts.Teacher.Type),
+                   Type = Enum.GetName(ts.Teacher.Type),
+               },
+               Payment = new TeacherViewModel.TeacherPayment
+               {
+                   Id = Convert.ToInt32(ts.Teacher.PaymentType),
+                   Type = ts.Teacher.PaymentType,
+                   Name =  Enum.GetName(ts.Teacher.PaymentType),
+                   FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
+                   SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
+                   SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
+               },
+               JoiningDate = ts.Teacher.JoiningDate,
+               Info = ts.Teacher.Info, 
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
@@ -194,20 +218,28 @@ public class TeacherService(
                 LastName = ts.Teacher.User.LastName,
                 Email = ts.Teacher.User.Email,
                 Phone = ts.Teacher.User.Phone,
+                Qualification =  ts.Teacher.Qualification,
                 Status = new TeacherUpdateViewModel.StatusInfo
                 {
                     Id = Convert.ToInt32(ts.Teacher.Status),
                     Name = Enum.GetName(ts.Teacher.Status),
                 },
-                // Amount = ts.Teacher.Salary,
-                JoiningDate = ts.Teacher.JoiningDate,
-                //  Specialization = ts.Teacher.Specialization,
-                Info = ts.Teacher.Info,
-                Role = new TeacherUpdateViewModel.RoleInfo
+                TypeInfo = new TeacherUpdateViewModel.TeacherTypeInfo
                 {
-                    //     Id = ts.Teacher.RoleId,
-                    //   Name = ts.Teacher.Role.Name
-                }
+                    Id =  Convert.ToInt32(ts.Teacher.Type),
+                    Type = Enum.GetName(ts.Teacher.Type),
+                },
+                Payment = new TeacherUpdateViewModel.TeacherPayment
+                {
+                    Id = Convert.ToInt32(ts.Teacher.PaymentType),
+                    Type = ts.Teacher.PaymentType,
+                    Name =  Enum.GetName(ts.Teacher.PaymentType),
+                    FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
+                    SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
+                    SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
+                },
+                JoiningDate = ts.Teacher.JoiningDate,
+                Info = ts.Teacher.Info,
             })
             .FirstOrDefaultAsync()
              ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
@@ -229,9 +261,9 @@ public class TeacherService(
     // works but not optimal enough for large dataset
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
-        var teacherQuery = unitOfWork.Employees
-            .SelectAllAsQueryable(t => !t.IsDeleted && t.User.CompanyId == companyId,
-            includes: ["Role", "User"]);
+        var teacherQuery = unitOfWork.Teachers
+            .SelectAllAsQueryable(t => !t.IsDeleted && t.User.CompanyId == companyId && t.Type == TeacherType.Lead,
+            includes: ["User", "Courses", "TeacherSubjects"]);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -239,73 +271,41 @@ public class TeacherService(
             teacherQuery = teacherQuery.Where(t =>
                 t.User.FirstName.ToLower().Contains(search) ||
                 t.User.LastName.ToLower().Contains(search) ||
-                t.Specialization.ToLower().Contains(search) ||
                 t.User.Phone.Contains(search) ||
                 t.User.Email.Contains(search));
         }
 
-        var teacherWithoutCourses = await teacherQuery.GroupJoin(
-                unitOfWork.TeacherSubjects.SelectAllAsQueryable(t => !t.IsDeleted, includes: "Subject"),
-                t => t.Id,
-                ts => ts.TeacherId,
-                (t, ts) => new TeacherTableViewModel
-                {
-                    Id = t.Id,
-                    FirstName = t.User.FirstName,
-                    LastName = t.User.LastName,
-                    Phone = t.User.Phone,
-                    Gender = new TeacherTableViewModel.GenderInfo
-                    {
-                        Id = Convert.ToInt32(t.Gender),
-                        Name = Enum.GetName(t.Gender),
-                    },
-                    Status = new TeacherTableViewModel.StatusInfo
-                    {
-                        Id = Convert.ToInt32(t.Status),
-                        Name = Enum.GetName(t.Status),
-                    },
-                    Subjects = ts.Select(t => new TeacherTableViewModel.SubjectInfo
-                    {
-                        Id = t.SubjectId,
-                        Name = t.Subject.Name,
-                    }),
-                    Role = new TeacherTableViewModel.RoleInfo
-                    {
-                        Id = t.Role.Id,
-                        Name = t.Role.Name
-                    }
-                }).ToListAsync();
-
-        if (subjectId is not null)
-            teacherWithoutCourses = teacherWithoutCourses.Where(t => t.Subjects.Select(t => t.Id).Contains(subjectId.Value)).ToList();
-
-        // var teachers = teacherWithoutCourses.GroupJoin(
-        //         await unitOfWork.Courses.SelectAllAsQueryable(t => !t.IsDeleted, includes: new[] { "Subject" }).ToListAsync(),
-        //         t => t.Id,
-        //       //  c => c.TeacherId,
-        //         (t, courses) => new TeacherTableViewModel
-        //         {
-        //             Id = t.Id,
-        //             // Gender = t.Gender,
-        //             // FirstName = t.FirstName,
-        //             // LastName = t.LastName,
-        //             // Phone = t.Phone,
-        //             // Status = t.Status,
-        //             // Subjects = t.Subjects,
-        //             Courses = courses.Select(c => new TeacherTableViewModel.CourseInfo
-        //             {
-        //                 Id = c.Id,
-        //                 Name = c.Name,
-        //                 SubjectId = c.Subject.Id,
-        //                 SubjectName = c.Subject.Name
-        //             }),
-        //             //Role = t.Role
-        //         }
-        //     );
-        //
-        // return teachers.ToList();
-
-        throw new NotImplementedException();
+        var teachers = await teacherQuery.Select(t => new TeacherTableViewModel
+        {
+            Id =  t.Id,
+            FirstName = t.User.FirstName,
+            LastName = t.User.LastName,
+            Phone = t.User.Phone,
+            Gender =  new TeacherTableViewModel.GenderInfo
+            {
+                Id = Convert.ToInt32(t.Gender),
+                Name = Enum.GetName(t.Gender),
+            },
+            Status = new TeacherTableViewModel.StatusInfo
+            {
+                Id =  Convert.ToInt32(t.Status),
+                Name = Enum.GetName(t.Status),
+            },
+            Subjects = t.TeacherSubjects.Select(ts => new TeacherTableViewModel.SubjectInfo
+            {
+                Id = ts.SubjectId,
+                Name = ts.Subject.Name
+            }),
+            Courses = t.Courses.Select( c => new TeacherTableViewModel.CourseInfo
+            {
+                Id =  c.Id,
+                Name = c.Name,
+                SubjectId = c.SubjectId,
+                SubjectName = c.Subject.Name
+            })
+        }).ToListAsync();
+        
+        return teachers;
     }
 
     public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)

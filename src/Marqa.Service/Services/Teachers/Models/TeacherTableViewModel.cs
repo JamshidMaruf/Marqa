@@ -10,7 +10,6 @@ public class TeacherTableViewModel
     public StatusInfo Status { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
-    public RoleInfo Role { get; set; }
 
     public class GenderInfo
     {
@@ -34,11 +33,5 @@ public class TeacherTableViewModel
         public string Name { get; set; }
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
-    }
-
-    public class RoleInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
     }
 }
