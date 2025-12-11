@@ -13,7 +13,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Permission> Permissions { get; } = new Repository<Permission>(context);
     public IRepository<RolePermission> RolePermissions { get; } = new Repository<RolePermission>(context);
 
-    // 2. Employee and Staff Management
+    /// 2. Employee and Staff Management
     public IRepository<Employee> Employees { get; } = new Repository<Employee>(context);
     public IRepository<EmployeeRole> EmployeeRoles { get; } = new Repository<EmployeeRole>(context);
     public IRepository<EmployeePaymentOperation> EmployeePaymentOperations { get; } = new Repository<EmployeePaymentOperation>(context);
