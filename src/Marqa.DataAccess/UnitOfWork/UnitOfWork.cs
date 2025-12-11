@@ -7,7 +7,7 @@ namespace Marqa.DataAccess.UnitOfWork;
 
 public class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
-    // 1. User and Authentication
+    /// 1. User and Authentication
     public IRepository<User> Users { get; } = new Repository<User>(context);
     public IRepository<RefreshToken> RefreshTokens { get; } = new Repository<RefreshToken>(context);
     public IRepository<Permission> Permissions { get; } = new Repository<Permission>(context);
