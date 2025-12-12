@@ -1,14 +1,14 @@
 ﻿using Marqa.Service.Services.Companies;
-using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
+using Marqa.Service.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.Controllers;
 
 public class DashboardController(
     ICompanyService companyService,
-    IEmployeeService employeeService,
+    IUserService userService,
     IPermissionService permissionService,
     ISettingService settingService) : Controller
 {
@@ -18,13 +18,12 @@ public class DashboardController(
         {
             // Get statistics
             var companies = await companyService.GetAllAsync();
-
-            var employees = await employeeService.GetAllAsync(1);
+            var usersCount = await userService.GetAllUsersCount();
             var permissions = await permissionService.GetAllAsync();
             var settings = await settingService.GetAllAsync();
             
             ViewBag.TotalCompanies = companies.Count();
-            ViewBag.TotalEmployees = employees.Count();
+            ViewBag.TotalUsers = usersCount;
             ViewBag.TotalSettings = settings.Count();
 
             return View();
