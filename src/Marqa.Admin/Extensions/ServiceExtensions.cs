@@ -21,6 +21,7 @@ using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
+using Marqa.Service.Services.Users;
 using Marqa.Service.Validators.Companies;
 
 namespace Marqa.Admin.Extensions;
@@ -34,6 +35,7 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<ICompanyService, CompanyService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
