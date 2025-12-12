@@ -7,7 +7,7 @@ public class TeacherCreateModel
     public int CompanyId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Qualiification { get; set; }
+    public string Qualification { get; set; }
     public string Info { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public string Phone { get; set; }

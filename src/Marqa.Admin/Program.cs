@@ -1,6 +1,7 @@
 ﻿using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
 using Marqa.Shared.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -13,6 +14,31 @@ builder.Services.AddLogging();
 
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Add Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = CookieAuthenticationDefaults.AuthenticationScheme; 
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None; 
+        options.Cookie.SameSite = SameSiteMode.Lax;            
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.SlidingExpiration = true;
+    });
 
 builder.Services.AddDbContext<AppDbContext>(option
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));
@@ -31,19 +57,29 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// Diagnostic middleware: logs every request, cookies and auth status
+app.Use(async (ctx, next) =>
+{
+    var now = DateTime.UtcNow.ToString("o");
+    var path = ctx.Request.Path;
+    var cookieHeader = ctx.Request.Headers["Cookie"].ToString();
+    var isAuth = ctx.User?.Identity?.IsAuthenticated ?? false;
+    Console.WriteLine($"[DIAG] {now} -> {path} | IsAuthenticated={isAuth} | Cookies='{cookieHeader}'");
+    await next();
+});
+
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAuthentication();
-
-app.MapStaticAssets();
-
 app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Auth}/{action=Login}/{id?}")
-    .WithStaticAssets();
+    name: "default",
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();

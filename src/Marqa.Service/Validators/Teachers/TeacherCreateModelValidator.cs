@@ -23,7 +23,7 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .NotEmpty().WithMessage("Last name is required.")
             .MaximumLength(50);
 
-        RuleFor(x => x.Qualiification)
+        RuleFor(x => x.Qualification)
             .NotEmpty().WithMessage("Qualification is required.")
             .MaximumLength(200);
 

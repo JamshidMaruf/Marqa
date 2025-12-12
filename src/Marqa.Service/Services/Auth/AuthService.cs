@@ -235,7 +235,7 @@ public class AuthService(
     public SuperAdminResponseModel LoginAdmin(string phone, string password)
     {
         // temporary admin credentials 
-        const string ADMIN_PHONE = "998975777552";
+        const string ADMIN_PHONE = "998777777777";
         const string ADMIN_PASSWORD = "root";
 
         // Validate credentials

@@ -20,7 +20,8 @@ public class TeacherService(
     IUnitOfWork unitOfWork,
     ISubjectService subjectService,
     IValidator<TeacherCreateModel> validatorTeacherCreate,
-    IValidator<TeacherUpdateModel> validatorTeacherUpdate) : ITeacherService
+    IValidator<TeacherUpdateModel> validatorTeacherUpdate,
+    IEnumService enumService) : ITeacherService
 {
     public async Task CreateAsync(TeacherCreateModel model)
     {
@@ -51,7 +52,7 @@ public class TeacherService(
             DateOfBirth = model.DateOfBirth,
             Gender = model.Gender,
             JoiningDate = model.JoiningDate,
-            Qualification = model.Qualiification,
+            Qualification = model.Qualification,
             Info = model.Info,
             Type = model.Type,
             Status = model.Status,
@@ -60,7 +61,7 @@ public class TeacherService(
             SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
             SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
         });
-        
+
         await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
         await unitOfWork.SaveAsync();
@@ -75,15 +76,15 @@ public class TeacherService(
             e.User.Phone == model.Phone &&
             e.User.CompanyId == existTeacher.User.CompanyId &&
             e.Id != id, includes: "User");
-        
+
         if (existPhone != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
-        
-        
+
+
         var teacherPhone = model.Phone.TrimPhoneNumber();
         if (!teacherPhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
-        
+
         existTeacher.User.FirstName = model.FirstName;
         existTeacher.User.LastName = model.LastName;
         existTeacher.User.Email = model.Email;
@@ -99,9 +100,9 @@ public class TeacherService(
         existTeacher.FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0;
         existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0;
         existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0;
-        
+
         await subjectService.BulkAttachAsync(existTeacher.Id, model.SubjectIds);
-        await unitOfWork.SaveAsync();   
+        await unitOfWork.SaveAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -153,20 +154,20 @@ public class TeacherService(
                },
                TypeInfo = new TeacherViewModel.TeacherTypeInfo
                {
-                   Id =  Convert.ToInt32(ts.Teacher.Type),
+                   Id = Convert.ToInt32(ts.Teacher.Type),
                    Type = Enum.GetName(ts.Teacher.Type),
                },
                Payment = new TeacherViewModel.TeacherPayment
                {
                    Id = Convert.ToInt32(ts.Teacher.PaymentType),
                    Type = ts.Teacher.PaymentType,
-                   Name =  Enum.GetName(ts.Teacher.PaymentType),
+                   Name = Enum.GetName(ts.Teacher.PaymentType),
                    FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
                    SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
                    SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
                },
                JoiningDate = ts.Teacher.JoiningDate,
-               Info = ts.Teacher.Info, 
+               Info = ts.Teacher.Info,
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
@@ -218,7 +219,7 @@ public class TeacherService(
                 LastName = ts.Teacher.User.LastName,
                 Email = ts.Teacher.User.Email,
                 Phone = ts.Teacher.User.Phone,
-                Qualification =  ts.Teacher.Qualification,
+                Qualification = ts.Teacher.Qualification,
                 Status = new TeacherUpdateViewModel.StatusInfo
                 {
                     Id = Convert.ToInt32(ts.Teacher.Status),
@@ -226,14 +227,14 @@ public class TeacherService(
                 },
                 TypeInfo = new TeacherUpdateViewModel.TeacherTypeInfo
                 {
-                    Id =  Convert.ToInt32(ts.Teacher.Type),
+                    Id = Convert.ToInt32(ts.Teacher.Type),
                     Type = Enum.GetName(ts.Teacher.Type),
                 },
                 Payment = new TeacherUpdateViewModel.TeacherPayment
                 {
                     Id = Convert.ToInt32(ts.Teacher.PaymentType),
                     Type = ts.Teacher.PaymentType,
-                    Name =  Enum.GetName(ts.Teacher.PaymentType),
+                    Name = Enum.GetName(ts.Teacher.PaymentType),
                     FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
                     SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
                     SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
@@ -277,18 +278,18 @@ public class TeacherService(
 
         var teachers = await teacherQuery.Select(t => new TeacherTableViewModel
         {
-            Id =  t.Id,
+            Id = t.Id,
             FirstName = t.User.FirstName,
             LastName = t.User.LastName,
             Phone = t.User.Phone,
-            Gender =  new TeacherTableViewModel.GenderInfo
+            Gender = new TeacherTableViewModel.GenderInfo
             {
                 Id = Convert.ToInt32(t.Gender),
                 Name = Enum.GetName(t.Gender),
             },
             Status = new TeacherTableViewModel.StatusInfo
             {
-                Id =  Convert.ToInt32(t.Status),
+                Id = Convert.ToInt32(t.Status),
                 Name = Enum.GetName(t.Status),
             },
             Subjects = t.TeacherSubjects.Select(ts => new TeacherTableViewModel.SubjectInfo
@@ -296,15 +297,15 @@ public class TeacherService(
                 Id = ts.SubjectId,
                 Name = ts.Subject.Name
             }),
-            Courses = t.Courses.Select( c => new TeacherTableViewModel.CourseInfo
+            Courses = t.Courses.Select(c => new TeacherTableViewModel.CourseInfo
             {
-                Id =  c.Id,
+                Id = c.Id,
                 Name = c.Name,
                 SubjectId = c.SubjectId,
                 SubjectName = c.Subject.Name
             })
         }).ToListAsync();
-        
+
         return teachers;
     }
 
@@ -353,4 +354,4 @@ public class TeacherService(
 
         return paymentTypes;
     }
-    }
+}

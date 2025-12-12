@@ -1,0 +1,163 @@
+﻿@{
+	ViewData["Title"] = "Dashboard";
+}
+
+<div class="dashboard p-3">
+	<!-- Page Header -->
+	<div class="row mb-3">
+		<div class="col-12">
+			<h1 class="h4 mb-0 fw-700">Dashboard</h1>
+		</div>
+	</div>
+
+	<!-- Statistics Cards -->
+	<div class="row">
+		<!-- Companies Card -->
+		<div class="col-xl-3 col-md-6 mb-3">
+			<div class="stats-card primary d-flex align-items-center">
+				<div class="stats-icon me-4">
+					<i class="fas fa-building"></i>
+				</div>
+				<div class="stats-content">
+					<h3>@ViewBag.TotalCompanies</h3>
+					<p>Total Companies</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Employee Card -->
+		<div class="col-xl-3 col-md-6 mb-3">
+			<div class="stats-card success d-flex align-items-center">
+				<div class="stats-icon me-4">
+					<i class="fas fa-users"></i>
+				</div>
+				<div class="stats-content">
+					<h3>@ViewBag.TotalEmployees</h3>
+					<p>Total Employees</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Setting Card -->
+		<div class="col-xl-3 col-md-6 mb-3">
+			<div class="stats-card warning d-flex align-items-center">
+				<div class="stats-icon me-4">
+					<i class="fas fa-box"></i>
+				</div>
+				<div class="stats-content">
+					<h3>@ViewBag.TotalSettings</h3>
+					<p>Total Settings</p>
+				</div>
+			</div>
+		</div>
+
+
+	<!-- Quick Actions -->
+	<div class="row mb-3">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="mb-0 fw-700">Quick Actions</h6>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-3 mb-3">
+							<a asp-controller="Companies" asp-action="Create" class="btn btn-primary w-100">
+								<i class="fas fa-plus me-1"></i>Add Company
+							</a>
+						</div>
+						<div class="col-md-3 mb-3">
+							<a asp-controller="Employee" asp-action="Create" class="btn btn-info w-100">
+								<i class="fas fa-code-branch me-1"></i>Add Employee
+							</a>
+						</div>
+						<div class="col-md-3 mb-3">
+							<a asp-controller="Permission" asp-action="Create" class="btn btn-success w-100">
+								<i class="fas fa-user-plus me-1"></i>Add Permission
+							</a>
+						</div>
+						<div class="col-md-3 mb-3">
+							<a asp-controller="Setting" asp-action="Create" class="btn btn-warning w-100">
+								<i class="fas fa-box me-1"></i>Add Setting
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Recent Activity -->
+	<div class="row">
+		<div class="col-lg-8 mb-3">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="mb-0 fw-700">System Overview</h6>
+				</div>
+				<div class="card-body">
+					<div class="alert alert-info">
+						<i class="fas fa-info-circle me-2"></i>
+						<strong>Welcome!</strong> This is your admin dashboard. Use the sidebar to navigate through different sections.
+					</div>
+
+					<h6 class="mt-4 mb-3">System Status</h6>
+					<div class="row">
+						<div class="col-md-6 mb-3">
+							<div class="d-flex align-items-center">
+								<div class="flex-shrink-0">
+									<i class="fas fa-check-circle fa-2x text-success"></i>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<h6 class="mb-0">Database</h6>
+									<small class="text-muted">Connected</small>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mb-3">
+							<div class="d-flex align-items-center">
+								<div class="flex-shrink-0">
+									<i class="fas fa-check-circle fa-2x text-success"></i>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<h6 class="mb-0">API</h6>
+									<small class="text-muted">Running</small>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-4 mb-3">
+			<div class="card">
+				<div class="card-header">
+					<h6 class="mb-0 fw-700">Quick Links</h6>
+				</div>
+				<div class="card-body">
+					<div class="list-group list-group-flush">
+						<a asp-controller="Companies" asp-action="Index" class="list-group-item list-group-item-action">
+							<i class="fas fa-building me-2 text-primary"></i>Manage Companies
+						</a>
+						<a asp-controller="Employees" asp-action="Index" class="list-group-item list-group-item-action">
+								<i class="fas fa-code-branch me-2 text-success"></i>Manage Employees
+						</a>
+							<a asp-controller="Permissions" asp-action="Index" class="list-group-item list-group-item-action">
+							<i class="fas fa-users me-2 text-info"></i>Manage Permissions
+						</a>
+						<a asp-controller="Settings" asp-action="Index" class="list-group-item list-group-item-action">
+								<i class="fas fa-box me-2 text-warning"></i>Manage Settings
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		console.log('Dashboard loaded successfully');
+	</script>
+}
+
