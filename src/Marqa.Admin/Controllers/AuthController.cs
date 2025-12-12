@@ -29,7 +29,7 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> LoginAdminAsync(string phone, string password, bool rememberMe)
+    public async Task<IActionResult> Login(string phone, string password, bool rememberMe)
     {
         try
         {
