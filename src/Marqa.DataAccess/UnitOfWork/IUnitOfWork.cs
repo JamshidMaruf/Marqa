@@ -31,6 +31,8 @@ public interface IUnitOfWork : IDisposable
     IRepository<Subject> Subjects { get; }
     IRepository<Lesson> Lessons { get; }
     IRepository<CourseWeekday> CourseWeekdays { get; }
+    IRepository<CourseTeacher> CourseTeachers { get; }
+
 
     // 6. Enrollment and Registration
     IRepository<Enrollment> Enrollments { get; }
