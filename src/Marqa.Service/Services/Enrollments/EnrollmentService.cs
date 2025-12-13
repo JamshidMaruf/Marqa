@@ -22,29 +22,9 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
              includes: "Enrollments")
                 ?? throw new NotFoundException("Course is not found");
 
-        //await enrollmentCreateValidator.ValidateAndThrowAsync(model);
+        await enrollmentCreateValidator.ValidateAndThrowAsync(model);
 
-        var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
-
-        if (!existStudent)
-            throw new NotFoundException("Student is not found");
-        
-        if (existCourse.MaxStudentCount == existCourse.Enrollments.Count)
-            throw new RequestRefusedException("This course has reached its maximum number of students.");
-
-        if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
-            if (model.Amount > 100 || model.Amount < 0)
-                throw new ArgumentIsNotValidException("Invalid amount");
-
-            else if (model.PaymentType == CoursePaymentType.Fixed)
-                if (model.Amount < 0)
-                    throw new ArgumentIsNotValidException("Invalid amount");
-
-        if (model.EnrollmentDate > DateTime.UtcNow)
-            throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
-        //
-
-        unitOfWork.Enrollments.Insert(new Enrollment
+        var enrollment = new Enrollment
         {
             CourseId = model.CourseId,
             StudentId = model.StudentId,
@@ -52,7 +32,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
             EnrolledDate = model.EnrollmentDate,
             Status = model.Status
-        });
+        };
 
         await unitOfWork.SaveAsync();
     }
