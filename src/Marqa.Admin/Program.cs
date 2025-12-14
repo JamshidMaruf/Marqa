@@ -45,8 +45,6 @@ builder.Services.AddDbContext<AppDbContext>(option
 
 builder.Services.AddMarqaServices();
 
-builder.Services.AddJWTService();
-
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(
@@ -56,17 +54,6 @@ builder.Services.AddControllers(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
-// Diagnostic middleware: logs every request, cookies and auth status
-app.Use(async (ctx, next) =>
-{
-    var now = DateTime.UtcNow.ToString("o");
-    var path = ctx.Request.Path;
-    var cookieHeader = ctx.Request.Headers["Cookie"].ToString();
-    var isAuth = ctx.User?.Identity?.IsAuthenticated ?? false;
-    Console.WriteLine($"[DIAG] {now} -> {path} | IsAuthenticated={isAuth} | Cookies='{cookieHeader}'");
-    await next();
-});
 
 app.UseHttpsRedirection();
 

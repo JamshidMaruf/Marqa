@@ -40,16 +40,18 @@ public class AuthController : Controller
                 return View();
             }
 
-            // Authenticate admin using Login method
-            var loginResponse = _authService.LoginAdmin(phone, password);
+            var loginModel = new LoginModel{Phone = phone, Password = password, RememberMe = rememberMe};
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+            var loginResponse = await _authService.LoginAdminAsync(loginModel, ipAddress);
 
             // Create claims
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, loginResponse.Id.ToString()),
-                new Claim(ClaimTypes.Name, $"{loginResponse.FirstName} {loginResponse.LastName}"),
-                new Claim(ClaimTypes.MobilePhone, loginResponse.Phone),
-                new Claim(ClaimTypes.Role, loginResponse.Role)
+                new Claim(ClaimTypes.NameIdentifier, loginResponse.User.Id.ToString()),
+                new Claim(ClaimTypes.Name, $"{loginResponse.User.FirstName} {loginResponse.User.LastName}"),
+                new Claim(ClaimTypes.MobilePhone, loginResponse.User.Phone),
+                new Claim(ClaimTypes.Role, loginResponse.User.Role)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -65,9 +67,9 @@ public class AuthController : Controller
                 authProperties);
 
             // Store tokens in session
-            HttpContext.Session.SetString("AccessToken", loginResponse.AccessToken);
-            HttpContext.Session.SetString("RefreshToken", loginResponse.RefreshToken);
-
+            HttpContext.Session.SetString("AccessToken", loginResponse.Token.AccessToken);
+            HttpContext.Session.SetString("RefreshToken", loginResponse.Token.RefreshToken);
+            
             TempData["SuccessMessage"] = "Login successful!";
             return RedirectToAction("Index", "Dashboard");
         }

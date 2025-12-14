@@ -19,8 +19,7 @@ namespace Marqa.Service.Services.Auth;
 public class AuthService(
     IUnitOfWork unitOfWork,
     IJwtService jwtService, 
-    ISettingService settingService,
-    IConfiguration configuration) : IAuthService
+    ISettingService settingService) : IAuthService
 {
     public async ValueTask<LoginResponseModel> LoginAsync(LoginModel model, string ipAddress)
     {
@@ -232,57 +231,62 @@ public class AuthService(
         };
     }
 
-    public SuperAdminResponseModel LoginAdmin(string phone, string password)
+    public async Task<LoginResponseModel> LoginAdminAsync(LoginModel model, string ipAddress)
     {
         // temporary admin credentials 
         const string ADMIN_PHONE = "998777777777";
         const string ADMIN_PASSWORD = "root";
 
         // Validate credentials
-        if (phone != ADMIN_PHONE || password != ADMIN_PASSWORD)
-        {
+        if (model.Phone != ADMIN_PHONE || model.Password != ADMIN_PASSWORD)
             throw new UnauthorizedAccessException("Invalid phone or password");
-        }
 
-        // Generate JWT token for admin
-        var claims = new List<Claim>
+        var user = new User
         {
-            new Claim(ClaimTypes.NameIdentifier, "0"),
-            new Claim(ClaimTypes.Name, "Super Admin"),
-            new Claim(ClaimTypes.MobilePhone, ADMIN_PHONE),
-            new Claim(ClaimTypes.Role, "SuperAdmin"),
-            new Claim("Permissions", "all")
+            Id = 0, FirstName = "Super", LastName = "Admin", Phone = ADMIN_PHONE,
         };
+        
+        var accessToken = await jwtService.GenerateJwtToken(user,"SuperAdmin");
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"]));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiresInSeconds = int.Parse(configuration["Jwt:ExpiresInSeconds"] ?? "3600");
+        // refresh token
+        var refreshToken = jwtService.GenerateRefreshToken();
 
-        var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(expiresInSeconds),
-            signingCredentials: credentials
-        );
+        var configuration = await settingService.GetByCategoryAsync("RefreshToken");
 
-        var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-        // Generate refresh token
-        var refreshToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        var refreshTokenExpiresIn = model.RememberMe 
+            ? DateTime.UtcNow.AddDays(Convert.ToInt16(configuration["RefreshToken.Expires.RememberMe"])) 
+            : DateTime.UtcNow.AddDays(Convert.ToInt16(configuration["RefreshToken.Expires.Standard"]));
+    
+        var refreshTokenEntity = new RefreshToken
+        {
+            UserId = user.Id,
+            Token = refreshToken, 
+            ExpiresAt = refreshTokenExpiresIn, 
+            CreatedByIp = ipAddress,
+            CreatedAt = DateTime.UtcNow
+        };
+        
+        unitOfWork.RefreshTokens.Insert(refreshTokenEntity);
+        await unitOfWork.SaveAsync();
         
         // Return admin login response
-        return new SuperAdminResponseModel
+        return new LoginResponseModel
         {
-            Id = 0L,
-            FirstName = "Super",
-            LastName = "Admin",
-            Phone = ADMIN_PHONE,
-            Role = "SuperAdmin",
-            AccessToken = accessToken,
-            RefreshToken = refreshToken,
-            ExpiresIn = expiresInSeconds,
-            TokenType = "Bearer"
+            User = new LoginResponseModel.UserData
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Phone = user.Phone,
+                Role = "SuperAdmin",
+            },
+            Token = new LoginResponseModel.TokenData
+            {
+                AccessToken = accessToken.Token,
+                RefreshToken = refreshToken,
+                ExpiresIn = accessToken.ExpiresIn,
+                TokenType = "Bearer"
+            }
         };
     }
 }

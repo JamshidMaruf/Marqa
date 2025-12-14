@@ -2,10 +2,12 @@
 using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc; 
 
 namespace Marqa.Admin.Controllers;
 
+[Authorize]
 public class DashboardController(
     ICompanyService companyService,
     IUserService userService,
