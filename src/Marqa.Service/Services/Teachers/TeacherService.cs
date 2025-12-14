@@ -107,14 +107,45 @@ public class TeacherService(
 
     public async Task DeleteAsync(int id)
     {
-        var teacherForDeletion = await unitOfWork.Teachers
-            .SelectAllAsQueryable(b => !b.IsDeleted,
-            includes: "Role")
+        var teacherForDeletion = await unitOfWork.Employees
+            .SelectAllAsQueryable(e => e.Id == id && !e.IsDeleted,
+                includes: "User")
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Teacher was not found with ID = {id}");
 
+        bool hasActiveCourses = await unitOfWork.CourseTeachers
+            .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted,
+                includes: "Course")
+            .AnyAsync(ct => !ct.Course.IsDeleted && ct.Course.Status == CourseStatus.Active);
+
+        if (hasActiveCourses)
+        {
+            var activeCourses = await unitOfWork.CourseTeachers
+                .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted,
+                    includes: "Course")
+                .Where(ct => !ct.Course.IsDeleted && ct.Course.Status == CourseStatus.Active)
+                .Select(ct => ct.Course.Name)
+                .ToListAsync();
+
+            var teacherName = $"{teacherForDeletion.User.FirstName} {teacherForDeletion.User.LastName}";
+
+            throw new InvalidOperationException(
+                $"Cannot delete teacher '{teacherName}'. " +
+                $"This teacher has {activeCourses.Count} active course(s): {string.Join(", ", activeCourses)}. " +
+                "Please reassign courses to another teacher or deactivate courses first.");
+        }
+
+        var courseTeachers = await unitOfWork.CourseTeachers
+            .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted)
+            .ToListAsync();
+
+        foreach (var courseTeacher in courseTeachers)
+        {
+            unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
+        }
+
         var teacherSubjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id)
+            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted)
             .ToListAsync();
 
         foreach (var teacherSubject in teacherSubjects)
@@ -122,8 +153,7 @@ public class TeacherService(
             unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
         }
 
-        unitOfWork.Teachers.MarkAsDeleted(teacherForDeletion);
-
+        unitOfWork.Employees.MarkAsDeleted(teacherForDeletion);
         await unitOfWork.SaveAsync();
     }
 

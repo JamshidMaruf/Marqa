@@ -12,22 +12,32 @@ public static class EnrollmentValidatorHelper
         if (model.PaymentType == CoursePaymentType.Fixed)
             return amount >= 0;
 
-        return true;
+        return true; 
     }
 
     public static async Task<bool> ValidateCourseCapacityAsync(IUnitOfWork unitOfWork, int courseId, int studentId)
     {
-        var course = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId);
+        var course = await unitOfWork.Courses.SelectAsync(
+            c => c.Id == courseId,
+            includes: "Enrollments");
 
         if (course == null)
             return false;
 
-
         var existingEnrollment = await unitOfWork.Enrollments.CheckExistAsync(
-            e => e.StudentId == studentId && e.CourseId == courseId);
+            e => e.StudentId == studentId &&
+                 e.CourseId == courseId &&
+                 !e.IsDeleted &&
+                 (e.Status == EnrollmentStatus.Active || e.Status == EnrollmentStatus.Test));
 
-        return !existingEnrollment;
+        if (existingEnrollment)
+            return false;
 
+        var activeEnrollmentsCount = course.Enrollments?
+            .Count(e => !e.IsDeleted &&
+                       (e.Status == EnrollmentStatus.Active || e.Status == EnrollmentStatus.Test)) ?? 0;
+
+        return activeEnrollmentsCount < course.MaxStudentCount;
     }
 }
 

@@ -34,6 +34,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<Subject> Subjects { get; } = new Repository<Subject>(context);
     public IRepository<Lesson> Lessons { get; } = new Repository<Lesson>(context);
     public IRepository<CourseWeekday> CourseWeekdays { get; } = new Repository<CourseWeekday>(context);
+    public IRepository<CourseTeacher> CourseTeachers { get; } = new Repository<CourseTeacher>(context);
+
 
     // 6. Enrollment and Registration
     public IRepository<Enrollment> Enrollments { get; } = new Repository<Enrollment>(context);
