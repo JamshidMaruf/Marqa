@@ -1,0 +1,85 @@
+﻿@model CompanyViewModel
+@{
+	TempData["Edit"] = "Edit";
+}
+
+	<!-- Alerts -->
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		<i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}
+
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		<i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}
+
+<div class="container-fluid py-3">
+	<!-- Header -->
+	<div class="mb-3">
+		<h1 class="h4 mb-0 fw-700">Edit Company</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="card">
+				<div class="card-body">
+					<form method="post" asp-action="Edit" asp-route-id="ViewBag.Id">
+						<!-- Branch Information -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Name" class="form-label">Company Name <span class="text-danger">*</span></label>
+								<input asp-for="Name" class="form-control" placeholder="Enter company name" required>
+								<span asp-validation-for="Name" class="text-danger small"></span>
+							</div>						
+						</div>
+
+						<!-- Contact Information -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Phone" class="form-label">Phone <span class="text-danger">*</span></label>
+								<input asp-for="Phone" type="tel" class="form-control" placeholder="+998..." required>
+								<span asp-validation-for="Phone" class="text-danger small"></span>
+							</div>
+							<div class="mb-3">
+								<label asp-for="Address" class="form-label">Address <span class="text-danger">*</span></label>
+								<textarea asp-for="Address" class="form-control" placeholder="Enter branch address" rows="3" required></textarea>
+								<span asp-validation-for="Address" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Buttons -->
+						<div class="d-flex gap-2 mt-3">
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Cancel
+							</a>
+							<button type="submit" class="btn btn-primary" style="color:gold">
+								<i class="fas fa-save me-1"></i>Update
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Info Card -->
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-body">
+					<h6 class="fw-700 mb-2">Information</h6>
+					<div class="mb-3">
+						<small class="text-muted">Company</small>
+						<p class="mb-0 fw-600">@Model.Name</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
