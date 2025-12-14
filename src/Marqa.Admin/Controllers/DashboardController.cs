@@ -2,7 +2,7 @@
 using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.Users;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 
 namespace Marqa.Admin.Controllers;
 
@@ -21,10 +21,12 @@ public class DashboardController(
             var usersCount = await userService.GetAllUsersCount();
             var permissions = await permissionService.GetAllAsync();
             var settings = await settingService.GetAllAsync();
+            //var subscribers = await subscriptionService.GetAllSubscribersAsync();    
             
             ViewBag.TotalCompanies = companies.Count();
             ViewBag.TotalUsers = usersCount;
             ViewBag.TotalSettings = settings.Count();
+            //ViewBag.TotalSubscribers = subscribers.Count();
 
             return View();
         }
@@ -33,8 +35,8 @@ public class DashboardController(
             TempData["ErrorMessage"] = $"Error loading dashboard: {ex.Message}";
             ViewBag.TotalCompanies = 0;
             ViewBag.TotalUsers = 0;
-            ViewBag.TotalProducts = 0;
-            ViewBag.TotalBranches = 0;
+            ViewBag.TotalSettings = 0;
+            //ViewBag.TotalSubscribers = 0;
             return View();
         }
     }

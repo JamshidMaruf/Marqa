@@ -1,0 +1,122 @@
+﻿@{
+	ViewData["Title"] = "Create Company";
+}
+
+@model CompanyCreateModel;
+
+<div class="container-fluid py-3">
+	<!-- Header -->
+	<div class="mb-3">
+		<h1 class="h4 mb-0 fw-700">Create Company</h1>
+	</div>
+
+	<!-- Alerts -->
+@if (TempData["Success"] != null)
+{
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		<i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}
+
+@if (TempData["Error"] != null)
+{
+	<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		<i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}
+
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="card">
+				<div class="card-body">
+					<form method="post" asp-action="Create">
+
+						<!-- Company Information -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Name" class="form-label">Company Name <span class="text-danger">*</span></label>
+								<input asp-for="Name" class="form-control" placeholder="Enter company name" required>
+								<span asp-validation-for="Name" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Director Information -->
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label asp-for="Director" class="form-label">Director Name <span class="text-danger">*</span></label>
+									<input asp-for="Director" class="form-control" placeholder="Enter full name" required>
+									<span asp-validation-for="Director" class="text-danger small"></span>
+								</div>
+						</div>
+
+						<!-- Contact Information -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Phone" class="form-label">Phone <span class="text-danger">*</span></label>
+								<input asp-for="Phone" type="tel" class="form-control" placeholder="+998..." required>
+								<span asp-validation-for="Phone" class="text-danger small"></span>
+							</div>
+							<div class="mb-3">
+								<label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+								<input asp-for="Email" type="email" class="form-control" placeholder="email@company.com" required>
+								<span asp-validation-for="Email" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Address -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Address" class="form-label">Addess <span class="text-danger">*</span></label>
+									<input asp-for="Address" type="text" class="form-control" placeholder="Enter address" required>
+									<span asp-validation-for="Address" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Buttons -->
+						<div class="d-flex gap-2 mt-3">
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Cancel
+							</a>
+							<button type="submit" class="btn btn-primary" style="color: green">
+								<i class="fas fa-save me-1"></i>Create
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Info Card -->
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-body">
+					<h6 class="fw-700 mb-2">Tips</h6>
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<i class="fas fa-check text-success me-2"></i>
+							<small>Use a unique company name</small>
+						</li>
+						<li class="mb-2">
+							<i class="fas fa-check text-success me-2"></i>
+							<small>Director information is required</small>
+						</li>
+						<li class="mb-2">
+							<i class="fas fa-check text-success me-2"></i>
+							<small>Use a valid email address</small>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
+

@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Net;
-using System.Numerics;
-using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
