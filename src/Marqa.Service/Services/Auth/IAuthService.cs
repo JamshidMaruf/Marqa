@@ -8,5 +8,5 @@ public interface IAuthService
     ValueTask<LoginResponseModel> RefreshTokenAsync(RefreshTokenModel model);
     ValueTask<bool> LogoutAsync(LogoutModel model, string ipAddress);
     ValueTask<LoginResponseModel.UserData> GetCurrentUser(RefreshTokenModel model);
-    SuperAdminResponseModel LoginAdmin(string phone, string password);
+    Task<LoginResponseModel> LoginAdminAsync(LoginModel model, string ipAddress);
 }
