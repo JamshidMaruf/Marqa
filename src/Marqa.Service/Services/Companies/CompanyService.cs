@@ -72,10 +72,23 @@ public class CompanyService(
         };
     }
 
-    public async Task<List<CompanyViewModel>> GetAllAsync()
+    public async Task<List<CompanyViewModel>> GetAllAsync(string? search = null)
     {
-        return await unitOfWork.Companies
-            .SelectAllAsQueryable(t => !t.IsDeleted)
+        var query = unitOfWork.Companies.SelectAllAsQueryable(c => !c.IsDeleted);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim(); 
+
+            query = query.Where(c =>
+                c.Name.Contains(search) ||
+                c.Address.Contains(search) ||
+                c.Phone.Contains(search) ||
+                c.Email.Contains(search) ||
+                c.Director.Contains(search));
+        }
+
+        return await query
             .Select(c => new CompanyViewModel
             {
                 Id = c.Id,
@@ -84,6 +97,8 @@ public class CompanyService(
                 Phone = c.Phone,
                 Email = c.Email,
                 Director = c.Director,
-            }).ToListAsync();
+            })
+            .ToListAsync();
+        //
     }
 }

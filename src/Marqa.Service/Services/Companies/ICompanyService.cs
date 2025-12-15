@@ -8,5 +8,7 @@ public interface ICompanyService
     Task UpdateAsync(int id, CompanyUpdateModel model);
     Task DeleteAsync(int id);
     Task<CompanyViewModel> GetAsync(int id);
-    Task<List<CompanyViewModel>> GetAllAsync();
+    Task<List<CompanyViewModel>> GetAllAsync(string? search = null);
+    //
+
 }
