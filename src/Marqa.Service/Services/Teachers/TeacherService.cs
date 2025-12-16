@@ -26,6 +26,7 @@ public class TeacherService(
     public async Task CreateAsync(TeacherCreateModel model)
     {
         await validatorTeacherCreate.EnsureValidatedAsync(model);
+
         var alreadyExistTeacher =
             await unitOfWork.Teachers.CheckExistAsync(t =>
                 t.User.Phone == model.Phone && t.User.CompanyId == model.CompanyId);
@@ -61,6 +62,8 @@ public class TeacherService(
             SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
             SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
         });
+
+        await unitOfWork.SaveAsync();
 
         await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
@@ -157,134 +160,111 @@ public class TeacherService(
         await unitOfWork.SaveAsync();
     }
 
-    // works but can be optimized
     public async Task<TeacherViewModel> GetAsync(int id)
     {
-        var teacher = await unitOfWork.TeacherSubjects
-           .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-           includes: ["Teacher", "Teacher.User"])
+        var teacher = await unitOfWork.Teachers
+           .SelectAllAsQueryable(ts => ts.Id == id)
            .Select(ts => new TeacherViewModel
            {
-               Id = ts.Teacher.Id,
-               DateOfBirth = ts.Teacher.DateOfBirth,
+               Id = ts.Id,
+               DateOfBirth = ts.DateOfBirth,
                Gender = new TeacherViewModel.GenderInfo
                {
-                   Id = Convert.ToInt32(ts.Teacher.Gender),
-                   Name = Enum.GetName(ts.Teacher.Gender),
+                   Id = Convert.ToInt32(ts.Gender),
+                   Name = Enum.GetName(ts.Gender),
                },
-               FirstName = ts.Teacher.User.FirstName,
-               LastName = ts.Teacher.User.LastName,
-               Email = ts.Teacher.User.Email,
-               Phone = ts.Teacher.User.Phone,
-               Qualification = ts.Teacher.Qualification,
+               FirstName = ts.User.FirstName,
+               LastName = ts.User.LastName,
+               Email = ts.User.Email,
+               Phone = ts.User.Phone,
+               Qualification = ts.Qualification,
                Status = new TeacherViewModel.StatusInfo
                {
-                   Id = Convert.ToInt32(ts.Teacher.Status),
-                   Name = Enum.GetName(ts.Teacher.Status),
+                   Id = Convert.ToInt32(ts.Status),
+                   Name = Enum.GetName(ts.Status),
                },
                TypeInfo = new TeacherViewModel.TeacherTypeInfo
                {
-                   Id = Convert.ToInt32(ts.Teacher.Type),
-                   Type = Enum.GetName(ts.Teacher.Type),
+                   Id = Convert.ToInt32(ts.Type),
+                   Type = Enum.GetName(ts.Type),
                },
                Payment = new TeacherViewModel.TeacherPayment
                {
-                   Id = Convert.ToInt32(ts.Teacher.PaymentType),
-                   Type = ts.Teacher.PaymentType,
-                   Name = Enum.GetName(ts.Teacher.PaymentType),
-                   FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
-                   SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
-                   SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
+                   Id = Convert.ToInt32(ts.PaymentType),
+                   Type = ts.PaymentType,
+                   Name = Enum.GetName(ts.PaymentType),
+                   FixSalary = TeacherPaymentType.Fixed == ts.PaymentType ? ts.FixSalary : 0,
+                   SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.PaymentType ? ts.SalaryAmountPerHour : 0,
+                   SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.PaymentType ? ts.SalaryPercentPerStudent : 0,
                },
-               JoiningDate = ts.Teacher.JoiningDate,
-               Info = ts.Teacher.Info,
+               JoiningDate = ts.JoiningDate,
+               Info = ts.Info,
+               Subjects = ts.TeacherSubjects.Select(ts => new TeacherViewModel.SubjectInfo
+               {
+                   Id = ts.SubjectId,
+                   Name = ts.Subject.Name
+               }),
+               Courses = ts.Courses.Select(c => new TeacherViewModel.CourseInfo
+               {
+                   Id = c.Id,
+                   Name = c.Name,
+                   SubjectId = c.Subject.Id,
+                   SubjectName = c.Subject.Name
+               })
            })
            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
 
-        var subjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id)
-            .Select(ts => new TeacherViewModel.SubjectInfo
-            {
-                Id = ts.SubjectId,
-                Name = ts.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Subjects = subjects;
-
-        var courses = await unitOfWork.Courses.SelectAllAsQueryable(ts => !ts.IsDeleted,
-            includes: "Subject")
-            // .Where(c => c.TeacherId == id)
-            .Select(c => new TeacherViewModel.CourseInfo
-            {
-                Id = c.Id,
-                Name = c.Name,
-                SubjectId = c.Subject.Id,
-                SubjectName = c.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Courses = courses;
-
         return teacher;
     }
 
-    // works but can be optimized 
     public async Task<TeacherUpdateViewModel> GetForUpdateAsync(int id)
     {
-        var teacher = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted,
-            includes: ["Teacher", "Teacher.User"])
+        var teacher = await unitOfWork.Teachers
+            .SelectAllAsQueryable(ts => ts.Id == id)
             .Select(ts => new TeacherUpdateViewModel
             {
-                Id = ts.Teacher.Id,
-                DateOfBirth = ts.Teacher.DateOfBirth,
+                Id = ts.Id,
+                DateOfBirth = ts.DateOfBirth,
                 Gender = new TeacherUpdateViewModel.GenderInfo
                 {
-                    Id = Convert.ToInt32(ts.Teacher.Gender),
-                    Name = Enum.GetName(ts.Teacher.Gender),
+                    Id = Convert.ToInt32(ts.Gender),
+                    Name = Enum.GetName(ts.Gender),
                 },
-                FirstName = ts.Teacher.User.FirstName,
-                LastName = ts.Teacher.User.LastName,
-                Email = ts.Teacher.User.Email,
-                Phone = ts.Teacher.User.Phone,
-                Qualification = ts.Teacher.Qualification,
+                FirstName = ts.User.FirstName,
+                LastName = ts.User.LastName,
+                Email = ts.User.Email,
+                Phone = ts.User.Phone,
+                Qualification = ts.Qualification,
                 Status = new TeacherUpdateViewModel.StatusInfo
                 {
-                    Id = Convert.ToInt32(ts.Teacher.Status),
-                    Name = Enum.GetName(ts.Teacher.Status),
+                    Id = Convert.ToInt32(ts.Status),
+                    Name = Enum.GetName(ts.Status),
                 },
                 TypeInfo = new TeacherUpdateViewModel.TeacherTypeInfo
                 {
-                    Id = Convert.ToInt32(ts.Teacher.Type),
-                    Type = Enum.GetName(ts.Teacher.Type),
+                    Id = Convert.ToInt32(ts.Type),
+                    Type = Enum.GetName(ts.Type),
                 },
                 Payment = new TeacherUpdateViewModel.TeacherPayment
                 {
-                    Id = Convert.ToInt32(ts.Teacher.PaymentType),
-                    Type = ts.Teacher.PaymentType,
-                    Name = Enum.GetName(ts.Teacher.PaymentType),
-                    FixSalary = TeacherPaymentType.Fixed == ts.Teacher.PaymentType ? ts.Teacher.FixSalary : 0,
-                    SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.Teacher.PaymentType ? ts.Teacher.SalaryAmountPerHour : 0,
-                    SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.Teacher.PaymentType ? ts.Teacher.SalaryPercentPerStudent : 0,
+                    Id = Convert.ToInt32(ts.PaymentType),
+                    Type = ts.PaymentType,
+                    Name = Enum.GetName(ts.PaymentType),
+                    FixSalary = TeacherPaymentType.Fixed == ts.PaymentType ? ts.FixSalary : 0,
+                    SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.PaymentType ? ts.SalaryAmountPerHour : 0,
+                    SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.PaymentType ? ts.SalaryPercentPerStudent : 0,
                 },
-                JoiningDate = ts.Teacher.JoiningDate,
-                Info = ts.Teacher.Info,
+                JoiningDate = ts.JoiningDate,
+                Info = ts.Info,
+                Subjects = ts.TeacherSubjects.Select(ts => new TeacherUpdateViewModel.SubjectInfo
+                {
+                    Id = ts.SubjectId,
+                    Name = ts.Subject.Name
+                })
             })
             .FirstOrDefaultAsync()
-             ?? throw new NotFoundException($"No teacher was found with ID = {id}.");
-
-        var subjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id)
-            .Select(ts => new TeacherUpdateViewModel.SubjectInfo
-            {
-                Id = ts.SubjectId,
-                Name = ts.Subject.Name
-            })
-            .ToListAsync();
-
-        teacher.Subjects = subjects;
+             ?? throw new NotFoundException($"No teacher was found with ID = {id}");
 
         return teacher;
     }
@@ -292,7 +272,7 @@ public class TeacherService(
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Teachers
-            .SelectAllAsQueryable(t => !t.IsDeleted && t.User.CompanyId == companyId && t.Type == TeacherType.Lead,
+            .SelectAllAsQueryable(t => t.User.CompanyId == companyId && t.Type == TeacherType.Lead,
             includes: ["User", "Courses", "TeacherSubjects"]);
 
         if (!string.IsNullOrWhiteSpace(search))
