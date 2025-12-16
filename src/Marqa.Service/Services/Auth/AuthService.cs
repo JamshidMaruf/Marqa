@@ -243,7 +243,7 @@ public class AuthService(
 
         var user = new User
         {
-            Id = 0, FirstName = "Super", LastName = "Admin", Phone = ADMIN_PHONE,
+            Id = 0, FirstName = "Super", LastName = "Admin", Phone = ADMIN_PHONE
         };
         
         var accessToken = await jwtService.GenerateJwtToken(user,"SuperAdmin");
@@ -262,8 +262,7 @@ public class AuthService(
             UserId = user.Id,
             Token = refreshToken, 
             ExpiresAt = refreshTokenExpiresIn, 
-            CreatedByIp = ipAddress,
-            CreatedAt = DateTime.UtcNow
+            CreatedByIp = ipAddress
         };
         
         unitOfWork.RefreshTokens.Insert(refreshTokenEntity);

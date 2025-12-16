@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -108,8 +107,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted,
-            includes: ["Role", "User"])
+            .SelectAllAsQueryable()
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -138,8 +136,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<EmployeeViewModel> GetForUpdateAsync(int id)
     {
         return await unitOfWork.Employees
-            .SelectAllAsQueryable(e => !e.IsDeleted,
-            includes: ["Role", "User"])
+            .SelectAllAsQueryable()
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
@@ -175,7 +172,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
         var employees = unitOfWork.Employees
-            .SelectAllAsQueryable(e => e.User.CompanyId == companyId && !e.IsDeleted);
+            .SelectAllAsQueryable(e => e.User.CompanyId == companyId);
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>

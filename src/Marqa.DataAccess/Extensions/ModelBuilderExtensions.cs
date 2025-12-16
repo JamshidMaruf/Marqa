@@ -1,12 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.DataAccess.Extensions;
 public static class ModelBuilderExtensions
 {
-    public static void ApplyGlobalConfigurations(this ModelBuilder modelBuilder)
+    public static void ApplyGlobalTableNameConfiguration(this ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            modelBuilder.Entity(entity.ClrType).ToTable(entity.ClrType.Name + "s");
+        {
+            entity.SetTableName(ToSnakeCase(entity.ClrType.Name) + "s");
+        }
+    }
+
+    private static string ToSnakeCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // Simple conversion
+        var result = new StringBuilder();
+        result.Append(char.ToLowerInvariant(input[0]));
+
+        for (int i = 1; i < input.Length - 1; i++)
+        {
+            if (char.IsUpper(input[i]))
+            {
+                if (!char.IsUpper(input[i + 1]))
+                    result.Append('_');
+
+                result.Append(char.ToLowerInvariant(input[i]));
+            }
+            else
+            {
+                result.Append(input[i]);
+            }
+        }
+
+        result.Append(char.ToLowerInvariant(input[input.Length - 1]));
+        return result.ToString();
     }
 }

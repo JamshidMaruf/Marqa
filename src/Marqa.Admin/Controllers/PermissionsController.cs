@@ -1,8 +1,10 @@
 ﻿using Marqa.Service.Services.Permissions.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.Controllers;
 
+[Authorize]
 public class PermissionsController(IPermissionService permissionService) : Controller
 {
     public async Task<IActionResult> Index()

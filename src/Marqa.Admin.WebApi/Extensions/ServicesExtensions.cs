@@ -59,6 +59,5 @@ public static class ServicesExtensions
         services.AddScoped<ITeacherService, TeacherService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
-        services.AddValidatorsFromAssemblyContaining<TeacherCreateModelValidator>();
     }
 }

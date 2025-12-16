@@ -3,6 +3,9 @@ using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;
+using Marqa.DataAccess.Repositories;
+using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Entities;
 using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +24,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerService();
 
-builder.Services.AddDbContext<AppDbContext>(option 
-    => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("PostgresSQLConnection")); 
+});
 
 // Add Hangfire services.
 builder.Services.AddHangfire(configuration => configuration
@@ -36,7 +42,7 @@ builder.Services.AddHangfireServer();
 
 builder.Services.AddMarqaServices();
 
-builder.Services.AddJWTService();
+await builder.Services.AddJWTServiceAsync();
 
 builder.Services.AddApiVersioning(options =>
 {

@@ -289,7 +289,6 @@ public class TeacherService(
         return teacher;
     }
 
-    // works but not optimal enough for large dataset
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Teachers

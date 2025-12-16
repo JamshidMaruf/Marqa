@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(option
 
 builder.Services.AddMarqaServices();
 
-builder.Services.AddJWTService();
+await builder.Services.AddJWTServiceAsync();
 
 builder.Services.AddAuthorization();
 

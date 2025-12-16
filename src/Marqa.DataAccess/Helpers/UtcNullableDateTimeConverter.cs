@@ -2,7 +2,7 @@
 
 namespace Marqa.DataAccess.Helpers;
 
-public sealed class UtcNullableDateTimeConverter : ValueConverter<DateTime?, DateTime?>
+internal sealed class UtcNullableDateTimeConverter : ValueConverter<DateTime?, DateTime?>
 {
     public UtcNullableDateTimeConverter()
         : base(
