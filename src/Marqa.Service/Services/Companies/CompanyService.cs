@@ -74,7 +74,7 @@ public class CompanyService(
 
     public async Task<List<CompanyViewModel>> GetAllAsync(string? search = null)
     {
-        var query = unitOfWork.Companies.SelectAllAsQueryable(c => !c.IsDeleted);
+        var query = unitOfWork.Companies.SelectAllAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
