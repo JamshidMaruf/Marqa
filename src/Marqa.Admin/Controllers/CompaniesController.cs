@@ -11,7 +11,9 @@ public class CompaniesController(ICompanyService companyService) : Controller
     {
         try
         {
-            var companies = await companyService.GetAllAsync();
+            ViewBag.Search = search;
+
+            var companies = await companyService.GetAllAsync(search);
 
             return View(companies);
         }
@@ -82,7 +84,6 @@ public class CompaniesController(ICompanyService companyService) : Controller
             TempData["Error"] = ex.Message;
             return RedirectToAction("Index");
         }
+        //
     }
-
 }
-
