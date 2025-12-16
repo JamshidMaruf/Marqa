@@ -1,5 +1,4 @@
-﻿using System;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -441,46 +440,9 @@ public class StudentService(
         return students;
     }
 
-    public async Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture)
+    public async Task UploadProfilePictureAsync(int studentId, IFormFile picture)
     {
-        var student = await unitOfWork.Students.SelectAsync(s => s.Id == studentId)
-           ?? throw new NotFoundException($"Student not found (ID: {studentId})");
-
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-        var extension = Path.GetExtension(picture.FileName).ToLowerInvariant();
-
-        if (!allowedExtensions.Contains(extension))
-            throw new ArgumentIsNotValidException("Only image files are allowed (jpg, jpeg, png, webp)");
-
-        if (picture.Length > 5 * 1024 * 1024)
-            throw new ArgumentIsNotValidException("File size must not exceed 5MB");
-
-        // if (!string.IsNullOrEmpty(student.ProfilePicture))
-        // {
-        //     var oldFilePath = Path.Combine("wwwroot", student.ProfilePicture.TrimStart('/'));
-        //     if (File.Exists(oldFilePath))
-        //         File.Delete(oldFilePath);
-        // }
-
-        var fileName = $"{studentId}_{Guid.NewGuid()}{extension}";
-        var uploadsFolder = Path.Combine("wwwroot", "uploads", "students", "profiles");
-
-        if (!Directory.Exists(uploadsFolder))
-            Directory.CreateDirectory(uploadsFolder);
-
-        var filePath = Path.Combine(uploadsFolder, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await picture.CopyToAsync(stream);
-        }
-        var relativePath = $"/uploads/students/profiles/{fileName}";
-        //student.ProfilePicture = relativePath;
-
-        unitOfWork.Students.Update(student);
-        await unitOfWork.SaveAsync();
-
-        return relativePath;
+        
     }
 
     public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)

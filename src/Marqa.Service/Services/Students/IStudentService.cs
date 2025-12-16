@@ -13,7 +13,7 @@ public interface IStudentService
     Task<int> GetByPhoneAsync(string phone);
     Task<int> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
-    Task<string> UploadProfilePictureAsync(long studentId, IFormFile picture);
+    Task UploadProfilePictureAsync(int studentId, IFormFile picture);
     Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel);
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
 }

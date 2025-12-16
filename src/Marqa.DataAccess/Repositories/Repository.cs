@@ -120,4 +120,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
     {
         _context.Entry(entity).State = EntityState.Detached;
     }
+
+    public async Task<bool> CanConnectAsync()
+    {
+        return await _context.Database.CanConnectAsync();
+    }
 }

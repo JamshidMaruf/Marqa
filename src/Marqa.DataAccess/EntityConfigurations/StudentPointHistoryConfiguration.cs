@@ -8,7 +8,7 @@ public class StudentPointHistoryConfiguration : IEntityTypeConfiguration<Student
 {
     public void Configure(EntityTypeBuilder<StudentPointHistory> builder)
     {
-        builder.ToTable("PointHistories");
+        builder.ToTable("student_point_histories");
 
         builder.HasOne(sph => sph.Student)
                 .WithMany(s => s.PointHistories)

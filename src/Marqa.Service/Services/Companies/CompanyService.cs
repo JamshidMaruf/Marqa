@@ -72,7 +72,7 @@ public class CompanyService(
         };
     }
 
-    public async Task<List<CompanyViewModel>> GetAllAsync(string? search = null)
+    public async Task<List<CompanyViewModel>> GetAllAsync(string search = null)
     {
         var query = unitOfWork.Companies.SelectAllAsQueryable();
 
@@ -99,6 +99,5 @@ public class CompanyService(
                 Director = c.Director,
             })
             .ToListAsync();
-        //
     }
 }

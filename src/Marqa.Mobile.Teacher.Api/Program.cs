@@ -29,7 +29,7 @@ builder.Services.AddMarqaServices();
 
 builder.Services.AddSwaggerService();
 
-builder.Services.AddJWTService();
+await builder.Services.AddJWTServiceAsync();
 
 builder.Services.AddAuthorization();
 

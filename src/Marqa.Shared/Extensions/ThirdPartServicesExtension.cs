@@ -4,33 +4,42 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Marqa.DataAccess.Repositories;
+using Marqa.Domain.Entities;
 
 namespace Marqa.Shared.Extensions;
 
 public static class ThirdPartServicesExtension
 {
-    public static void AddJWTService(this IServiceCollection services)
+    public async static Task AddJWTServiceAsync(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
-        var settingService = serviceProvider.GetService<ISettingService>();
+        bool check = await serviceProvider
+            .GetService<IRepository<User>>()
+            .CanConnectAsync();
 
-        var jwtSettings = settingService.GetByCategoryAsync("JWT").GetAwaiter().GetResult();
+        if (check)
+        {
+            var settingService = serviceProvider.GetService<ISettingService>();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+            var jwtSettings = await settingService.GetByCategoryAsync("JWT");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["JWT.Issuer"],
-                    ValidAudience = jwtSettings["JWT.Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
-                };
-            });
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["JWT.Issuer"],
+                        ValidAudience = jwtSettings["JWT.Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+                    };
+                });
+        }
     }
 
     public static void AddSwaggerService(this IServiceCollection services)

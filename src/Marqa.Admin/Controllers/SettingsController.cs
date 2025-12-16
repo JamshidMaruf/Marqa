@@ -1,8 +1,10 @@
 ﻿using Marqa.Service.Services.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.Controllers;
 
+[Authorize]
 public class SettingsController(ISettingService settingService) : Controller
 {
     public async Task<IActionResult> Index()

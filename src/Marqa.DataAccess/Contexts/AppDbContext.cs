@@ -14,21 +14,19 @@ public class AppDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new ConcurrencyTokenInterceptor());
+        optionsBuilder.UseSnakeCaseNamingConvention();
+
+        base.OnConfiguring(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Ensures each concrete class that inherit from Auditable is registered in the Model
-        var entityAssembly = typeof(Auditable).Assembly;
-        var entityTypes = entityAssembly
-            .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(Auditable).IsAssignableFrom(t));
+        EnsureAllEntitiesRegistered(modelBuilder);
 
-        foreach (var type in entityTypes)
-            modelBuilder.Entity(type);
-        
-        // Applies global configurations written using reflection
-        modelBuilder.ApplyGlobalConfigurations();
+        // Applies global table name naming convention
+        modelBuilder.ApplyGlobalTableNameConfiguration();
+
         // Applies custom entity configurations from assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
@@ -54,5 +52,16 @@ public class AppDbContext : DbContext
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.ApplyDefaultConventions();
+    }
+
+    private void EnsureAllEntitiesRegistered(ModelBuilder modelBuilder)
+    {
+        var entityAssembly = typeof(Auditable).Assembly;
+        var entityTypes = entityAssembly
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(Auditable).IsAssignableFrom(t));
+
+        foreach (var type in entityTypes)
+            modelBuilder.Entity(type);
     }
 }

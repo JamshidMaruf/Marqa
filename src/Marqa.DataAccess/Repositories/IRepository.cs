@@ -41,4 +41,10 @@ public interface IRepository<TEntity> where TEntity : Auditable
     Task<bool> CheckExistAsync(Expression<Func<TEntity, bool>> predicate);
     bool CheckExist(Expression<Func<TEntity, bool>> predicate);
     void DetachFromChangeTracker(TEntity entity);
+
+    /// <summary>
+    /// Tries to connect to database and returns result in boolean value
+    /// </summary>
+    /// <returns></returns>
+    Task<bool> CanConnectAsync();
 }
