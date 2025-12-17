@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Teachers.Models;
 
 namespace Marqa.Service.Validators.Teachers;
@@ -54,7 +53,7 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .IsInEnum().WithMessage("Invalid payment type.");
 
         RuleFor(x => x.Amount)
-            .LessThan(0).WithMessage("Amount must not be less than 0.");
+            .GreaterThan(0).WithMessage("Amount can not be less than 0.");
 
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid teacher type.");

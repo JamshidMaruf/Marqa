@@ -1,11 +1,6 @@
-﻿using Marqa.Admin.WebApi.Filters;
-using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
-using Marqa.Service.Services.Courses;
+﻿using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
-using Marqa.Service.Services.Students;
 using Marqa.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
