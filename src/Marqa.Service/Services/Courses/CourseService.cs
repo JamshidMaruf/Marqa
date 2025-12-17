@@ -66,6 +66,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 model.Room,
                 model.TeacherId,
                 weekDays);
+
             await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
@@ -413,64 +414,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         return mappedFrozenModels;
     }
 
-    private async Task GenerateLessonAsync(
-     int courseId,
-     DateOnly startDate,
-     DateOnly endDate,
-     string room,
-     int teacherId,
-     List<CourseCreateModel.Weekday> weekDays)
-    {
-        var lessons = new List<Lesson>
-        {
-            new Lesson
-            {
-                CourseId = courseId,
-                StartTime = weekDays[0].StartTime,
-                EndTime = weekDays[0].EndTime,
-                Room = room,
-                Number = 1,
-                Date = startDate,
-                TeacherId = teacherId
-            }
-        };
-
-        var lessonCount = 1;
-        var count = 2;
-        var currentDate = startDate;
-
-        await Task.Run(() =>
-        {
-            while (currentDate <= endDate)
-            {
-                for (int i = count; i < weekDays.Count; i++)
-                {
-                    while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
-                    {
-                        currentDate = currentDate.AddDays(1);
-                    }
-                    lessons.Add(new Lesson
-                    {
-                        CourseId =  courseId,
-                        StartTime = weekDays[i].StartTime,
-                        EndTime = weekDays[i].EndTime,
-                        Room = room,
-                        Number = i,
-                        Date = currentDate,
-                        TeacherId = teacherId
-                    });
-                    lessonCount++;
-                }
-            }
-        });
-
-        var course = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId);
-        
-        course.LessonCount = lessonCount;
-        unitOfWork.Courses.Update(course);
-
-        await unitOfWork.Lessons.InsertRangeAsync(lessons);
-    }
+    
 
     public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
@@ -546,5 +490,64 @@ public class CourseService(IUnitOfWork unitOfWork,
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    private async Task GenerateLessonAsync(
+     int courseId,
+     DateOnly startDate,
+     DateOnly endDate,
+     string room,
+     int teacherId,
+     List<CourseCreateModel.Weekday> weekDays)
+    {
+        var lessons = new List<Lesson>
+        {
+            new Lesson
+            {
+                CourseId = courseId,
+                StartTime = weekDays[0].StartTime,
+                EndTime = weekDays[0].EndTime,
+                Room = room,
+                Number = 1,
+                Date = startDate,
+                TeacherId = teacherId
+            }
+        };
+
+        var lessonCount = 1;
+        var count = 2;
+        var currentDate = startDate;
+
+        await Task.Run(() =>
+        {
+            while (currentDate <= endDate)
+            {
+                for (int i = count; i < weekDays.Count; i++)
+                {
+                    while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
+                    {
+                        currentDate = currentDate.AddDays(1);
+                    }
+                    lessons.Add(new Lesson
+                    {
+                        CourseId = courseId,
+                        StartTime = weekDays[i].StartTime,
+                        EndTime = weekDays[i].EndTime,
+                        Room = room,
+                        Number = i,
+                        Date = currentDate,
+                        TeacherId = teacherId
+                    });
+                    lessonCount++;
+                }
+            }
+        });
+
+        var course = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId);
+
+        course.LessonCount = lessonCount;
+        unitOfWork.Courses.Update(course);
+
+        await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
 }

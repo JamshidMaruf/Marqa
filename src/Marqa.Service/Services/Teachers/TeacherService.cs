@@ -38,36 +38,47 @@ public class TeacherService(
         if (!teacherPhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        var teacher = unitOfWork.Teachers.Insert(new Teacher
+        var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
         {
-            User = new User()
+            var teacher = unitOfWork.Teachers.Insert(new Teacher
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Phone = teacherPhone.Phone,
-                Email = model.Email,
-                PasswordHash = PasswordHelper.Hash(model.Password),
-                Role = UserRole.Employee,
-                CompanyId = model.CompanyId,
-            },
-            DateOfBirth = model.DateOfBirth,
-            Gender = model.Gender,
-            JoiningDate = model.JoiningDate,
-            Qualification = model.Qualification,
-            Info = model.Info,
-            Type = model.Type,
-            Status = model.Status,
-            PaymentType = model.PaymentType,
-            FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
-            SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
-            SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
-        });
+                User = new User()
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = teacherPhone.Phone,
+                    Email = model.Email,
+                    PasswordHash = PasswordHelper.Hash(model.Password),
+                    Role = UserRole.Employee,
+                    CompanyId = model.CompanyId,
+                },
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                JoiningDate = model.JoiningDate,
+                Qualification = model.Qualification,
+                Info = model.Info,
+                Type = model.Type,
+                Status = model.Status,
+                PaymentType = model.PaymentType,
+                FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
+                SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
+                SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
+            });
 
-        await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
 
-        await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
+            await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
-        await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task UpdateAsync(int id, TeacherUpdateModel model)
