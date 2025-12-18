@@ -15,6 +15,7 @@ public class Lesson : Auditable
     public int CourseId { get; set; }
     public int TeacherId { get; set; }
     public decimal Price { get; set; }
+    public bool IsAttended { get; set; }
 
     // Navigation
     public Course Course { get; set; }
