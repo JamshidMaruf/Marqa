@@ -2,27 +2,24 @@
 
 namespace Marqa.Service.Services.Courses.Models;
 
-public class CourseUpdateViewModel
+public class CourseTableViewModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public SubjectInfo Subject { get; set; }
+    public string Level { get; set; }
+    public CourseStatus Status { get; set; }
     public IEnumerable<TeacherInfo> Teachers { get; set; }
-    public DateOnly StartDate { get; set; }
-    public DateOnly EndDate { get; set; }
-    public decimal Price { get; set; }
-    public CourseStatus Status  { get; set; }
-    public int MaxStudentCount { get; set; }
-    public string Description { get; set; }
     public IEnumerable<WeekInfo> Weekdays { get; set; }
-    public IEnumerable<LessonInfo> Lessons { get; set; }
+    public int LessonCount { get; set; }
+    public decimal Price { get; set; }
+    public int MaxStudentCount { get; set; }
+    public int AvailableStudentCount { get; set; }
 
     public class WeekInfo
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
     }
 
     public class TeacherInfo
@@ -36,14 +33,5 @@ public class CourseUpdateViewModel
     {
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
-    }
-
-    public class LessonInfo
-    {
-        public int Id { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
-        public DateOnly Date { get; set; }
-        public string Room { get; set; }
     }
 }

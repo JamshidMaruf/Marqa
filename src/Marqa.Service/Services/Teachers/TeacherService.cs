@@ -38,36 +38,47 @@ public class TeacherService(
         if (!teacherPhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
 
-        var teacher = unitOfWork.Teachers.Insert(new Teacher
+        var transaction = await unitOfWork.BeginTransactionAsync();
+
+        try
         {
-            User = new User()
+            var teacher = unitOfWork.Teachers.Insert(new Teacher
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Phone = teacherPhone.Phone,
-                Email = model.Email,
-                PasswordHash = PasswordHelper.Hash(model.Password),
-                Role = UserRole.Employee,
-                CompanyId = model.CompanyId,
-            },
-            DateOfBirth = model.DateOfBirth,
-            Gender = model.Gender,
-            JoiningDate = model.JoiningDate,
-            Qualification = model.Qualification,
-            Info = model.Info,
-            Type = model.Type,
-            Status = model.Status,
-            PaymentType = model.PaymentType,
-            FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
-            SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
-            SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
-        });
+                User = new User()
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = teacherPhone.Phone,
+                    Email = model.Email,
+                    PasswordHash = PasswordHelper.Hash(model.Password),
+                    Role = UserRole.Employee,
+                    CompanyId = model.CompanyId,
+                },
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender,
+                JoiningDate = model.JoiningDate,
+                Qualification = model.Qualification,
+                Info = model.Info,
+                Type = model.Type,
+                Status = model.Status,
+                PaymentType = model.PaymentType,
+                FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
+                SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
+                SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
+            });
 
-        await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
 
-        await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
+            await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
 
-        await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task UpdateAsync(int id, TeacherUpdateModel model)
@@ -320,36 +331,43 @@ public class TeacherService(
 
     public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)
     {
-        //var teacherSalary = await unitOfWork.TeacherSalaries.SelectAsync(t => t.TeacherId == teacherId)
-        //    ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
+        var teacher = await unitOfWork.Teachers.SelectAsync(t => t.Id == teacherId)
+            ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
 
-        //var teacher = await unitOfWork.Teachers.SelectAllAsQueryable(t =>
-        //        t.Id == teacherId)
-        //    .Include(t => t.Courses.Where(c =>
-        //    c.StartDate.Year == year &&)
-        //    .FirstOrDefaultAsync();
+        var query = unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(
+                predicate: la => la.Lesson.Course.CourseTeachers.Any(ct => ct.TeacherId == teacherId) &&
+                                 la.Lesson.Date.Year == year &&
+                                 la.Lesson.Date.Month == (int)month,
+                includes: ["Lesson", "Lesson.Course", "Lesson.Course.CourseTeachers"]);
 
-        //var paymentType = teacherSalary.PaymentType;
-        //var studentCount = teacher.Courses.Select(c => c.Enrollments.Count).Sum();
-        //var currentCourses = teacher.Courses.Where(c => c.Status == CourseStatus.Active).Count();
-        //var calculatedModel = new CalculatedTeacherSalaryModel();
+        var activeCourses = await query.Select(la => la.Lesson.Course).Distinct().ToListAsync();
+        
+        var activeStudentsCount = activeCourses.Sum(c => c.StudentCount);
 
-        //if (paymentType == TeacherPaymentType.Fixed)
-        //{
-        //    calculatedModel.StudentsCount = studentCount;
-        //    calculatedModel.GroupsCount = teacher.Courses.Count;
-        //    calculatedModel.Total = teacherSalary.Amount;
-
-        //}
-        //else if(paymentType ==TeacherPaymentType.Percentage)
-        //{
-        //    calculatedModel.StudentsCount = studentCount;
-        //    calculatedModel.GroupsCount = teacher.Courses.Count;
-        //    calculatedModel.Percent = teacherSalary.Percent;
-        //    calculatedModel.Total = studentCount * currentCourses;
-        //}
-
-        return new CalculatedTeacherSalaryModel();
+        var result = new CalculatedTeacherSalaryModel();
+        
+        result.GroupsCount = activeCourses.Count;
+        result.ActiveStudentsCount = activeStudentsCount;
+        
+        if (teacher.PaymentType == TeacherPaymentType.Fixed)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Percentage)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Hourly)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Mixed)
+        {
+            
+        }
+        
+        return result;
     }
 
     public async Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes()
@@ -362,5 +380,10 @@ public class TeacherService(
         }).ToList();
 
         return paymentTypes;
+    }
+
+    public Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId)
+    {
+        throw new NotImplementedException();
     }
 }

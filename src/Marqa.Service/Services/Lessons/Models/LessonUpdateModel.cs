@@ -6,5 +6,5 @@ public class LessonUpdateModel
     public TimeOnly EndTime { get; set; }
     public DateOnly Date { get; set; }
     public string Room { get; set; }
-    public int TeacherId { get; set; }
+    public IEnumerable<int> TeacherIds { get; set; }
 }

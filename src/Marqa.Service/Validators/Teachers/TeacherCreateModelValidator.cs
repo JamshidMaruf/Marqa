@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Teachers.Models;
 
 namespace Marqa.Service.Validators.Teachers;
@@ -54,7 +53,7 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .IsInEnum().WithMessage("Invalid payment type.");
 
         RuleFor(x => x.Amount)
-            .LessThan(0).WithMessage("Amount must not be less than 0.");
+            .GreaterThan(0).WithMessage("Amount can not be less than 0.");
 
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid teacher type.");
@@ -72,10 +71,10 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .Must(list => list.All(id => id > 0))
             .WithMessage("Invalid subject ID.");
     
-        RuleForEach(x => x.SubjectIds)
-            .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
-            )
-            .WithMessage("Subject with the given Id does not exist.");
+        //RuleForEach(x => x.SubjectIds)
+        //    .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
+        //    )
+        //    .WithMessage("Subject with the given Id does not exist.");
     }
 
     private bool BeAValidAge(DateOnly dob)

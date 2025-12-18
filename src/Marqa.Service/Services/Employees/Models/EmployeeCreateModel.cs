@@ -18,4 +18,5 @@ public class EmployeeCreateModel
     public string Specialization { get; set; }
     public string Info { get; set; }
     public int RoleId { get; set; }
+    public bool IsUseSystem { get; set; }
 }

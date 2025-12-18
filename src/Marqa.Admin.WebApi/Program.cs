@@ -39,6 +39,8 @@ builder.Services.AddHangfireServer();
 
 builder.Services.AddMarqaServices();
 
+builder.Services.AddHttpContextAccessor();
+
 await builder.Services.AddJWTServiceAsync();
 
 builder.Services.AddApiVersioning(options =>
@@ -72,6 +74,9 @@ builder.Services.AddHttpContextAccessor();
 
 HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
+HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
+
+var app = builder.Build();
 
 var app = builder.Build();
 

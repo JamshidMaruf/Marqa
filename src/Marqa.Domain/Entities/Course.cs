@@ -11,6 +11,7 @@ public class Course : Auditable
     public CourseStatus Status { get; set; }
     public string Level { get; set; }
     public int MaxStudentCount { get; set; }
+    public int StudentCount { get; set; }
     public decimal Price { get; set; }
     public string Description { get; set; }
     public int CompanyId { get; set; }
