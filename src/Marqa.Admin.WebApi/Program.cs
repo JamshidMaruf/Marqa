@@ -8,6 +8,7 @@ using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
+using Marqa.Shared.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,8 @@ builder.Services.AddHangfire(configuration => configuration
 builder.Services.AddHangfireServer();
 
 builder.Services.AddMarqaServices();
+
+builder.Services.AddHttpContextAccessor();
 
 await builder.Services.AddJWTServiceAsync();
 
@@ -80,9 +83,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
-
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
+HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
+
+var app = builder.Build();
 
 app.UseExceptionHandler();
 

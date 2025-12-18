@@ -59,8 +59,11 @@ public class ProductsController(IProductService productService) : ControllerBase
         });
     }
 
-    [HttpGet("by-company/{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search = null)
+    [HttpGet("company/{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(
+        int companyId,
+        [FromQuery] PaginationParams @params,
+        [FromQuery] string? search = null)
     {
         var products = await productService.GetAllAsync(companyId, search);
         

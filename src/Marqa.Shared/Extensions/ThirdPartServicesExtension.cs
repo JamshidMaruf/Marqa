@@ -1,45 +1,41 @@
 ﻿using System.Text;
-using Marqa.Service.Services.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Marqa.DataAccess.Repositories;
-using Marqa.Domain.Entities;
-
 namespace Marqa.Shared.Extensions;
 
 public static class ThirdPartServicesExtension
 {
     public async static Task AddJWTServiceAsync(this IServiceCollection services)
     {
-        var serviceProvider = services.BuildServiceProvider();
-
-        bool check = await serviceProvider
-            .GetService<IRepository<User>>()
-            .CanConnectAsync();
-
-        if (check)
-        {
-            var settingService = serviceProvider.GetService<ISettingService>();
-
-            var jwtSettings = await settingService.GetByCategoryAsync("JWT");
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings["JWT.Issuer"],
-                        ValidAudience = jwtSettings["JWT.Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
-                    };
-                });
-        }
+        // var serviceProvider = services.BuildServiceProvider();
+        //
+        // bool check = await serviceProvider
+        //     .GetService<IRepository<User>>()
+        //     .CanConnectAsync();
+        //
+        // if (check)
+        // {
+        //     var settingService = serviceProvider.GetService<ISettingService>();
+        //
+        //     var jwtSettings = await settingService.GetByCategoryAsync("JWT");
+        //
+        //     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //         .AddJwtBearer(options =>
+        //         {
+        //             options.TokenValidationParameters = new TokenValidationParameters
+        //             {
+        //                 ValidateIssuer = true,
+        //                 ValidateAudience = true,
+        //                 ValidateLifetime = true,
+        //                 ValidateIssuerSigningKey = true,
+        //                 ValidIssuer = jwtSettings["JWT.Issuer"],
+        //                 ValidAudience = jwtSettings["JWT.Audience"],
+        //                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+        //             };
+        //         });
+        // }
     }
 
     public static void AddSwaggerService(this IServiceCollection services)

@@ -7,7 +7,7 @@ using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Products.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Marqa.Service.Servcies.Products;
+namespace Marqa.Service.Services.Products;
 
 public class ProductService(IUnitOfWork unitOfWork,
     IValidator<ProductCreateModel> productCreateValidator,
