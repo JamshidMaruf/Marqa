@@ -14,12 +14,12 @@ public class StudentExamResultCreateModelValidator : AbstractValidator<StudentEx
     {
         RuleFor(x => x.StudentId)
             .GreaterThan(0).WithMessage("StudentId is required.");
-        RuleFor(x => x.StudentId).Must(x => unitOfWork.Students.CheckExist(s => s.Id == x))
+        RuleFor(x => x.StudentId).MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId))
             .WithMessage("Student with the given StudentId does not exist.");
 
         RuleFor(x => x.ExamId)
             .GreaterThan(0).WithMessage("ExamId is required.");
-        RuleFor(x => x.ExamId).Must(x => unitOfWork.Exams.CheckExist(e => e.Id == x))
+        RuleFor(x => x.ExamId).MustAsync(async (examId, cancellation) => await unitOfWork.Exams.CheckExistAsync(s => s.Id == examId))
             .WithMessage("Exam with the given ExamId does not exist.");
 
         RuleFor(x => x.Score)

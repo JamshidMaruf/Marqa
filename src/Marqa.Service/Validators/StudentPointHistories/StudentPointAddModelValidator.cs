@@ -10,7 +10,7 @@ public class StudentPointAddModelValidator : AbstractValidator<StudentPointAddMo
         RuleFor(p => p.StudentId)
             .GreaterThan(0)
             .WithMessage("Student Id is required");
-        RuleFor(p => p.StudentId).Must(p => unitOfWork.Students.CheckExist(s => s.Id == p))
+        RuleFor(p => p.StudentId).MustAsync(async (studentId, cancellation) => await unitOfWork.StudentPaymentOperations.CheckExistAsync(p => p.Id == studentId))
             .WithMessage("Student not found");
 
         RuleFor(p => p.Point).GreaterThan(0);

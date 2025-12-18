@@ -8,10 +8,10 @@ public class LessonAttendanceModelValidator : AbstractValidator<LessonAttendance
     public LessonAttendanceModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(x => x.LessonId).GreaterThan(0);
-        RuleFor(x => x.LessonId).Must(x => unitOfWork.LessonAttendances.CheckExist(l => l.Id == x))
+        RuleFor(x => x.LessonId).MustAsync(async (lessonId, cancellation) => await unitOfWork.Lessons.CheckExistAsync(l => l.Id == lessonId))
             .WithMessage("Lesson with the given ID does not exist.");
         RuleFor(x => x.StudentId).GreaterThan(0);
-        RuleFor(x => x.StudentId).Must(x => unitOfWork.Students.CheckExist(s => s.Id == x))
+        RuleFor(x => x.StudentId).MustAsync(async  (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId))
             .WithMessage("Student with the given ID does not exist.");
         RuleFor(x => x.Status).NotNull().IsInEnum();
     }

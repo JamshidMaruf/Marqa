@@ -76,7 +76,6 @@ HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
 
-var app = builder.Build();
 
 var app = builder.Build();
 
