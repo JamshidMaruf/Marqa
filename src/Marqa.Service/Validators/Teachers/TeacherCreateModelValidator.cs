@@ -71,10 +71,10 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .Must(list => list.All(id => id > 0))
             .WithMessage("Invalid subject ID.");
     
-        RuleForEach(x => x.SubjectIds)
-            .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
-            )
-            .WithMessage("Subject with the given Id does not exist.");
+        //RuleForEach(x => x.SubjectIds)
+        //    .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
+        //    )
+        //    .WithMessage("Subject with the given Id does not exist.");
     }
 
     private bool BeAValidAge(DateOnly dob)

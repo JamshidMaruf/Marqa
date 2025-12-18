@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Courses;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -72,11 +73,11 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     }
 
     [HttpGet("companies/{companyId:int}/courses")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
+    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId, [FromQuery] CourseStatus status)
     {
-        var courses = await courseService.GetAllAsync(companyId, search, subjectId);
+        var courses = await courseService.GetAllAsync(companyId, search, subjectId, status);
 
-        return Ok(new Response<List<CourseViewModel>>
+        return Ok(new Response<List<CourseTableViewModel>>
         {
             StatusCode = 200,
             Message = "success",

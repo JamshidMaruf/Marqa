@@ -1,8 +1,6 @@
-﻿using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
+﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Files;
 using Marqa.Service.Services.Lessons.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +19,19 @@ public class LessonService(
         lessonForUpdation.StartTime = model.StartTime;
         lessonForUpdation.EndTime = model.EndTime;
         lessonForUpdation.Date = model.Date;
-        lessonForUpdation.TeacherId = model.TeacherId;
+
+        foreach(var lessonteacher in lessonForUpdation.Teachers)
+            unitOfWork.LessonTeachers.MarkAsDeleted(lessonteacher);
+
+        var lessonTeachers = new List<LessonTeacher>();
+        foreach (var teacherId in model.TeacherIds)
+            lessonTeachers.Add(new LessonTeacher
+            {
+                TeacherId = teacherId,
+                LessonId = lessonForUpdation.Id
+            });
+
+        await unitOfWork.LessonTeachers.InsertRangeAsync(lessonTeachers);
 
         unitOfWork.Lessons.Update(lessonForUpdation);
 
@@ -48,9 +58,7 @@ public class LessonService(
         if (!existLesson)
             throw new NotFoundException($"Lesson was not found with this ID = {id}");
 
-        var allowedExtensions = new string[] { ".mp4", ".avi", ".mkv", ".mov", ".flv" };
-
-        if (!allowedExtensions.Contains(Path.GetExtension(video.FileName)))
+        if (fileService.IsVideoExtension(Path.GetExtension(video.FileName)))
             throw new ArgumentIsNotValidException("Not supported video format");
 
         var result = await fileService.UploadAsync(video, "Files/Videos");

@@ -25,6 +25,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var employeePhone = model.Phone.TrimPhoneNumber();
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
+        
 
         var createdEmployee = unitOfWork.Employees.Insert(new Employee
         {
