@@ -1,13 +1,10 @@
 ﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
-using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Contexts;
-using Marqa.DataAccess.Repositories;
-using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
 using Marqa.Service.Helpers;
 using Marqa.Shared.Extensions;
+using Marqa.Shared.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -51,15 +48,6 @@ builder.Services.AddApiVersioning(options =>
     options.ReportApiVersions = true;
 });
 
-builder.Services.AddExceptionHandler<AlreadyExitExceptionHandler>();
-builder.Services.AddExceptionHandler<ValidateExceptionHandler>();
-builder.Services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
-builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
-builder.Services.AddExceptionHandler<NotMatchedExceptionHandler>();
-builder.Services.AddExceptionHandler<RequestRefusedExceptionHandler>();
-builder.Services.AddExceptionHandler<InternalServerErrorHandler>();
-builder.Services.AddProblemDetails();
-
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(
@@ -80,9 +68,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHttpContextAccessor();
+
+HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
+EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
+
 var app = builder.Build();
 
-EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 
 app.UseExceptionHandler();
 

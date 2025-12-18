@@ -2,7 +2,7 @@
 
 public static class FileExtensionHelper
 {
-    private static readonly HashSet<string> ImageExtensions =
+    private static readonly HashSet<string> _imageExtensions =
         new(StringComparer.OrdinalIgnoreCase)
         {
             ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp",
@@ -10,7 +10,7 @@ public static class FileExtensionHelper
             ".raw", ".cr2", ".nef", ".dng", ".arw"
         };
 
-    private static readonly HashSet<string> VideoExtensions =
+    private static readonly HashSet<string> _videoExtensions =
         new(StringComparer.OrdinalIgnoreCase)
         {
             ".mp4", ".avi", ".mov", ".mkv", ".webm", ".wmv",
@@ -23,7 +23,7 @@ public static class FileExtensionHelper
         if (string.IsNullOrWhiteSpace(extension))
             return false;
 
-        return ImageExtensions.Contains(Normalize(extension));
+        return _imageExtensions.Contains(Normalize(extension));
     }
 
     public static bool IsVideoExtension(string extension)
@@ -31,7 +31,7 @@ public static class FileExtensionHelper
         if (string.IsNullOrWhiteSpace(extension))
             return false;
 
-        return VideoExtensions.Contains(Normalize(extension));
+        return _videoExtensions.Contains(Normalize(extension));
     }
 
     private static string Normalize(string extension)

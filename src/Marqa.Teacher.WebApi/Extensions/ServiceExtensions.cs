@@ -2,6 +2,7 @@
 using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Entities;
 using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
@@ -41,5 +42,36 @@ public static class ServicesExtension
         services.AddScoped<ISettingService, SettingService>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
+    }
+
+    public async static Task AddJWTServiceAsync(this IServiceCollection services)
+    {
+        var serviceProvider = services.BuildServiceProvider();
+
+        bool check = await serviceProvider
+            .GetService<IRepository<User>>()
+            .CanConnectAsync();
+
+        if (check)
+        {
+            var settingService = serviceProvider.GetService<ISettingService>();
+
+            var jwtSettings = await settingService.GetByCategoryAsync("JWT");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["JWT.Issuer"],
+                        ValidAudience = jwtSettings["JWT.Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+                    };
+                });
+        }
     }
 }
