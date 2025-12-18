@@ -15,6 +15,7 @@ namespace Marqa.Service.Services.Students;
 public class StudentService(
     IUnitOfWork unitOfWork,
     IStudentPointHistoryService studentPointHistoryService,
+    IFileService fileService,
     IValidator<StudentCreateModel> createValidator,
     IValidator<StudentUpdateModel> updateValidator) : IStudentService
 {
@@ -189,7 +190,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: s => s.Id == id,
-                includes: [ "StudentDetail", "User" ])
+                includes: ["StudentDetail", "User"])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail != null)
@@ -270,7 +271,7 @@ public class StudentService(
             {
                 CourseName = c.Course.Name,
                 Subject = c.Course.Subject.Name,
-              //  TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
+                //  TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
                 CourseStatusName = Enum.GetName(c.Status),
                 CourseLevel = c.Course.Level
             })
@@ -289,7 +290,7 @@ public class StudentService(
                 DateTime = p.DateTime,
                 Description = p.Description,
                 PaymentOperationType = p.PaymentOperationType,
-              //  CoursePrice = p.CoursePrice
+                //  CoursePrice = p.CoursePrice
             })
             .ToList(),
             PointHistories = existStudent.PointHistories.Select(p => new StudentViewModel.StudentPointHistory
@@ -363,29 +364,106 @@ public class StudentService(
 
         if (filterModel.CourseId != null && filterModel.CourseId != 0)
             query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
-        
-        //    if(filterModel.Status != null)
-        //    {
-        //        if(filterModel.Status == StudentFilteringStatus.Active)
-        //        {
-        //            query = query.Where(s => s.Status == StudentStatus.Active);
-        //        }
-        //        else if(filterModel.Status == StudentFilteringStatus.Completed)
-        //        {
-        //            query = query.Where(s => s.Status == StudentStatus.Completed);
-        //        }
-        //        else if(filterModel.Status == StudentFilteringStatus.Upcoming)
-        //        {
-        //            query = query.Where(s => )
-        //        }
-        //All = 0,
-        //Active = 1,
-        //Upcoming = 2,
-        //Completed = 3,
-        //Closed = 4,
-        //Frozen = 5,
-        //GroupLess = 6,
-        //    }
+
+        if (filterModel.Status != null)
+        {
+            if (filterModel.Status == StudentFilteringStatus.Active)
+            {
+                query = query.Where(s => s.Status == StudentStatus.Active);
+            }
+            else if (filterModel.Status == StudentFilteringStatus.Completed)
+            {
+                query = query.Where(s => s.Status == StudentStatus.Completed);
+            }
+            else if (filterModel.Status == StudentFilteringStatus.Upcoming)
+            {
+                return await unitOfWork.Courses.SelectAllAsQueryable(c =>
+                c.Status == CourseStatus.Upcoming)
+                    .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
+                    {
+                        Id = e.Student.Id,
+                        Status = e.Student.Status,
+                        Balance = e.Student.Balance,
+                        FirstName = e.Student.User.FirstName,
+                        LastName = e.Student.User.LastName,
+                        Phone = e.Student.User.Phone,
+                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        {
+                            CourseId = c.CourseId,
+                            CourseName = c.Course.Name,
+                            CourseStatus = Enum.GetName(c.Course.Status)
+                        }).ToList()
+                    }))
+                    .ToListAsync();
+            }
+            else if (filterModel.Status == StudentFilteringStatus.Frozen)
+            {
+                return await unitOfWork.Enrollments
+                    .SelectAllAsQueryable(e => e.Status == EnrollmentStatus.Frozen)
+                    .Select(e => new StudentListModel
+                    {
+                        Id = e.Student.Id,
+                        Status = e.Student.Status,
+                        Balance = e.Student.Balance,
+                        FirstName = e.Student.User.FirstName,
+                        LastName = e.Student.User.LastName,
+                        Phone = e.Student.User.Phone,
+                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        {
+                            CourseId = c.CourseId,
+                            CourseName = c.Course.Name,
+                            CourseStatus = Enum.GetName(c.Course.Status)
+                        }).ToList()
+                    })
+                    .ToListAsync();
+            }
+            else if (filterModel.Status == StudentFilteringStatus.Completed)
+            {
+                return await unitOfWork.Courses.SelectAllAsQueryable(c =>
+                c.Status == CourseStatus.Completed)
+                    .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
+                    {
+                        Id = e.Student.Id,
+                        Status = e.Student.Status,
+                        Balance = e.Student.Balance,
+                        FirstName = e.Student.User.FirstName,
+                        LastName = e.Student.User.LastName,
+                        Phone = e.Student.User.Phone,
+                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        {
+                            CourseId = c.CourseId,
+                            CourseName = c.Course.Name,
+                            CourseStatus = Enum.GetName(c.Course.Status)
+                        }).ToList()
+                    }))
+                    .ToListAsync();
+            }
+            else if (filterModel.Status == StudentFilteringStatus.Closed)
+            {
+                return await unitOfWork.Courses.SelectAllAsQueryable(c =>
+                c.Status == CourseStatus.Closed)
+                    .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
+                    {
+                        Id = e.Student.Id,
+                        Status = e.Student.Status,
+                        Balance = e.Student.Balance,
+                        FirstName = e.Student.User.FirstName,
+                        LastName = e.Student.User.LastName,
+                        Phone = e.Student.User.Phone,
+                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        {
+                            CourseId = c.CourseId,
+                            CourseName = c.Course.Name,
+                            CourseStatus = Enum.GetName(c.Course.Status)
+                        }).ToList()
+                    }))
+                    .ToListAsync();
+            }
+            else if (filterModel.Status == StudentFilteringStatus.GroupLess)
+            {
+                query = query.Where(s => s.Courses.Count == 0);
+            }
+        }
 
         return await query.Select(x => new StudentListModel
         {
@@ -442,7 +520,23 @@ public class StudentService(
 
     public async Task UploadProfilePictureAsync(int studentId, IFormFile picture)
     {
-        
+        var student = await unitOfWork.Students.SelectAsync(s => s.Id == studentId,
+            includes: "Asset")
+            ?? throw new NotFoundException("Student was not found!");
+
+        if (!fileService.IsImageExtension(Path.GetExtension(picture.FileName)))
+        {
+            throw new ArgumentIsNotValidException("file format is not valid! Load only image file!");
+        }
+
+        var fileData = await fileService.UploadAsync(picture, "images/students");
+
+        student.Asset.FileName = fileData.FileName;
+        student.Asset.FilePath = fileData.FilePath;
+        student.Asset.FileExtension = Path.GetExtension(picture.FileName);
+
+        unitOfWork.Students.Update(student);
+        await unitOfWork.SaveAsync();
     }
 
     public async Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status)

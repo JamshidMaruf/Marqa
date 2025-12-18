@@ -17,12 +17,6 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
 
-        builder.HasOne(l => l.Teacher)
-            .WithMany()
-            .HasForeignKey(l => l.TeacherId)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
-
         builder.HasMany(l => l.Files)
             .WithOne(f => f.Lesson)
             .HasForeignKey(f => f.LessonId)

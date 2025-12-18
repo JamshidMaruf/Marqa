@@ -8,11 +8,11 @@ public class BannerCreateModelValidator : AbstractValidator<BannerCreateModel>
 {
     public BannerCreateModelValidator(IUnitOfWork unitOfWork)
     {
-        RuleFor(x => x.CompanyId)
-             .GreaterThan(0)
-             .WithMessage("Company ID must be greater than 0");
-        RuleFor(x => x.CompanyId).Must(c => unitOfWork.Companies.CheckExist(ex => ex.Id == c))
-            .WithMessage("Company does not exist.");
+        //RuleFor(x => x.CompanyId)
+        //     .GreaterThan(0)
+        //     .WithMessage("Company ID must be greater than 0");
+        //RuleFor(x => x.CompanyId).Must(c => unitOfWork.Companies.CheckExist(ex => ex.Id == c))
+        //    .WithMessage("Company does not exist.");
 
         RuleFor(x => x.Title)
             .NotEmpty()

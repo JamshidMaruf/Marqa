@@ -7,7 +7,7 @@ public class CourseViewModel
     public int Id { get; set; }
     public string Name { get; set; }
     public SubjectInfo Subject { get; set; }
-    public TeacherInfo Teacher { get; set; }
+    public IEnumerable<TeacherInfo> Teachers { get; set; }
     public int LessonCount { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
@@ -16,8 +16,8 @@ public class CourseViewModel
     public int MaxStudentCount { get; set; }
     public int AvailableStudentCount { get; set; }
     public string Description { get; set; }
-    public List<WeekInfo> Weekdays { get; set; }
-    public List<LessonInfo> Lessons { get; set; }
+    public IEnumerable<WeekInfo> Weekdays { get; set; }
+    public IEnumerable<LessonInfo> Lessons { get; set; }
 
     public class WeekInfo
     {

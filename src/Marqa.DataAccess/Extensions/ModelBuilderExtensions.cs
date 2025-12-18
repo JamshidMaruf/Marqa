@@ -7,9 +7,7 @@ public static class ModelBuilderExtensions
     public static void ApplyGlobalTableNameConfiguration(this ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
-        {
-            entity.SetTableName(ToSnakeCase(entity.ClrType.Name) + "s");
-        }
+            entity.SetTableName(ToSnakeCase(entity.ClrType.Name) + "s");     
     }
 
     private static string ToSnakeCase(string input)
@@ -17,7 +15,6 @@ public static class ModelBuilderExtensions
         if (string.IsNullOrEmpty(input))
             return input;
 
-        // Simple conversion
         var result = new StringBuilder();
         result.Append(char.ToLowerInvariant(input[0]));
 
