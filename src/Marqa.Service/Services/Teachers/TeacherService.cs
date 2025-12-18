@@ -1,14 +1,9 @@
-﻿using System.Data;
-using System.Diagnostics;
-using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
-using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Employees.Models;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers.Models;
@@ -349,22 +344,87 @@ public class TeacherService(
         
         result.GroupsCount = activeCourses.Count;
         result.ActiveStudentsCount = activeStudentsCount;
-        
+
         if (teacher.PaymentType == TeacherPaymentType.Fixed)
         {
-            
+            foreach (var course in activeCourses)
+            {
+                result.FixedSalaries.Add(new CalculatedTeacherSalaryModel.FixedSalary
+                {
+                    CourseId = course.Id,
+                    CourseName = course.Name,
+                    ActiveStudentsCount = course.StudentCount,
+                    FixSalary = Convert.ToDecimal(teacher.FixSalary)
+                });
+                
+                result.TotalSalary += Convert.ToDecimal(teacher.FixSalary);
+            }
         }
         else if (teacher.PaymentType == TeacherPaymentType.Percentage)
         {
-            
+            foreach (var course in activeCourses)
+            {
+                result.PercentageSalaries.Add(new CalculatedTeacherSalaryModel.PercentageSalary
+                {
+                    CourseId = course.Id,
+                    CourseName = course.Name,
+                    ActiveStudentsCount = course.StudentCount,
+                    Percent = Convert.ToDecimal(teacher.SalaryPercentPerStudent),
+                    Total = Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
+                });
+                
+                result.TotalSalary += Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
+            }
         }
         else if (teacher.PaymentType == TeacherPaymentType.Hourly)
         {
+            var attendedLessons = unitOfWork.Lessons
+                .SelectAllAsQueryable(l =>
+                    l.TeacherId == teacherId &&
+                    l.Date.Year == year &&
+                    l.Date.Month == (int)month &&
+                    l.IsAttended)
+                .ToListAsync();
+
+            double attendedLessonInHours = 0d;
+
+            // foreach (var lesson in await attendedLessons)
+            // {
+            //     attendedLessons = lesson.StartTime.Hour - lesson.EndTime.Hour;
+            // }
+            
+            foreach (var course in activeCourses)
+            {
+                result.HourlySalaries.Add(new CalculatedTeacherSalaryModel.HourlySalary
+                {
+                    CourseId = course.Id,
+                    CourseName = course.Name,
+                    ActiveStudentsCount = course.StudentCount,
+                    Hours = attendedLessonInHours,
+                    Amount = Convert.ToDecimal(teacher.SalaryAmountPerHour),
+                    Total = Convert.ToDecimal((decimal)attendedLessonInHours * teacher.SalaryAmountPerHour)
+                });
+                
+                result.TotalSalary += Convert.ToDecimal((decimal)attendedLessonInHours * teacher.SalaryAmountPerHour);
+            }
             
         }
         else if (teacher.PaymentType == TeacherPaymentType.Mixed)
         {
-            
+            foreach (var course in activeCourses)
+            {
+                result.MixedSalaries.Add(new CalculatedTeacherSalaryModel.MixedSalary
+                {
+                    CourseId = course.Id,
+                    CourseName = course.Name,
+                    ActiveStudentsCount = course.StudentCount,
+                    FixSalary = Convert.ToDecimal(teacher.FixSalary),
+                    Percent = Convert.ToInt32(teacher.SalaryPercentPerStudent),
+                    Total = Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
+                });
+                
+                result.TotalSalary += Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
+            }
         }
         
         return result;

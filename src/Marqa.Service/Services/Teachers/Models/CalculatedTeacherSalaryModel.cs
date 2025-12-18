@@ -6,10 +6,11 @@ public class CalculatedTeacherSalaryModel
 {
     public int GroupsCount { get; set; }
     public int ActiveStudentsCount { get; set; }
-    public FixedSalary Fixed { get; set; }
-    public PercentageSalary Percentage { get; set; }
-    public HourlySalary Hourly { get; set; }
-    public MixedSalary Mixed { get; set; }
+    public decimal TotalSalary { get; set; }
+    public List<FixedSalary> FixedSalaries { get; set; } = new();
+    public List<PercentageSalary> PercentageSalaries { get; set; } = new();
+    public List<HourlySalary> HourlySalaries { get; set; } = new();
+    public List<MixedSalary> MixedSalaries { get; set; } = new();
     
     public class FixedSalary
     {
@@ -33,8 +34,7 @@ public class CalculatedTeacherSalaryModel
         public int CourseId { get; set; }
         public string CourseName { get; set; }
         public int ActiveStudentsCount { get; set; }
-        public decimal FixSalary { get; set; }
-        public int Hours { get; set; }
+        public double Hours { get; set; }
         public decimal Amount { get; set; }
         public decimal Total { get; set; }
     }

@@ -64,13 +64,13 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("companies/{companyId:int}/courses")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
     {
-        var courses = await courseService.GetAllAsync(companyId, search, subjectId);
+        //var courses = await courseService.GetAllAsync(companyId, search, subjectId);
 
         return Ok(new Response<List<CourseViewModel>>
         {
             StatusCode = 200,
             Message = "success",
-            Data = courses
+         //   Data = courses
         });
     }
 }
