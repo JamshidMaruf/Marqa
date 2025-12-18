@@ -7,7 +7,7 @@ public class CourseCreateModel
     public string Name { get; set; }
     public string Room { get; set; }
     public int SubjectId { get; set; } 
-    public int TeacherId { get; set; }
+    public IEnumerable<int> TeacherIds { get; set; }
     public int CompanyId { get; set; } 
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }

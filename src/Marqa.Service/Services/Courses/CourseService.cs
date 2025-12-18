@@ -26,7 +26,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = model.Name,
                 SubjectId = model.SubjectId,
                 StartDate = model.StartDate,
-            //    TeacherId = model.TeacherId,
                 Level = model.Level,
                 Price = model.Price,
                 Status = model.Status,
@@ -38,6 +37,18 @@ public class CourseService(IUnitOfWork unitOfWork,
             unitOfWork.Courses.Insert(createdCourse);
             await unitOfWork.SaveAsync();
 
+            var teacherCourses = new List<CourseTeacher>();
+            foreach(var teacherId in model.TeacherIds)
+            {
+                teacherCourses.Add(new CourseTeacher
+                {
+                    TeacherId = teacherId,
+                    CourseId = createdCourse.Id
+                });
+            }
+
+            await unitOfWork.CourseTeachers.InsertRangeAsync(teacherCourses);
+            await unitOfWork.SaveAsync();
 
             var weekDays = new List<CourseCreateModel.Weekday>();
             var courseWeekDays = new List<CourseWeekday>();
@@ -64,7 +75,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 model.StartDate,
                 model.EndDate,
                 model.Room,
-                model.TeacherId,
+                model.TeacherIds,
                 weekDays);
 
             await unitOfWork.SaveAsync();
@@ -88,9 +99,9 @@ public class CourseService(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
         
-      //  existCourse.TeacherId = model.TeacherId;
         existCourse.Price = model.Price;
         existCourse.StartDate = model.StartDate;
+        existCourse.EndDate = model.Status == CourseStatus.Closed ? DateOnly.FromDateTime(DateTime.UtcNow) : model.EndDate;
         existCourse.Status = model.Status;
         existCourse.MaxStudentCount = model.MaxStudentCount;
         existCourse.Description = model.Description;
@@ -107,6 +118,22 @@ public class CourseService(IUnitOfWork unitOfWork,
             foreach (var weekday in existCourse.CourseWeekdays)
                 unitOfWork.CourseWeekdays.Remove(weekday);
 
+            await unitOfWork.SaveAsync();
+
+            foreach(var courseTeacher in existCourse.CourseTeachers)
+                unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
+            
+            await unitOfWork.SaveAsync();
+
+            var teacherCourses = new List<CourseTeacher>();
+            foreach (var teacherId in model.TeacherIds)
+                teacherCourses.Add(new CourseTeacher
+                {
+                    TeacherId = teacherId,
+                    CourseId = existCourse.Id
+                });
+            
+            await unitOfWork.CourseTeachers.InsertRangeAsync(teacherCourses);
             await unitOfWork.SaveAsync();
 
             foreach (var weekDay in model.Weekdays)
@@ -126,7 +153,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                model.StartDate,
                model.EndDate,
                model.Room,
-               model.TeacherId,
+               model.TeacherIds,
                model.Weekdays);
             await unitOfWork.SaveAsync();
 
@@ -146,7 +173,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: new[] { "Lessons", "CourseWeekdays" })
+            includes: [ "Lessons", "Lessons.LessonTeachers", "CourseWeekdays", "Enrollments", "TeacherCourses"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
@@ -155,6 +182,15 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         foreach (var weekday in existCourse.CourseWeekdays)
             unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
+        
+        foreach(var enrollment in existCourse.Enrollments)
+            unitOfWork.Enrollments.MarkAsDeleted(enrollment);
+
+        foreach (var lessonTeacher in existCourse.Lessons.SelectMany(l => l.Teachers))
+            unitOfWork.LessonTeachers.MarkAsDeleted(lessonTeacher);
+        
+        foreach(var courseTeacher in existCourse.CourseTeachers)
+            unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
 
         unitOfWork.Courses.MarkAsDeleted(existCourse);
 
@@ -181,12 +217,12 @@ public class CourseService(IUnitOfWork unitOfWork,
                     SubjectId = c.SubjectId,
                     SubjectName = c.Subject.Name,
                 },
-                Teacher = new CourseViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new CourseViewModel.TeacherInfo
                 {
-                 //   Id = c.TeacherId,
-                 //   FirstName = c.Teacher.User.FirstName,
-                  //  LastName = c.Teacher.User.LastName,
-                },
+                    Id = ct.Teacher.Id,
+                    FirstName = ct.Teacher.User.FirstName,
+                    LastName = ct.Teacher.User.LastName
+                }),
                 Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
@@ -212,7 +248,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     {
         return await unitOfWork.Courses
             .SelectAllAsQueryable(
-            predicate: c => !c.IsDeleted)
+            predicate: c => c.Id == id)
             .Select(c => new CourseUpdateViewModel
             {
                 Id = c.Id,
@@ -228,19 +264,19 @@ public class CourseService(IUnitOfWork unitOfWork,
                     SubjectId = c.SubjectId,
                     SubjectName = c.Subject.Name,
                 },
-                Teacher = new CourseUpdateViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new CourseUpdateViewModel.TeacherInfo
                 {
-                    // Id = c.TeacherId,
-                    // FirstName = c.Teacher.User.FirstName,
-                    // LastName = c.Teacher.User.LastName,
-                },
+                    Id = ct.Teacher.Id,
+                    FirstName = ct.Teacher.User.FirstName,
+                    LastName = ct.Teacher.User.LastName
+                }),
                 Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
                     StartTime = w.StartTime,
                     EndTime = w.EndTime
-                }).ToList(),
+                }),
                 Lessons = c.Lessons.Select(cl => new CourseUpdateViewModel.LessonInfo
                 {
                     Id = cl.Id,
@@ -248,17 +284,15 @@ public class CourseService(IUnitOfWork unitOfWork,
                     EndTime = cl.EndTime,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
-                }).OrderBy(l => l.Date).ToList(),
+                }).OrderBy(l => l.Date)
             })
-            .FirstOrDefaultAsync(t => t.Id == id)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
     }
 
-    public async Task<List<CourseViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null)
+    public async Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null, CourseStatus? status = null)
     {
-        var query = unitOfWork.Courses.SelectAllAsQueryable(
-            predicate: c => c.CompanyId == companyId && !c.IsDeleted,
-            includes: ["Subject", "Teacher", "Lessons", "Enrollments", "CourseWeekdays", "Teacher.User"]);
+        var query = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyId);
 
         if (!string.IsNullOrEmpty(search))
             query = query.Where(t => t.Name.Contains(search));
@@ -266,43 +300,36 @@ public class CourseService(IUnitOfWork unitOfWork,
         if (subjectId != null)
             query = query.Where(t => t.SubjectId == subjectId);
 
+        if (status != null)
+            query = query.Where(t => t.Status == status);
+
         return await query
-            .Select(c => new CourseViewModel
+            .Select(c => new CourseTableViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
                 LessonCount = c.LessonCount,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
                 Status = c.Status,
+                Level = c.Level,
                 MaxStudentCount = c.MaxStudentCount,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
-                Description = c.Description,                
-                Subject = new CourseViewModel.SubjectInfo
+                Subject = new CourseTableViewModel.SubjectInfo
                 {
                     SubjectId = c.SubjectId,
                     SubjectName = c.Subject.Name,
                 },
-                Teacher = new CourseViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new CourseTableViewModel.TeacherInfo
                 {
-                    // Id = c.TeacherId,
-                    // FirstName = c.Teacher.User.FirstName,
-                    // LastName = c.Teacher.User.LastName,
-                },
-                Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
+                    Id = ct.Teacher.Id,
+                    FirstName = ct.Teacher.User.FirstName,
+                    LastName = ct.Teacher.User.LastName
+                }),
+                Weekdays = c.CourseWeekdays.Select(w => new CourseTableViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
-                }).ToList(),
-                Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
-                {
-                    Id = cl.Id,
-                    Date = cl.Date,
-                    EndTime = cl.EndTime,
-                    StartTime = cl.StartTime,
-                    Room = cl.Room,
-                }).OrderBy(l => l.Date).ToList(),
+                })
             })
             .ToListAsync();
     }
@@ -360,7 +387,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             {
                 Id = c.Id,
                 Name = c.Name,
-               // TeacherFullName = $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}",
+                TeachersFullName = c.CourseTeachers.Select(ct => $"{ct.Teacher.User.FirstName} {ct.Teacher.User.LastName}"),
                 MaxStudentCount = c.MaxStudentCount,
                 CoursePrice = c.Price
             }).ToListAsync();
@@ -413,8 +440,6 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         return mappedFrozenModels;
     }
-
-    
 
     public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
@@ -492,27 +517,45 @@ public class CourseService(IUnitOfWork unitOfWork,
         }
     }
 
+    public Task CreateTeacherAssessmentAsync(TeacherAssessment model)
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task GenerateLessonAsync(
      int courseId,
      DateOnly startDate,
      DateOnly endDate,
      string room,
-     int teacherId,
+     IEnumerable<int> teacherIds,
      List<CourseCreateModel.Weekday> weekDays)
     {
-        var lessons = new List<Lesson>
+        var lessons = new List<Lesson>();
+        var initialLesson = new Lesson
         {
-            new Lesson
-            {
-                CourseId = courseId,
-                StartTime = weekDays[0].StartTime,
-                EndTime = weekDays[0].EndTime,
-                Room = room,
-                Number = 1,
-                Date = startDate,
-                TeacherId = teacherId
-            }
+            CourseId = courseId,
+            StartTime = weekDays[0].StartTime,
+            EndTime = weekDays[0].EndTime,
+            Room = room,
+            Number = 1,
+            Date = startDate,
+
         };
+
+        lessons.Add(initialLesson);
+
+        var lessonTeachers = new List<LessonTeacher>();
+
+        foreach(var teacherId in teacherIds)
+        {
+            lessonTeachers.Add(new LessonTeacher
+            {
+                TeacherId = teacherId,
+                LessonId = initialLesson.Id
+            });
+        }
+
+        await unitOfWork.LessonTeachers.InsertRangeAsync(lessonTeachers);
 
         var lessonCount = 1;
         var count = 2;
@@ -536,7 +579,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                         Room = room,
                         Number = i,
                         Date = currentDate,
-                        TeacherId = teacherId
+                        Teachers = lessonTeachers
                     });
                     lessonCount++;
                 }

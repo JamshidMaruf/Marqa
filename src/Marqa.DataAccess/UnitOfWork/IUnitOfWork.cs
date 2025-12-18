@@ -19,6 +19,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<Teacher> Teachers { get; }
     IRepository<TeacherSubject> TeacherSubjects { get; }
     IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; }
+    IRepository<TeacherAssessment> TeacherAssessments { get; }
 
     // 4. Student Management
     IRepository<Student> Students { get; }
@@ -44,6 +45,7 @@ public interface IUnitOfWork : IDisposable
     IRepository<LessonAttendance> LessonAttendances { get; }
     IRepository<LessonFile> LessonFiles { get; }
     IRepository<LessonVideo> LessonVideos { get; }
+    IRepository<LessonTeacher> LessonTeachers { get; }
 
     // 8. Exams and Results
     IRepository<Exam> Exams { get; }

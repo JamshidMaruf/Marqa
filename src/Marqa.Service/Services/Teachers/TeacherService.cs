@@ -374,4 +374,9 @@ public class TeacherService(
 
         return paymentTypes;
     }
+
+    public Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -21,7 +21,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     // 3. Teacher Management
     public IRepository<Teacher> Teachers => new Repository<Teacher>(context);
     public IRepository<TeacherSubject> TeacherSubjects { get; } = new Repository<TeacherSubject>(context);
-    public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; }= new Repository<TeacherPaymentOperation>(context);
+    public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; } = new Repository<TeacherPaymentOperation>(context);
+    public IRepository<TeacherAssessment> TeacherAssessments { get; } = new Repository<TeacherAssessment>(context);
 
     // 4. Student Management
     public IRepository<Student> Students { get; } = new Repository<Student>(context);
@@ -47,6 +48,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<LessonAttendance> LessonAttendances { get; } = new Repository<LessonAttendance>(context);
     public IRepository<LessonFile> LessonFiles { get; } = new Repository<LessonFile>(context);
     public IRepository<LessonVideo> LessonVideos { get; } = new Repository<LessonVideo>(context);
+    public IRepository<LessonTeacher> LessonTeachers { get; } = new Repository<LessonTeacher>(context);
 
     // 8. Exams and Results
     public IRepository<Exam> Exams { get; } = new Repository<Exam>(context);
@@ -85,6 +87,8 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     // 15. Security and OTP
     public IRepository<OTP> OTPs { get; } = new Repository<OTP>(context);
+
+
 
     public async Task SaveAsync()
     {
