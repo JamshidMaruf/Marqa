@@ -7,7 +7,9 @@ namespace Marqa.Admin.WebApi.Controllers;
 [ApiVersion("1")]
 // TODO: Implement default api versioning
 [Route("api/v1/[controller]")]
-//[Authorize]
+#if (!DEBUG)
+[Authorize]
+#endif
 public class BaseController : ControllerBase
 {
     

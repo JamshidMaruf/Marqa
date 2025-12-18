@@ -331,36 +331,43 @@ public class TeacherService(
 
     public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)
     {
-        //var teacherSalary = await unitOfWork.TeacherSalaries.SelectAsync(t => t.TeacherId == teacherId)
-        //    ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
+        var teacher = await unitOfWork.Teachers.SelectAsync(t => t.Id == teacherId)
+            ?? throw new NotFoundException($"No teacher was found with ID {teacherId}");
 
-        //var teacher = await unitOfWork.Teachers.SelectAllAsQueryable(t =>
-        //        t.Id == teacherId)
-        //    .Include(t => t.Courses.Where(c =>
-        //    c.StartDate.Year == year &&)
-        //    .FirstOrDefaultAsync();
+        var query = unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(
+                predicate: la => la.Lesson.Course.CourseTeachers.Any(ct => ct.TeacherId == teacherId) &&
+                                 la.Lesson.Date.Year == year &&
+                                 la.Lesson.Date.Month == (int)month,
+                includes: ["Lesson", "Lesson.Course", "Lesson.Course.CourseTeachers"]);
 
-        //var paymentType = teacherSalary.PaymentType;
-        //var studentCount = teacher.Courses.Select(c => c.Enrollments.Count).Sum();
-        //var currentCourses = teacher.Courses.Where(c => c.Status == CourseStatus.Active).Count();
-        //var calculatedModel = new CalculatedTeacherSalaryModel();
+        var activeCourses = await query.Select(la => la.Lesson.Course).Distinct().ToListAsync();
+        
+        var activeStudentsCount = activeCourses.Sum(c => c.StudentCount);
 
-        //if (paymentType == TeacherPaymentType.Fixed)
-        //{
-        //    calculatedModel.StudentsCount = studentCount;
-        //    calculatedModel.GroupsCount = teacher.Courses.Count;
-        //    calculatedModel.Total = teacherSalary.Amount;
-
-        //}
-        //else if(paymentType ==TeacherPaymentType.Percentage)
-        //{
-        //    calculatedModel.StudentsCount = studentCount;
-        //    calculatedModel.GroupsCount = teacher.Courses.Count;
-        //    calculatedModel.Percent = teacherSalary.Percent;
-        //    calculatedModel.Total = studentCount * currentCourses;
-        //}
-
-        return new CalculatedTeacherSalaryModel();
+        var result = new CalculatedTeacherSalaryModel();
+        
+        result.GroupsCount = activeCourses.Count;
+        result.ActiveStudentsCount = activeStudentsCount;
+        
+        if (teacher.PaymentType == TeacherPaymentType.Fixed)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Percentage)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Hourly)
+        {
+            
+        }
+        else if (teacher.PaymentType == TeacherPaymentType.Mixed)
+        {
+            
+        }
+        
+        return result;
     }
 
     public async Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes()

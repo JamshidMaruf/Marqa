@@ -5,17 +5,47 @@ namespace Marqa.Service.Services.Teachers.Models;
 public class CalculatedTeacherSalaryModel
 {
     public int GroupsCount { get; set; }
-    public int StudentsCount { get; set; }
-    public decimal? Percent { get; set; }
-    public decimal? Amount { get; set; }
-    public decimal Total { get; set; }
-    public TeacherPaymentType PaymentType { get; set; }
-    public List<GroupData> Groups { get; set; }
-
-    public class GroupData
+    public int ActiveStudentsCount { get; set; }
+    public FixedSalary Fixed { get; set; }
+    public PercentageSalary Percentage { get; set; }
+    public HourlySalary Hourly { get; set; }
+    public MixedSalary Mixed { get; set; }
+    
+    public class FixedSalary
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
+        public int ActiveStudentsCount { get; set; }
+        public decimal FixSalary { get; set; }
+    }
+    
+    public class PercentageSalary
+    {
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
+        public int ActiveStudentsCount { get; set; }
+        public decimal Percent { get; set; }
+        public decimal Total { get; set; }
+    }
+    
+    public class HourlySalary
+    {
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
+        public int ActiveStudentsCount { get; set; }
+        public decimal FixSalary { get; set; }
+        public int Hours { get; set; }
+        public decimal Amount { get; set; }
+        public decimal Total { get; set; }
+    }
+    
+    public class MixedSalary
+    {
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
+        public int ActiveStudentsCount { get; set; }
+        public decimal FixSalary { get; set; }
+        public decimal Percent { get; set; }
+        public decimal Total { get; set; }
     }
 }

@@ -13,6 +13,8 @@ public class Lesson : Auditable
     public HomeTaskStatus HomeTaskStatus { get; set; }
     public bool IsCompleted { get; set; }
     public int CourseId { get; set; }
+    public int TeacherId { get; set; }
+    public decimal Price { get; set; }
 
     // Navigation
     public Course Course { get; set; }

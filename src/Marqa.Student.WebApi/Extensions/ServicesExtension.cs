@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
-using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;

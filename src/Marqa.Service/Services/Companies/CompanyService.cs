@@ -3,6 +3,8 @@ using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Companies.Models;
+using Marqa.Shared.Extensions;
+using Marqa.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Companies;
@@ -99,5 +101,22 @@ public class CompanyService(
                 Director = c.Director,
             })
             .ToListAsync();
+    }
+
+    public async Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params)
+    {
+        var query = unitOfWork.Companies.SelectAllAsQueryable();
+        
+        var paginatedCompanies = await query.Paginate(@params).ToListAsync();
+        
+        return paginatedCompanies.Select(c => new CompanyViewModel
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Address = c.Address,
+            Phone = c.Phone,
+            Email = c.Email,
+            Director = c.Director,
+        }).ToList();
     }
 }
