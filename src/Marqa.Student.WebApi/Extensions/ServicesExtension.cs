@@ -1,6 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Text;
+using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Domain.Entities;
+using Marqa.Service.Servcies.Products;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
@@ -19,6 +22,8 @@ using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Student.WebApi.Extensions;
 public static class ServicesExtension
@@ -38,7 +43,7 @@ public static class ServicesExtension
         services.AddScoped<IHomeTaskService, HomeTaskService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILessonService, LessonService>();
-       // services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IPointSettingService, PointSettingService>();
         services.AddScoped<IExamService, ExamService>();
@@ -47,5 +52,36 @@ public static class ServicesExtension
         services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
         services.AddScoped<IEncryptionService, EncryptionService>();
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
+    }
+
+    public async static Task AddJWTServiceAsync(this IServiceCollection services)
+    {
+        var serviceProvider = services.BuildServiceProvider();
+
+        bool check = await serviceProvider
+            .GetService<IRepository<User>>()
+            .CanConnectAsync();
+
+        if (check)
+        {
+            var settingService = serviceProvider.GetService<ISettingService>();
+
+            var jwtSettings = await settingService.GetByCategoryAsync("JWT");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["JWT.Issuer"],
+                        ValidAudience = jwtSettings["JWT.Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["JWT.Key"]))
+                    };
+                });
+        }
     }
 }

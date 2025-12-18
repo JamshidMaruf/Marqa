@@ -1,5 +1,4 @@
-namespace Marqa.Shared.Models;
-
+﻿namespace Marqa.Shared.Models;
 public class PaginationParams
 {
     public int PageIndex { get; set; } = 1;
