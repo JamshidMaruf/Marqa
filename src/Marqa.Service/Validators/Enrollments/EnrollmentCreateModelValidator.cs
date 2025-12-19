@@ -13,17 +13,17 @@ public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreate
             .NotEmpty()
             .GreaterThan(0);
 
-        //RuleFor(model => model.StudentId)
-        //    .Must(studentId => unitOfWork.Students.CheckExist(s => s.Id == studentId))
-        //    .WithMessage("Student is not found.");
+        RuleFor(model => model.StudentId)
+            .MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId))
+            .WithMessage("Student is not found.");
 
         RuleFor(model => model.CourseId)
             .NotEmpty()
             .GreaterThan(0);
 
-        //RuleFor(model => model.CourseId)
-        //    .Must(courseId => unitOfWork.Courses.CheckExist(c => c.Id == courseId))
-        //    .WithMessage("Course is not found.");
+        RuleFor(model => model.CourseId)
+           .MustAsync(async (courseId, cancellation) => await unitOfWork.Courses.CheckExistAsync(c => c.Id == courseId))
+            .WithMessage("Course is not found.");
 
         RuleFor(model => model.EnrollmentDate)
             .NotEmpty()

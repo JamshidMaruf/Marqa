@@ -9,8 +9,8 @@ public class ExamUpdateModelValidator : AbstractValidator<ExamUpdateModel>
     {
         RuleFor(x => x.CourseId)
             .GreaterThan(0).WithMessage("CourseId is required.");
-        //RuleFor(x => x.CourseId).Must(x => unitOfWork.Courses.CheckExist(c => c.Id == x))
-        //    .WithMessage("Course with the given CourseId does not exist.");
+        RuleFor(x => x.CourseId).MustAsync(async (courseId, cancellation) => await unitOfWork.Courses.CheckExistAsync(c => c.Id == courseId))
+            .WithMessage("Course with the given CourseId does not exist.");
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")

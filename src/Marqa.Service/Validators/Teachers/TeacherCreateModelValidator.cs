@@ -11,8 +11,8 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .GreaterThan(0)
             .WithMessage("CompanyId is required.");
         RuleFor(x => x.CompanyId)
-            .Must(companyId=> unitOfWork.Companies.CheckExist(x => x.Id == companyId))
-            .WithMessage("Company with given Id does not exist.");
+            .MustAsync(async (companyId, cancellation) => await unitOfWork.Companies.CheckExistAsync(p => p.Id == companyId))
+            .WithMessage("Company not found");
 
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
@@ -71,10 +71,9 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .Must(list => list.All(id => id > 0))
             .WithMessage("Invalid subject ID.");
     
-        //RuleForEach(x => x.SubjectIds)
-        //    .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
-        //    )
-        //    .WithMessage("Subject with the given Id does not exist.");
+        RuleForEach(x => x.SubjectIds)
+            .MustAsync(async (subjectId, cancellation) => await unitOfWork.Subjects.CheckExistAsync(s => s.Id == subjectId))
+            .WithMessage("Subject with the given Id does not exist.");
     }
 
     private bool BeAValidAge(DateOnly dob)

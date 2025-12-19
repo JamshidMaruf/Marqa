@@ -8,8 +8,7 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
 {
     public CourseUpdateModelValidator(IUnitOfWork unitOfWork)
     {
-        //RuleFor(c => c.TeacherId).GreaterThan(0);
-
+        RuleForEach(c => c.TeacherIds).GreaterThan(0).WithMessage("Teacher IDs must be greater than 0");
         RuleForEach(c => c.TeacherIds)
             .MustAsync(async (teacherId, cancellationToken) =>
             {

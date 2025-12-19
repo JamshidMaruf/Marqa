@@ -62,8 +62,7 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
             .WithMessage("Duplicate subject IDs are not allowed.");
 
         RuleForEach(x => x.SubjectIds)
-            .Must(subjectId => unitOfWork.Subjects.CheckExist(s => s.Id == subjectId)
-            )
+            .MustAsync(async (subjectId, cancellation) => await unitOfWork.Subjects.CheckExistAsync(s => s.Id == subjectId))
             .WithMessage("Subject with the given Id does not exist.");
     }
 

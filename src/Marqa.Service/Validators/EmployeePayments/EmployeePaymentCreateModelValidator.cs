@@ -8,11 +8,14 @@ public class EmployeePaymentCreateModelValidator : AbstractValidator<EmployeePay
 {
     public EmployeePaymentCreateModelValidator(IUnitOfWork unitOfWork)
     {
-        //RuleFor(model => model.EmployeeId)
-        //    .NotEmpty()
-        //    .GreaterThan(0);
-        //RuleFor(model => model.EmployeeId).Must(e => unitOfWork.Employees.CheckExist(ex => ex.Id == e))
-        //    .WithMessage("Employee not found.");
+        RuleFor(model => model.EmployeeId)
+            .NotEmpty()
+            .GreaterThan(0);
+        RuleFor(model => model.EmployeeId).MustAsync(async (employeeId, token) =>
+            {
+                return await unitOfWork.Employees.CheckExistAsync(e => e.Id == employeeId);
+            })
+            .WithMessage("Employee not found.");
 
         RuleFor(model => model.PaymentMethod)
             .NotNull();

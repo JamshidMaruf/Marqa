@@ -16,7 +16,10 @@ public class EmployeeCreateModelValidator : AbstractValidator<EmployeeCreateMode
         RuleFor(x => x.CompanyId)
             .GreaterThan(0).WithMessage("CompanyId is required.");
         RuleFor(x => x.CompanyId)
-            .Must(companyId => unitOfWork.Companies.CheckExist(c => c.Id == companyId))
+            .MustAsync(async (companyId, cancellationToken) =>
+            {
+                return await unitOfWork.Companies.CheckExistAsync(c => c.Id == companyId);
+            })
             .WithMessage("Company with given Id does not exist.");
 
         RuleFor(x => x.FirstName)
@@ -56,7 +59,10 @@ public class EmployeeCreateModelValidator : AbstractValidator<EmployeeCreateMode
 
         RuleFor(x => x.RoleId)
             .GreaterThan(0).WithMessage("RoleId is required.");
-        RuleFor(x => x.RoleId).Must(roleId => unitOfWork.EmployeeRoles.CheckExist(r => r.Id == roleId))
+        RuleFor(x => x.RoleId).MustAsync(async (roleId, cancellationToken) =>
+            {
+                return await unitOfWork.EmployeeRoles.CheckExistAsync(r => r.Id == roleId);
+            })
             .WithMessage("Employee role with given Id does not exist.");
     }
 }
