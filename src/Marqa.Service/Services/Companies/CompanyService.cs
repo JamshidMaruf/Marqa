@@ -106,7 +106,7 @@ public class CompanyService(
     public async Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params)
     {
         var query = unitOfWork.Companies.SelectAllAsQueryable();
-        
+
         var paginatedCompanies = await query.Paginate(@params).ToListAsync();
         
         return paginatedCompanies.Select(c => new CompanyViewModel
