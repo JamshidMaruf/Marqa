@@ -70,7 +70,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         {
             StatusCode = 200,
             Message = "success",
-            Data = courses
+         //   Data = courses
         });
     }
 }
