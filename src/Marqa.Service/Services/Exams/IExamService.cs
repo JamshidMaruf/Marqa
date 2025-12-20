@@ -1,7 +1,7 @@
-﻿using Marqa.Service.Services.Exams.Models;
+﻿﻿using Marqa.Service.Services.Exams.Models;
 
 namespace Marqa.Service.Services.Exams;
-public interface IExamService
+public interface IExamService : IScopedService
 {
     Task CreateExamAsync(ExamCreateModel model);
     Task UpdateExamAsync(int examId, ExamUpdateModel model);

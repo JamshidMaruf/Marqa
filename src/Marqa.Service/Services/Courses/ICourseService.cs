@@ -1,10 +1,10 @@
-﻿using Marqa.Domain.Entities;
+﻿﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses.Models;
 
 namespace Marqa.Service.Services.Courses;
 
-public interface ICourseService
+public interface ICourseService : IScopedService
 {
     Task CreateAsync(CourseCreateModel model);
     Task UpdateAsync(int id, CourseUpdateModel model);

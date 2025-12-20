@@ -1,9 +1,9 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Orders.Models;
 
 namespace Marqa.Service.Services.Orders;
 
-public interface IOrderService
+public interface IOrderService : IScopedService
 {
     Task CreateBasketAsync(int studentId);
     Task CreateBasketItemAsync(BasketItemCreateModel model);

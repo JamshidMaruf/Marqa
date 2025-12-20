@@ -1,5 +1,9 @@
-﻿namespace Marqa.Service.Services.Permissions.Models;
-public interface IPermissionService
+﻿﻿using Marqa.Service.Exceptions;
+ using Marqa.Service.Services;
+ using Marqa.Service.Services.Permissions.Models;
+
+ namespace Marqa.Service.Services.Permissions;
+public interface IPermissionService : IScopedService
 {
     /// <summary>
     /// Creates a new permission in the system

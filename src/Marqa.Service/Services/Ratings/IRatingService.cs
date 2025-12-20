@@ -1,8 +1,8 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Ratings.Models;
 
 namespace Marqa.Service.Services.Ratings;
-public interface IRatingService
+public interface IRatingService : IScopedService
 {
     Task<Rating> GetStudentRatingAsync(int studentId);
     Task<IEnumerable<Rating>> GetAllStudentRatingsAsync();

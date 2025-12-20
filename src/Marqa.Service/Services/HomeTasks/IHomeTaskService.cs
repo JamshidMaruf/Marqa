@@ -1,9 +1,9 @@
-﻿using Marqa.Service.Services.HomeTasks.Models;
+﻿﻿using Marqa.Service.Services.HomeTasks.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.HomeTasks;
 
-public interface IHomeTaskService
+public interface IHomeTaskService : IScopedService
 {
     Task CreateAsync(HomeTaskCreateModel model);
     Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file);

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿﻿using Marqa.Service.Services;
+using Microsoft.AspNetCore.Http;
 
-public interface IFileService
+public interface IFileService : IScopedService
 {
     Task<(string FileName, string FilePath)> UploadAsync(IFormFile file, string folder);
 

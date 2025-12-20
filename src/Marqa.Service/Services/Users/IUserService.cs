@@ -1,6 +1,6 @@
-﻿namespace Marqa.Service.Services.Users;
+﻿﻿namespace Marqa.Service.Services.Users;
 
-public interface IUserService
+public interface IUserService : IScopedService
 {
     Task<int> GetAllUsersCount();
 }

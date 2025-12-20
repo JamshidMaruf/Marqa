@@ -1,5 +1,4 @@
 ﻿using Marqa.DataAccess.Contexts;
-using Marqa.Shared.Extensions;
 using Marqa.Student.WebApi.Extensions;
 using Marqa.Student.WebApi.Middlewares;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -21,7 +20,7 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerService();
+//builder.Services.AddSwaggerService();
 
 builder.Services.AddDbContext<AppDbContext>(option
     => option.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQLConnection")));

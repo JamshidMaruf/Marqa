@@ -1,9 +1,9 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Students.Models;
 using Microsoft.AspNetCore.Http;
 namespace Marqa.Service.Services.Students;
 
-public interface IStudentService
+public interface IStudentService : IScopedService
 {
     Task CreateAsync(StudentCreateModel model);
     Task UpdateAsync(int id, StudentUpdateModel model);

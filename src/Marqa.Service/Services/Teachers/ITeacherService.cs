@@ -1,9 +1,9 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Teachers.Models;
 
 namespace Marqa.Service.Services.Teachers;
 
-public interface ITeacherService
+public interface ITeacherService : IScopedService
 {
     Task CreateAsync(TeacherCreateModel model);
     Task UpdateAsync(int id, TeacherUpdateModel model);

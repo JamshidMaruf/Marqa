@@ -1,11 +1,7 @@
-﻿using Hangfire;
+﻿﻿﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.DataAccess.Contexts;
-using Marqa.Service.Helpers;
-using Marqa.Shared.Extensions;
-using Marqa.Shared.Helpers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -43,12 +39,8 @@ builder.Services.AddHttpContextAccessor();
 
 await builder.Services.AddJWTServiceAsync();
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.DefaultApiVersion = new ApiVersion(1, 2);
-    options.AssumeDefaultVersionWhenUnspecified = true;
-    options.ReportApiVersions = true;
-});
+// API Versioning
+builder.Services.AddApiVersioningService();
 
 builder.Services.AddControllers(options =>
 {
@@ -69,11 +61,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
-builder.Services.AddHttpContextAccessor();
-
-EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
-HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
 
 
 var app = builder.Build();

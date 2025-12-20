@@ -1,5 +1,6 @@
-﻿using Marqa.Service.Services.Banners.Models;
-public interface IBannerService
+﻿﻿using Marqa.Service.Services;
+using Marqa.Service.Services.Banners.Models;
+public interface IBannerService : IScopedService
 {
     Task CreateAsync(BannerCreateModel model);
     Task UpdateAsync(int id, BannerUpdateModel model);

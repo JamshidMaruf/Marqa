@@ -7,16 +7,20 @@ public class InternalServerErrorHandler(ILogger<InternalServerErrorHandler> logg
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        var ex = new ProblemDetails
+        logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
+
+        var problemDetails = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError, 
-            Title = exception.Message,
+            Title = "Internal Server Error",
+            Detail = "An unexpected error occurred. Please try again later.",
+            Instance = httpContext.Request.Path
         };
         
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        await httpContext.Response.WriteAsJsonAsync(ex, cancellationToken);
+        httpContext.Response.ContentType = "application/problem+json";
         
-        logger.LogError(exception.Message);
+        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
         return true;
     }

@@ -1,10 +1,11 @@
-﻿using Marqa.Service.DTOs.StudentPaymentOperations;
+﻿﻿using Marqa.Service.DTOs.StudentPaymentOperations;
+using Marqa.Service.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Marqa.Service.Interfaces;
 
-public interface IStudentPaymentService
+public interface IStudentPaymentService : IScopedService
 {
     /// <summary>
     /// Creates a new student payment record.

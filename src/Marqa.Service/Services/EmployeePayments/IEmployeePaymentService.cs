@@ -1,8 +1,8 @@
-﻿using Marqa.Service.Services.EmployeePayments.Models;
+﻿﻿using Marqa.Service.Services.EmployeePayments.Models;
 
 namespace Marqa.Service.Services.EmployeePayments;
 
-public interface IEmployeePaymentService
+public interface IEmployeePaymentService : IScopedService
 {
     /// <summary>
     /// Creates a new employee payment record in the system.

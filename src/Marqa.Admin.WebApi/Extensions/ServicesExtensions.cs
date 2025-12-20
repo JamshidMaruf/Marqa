@@ -1,34 +1,17 @@
-﻿using System.Text;
+﻿﻿using System.Text;
+using Asp.Versioning;
 using FluentValidation;
 using Marqa.Admin.WebApi.Handlers;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
-using Marqa.Service.Services.Auth;
-using Marqa.Service.Services.Companies;
-using Marqa.Service.Services.Courses;
-using Marqa.Service.Services.EmployeeRoles;
-using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Enrollments;
-using Marqa.Service.Services.Enums;
-using Marqa.Service.Services.Exams;
-using Marqa.Service.Services.Files;
-using Marqa.Service.Services.HomeTasks;
-using Marqa.Service.Services.Lessons;
-using Marqa.Service.Services.Messages;
-using Marqa.Service.Services.Permissions;
-using Marqa.Service.Services.Permissions.Models;
-using Marqa.Service.Services.PointSettings;
-using Marqa.Service.Services.Products;
-using Marqa.Service.Services.Ratings;
+using Marqa.Service.Services;
 using Marqa.Service.Services.Settings;
-using Marqa.Service.Services.StudentPointHistories;
-using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Subjects;
-using Marqa.Service.Services.Teachers;
 using Marqa.Service.Validators.Companies;
+using Marqa.Shared.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace Marqa.Admin.WebApi.Extensions;
 
@@ -36,34 +19,38 @@ public static class ServicesExtensions
 {
     public static void AddMarqaServices(this IServiceCollection services)
     {
+        // Core infrastructure
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IJwtService, JwtService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<ICourseService, CourseService>();
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
-        services.AddScoped<IHomeTaskService, HomeTaskService>();
-        services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<ISmsService, SmsService>();
-        services.AddScoped<ISubjectService, SubjectService>();
-        services.AddScoped<IPointSettingService, PointSettingService>();
-        services.AddScoped<IExamService, ExamService>();
-        services.AddScoped<IRatingService, RatingService>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
-        services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<ISettingService, SettingService>();
-        services.AddScoped<IPermissionService, PermissionService>();
-        services.AddScoped<IEnumService, EnumService>();
-        services.AddScoped<ITeacherService, TeacherService>();
-        services.AddScoped<IEnrollmentService, EnrollmentService>();
+
+        // DI-based services (replacing static helpers)
+        services.AddScoped<IEnvironmentService, EnvironmentService>();
+        services.AddScoped<IHttpContextService, HttpContextService>();
+        services.AddScoped<IPaginationService, PaginationService>();
+
+        // Auto-register all services using Scrutor
+        services.Scan(scan => scan
+            .FromAssemblyOf<IScopedService>()
+            .AddClasses(classes => classes.AssignableTo<IScopedService>())
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<ISingletonService>()
+            .AddClasses(classes => classes.AssignableTo<ISingletonService>())
+            .AsImplementedInterfaces()
+            .WithSingletonLifetime());
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<ITransientService>()
+            .AddClasses(classes => classes.AssignableTo<ITransientService>())
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
+
+        // FluentValidation auto-registration
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
 
-
+        // Exception handlers
         services.AddExceptionHandler<AlreadyExitExceptionHandler>();
         services.AddExceptionHandler<ValidateExceptionHandler>();
         services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
@@ -72,6 +59,25 @@ public static class ServicesExtensions
         services.AddExceptionHandler<RequestRefusedExceptionHandler>();
         services.AddExceptionHandler<InternalServerErrorHandler>();
         services.AddProblemDetails();
+    }
+
+    public static void AddApiVersioningService(this IServiceCollection services)
+    {
+        services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("X-Api-Version"),
+                new QueryStringApiVersionReader("api-version"));
+        })
+        .AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
     }
 
     public async static Task AddJWTServiceAsync(this IServiceCollection services)
@@ -101,5 +107,32 @@ public static class ServicesExtensions
                     };
                 });
         }
+    }
+    
+    public static void AddSwaggerService(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Scheme = "Bearer",
+                Description =
+                    "Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                    },
+                    new string[] { }
+                }
+            });
+        });
     }
 }
