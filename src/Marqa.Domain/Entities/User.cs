@@ -1,4 +1,4 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Domain.Entities;
 
@@ -12,6 +12,4 @@ public class User : Auditable
     public bool IsActive { get; set; }
     public bool IsUseSystem { get; set; }
     public UserRole Role { get; set; }
-    public int CompanyId { get; set; }
-    public Company Company { get; set; }
 }

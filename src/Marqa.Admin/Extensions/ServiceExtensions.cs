@@ -12,14 +12,12 @@ using Marqa.Service.Services.HomeTasks;
 using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.Messages;
 using Marqa.Service.Services.Permissions;
-using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.PointSettings;
 using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Users;
 using Marqa.Service.Validators.Companies;
 
@@ -42,7 +40,6 @@ public static class ServiceExtensions
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IPointSettingService, PointSettingService>();
         services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IRatingService, RatingService>();

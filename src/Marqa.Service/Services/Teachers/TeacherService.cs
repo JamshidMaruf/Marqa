@@ -1,11 +1,10 @@
-﻿using FluentValidation;
+﻿﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Enums;
-using Marqa.Service.Services.Subjects;
 using Marqa.Service.Services.Teachers.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +12,6 @@ namespace Marqa.Service.Services.Teachers;
 
 public class TeacherService(
     IUnitOfWork unitOfWork,
-    ISubjectService subjectService,
     IValidator<TeacherCreateModel> validatorTeacherCreate,
     IValidator<TeacherUpdateModel> validatorTeacherUpdate,
     IEnumService enumService) : ITeacherService
@@ -24,7 +22,7 @@ public class TeacherService(
 
         var alreadyExistTeacher =
             await unitOfWork.Teachers.CheckExistAsync(t =>
-                t.User.Phone == model.Phone && t.User.CompanyId == model.CompanyId);
+                t.User.Phone == model.Phone && t.CompanyId == model.CompanyId);
 
         if (alreadyExistTeacher)
             throw new AlreadyExistException($"Teacher with this phone {model.Phone} already exists");
@@ -50,9 +48,9 @@ public class TeacherService(
                     Phone = teacherPhone.Phone,
                     Email = model.Email,
                     PasswordHash = PasswordHelper.Hash(model.Password),
-                    Role = UserRole.Employee,
-                    CompanyId = model.CompanyId
+                    Role = UserRole.Employee
                 },
+                CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
                 JoiningDate = model.JoiningDate,
@@ -65,11 +63,7 @@ public class TeacherService(
                 SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
                 SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
             });
-
-            await unitOfWork.SaveAsync();
-
-            await subjectService.BulkAttachAsync(teacher.Id, model.SubjectIds);
-
+            
             await unitOfWork.SaveAsync();
             await transaction.CommitAsync();
         }
@@ -89,7 +83,7 @@ public class TeacherService(
 
         var existPhone = await unitOfWork.Teachers.SelectAsync(e =>
             e.User.Phone == model.Phone &&
-            e.User.CompanyId == existTeacher.User.CompanyId &&
+            e.CompanyId == existTeacher.CompanyId &&
             e.Id != id, includes: "User");
 
         if (existPhone != null)
@@ -116,7 +110,6 @@ public class TeacherService(
         existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
         existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
 
-        await subjectService.BulkAttachAsync(existTeacher.Id, model.SubjectIds);
         await unitOfWork.SaveAsync();
     }
 
@@ -154,15 +147,6 @@ public class TeacherService(
         foreach (var courseTeacher in courseTeachers)
         {
             unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
-        }
-
-        var teacherSubjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id)
-            .ToListAsync();
-
-        foreach (var teacherSubject in teacherSubjects)
-        {
-            unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
         }
 
         unitOfWork.Teachers.MarkAsDeleted(teacherForDeletion);
@@ -208,17 +192,10 @@ public class TeacherService(
                },
                JoiningDate = ts.JoiningDate,
                Info = ts.Info,
-               Subjects = ts.TeacherSubjects.Select(ts => new TeacherViewModel.SubjectInfo
-               {
-                   Id = ts.SubjectId,
-                   Name = ts.Subject.Name
-               }),
                Courses = ts.Courses.Select(c => new TeacherViewModel.CourseInfo
                {
                    Id = c.Id,
                    Name = c.Name,
-                   SubjectId = c.Subject.Id,
-                   SubjectName = c.Subject.Name
                })
            })
            .FirstOrDefaultAsync()
@@ -265,12 +242,7 @@ public class TeacherService(
                     SalaryPercentPerStudent = t.SalaryPercentPerStudent,
                 },
                 JoiningDate = t.JoiningDate,
-                Info = t.Info,
-                Subjects = t.TeacherSubjects.Select(ts => new TeacherUpdateViewModel.SubjectInfo
-                {
-                    Id = ts.SubjectId,
-                    Name = ts.Subject.Name
-                })
+                Info = t.Info
             })
             .FirstOrDefaultAsync()
              ?? throw new NotFoundException($"No teacher was found with ID = {id}");
@@ -281,8 +253,8 @@ public class TeacherService(
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Teachers
-            .SelectAllAsQueryable(t => t.User.CompanyId == companyId,
-            includes: ["User", "Courses", "TeacherSubjects"]);
+            .SelectAllAsQueryable(t => t.CompanyId == companyId,
+            includes: ["User", "Courses"]);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -315,17 +287,10 @@ public class TeacherService(
                 Id = Convert.ToInt32(t.Type),
                 Name = enumService.GetEnumDescription(t.Type),
             },
-            Subjects = t.TeacherSubjects.Select(ts => new TeacherTableViewModel.SubjectInfo
-            {
-                Id = ts.SubjectId,
-                Name = ts.Subject.Name
-            }),
             Courses = t.Courses.Select(c => new TeacherTableViewModel.CourseInfo
             {
                 Id = c.Id,
-                Name = c.Name,
-                SubjectId = c.SubjectId,
-                SubjectName = c.Subject.Name
+                Name = c.Name
             })
         }).ToListAsync();
 

@@ -4,9 +4,14 @@ namespace Marqa.Domain.Enums;
 
 public enum UserRole
 {
+    Admin = 0,
+    
     [Description("Ishchi")]
     Employee = 1,
 
     [Description("O'quvchi")]
-    Student = 2
+    Student = 2,
+    
+    [Description("O'qituvchi")]
+    Teacher = 3
 }

@@ -16,7 +16,6 @@ public class TeacherViewModel
     public TeacherPayment Payment { get; set; }
     public string Info { get; set; }
     public string Qualification { get; set; }
-    public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
     public TeacherTypeInfo TypeInfo { get; set; }
 
@@ -26,11 +25,6 @@ public class TeacherViewModel
         public string Name { get; set; }
     }
     public class StatusInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-    public class SubjectInfo
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -50,8 +44,6 @@ public class TeacherViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int SubjectId { get; set; }
-        public string SubjectName { get; set; }
     }
 
     public class TeacherTypeInfo

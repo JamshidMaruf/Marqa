@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.Students;
+﻿﻿using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +22,10 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     }
 
     [HttpPut("update/{id:int}")]
-    public async Task<IActionResult> PutAsync(int id, int companyId, [FromBody] StudentUpdateModel model)
+    public IActionResult Put(int id, int companyId, [FromBody] StudentUpdateModel model)
     {
-      //  await studentService.UpdateAsync(id, companyId, model);
+      // TODO: Implement UpdateAsync
+      //  studentService.UpdateAsync(id, companyId, model);
 
         return Ok(new Response
         {

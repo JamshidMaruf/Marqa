@@ -1,4 +1,4 @@
-﻿﻿﻿using Hangfire;
+﻿﻿﻿﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.DataAccess.Contexts;
@@ -28,7 +28,8 @@ builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UsePostgreSqlStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+    .UsePostgreSqlStorage(options => 
+        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"))));
 
 // Add the processing server as IHostedService
 builder.Services.AddHangfireServer();

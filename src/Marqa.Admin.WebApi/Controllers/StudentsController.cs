@@ -56,9 +56,8 @@ public class StudentsController(
         });
     }
 
-
     [HttpGet("{id:int}")]
-    //[ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<StudentViewModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAsync(int id)
@@ -73,7 +72,7 @@ public class StudentsController(
     }
 
     [HttpGet("{id}/update")]
-    //[ProducesResponseType(typeof(Response<StudentViewForUpdateModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<StudentViewForUpdateModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetForUpdate(int id)
@@ -122,12 +121,12 @@ public class StudentsController(
     }
 
     [HttpGet("{studentId:int}/unenrolled-courses")]
-    //[ProducesResponseType(typeof(Response<List<MinimalCourseDataModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<List<CourseMinimalListModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAvailableCoursesAsync(int companyId, int studentId)
     {
         var result = await courseService.GetUnEnrolledStudentCoursesAsync(companyId, studentId);
-        return Ok(new Response<List<MinimalCourseDataModel>>
+        return Ok(new Response<List<CourseMinimalListModel>>
         {
             StatusCode = 200,
             Message = "success",
@@ -137,11 +136,16 @@ public class StudentsController(
 
 
     [HttpGet]
-    //[ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<IEnumerable<StudentListModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll([FromQuery] StudentFilterModel filterModel)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] PaginationParams @params,
+        [FromQuery] int companyId,
+        [FromQuery] string? search = null,
+        [FromQuery] int? courseId = null,
+        [FromQuery] StudentFilteringStatus? status = null)
     {
-        var students = await studentService.GetAllAsync(filterModel);
+        var students = await studentService.GetAllAsync(@params, companyId, search, courseId, status);
 
         return Ok(new Response<IEnumerable<StudentListModel>>
         {

@@ -23,7 +23,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             Course createdCourse = new Course
             {
                 Name = model.Name,
-                SubjectId = model.SubjectId,
+                Subject = model.Subject,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
                 Level = model.Level,
@@ -88,7 +88,21 @@ public class CourseService(IUnitOfWork unitOfWork,
             throw;
         }
     }
+    
+    public async Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId)
+    {
+        var courses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.CompanyId == companyId && !c.IsDeleted)
+            .Select(c => new CourseMinimalListModel
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToListAsync();
 
+        return courses;
+    }
+    
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
         await courseUpdateValidator.EnsureValidatedAsync(model);
@@ -103,6 +117,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         existCourse.StartDate = model.StartDate;
         existCourse.EndDate = model.Status == CourseStatus.Closed ? DateOnly.FromDateTime(DateTime.UtcNow) : model.EndDate;
         existCourse.Status = model.Status;
+        existCourse.Subject = model.Subject;
         existCourse.MaxStudentCount = model.MaxStudentCount;
         existCourse.Description = model.Description;
         existCourse.Level = model.Level;
@@ -210,11 +225,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Description = c.Description,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
-                Subject = new CourseViewModel.SubjectInfo
-                {
-                    SubjectId = c.SubjectId,
-                    SubjectName = c.Subject.Name,
-                },
+                Subject = c.Subject,
                 Teachers = c.CourseTeachers.Select(ct => new CourseViewModel.TeacherInfo
                 {
                     Id = ct.Teacher.Id,
@@ -257,11 +268,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 MaxStudentCount = c.MaxStudentCount,
                 Price = c.Price,
                 Description = c.Description,
-                Subject = new CourseUpdateViewModel.SubjectInfo
-                {
-                    SubjectId = c.SubjectId,
-                    SubjectName = c.Subject.Name,
-                },
+                Subject =c.Subject,
                 Teachers = c.CourseTeachers.Select(ct => new CourseUpdateViewModel.TeacherInfo
                 {
                     Id = ct.Teacher.Id,
@@ -288,15 +295,22 @@ public class CourseService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
     }
 
-    public async Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, int? subjectId = null, CourseStatus? status = null)
+    public async Task<List<CourseTableViewModel>> GetAllAsync(
+        int companyId, 
+        string search,
+        int? subjectId = null,
+        CourseStatus? status = null)
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyId);
 
         if (!string.IsNullOrEmpty(search))
-            query = query.Where(t => t.Name.Contains(search));
-
-        if (subjectId != null)
-            query = query.Where(t => t.SubjectId == subjectId);
+        {
+            var searchText = search.ToLower();
+            query = query.Where(t => 
+                t.Name.ToLower().Contains(searchText) || 
+                t.Description.ToLower().Contains(searchText) ||
+                t.Subject.ToLower().Contains(searchText));
+        }
 
         if (status != null)
             query = query.Where(t => t.Status == status);
@@ -312,11 +326,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 MaxStudentCount = c.MaxStudentCount,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
-                Subject = new CourseTableViewModel.SubjectInfo
-                {
-                    SubjectId = c.SubjectId,
-                    SubjectName = c.Subject.Name,
-                },
+                Subject = c.Subject,
                 Teachers = c.CourseTeachers.Select(ct => new CourseTableViewModel.TeacherInfo
                 {
                     Id = ct.Teacher.Id,
@@ -373,7 +383,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task<List<MinimalCourseDataModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId)
+    public async Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId)
     {
         return await unitOfWork.Courses
             .SelectAllAsQueryable(predicate: c =>
@@ -381,13 +391,10 @@ public class CourseService(IUnitOfWork unitOfWork,
                 !c.Enrollments.Any(e => e.StudentId == studentId) &&
                 (c.Status == CourseStatus.Active ||
                  c.Status == CourseStatus.Upcoming))
-            .Select(c => new MinimalCourseDataModel
+            .Select(c => new CourseMinimalListModel
             {
                 Id = c.Id,
-                Name = c.Name,
-                TeachersFullName = c.CourseTeachers.Select(ct => $"{ct.Teacher.User.FirstName} {ct.Teacher.User.LastName}"),
-                MaxStudentCount = c.MaxStudentCount,
-                CoursePrice = c.Price
+                Name = c.Name
             }).ToListAsync();
     }
 
@@ -465,6 +472,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToList()
         };
     }
+    
     public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)
     {
         var transaction = await unitOfWork.BeginTransactionAsync();

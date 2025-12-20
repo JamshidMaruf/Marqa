@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.Companies;
+﻿﻿using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +8,7 @@ namespace Marqa.Admin.Controllers;
 [Authorize]
 public class CompaniesController(ICompanyService companyService) : Controller
 {
-    public async Task<IActionResult> Index(string search = null)
+    public async Task<IActionResult> Index(string? search = null)
     {
         try
         {
