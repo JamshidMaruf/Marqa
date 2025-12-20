@@ -12,6 +12,6 @@ public interface ITeacherService : IScopedService
     Task<TeacherUpdateViewModel> GetForUpdateAsync(int id);
     Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null);
     Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month);
-    Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes();
+    List<TeacherPaymentGetModel> GetTeacherPaymentTypes();
     Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId);
 }

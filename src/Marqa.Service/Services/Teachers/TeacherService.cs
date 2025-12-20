@@ -37,6 +37,10 @@ public class TeacherService(
 
         try
         {
+            //var user = 
+
+            //await unitOfWork.SaveAsync();
+
             var teacher = unitOfWork.Teachers.Insert(new Teacher
             {
                 User = new User()
@@ -47,7 +51,7 @@ public class TeacherService(
                     Email = model.Email,
                     PasswordHash = PasswordHelper.Hash(model.Password),
                     Role = UserRole.Employee,
-                    CompanyId = model.CompanyId,
+                    CompanyId = model.CompanyId
                 },
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
@@ -57,9 +61,9 @@ public class TeacherService(
                 Type = model.Type,
                 Status = model.Status,
                 PaymentType = model.PaymentType,
-                FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0,
-                SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0,
-                SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0,
+                FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.FixSalary : 0,
+                SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
+                SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
             });
 
             await unitOfWork.SaveAsync();
@@ -79,8 +83,10 @@ public class TeacherService(
     public async Task UpdateAsync(int id, TeacherUpdateModel model)
     {
         await validatorTeacherUpdate.EnsureValidatedAsync(model);
+
         var existTeacher = await unitOfWork.Teachers.SelectAsync(t => t.Id == id, includes: "User")
             ?? throw new NotFoundException($"Teacher was not found with ID = {id}");
+
         var existPhone = await unitOfWork.Teachers.SelectAsync(e =>
             e.User.Phone == model.Phone &&
             e.User.CompanyId == existTeacher.User.CompanyId &&
@@ -103,12 +109,12 @@ public class TeacherService(
         existTeacher.Info = model.Info;
         existTeacher.Gender = model.Gender;
         existTeacher.JoiningDate = model.JoiningDate;
-        existTeacher.PaymentType = model.PaymentType;
         existTeacher.Status = model.Status;
         existTeacher.Type = model.Type;
-        existTeacher.FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.Amount : 0;
-        existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.Amount : 0;
-        existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.Amount : 0;
+        existTeacher.PaymentType = model.PaymentType;
+        existTeacher.FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.FixSalary : 0;
+        existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
+        existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
 
         await subjectService.BulkAttachAsync(existTeacher.Id, model.SubjectIds);
         await unitOfWork.SaveAsync();
@@ -116,36 +122,33 @@ public class TeacherService(
 
     public async Task DeleteAsync(int id)
     {
-        var teacherForDeletion = await unitOfWork.Employees
-            .SelectAllAsQueryable(e => e.Id == id && !e.IsDeleted,
+        var teacherForDeletion = await unitOfWork.Teachers
+            .SelectAllAsQueryable(e => e.Id == id,
                 includes: "User")
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Teacher was not found with ID = {id}");
 
-        bool hasActiveCourses = await unitOfWork.CourseTeachers
-            .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted,
+        var activeCourses = await unitOfWork.CourseTeachers
+            .SelectAllAsQueryable(ct => ct.TeacherId == id,
                 includes: "Course")
-            .AnyAsync(ct => !ct.Course.IsDeleted && ct.Course.Status == CourseStatus.Active);
+            .Where(ct => ct.Course.Status == CourseStatus.Active && 
+                         ct.Course.Status == CourseStatus.Upcoming)
+            .Select(ct => ct.Course.Name)
+            .ToListAsync();
 
-        if (hasActiveCourses)
+        if (activeCourses.Count > 0)
         {
-            var activeCourses = await unitOfWork.CourseTeachers
-                .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted,
-                    includes: "Course")
-                .Where(ct => !ct.Course.IsDeleted && ct.Course.Status == CourseStatus.Active)
-                .Select(ct => ct.Course.Name)
-                .ToListAsync();
-
             var teacherName = $"{teacherForDeletion.User.FirstName} {teacherForDeletion.User.LastName}";
 
             throw new InvalidOperationException(
                 $"Cannot delete teacher '{teacherName}'. " +
                 $"This teacher has {activeCourses.Count} active course(s): {string.Join(", ", activeCourses)}. " +
-                "Please reassign courses to another teacher or deactivate courses first.");
+                "Please reassign courses to another teacher first.");
         }
 
+
         var courseTeachers = await unitOfWork.CourseTeachers
-            .SelectAllAsQueryable(ct => ct.TeacherId == id && !ct.IsDeleted)
+            .SelectAllAsQueryable(ct => ct.TeacherId == id)
             .ToListAsync();
 
         foreach (var courseTeacher in courseTeachers)
@@ -154,7 +157,7 @@ public class TeacherService(
         }
 
         var teacherSubjects = await unitOfWork.TeacherSubjects
-            .SelectAllAsQueryable(ts => ts.TeacherId == id && !ts.IsDeleted)
+            .SelectAllAsQueryable(ts => ts.TeacherId == id)
             .ToListAsync();
 
         foreach (var teacherSubject in teacherSubjects)
@@ -162,7 +165,7 @@ public class TeacherService(
             unitOfWork.TeacherSubjects.MarkAsDeleted(teacherSubject);
         }
 
-        unitOfWork.Employees.MarkAsDeleted(teacherForDeletion);
+        unitOfWork.Teachers.MarkAsDeleted(teacherForDeletion);
         await unitOfWork.SaveAsync();
     }
 
@@ -177,7 +180,7 @@ public class TeacherService(
                Gender = new TeacherViewModel.GenderInfo
                {
                    Id = Convert.ToInt32(ts.Gender),
-                   Name = Enum.GetName(ts.Gender),
+                   Name = enumService.GetEnumDescription(ts.Gender),
                },
                FirstName = ts.User.FirstName,
                LastName = ts.User.LastName,
@@ -187,21 +190,21 @@ public class TeacherService(
                Status = new TeacherViewModel.StatusInfo
                {
                    Id = Convert.ToInt32(ts.Status),
-                   Name = Enum.GetName(ts.Status),
+                   Name = enumService.GetEnumDescription(ts.Status),
                },
                TypeInfo = new TeacherViewModel.TeacherTypeInfo
                {
                    Id = Convert.ToInt32(ts.Type),
-                   Type = Enum.GetName(ts.Type),
+                   Type = enumService.GetEnumDescription(ts.Type),
                },
                Payment = new TeacherViewModel.TeacherPayment
                {
                    Id = Convert.ToInt32(ts.PaymentType),
                    Type = ts.PaymentType,
-                   Name = Enum.GetName(ts.PaymentType),
-                   FixSalary = TeacherPaymentType.Fixed == ts.PaymentType ? ts.FixSalary : 0,
-                   SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.PaymentType ? ts.SalaryAmountPerHour : 0,
-                   SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.PaymentType ? ts.SalaryPercentPerStudent : 0,
+                   Name = enumService.GetEnumDescription(ts.PaymentType),
+                   FixSalary = ts.FixSalary,
+                   SalaryAmountPerHour = ts.SalaryAmountPerHour,
+                   SalaryPercentPerStudent = ts.SalaryPercentPerStudent,
                },
                JoiningDate = ts.JoiningDate,
                Info = ts.Info,
@@ -228,42 +231,42 @@ public class TeacherService(
     {
         var teacher = await unitOfWork.Teachers
             .SelectAllAsQueryable(ts => ts.Id == id)
-            .Select(ts => new TeacherUpdateViewModel
+            .Select(t => new TeacherUpdateViewModel
             {
-                Id = ts.Id,
-                DateOfBirth = ts.DateOfBirth,
+                Id = t.Id,
+                DateOfBirth = t.DateOfBirth,
                 Gender = new TeacherUpdateViewModel.GenderInfo
                 {
-                    Id = Convert.ToInt32(ts.Gender),
-                    Name = Enum.GetName(ts.Gender),
+                    Id = Convert.ToInt32(t.Gender),
+                    Name = enumService.GetEnumDescription(t.Gender),
                 },
-                FirstName = ts.User.FirstName,
-                LastName = ts.User.LastName,
-                Email = ts.User.Email,
-                Phone = ts.User.Phone,
-                Qualification = ts.Qualification,
+                FirstName = t.User.FirstName,
+                LastName = t.User.LastName,
+                Email = t.User.Email,
+                Phone = t.User.Phone,
+                Qualification = t.Qualification,
                 Status = new TeacherUpdateViewModel.StatusInfo
                 {
-                    Id = Convert.ToInt32(ts.Status),
-                    Name = Enum.GetName(ts.Status),
+                    Id = Convert.ToInt32(t.Status),
+                    Name = enumService.GetEnumDescription(t.Status),
                 },
-                TypeInfo = new TeacherUpdateViewModel.TeacherTypeInfo
+                Type = new TeacherUpdateViewModel.TeacherTypeInfo
                 {
-                    Id = Convert.ToInt32(ts.Type),
-                    Type = Enum.GetName(ts.Type),
+                    Id = Convert.ToInt32(t.Type),
+                    Name = enumService.GetEnumDescription(t.Type),
                 },
                 Payment = new TeacherUpdateViewModel.TeacherPayment
                 {
-                    Id = Convert.ToInt32(ts.PaymentType),
-                    Type = ts.PaymentType,
-                    Name = Enum.GetName(ts.PaymentType),
-                    FixSalary = TeacherPaymentType.Fixed == ts.PaymentType ? ts.FixSalary : 0,
-                    SalaryAmountPerHour = TeacherPaymentType.Hourly == ts.PaymentType ? ts.SalaryAmountPerHour : 0,
-                    SalaryPercentPerStudent = TeacherPaymentType.Percentage == ts.PaymentType ? ts.SalaryPercentPerStudent : 0,
+                    Id = Convert.ToInt32(t.PaymentType),
+                    Type = t.PaymentType,
+                    Name = enumService.GetEnumDescription(t.PaymentType),
+                    FixSalary = t.FixSalary,
+                    SalaryAmountPerHour = t.SalaryAmountPerHour,
+                    SalaryPercentPerStudent = t.SalaryPercentPerStudent,
                 },
-                JoiningDate = ts.JoiningDate,
-                Info = ts.Info,
-                Subjects = ts.TeacherSubjects.Select(ts => new TeacherUpdateViewModel.SubjectInfo
+                JoiningDate = t.JoiningDate,
+                Info = t.Info,
+                Subjects = t.TeacherSubjects.Select(ts => new TeacherUpdateViewModel.SubjectInfo
                 {
                     Id = ts.SubjectId,
                     Name = ts.Subject.Name
@@ -278,7 +281,7 @@ public class TeacherService(
     public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
     {
         var teacherQuery = unitOfWork.Teachers
-            .SelectAllAsQueryable(t => t.User.CompanyId == companyId && t.Type == TeacherType.Lead,
+            .SelectAllAsQueryable(t => t.User.CompanyId == companyId,
             includes: ["User", "Courses", "TeacherSubjects"]);
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -300,12 +303,17 @@ public class TeacherService(
             Gender = new TeacherTableViewModel.GenderInfo
             {
                 Id = Convert.ToInt32(t.Gender),
-                Name = Enum.GetName(t.Gender),
+                Name = enumService.GetEnumDescription(t.Gender),
             },
             Status = new TeacherTableViewModel.StatusInfo
             {
                 Id = Convert.ToInt32(t.Status),
-                Name = Enum.GetName(t.Status),
+                Name = enumService.GetEnumDescription(t.Status),
+            },
+            Type = new TeacherTableViewModel.TeacherTypeInfo
+            {
+                Id = Convert.ToInt32(t.Type),
+                Name = enumService.GetEnumDescription(t.Type),
             },
             Subjects = t.TeacherSubjects.Select(ts => new TeacherTableViewModel.SubjectInfo
             {
@@ -337,11 +345,11 @@ public class TeacherService(
                 includes: ["Lesson", "Lesson.Course", "Lesson.Course.CourseTeachers"]);
 
         var activeCourses = await query.Select(la => la.Lesson.Course).Distinct().ToListAsync();
-        
+
         var activeStudentsCount = activeCourses.Sum(c => c.StudentCount);
 
         var result = new CalculatedTeacherSalaryModel();
-        
+
         result.GroupsCount = activeCourses.Count;
         result.ActiveStudentsCount = activeStudentsCount;
 
@@ -356,7 +364,7 @@ public class TeacherService(
                     ActiveStudentsCount = course.StudentCount,
                     FixSalary = Convert.ToDecimal(teacher.FixSalary)
                 });
-                
+
                 result.TotalSalary += Convert.ToDecimal(teacher.FixSalary);
             }
         }
@@ -372,13 +380,13 @@ public class TeacherService(
                     Percent = Convert.ToDecimal(teacher.SalaryPercentPerStudent),
                     Total = Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
                 });
-                
+
                 result.TotalSalary += Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
             }
         }
         else if (teacher.PaymentType == TeacherPaymentType.Hourly)
         {
-            var attendedLessons = unitOfWork.Lessons
+            var attendedLessons = await unitOfWork.Lessons
                 .SelectAllAsQueryable(l =>
                     l.TeacherId == teacherId &&
                     l.Date.Year == year &&
@@ -388,11 +396,11 @@ public class TeacherService(
 
             double attendedLessonInHours = 0d;
 
-            // foreach (var lesson in await attendedLessons)
-            // {
-            //     attendedLessons = lesson.StartTime.Hour - lesson.EndTime.Hour;
-            // }
-            
+            foreach (var lesson in attendedLessons)
+            {
+                attendedLessonInHours = lesson.StartTime.Hour - lesson.EndTime.Hour;
+            }
+
             foreach (var course in activeCourses)
             {
                 result.HourlySalaries.Add(new CalculatedTeacherSalaryModel.HourlySalary
@@ -404,10 +412,10 @@ public class TeacherService(
                     Amount = Convert.ToDecimal(teacher.SalaryAmountPerHour),
                     Total = Convert.ToDecimal((decimal)attendedLessonInHours * teacher.SalaryAmountPerHour)
                 });
-                
+
                 result.TotalSalary += Convert.ToDecimal((decimal)attendedLessonInHours * teacher.SalaryAmountPerHour);
             }
-            
+
         }
         else if (teacher.PaymentType == TeacherPaymentType.Mixed)
         {
@@ -422,15 +430,15 @@ public class TeacherService(
                     Percent = Convert.ToInt32(teacher.SalaryPercentPerStudent),
                     Total = Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
                 });
-                
+
                 result.TotalSalary += Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
             }
         }
-        
+
         return result;
     }
 
-    public async Task<List<TeacherPaymentGetModel>> GetTeacherPaymentTypes()
+    public List<TeacherPaymentGetModel> GetTeacherPaymentTypes()
     {
         var enumValues = enumService.GetEnumValues<TeacherPaymentType>();
         var paymentTypes = enumValues.Select(ev => new TeacherPaymentGetModel

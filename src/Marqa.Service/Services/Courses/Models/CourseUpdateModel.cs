@@ -14,6 +14,5 @@ public class CourseUpdateModel
     public CourseStatus Status  { get; set; }
     public int MaxStudentCount { get; set; }
     public string Description { get; set; }
-    public List<CourseCreateModel.Weekday> Weekdays { get; set; } = new();
-
+    public List<CourseWeekdayModel> Weekdays { get; set; }
 }

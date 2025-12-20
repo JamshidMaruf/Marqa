@@ -65,7 +65,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-
 app.UseExceptionHandler();
 
 app.UseCors("AllowFrontend");

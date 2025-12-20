@@ -10,7 +10,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder.Property(p => p.Info)
-            .HasMaxLength(4000);
+            .HasMaxLength(5000);
 
         builder.HasOne(e => e.Role)
             .WithMany()

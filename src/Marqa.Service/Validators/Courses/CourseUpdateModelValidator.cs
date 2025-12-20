@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Courses.Models;
 
 namespace Marqa.Service.Validators.Courses;
@@ -18,6 +17,5 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
 
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
         RuleFor(c => c.MaxStudentCount).GreaterThan(0);
-        RuleFor(c => c.Weekdays).IsInEnum();
     }
 }

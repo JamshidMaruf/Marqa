@@ -8,6 +8,7 @@ public class TeacherTableViewModel
     public string Phone { get; set; }
     public GenderInfo Gender { get; set; }
     public StatusInfo Status { get; set; }
+    public TeacherTypeInfo Type { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
 
@@ -17,6 +18,11 @@ public class TeacherTableViewModel
         public string Name { get; set; }
     }
     public class StatusInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+    public class TeacherTypeInfo
     {
         public int Id { get; set; }
         public string Name { get; set; }
