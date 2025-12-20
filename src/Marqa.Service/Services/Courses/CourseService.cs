@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -26,6 +25,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Name = model.Name,
                 SubjectId = model.SubjectId,
                 StartDate = model.StartDate,
+                EndDate = model.EndDate,
                 Level = model.Level,
                 Price = model.Price,
                 Status = model.Status,
@@ -50,7 +50,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             await unitOfWork.CourseTeachers.InsertRangeAsync(teacherCourses);
             await unitOfWork.SaveAsync();
 
-            var weekDays = new List<CourseCreateModel.Weekday>();
+            var weekDays = new List<CourseWeekdayModel>();
             var courseWeekDays = new List<CourseWeekday>();
 
             foreach (var weekDay in model.Weekdays)
@@ -155,9 +155,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                model.Room,
                model.TeacherIds,
                model.Weekdays);
-            await unitOfWork.SaveAsync();
 
-            unitOfWork.Courses.Update(existCourse);
             await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
@@ -528,7 +526,7 @@ public class CourseService(IUnitOfWork unitOfWork,
      DateOnly endDate,
      string room,
      IEnumerable<int> teacherIds,
-     List<CourseCreateModel.Weekday> weekDays)
+     List<CourseWeekdayModel> weekDays)
     {
         var lessons = new List<Lesson>();
         var initialLesson = new Lesson

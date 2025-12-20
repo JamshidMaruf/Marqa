@@ -9,19 +9,18 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required.")
-            .MaximumLength(50);
+            .MaximumLength(255);
 
         RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("Last name is required.")
-            .MaximumLength(50);
+            .MaximumLength(255);
 
         RuleFor(x => x.Qualification)
             .NotEmpty().WithMessage("Qualification is required.")
-            .MaximumLength(200);
+            .MaximumLength(255);
 
         RuleFor(x => x.Info)
-            .MaximumLength(500)
-            .When(x => !string.IsNullOrWhiteSpace(x.Info));
+            .MaximumLength(5000);
 
         RuleFor(x => x.DateOfBirth)
             .NotEmpty().WithMessage("Date of birth is required.")
@@ -42,9 +41,6 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
         RuleFor(x => x.PaymentType)
             .IsInEnum().WithMessage("Invalid payment type.");
 
-        RuleFor(x => x.Amount)
-            .GreaterThan(0).WithMessage("Amount can not be less than 0.");
-
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid teacher type.");
 
@@ -60,10 +56,6 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
             .NotEmpty().WithMessage("At least one subject is required.")
             .Must(ids => ids.Distinct().Count() == ids.Count)
             .WithMessage("Duplicate subject IDs are not allowed.");
-
-        RuleForEach(x => x.SubjectIds)
-            .MustAsync(async (subjectId, cancellation) => await unitOfWork.Subjects.CheckExistAsync(s => s.Id == subjectId))
-            .WithMessage("Subject with the given Id does not exist.");
     }
 
     private bool BeAValidPastDate(DateOnly dob)

@@ -52,9 +52,6 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
         RuleFor(x => x.PaymentType)
             .IsInEnum().WithMessage("Invalid payment type.");
 
-        RuleFor(x => x.Amount)
-            .GreaterThan(0).WithMessage("Amount can not be less than 0.");
-
         RuleFor(x => x.Type)
             .IsInEnum().WithMessage("Invalid teacher type.");
 
@@ -70,10 +67,6 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .NotEmpty().WithMessage("At least one subject is required.")
             .Must(list => list.All(id => id > 0))
             .WithMessage("Invalid subject ID.");
-    
-        RuleForEach(x => x.SubjectIds)
-            .MustAsync(async (subjectId, cancellation) => await unitOfWork.Subjects.CheckExistAsync(s => s.Id == subjectId))
-            .WithMessage("Subject with the given Id does not exist.");
     }
 
     private bool BeAValidAge(DateOnly dob)

@@ -17,7 +17,7 @@ public class TeacherUpdateViewModel
     public string Info { get; set; }
     public string Qualification { get; set; }
     public IEnumerable<SubjectInfo> Subjects { get; set; }
-    public TeacherTypeInfo TypeInfo { get; set; }
+    public TeacherTypeInfo Type { get; set; }
 
     public class GenderInfo
     {
@@ -48,6 +48,6 @@ public class TeacherUpdateViewModel
     public class TeacherTypeInfo
     {
         public int Id { get; set; }
-        public string Type { get; set; }
+        public string Name { get; set; }
     }
 }
