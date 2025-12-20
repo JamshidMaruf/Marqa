@@ -1,5 +1,4 @@
-﻿using Marqa.Mobile.Student.Api.Models;
-using Marqa.Service.Services.Auth;
+﻿﻿using Marqa.Mobile.Student.Api.Models;
 using Marqa.Service.Services.Messages;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,17 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Mobile.Student.Api.Controllers;
 
-public class AuthController(IAuthService authService, ISmsService smsService) : BaseController
+public class AuthController(ISmsService smsService) : BaseController
 {
     [AllowAnonymous]
     [HttpPost("session")]
-    public async Task<IActionResult> CreateSessionAsync([FromBody] SessionModel model)
+    public IActionResult CreateSession([FromBody] SessionModel model)
     {
+        // TODO: Implement token generation
         return Ok(new Response<string>
         {
             StatusCode = 200,
             Message = "token_generated",
-            //Data = await authService.GenerateAppToken(model.AppId, model.SecretKey)
+            //Data = authService.GenerateAppToken(model.AppId, model.SecretKey)
         });
     }
 

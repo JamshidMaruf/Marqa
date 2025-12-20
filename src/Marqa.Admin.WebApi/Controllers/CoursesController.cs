@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class CoursesController(ICourseService courseService) : ControllerBase
+public class CoursesController(ICourseService courseService) : BaseController
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync([FromBody] CourseCreateModel model)
@@ -82,6 +80,19 @@ public class CoursesController(ICourseService courseService) : ControllerBase
         var courses = await courseService.GetAllAsync(companyId, search, subjectId, status);
 
         return Ok(new Response<List<CourseTableViewModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = courses
+        });
+    }
+    
+    [HttpGet("minimal-list/{companyId:int}")]
+    public async Task<IActionResult> GetAllAsync(int companyId)
+    {
+        var courses = await courseService.GetMinimalListAsync(companyId);
+
+        return Ok(new Response<List<CourseMinimalListModel>>
         {
             StatusCode = 200,
             Message = "success",

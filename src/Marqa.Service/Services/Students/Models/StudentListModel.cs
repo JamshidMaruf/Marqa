@@ -10,11 +10,12 @@ public class StudentListModel
     public string Phone { get; set; }
     public decimal Balance { get; set; }
     public StudentStatus Status { get; set; }
-    public List<StudentCourseData> Courses { get; set; }
-    public class StudentCourseData
-    {
-        public int CourseId { get; set; }
-        public string CourseName { get; set; }
-        public string CourseStatus { get; set; }
-    }
+    public List<StudentCourseListData> Courses { get; set; }
+}
+
+public class StudentCourseListData
+{
+    public int CourseId { get; set; }
+    public string CourseName { get; set; }
+    public string CourseStatus { get; set; }
 }

@@ -35,12 +35,7 @@ public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreate
 
         RuleFor(model => model.PaymentType)
             .NotNull();
-
-        RuleFor(model => model.Amount)
-            .NotEmpty()
-            .Must(amount => amount >= 0)
-            .WithMessage("Amount must be greater than or equal to 0.");
-
+        
         RuleFor(e => e.Amount)
            .Must((model, amount) => EnrollmentValidatorHelper.ValidateAmount(model, amount))
            .WithMessage(model => model.PaymentType == CoursePaymentType.DiscountInPercentage

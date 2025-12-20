@@ -6,7 +6,7 @@ public class CourseUpdateViewModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public SubjectInfo Subject { get; set; }
+    public string Subject { get; set; }
     public IEnumerable<TeacherInfo> Teachers { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
@@ -31,13 +31,7 @@ public class CourseUpdateViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }
-
-    public class SubjectInfo
-    {
-        public int SubjectId { get; set; }
-        public string SubjectName { get; set; }
-    }
-
+    
     public class LessonInfo
     {
         public int Id { get; set; }

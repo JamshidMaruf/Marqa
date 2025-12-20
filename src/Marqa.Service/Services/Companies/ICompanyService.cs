@@ -1,4 +1,5 @@
-﻿﻿using Marqa.Service.Services.Companies.Models;
+﻿﻿﻿#nullable enable
+using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
 
 namespace Marqa.Service.Services.Companies;

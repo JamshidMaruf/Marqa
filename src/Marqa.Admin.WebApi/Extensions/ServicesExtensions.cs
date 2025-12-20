@@ -1,4 +1,4 @@
-﻿﻿using System.Text;
+﻿﻿﻿using System.Text;
 using Asp.Versioning;
 using FluentValidation;
 using Marqa.Admin.WebApi.Handlers;
@@ -80,15 +80,21 @@ public static class ServicesExtensions
         });
     }
 
-    public async static Task AddJWTServiceAsync(this IServiceCollection services)
+    public static async Task AddJWTServiceAsync(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
-        bool check = await serviceProvider.GetService<IRepository<User>>().CanConnectAsync();
+        var repository = serviceProvider.GetService<IRepository<User>>();
+        if (repository == null)
+            return;
+
+        bool check = await repository.CanConnectAsync();
 
         if (check)
         {
             var settingService = serviceProvider.GetService<ISettingService>();
+            if (settingService == null)
+                return;
 
             var jwtSettings = await settingService.GetByCategoryAsync("JWT");
 

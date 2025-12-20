@@ -23,12 +23,6 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasForeignKey(e => e.CourseId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
-
-        builder.HasOne(c => c.Subject)
-            .WithMany()
-            .HasForeignKey(c => c.SubjectId)
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired();
         
         builder.HasMany(c => c.CourseWeekdays)
             .WithOne(cw => cw.Course)

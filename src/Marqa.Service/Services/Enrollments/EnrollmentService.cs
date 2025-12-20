@@ -17,10 +17,10 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
-        var existCourse = await unitOfWork.Courses
-            .SelectAsync(c => c.Id == model.CourseId,
-             includes: "Enrollments")
-                ?? throw new NotFoundException("Course is not found");
+        var existCourse = await unitOfWork.Courses.CheckExistAsync(c => c.Id == model.CourseId);
+        
+        if(!existCourse)
+            throw new NotFoundException("Course is not found");
 
         await enrollmentCreateValidator.ValidateAndThrowAsync(model);
 
@@ -33,6 +33,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             EnrolledDate = model.EnrollmentDate,
             Status = model.Status
         };
+        
+        unitOfWork.Enrollments.Insert(enrollment);
 
         await unitOfWork.SaveAsync();
     }

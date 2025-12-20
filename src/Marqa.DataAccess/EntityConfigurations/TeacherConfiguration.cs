@@ -1,5 +1,4 @@
-﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,11 +11,12 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
         builder.Property(p => p.Info)
             .HasMaxLength(4000);
 
-        builder
-            .HasMany(t => t.TeacherSubjects)
-            .WithOne(t => t.Teacher)
-            .HasForeignKey(ts => ts.TeacherId)
-            .OnDelete(DeleteBehavior.Cascade)
+        builder.HasOne(t => t.Company)
+            .WithMany(c => c.Teachers)
+            .HasForeignKey(t => t.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();
+
+        builder.HasIndex(t => t.CompanyId);
     }
 }

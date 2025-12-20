@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+﻿﻿﻿using System.Linq.Expressions;
 using Marqa.DataAccess.Extensions;
 using Marqa.DataAccess.Helpers;
 using Marqa.Domain.Entities;
@@ -33,6 +33,8 @@ public class AppDbContext : DbContext
         // Applies custom entity configurations from assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
+        // Seed initial data
+        DatabaseSeeder.SeedData(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
 

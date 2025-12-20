@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.Courses;
+﻿﻿using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Enrollments;
 using Marqa.Service.Services.Enrollments.Models;
@@ -112,7 +112,7 @@ public class EnrollmentsController(
 
     [HttpGet("specific-enrollment-statuses")]
     [ProducesResponseType(typeof(Response<EnrollmentStatusViewModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSpecificEnrollmentStatusesAsync()
+    public IActionResult GetSpecificEnrollmentStatuses()
     {
         var result = enrollmentService.GetSpecificEnrollmentStatuses();
         return Ok(new Response<EnrollmentStatusViewModel>

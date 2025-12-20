@@ -9,25 +9,5 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
     public void Configure(EntityTypeBuilder<Company> builder)
     {
         builder.ToTable("companies");
-
-        builder.HasData(
-            new Company
-            {
-                Id = 1,
-                Name = "TechStar",
-                Address = "address",
-                Phone = "947157279",
-                Email = "email",
-                Director = "Salim"
-            },
-            new Company
-            {
-                Id = 2,
-                Name = "test",
-                Address = "address",
-                Phone = "123456987",
-                Email = "email",
-                Director = "Murodjon"
-            });
     }
 }
