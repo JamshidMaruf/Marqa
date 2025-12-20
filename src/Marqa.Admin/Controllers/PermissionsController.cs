@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Permissions.Models;
+﻿using Marqa.Service.Services.Permissions;
+using Marqa.Service.Services.Permissions.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

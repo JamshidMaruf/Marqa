@@ -1,8 +1,8 @@
-﻿using Marqa.Service.Services.Subjects.Models;
+﻿﻿using Marqa.Service.Services.Subjects.Models;
 
 namespace Marqa.Service.Services.Subjects;
 
-public interface ISubjectService
+public interface ISubjectService : IScopedService
 {
     Task CreateAsync(SubjectCreateModel model);
     Task UpdateAsync(int id, SubjectUpdateModel model);

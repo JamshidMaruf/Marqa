@@ -1,7 +1,7 @@
-﻿using Marqa.Service.Services.PointSettings.Models;
+﻿﻿using Marqa.Service.Services.PointSettings.Models;
 
 namespace Marqa.Service.Services.PointSettings;
-public interface IPointSettingService
+public interface IPointSettingService : IScopedService
 {
     Task CreateAsync(PointSettingCreateModel model);
     Task UpdateAsync(int id, PointSettingUpdateModel model);

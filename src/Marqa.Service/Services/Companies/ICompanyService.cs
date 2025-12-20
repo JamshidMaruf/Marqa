@@ -1,9 +1,9 @@
-﻿using Marqa.Service.Services.Companies.Models;
+﻿﻿using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
 
 namespace Marqa.Service.Services.Companies;
 
-public interface ICompanyService
+public interface ICompanyService : IScopedService
 {
     Task CreateAsync(CompanyCreateModel model);
     Task UpdateAsync(int id, CompanyUpdateModel model);

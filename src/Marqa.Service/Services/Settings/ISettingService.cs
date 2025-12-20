@@ -3,7 +3,7 @@ using Marqa.Service.Services.Settings.Models;
 
 namespace Marqa.Service.Services.Settings;
 
-public interface ISettingService
+public interface ISettingService : IScopedService
 {
     Task CreateAsync(SettingCreateModel model);
     Task DeleteAsync(string key);

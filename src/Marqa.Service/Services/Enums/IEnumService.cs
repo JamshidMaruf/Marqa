@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
+﻿﻿using System.ComponentModel;
 using System.Reflection;
 using Marqa.Service.Services.Enums.Models;
 
 namespace Marqa.Service.Services.Enums;
-public interface IEnumService
+public interface IEnumService : IScopedService
 {
 
     /// <summary>

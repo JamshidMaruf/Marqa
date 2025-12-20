@@ -71,7 +71,9 @@ public class AuthService(
             Token = refreshToken, 
             ExpiresAt = refreshTokenExpiresIn, 
             CreatedByIp = ipAddress,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            DeletedAt = DateTime.UtcNow
         };
         
         unitOfWork.RefreshTokens.Insert(refreshTokenEntity);

@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿﻿using System.Linq.Expressions;
 using Marqa.DataAccess.Contexts;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -24,14 +23,12 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
 
     public async Task InsertRangeAsync(IEnumerable<TEntity> entities)
     {
-        await Task.Run(() =>
+        var entityList = entities.ToList();
+        foreach (var entity in entityList)
         {
-            foreach (var entity in entities)
-            {
-                entity.CreatedAt = DateTime.UtcNow;
-                _context.Add(entity);
-            }
-        });
+            entity.CreatedAt = DateTime.UtcNow;
+        }
+        await _context.AddRangeAsync(entityList);
     }
 
     public void Update(TEntity entity)
@@ -48,18 +45,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
     }
 
-    public async Task MarkRangeAsDeletedAsync(IEnumerable<TEntity> entities)
+    public Task MarkRangeAsDeletedAsync(IEnumerable<TEntity> entities)
     {
-        await Task.Run(() =>
+        foreach (var entity in entities)
         {
-            foreach (var entity in entities)
-            {
-                entity.DeletedAt = DateTime.UtcNow;
-                entity.IsDeleted = true;
-                _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
-                _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
-            }
-        });
+            entity.DeletedAt = DateTime.UtcNow;
+            entity.IsDeleted = true;
+            _context.Entry(entity).Property(e => e.DeletedAt).IsModified = true;
+            _context.Entry(entity).Property(e => e.IsDeleted).IsModified = true;
+        }
+        return Task.CompletedTask;
     }
 
     public void Remove(TEntity entity)

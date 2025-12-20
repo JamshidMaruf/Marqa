@@ -1,8 +1,8 @@
-﻿using Marqa.Domain.Entities;
+﻿﻿using Marqa.Domain.Entities;
 using Marqa.Service.Services.EmployeeRoles.Models;
 
 namespace Marqa.Service.Services.EmployeeRoles;
-public interface IEmployeeRoleService
+public interface IEmployeeRoleService : IScopedService
 {
     Task CreateAsync(EmployeeRoleCreateModel model);
     Task UpdateAsync(int id, EmployeeRoleUpdateModel model);

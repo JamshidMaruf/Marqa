@@ -1,4 +1,4 @@
-﻿using Marqa.DataAccess.Contexts;
+﻿﻿using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -19,7 +19,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IRepository<EmployeePaymentOperation> EmployeePaymentOperations { get; } = new Repository<EmployeePaymentOperation>(context);
 
     // 3. Teacher Management
-    public IRepository<Teacher> Teachers => new Repository<Teacher>(context);
+    public IRepository<Teacher> Teachers { get; } = new Repository<Teacher>(context);
     public IRepository<TeacherSubject> TeacherSubjects { get; } = new Repository<TeacherSubject>(context);
     public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; } = new Repository<TeacherPaymentOperation>(context);
     public IRepository<TeacherAssessment> TeacherAssessments { get; } = new Repository<TeacherAssessment>(context);

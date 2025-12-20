@@ -3,7 +3,6 @@ using Marqa.Mobile.Student.Api.Extensions;
 using Marqa.Mobile.Student.Api.Filters;
 using Marqa.Mobile.Student.Api.Helpers;
 using Marqa.Mobile.Student.Api.Middlewares;
-using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -31,7 +30,7 @@ builder.Services.AddMarqaServices();
 
 await builder.Services.AddJWTServiceAsync();
 
-builder.Services.AddSwaggerService();
+//builder.Services.AddSwaggerService();
 
 builder.Services.AddAuthorization();
 

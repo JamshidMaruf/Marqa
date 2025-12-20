@@ -2,7 +2,6 @@
 using Marqa.Mobile.Teacher.Api.Extensions;
 using Marqa.Mobile.Teacher.Api.Helpers;
 using Marqa.Mobile.Teacher.Api.Middlewares;
-using Marqa.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -27,7 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(option
 
 builder.Services.AddMarqaServices();
 
-builder.Services.AddSwaggerService();
+//builder.Services.AddSwaggerService();
 
 await builder.Services.AddJWTServiceAsync();
 

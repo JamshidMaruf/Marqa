@@ -1,10 +1,10 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Lessons.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.Lessons;
 
-public interface ILessonService
+public interface ILessonService : IScopedService
 {
     Task UpdateAsync(int id, LessonUpdateModel model);
     Task CheckUpAsync(LessonAttendanceModel model);

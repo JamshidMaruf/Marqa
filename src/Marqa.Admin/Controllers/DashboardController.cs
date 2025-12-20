@@ -1,4 +1,5 @@
 ﻿using Marqa.Service.Services.Companies;
+using Marqa.Service.Services.Permissions;
 using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.Users;

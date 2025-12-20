@@ -1,7 +1,7 @@
-﻿using Marqa.Service.Services.Enrollments.Models;
+﻿﻿using Marqa.Service.Services.Enrollments.Models;
 
 namespace Marqa.Service.Services.Enrollments;
-public interface IEnrollmentService
+public interface IEnrollmentService : IScopedService
 {
     Task FreezeStudentAsync(FreezeModel model);
     Task UnFreezeStudentAsync(UnFreezeModel model);
