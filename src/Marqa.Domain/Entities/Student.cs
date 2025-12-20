@@ -21,4 +21,6 @@ public class Student : Auditable
     public ICollection<StudentExamResult> ExamResults { get; set; }
     public ICollection<StudentPaymentOperation> PaymentOperations { get; set; }
     public Asset Asset { get; set; }
+    public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
+
 }

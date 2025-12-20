@@ -23,4 +23,6 @@ public class Teacher : Auditable
     public User User { get; set; }
     public ICollection<Course> Courses { get; set; }
     public ICollection<TeacherSubject> TeacherSubjects { get; set; }
+    public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
+
 }
