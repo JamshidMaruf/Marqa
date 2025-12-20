@@ -72,13 +72,11 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
 EnvironmentHelper.WebRootPath = builder.Environment.WebRootPath;
 HttpContextHelper.HttpContextAccessor = builder.Services.BuildServiceProvider().GetService<IHttpContextAccessor>();
 
 
 var app = builder.Build();
-
 
 app.UseExceptionHandler();
 

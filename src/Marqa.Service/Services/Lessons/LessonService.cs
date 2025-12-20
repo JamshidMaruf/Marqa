@@ -81,11 +81,6 @@ public class LessonService(
         var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
-        var existStudent = await unitOfWork.Students.CheckExistAsync(s => s.Id == model.StudentId);
-
-        if (!existStudent)
-            throw new NotFoundException($"Student was not found with ID = {model.StudentId}");
-
         var lessonAttendance = await unitOfWork.LessonAttendances
             .SelectAsync(la => la.LessonId == model.LessonId && la.StudentId == model.StudentId);
 
@@ -113,6 +108,7 @@ public class LessonService(
                 LateTimeInMinutes = model.LateTimeInMinutes
             });
 
+            lesson.IsAttended = true;
             await unitOfWork.SaveAsync();
         }
     }

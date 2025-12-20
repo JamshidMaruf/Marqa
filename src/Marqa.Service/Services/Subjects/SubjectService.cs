@@ -73,7 +73,7 @@ public class SubjectService(IUnitOfWork unitOfWork,
     public async Task<List<SubjectViewModel>> GetAllAsync(int companyId)
     {
         return await unitOfWork.Subjects.SelectAllAsQueryable(
-            predicate: s => s.CompanyId == companyId && !s.IsDeleted,
+            predicate: s => s.CompanyId == companyId,
             includes: "Company")
             .Select(s => new SubjectViewModel
             {

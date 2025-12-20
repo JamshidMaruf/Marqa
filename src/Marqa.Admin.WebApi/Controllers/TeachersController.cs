@@ -112,9 +112,9 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
         });
     }
     [HttpGet("teachers/payment-types")]
-    public async Task<IActionResult> GetTeacherPaymentTypes()
+    public IActionResult GetTeacherPaymentTypes()
     {
-        var result = await teacherService.GetTeacherPaymentTypes();
+        var result = teacherService.GetTeacherPaymentTypes();
         return Ok(new Response<List<TeacherPaymentGetModel>>
         {
             StatusCode = 200,
