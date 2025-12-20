@@ -1,5 +1,4 @@
-﻿using Marqa.Domain.Entities;
-using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,5 +17,12 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
+        builder.HasOne(e => e.Company)
+            .WithMany(c => c.Employees)
+            .HasForeignKey(e => e.CompanyId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired();
+
+        builder.HasIndex(e => e.CompanyId);
     }
 }

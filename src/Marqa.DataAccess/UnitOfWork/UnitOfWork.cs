@@ -20,7 +20,6 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     // 3. Teacher Management
     public IRepository<Teacher> Teachers { get; } = new Repository<Teacher>(context);
-    public IRepository<TeacherSubject> TeacherSubjects { get; } = new Repository<TeacherSubject>(context);
     public IRepository<TeacherPaymentOperation> TeacherPaymentOperations { get; } = new Repository<TeacherPaymentOperation>(context);
     public IRepository<TeacherAssessment> TeacherAssessments { get; } = new Repository<TeacherAssessment>(context);
 
@@ -32,7 +31,6 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     // 5. Course and Learning
     public IRepository<Course> Courses { get; } = new Repository<Course>(context);
-    public IRepository<Subject> Subjects { get; } = new Repository<Subject>(context);
     public IRepository<Lesson> Lessons { get; } = new Repository<Lesson>(context);
     public IRepository<CourseWeekday> CourseWeekdays { get; } = new Repository<CourseWeekday>(context);
     public IRepository<CourseTeacher> CourseTeachers { get; } = new Repository<CourseTeacher>(context);

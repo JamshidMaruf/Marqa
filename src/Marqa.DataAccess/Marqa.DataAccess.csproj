@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Marqa.Domain\Marqa.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
