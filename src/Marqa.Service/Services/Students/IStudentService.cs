@@ -15,5 +15,6 @@ public interface IStudentService : IScopedService
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
     Task UploadProfilePictureAsync(int studentId, IFormFile picture);
     Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel);
+    ValueTask<StudentsInfo> GetStudentsInfo(int companyid);
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
 }
