@@ -331,11 +331,8 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: ["StudentDetail", "User", "Enrollments"])
+                includes: ["StudentDetail", "User", "Enrollments", "Enrollments.Course"])
             ?? throw new NotFoundException($"Student is not found");
-
-        if (existStudent.StudentDetail == null)
-            throw new NotFoundException("Student details not found");
 
         return new StudentViewForUpdateModel
         {
@@ -360,8 +357,8 @@ public class StudentService(
             {
                 CourseId = x.CourseId,
                 CourseName = x.Course.Name,
-                CourseStatusId = ((int)x.Course.Status),
-                CourseStatusName = enumService.GetEnumDescription(x.Course.Status)
+                CourseStatusId = ((int)x.Status),
+                CourseStatusName = enumService.GetEnumDescription(x.Status)
             }).ToList()
         };
     }
