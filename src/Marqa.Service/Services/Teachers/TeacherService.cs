@@ -418,8 +418,7 @@ public class TeacherService(
     {
         var query = unitOfWork.Teachers
             .SelectAllAsQueryable(t =>
-                t.CompanyId == companyId &&
-                !t.IsDeleted);
+                t.CompanyId == companyId);
 
         var stats = await query
             .GroupBy(t => 1) 
@@ -429,7 +428,7 @@ public class TeacherService(
                 TotalLeadTeachersCount = g.Count(t => t.Type == TeacherType.Lead),
                 TotalAssistantTeachersCount = g.Count(t => t.Type == TeacherType.Assistant),
                 TotalActiveTeacherCount = g.Count(t => t.Status == TeacherStatus.Active),
-                TotalInactiveTeacherCount = g.Count(t => t.Status == TeacherStatus.Inactive),
+                TotalLeftTeacherCount = g.Count(t => t.Status == TeacherStatus.Left),
                 TotalOnLeaveTeacherCount = g.Count(t => t.Status == TeacherStatus.OnLeave)
             })
             .FirstOrDefaultAsync();
