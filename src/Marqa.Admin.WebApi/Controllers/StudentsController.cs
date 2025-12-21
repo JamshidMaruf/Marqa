@@ -154,4 +154,18 @@ public class StudentsController(
             Data = students
         });
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetStudentsInfoByCompanyAsync(int companyId)
+    {
+        var result = await studentService.GetStudentsInfo(companyId);
+        return Ok(new Response<StudentsInfo>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    
+    
 }
