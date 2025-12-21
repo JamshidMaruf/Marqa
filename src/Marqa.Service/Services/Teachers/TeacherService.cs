@@ -48,6 +48,8 @@ public class TeacherService(
                 Role = UserRole.Employee
             };
 
+            unitOfWork.Users.Insert(user);
+
             await unitOfWork.SaveAsync();
 
             var teacher = unitOfWork.Teachers.Insert(new Teacher
@@ -160,45 +162,45 @@ public class TeacherService(
     {
         var teacher = await unitOfWork.Teachers
            .SelectAllAsQueryable(ts => ts.Id == id)
-           .Select(ts => new TeacherViewModel
+           .Select(t => new TeacherViewModel
            {
-               Id = ts.Id,
-               DateOfBirth = ts.DateOfBirth,
+               Id = t.Id,
+               DateOfBirth = t.DateOfBirth,
                Gender = new TeacherViewModel.GenderInfo
                {
-                   Id = Convert.ToInt32(ts.Gender),
-                   Name = enumService.GetEnumDescription(ts.Gender),
+                   Id = Convert.ToInt32(t.Gender),
+                   Name = enumService.GetEnumDescription(t.Gender),
                },
-               FirstName = ts.User.FirstName,
-               LastName = ts.User.LastName,
-               Email = ts.User.Email,
-               Phone = ts.User.Phone,
-               Qualification = ts.Qualification,
+               FirstName = t.User.FirstName,
+               LastName = t.User.LastName,
+               Email = t.User.Email,
+               Phone = t.User.Phone,
+               Qualification = t.Qualification,
                Status = new TeacherViewModel.StatusInfo
                {
-                   Id = Convert.ToInt32(ts.Status),
-                   Name = enumService.GetEnumDescription(ts.Status),
+                   Id = Convert.ToInt32(t.Status),
+                   Name = enumService.GetEnumDescription(t.Status),
                },
                TypeInfo = new TeacherViewModel.TeacherTypeInfo
                {
-                   Id = Convert.ToInt32(ts.Type),
-                   Type = enumService.GetEnumDescription(ts.Type),
+                   Id = Convert.ToInt32(t.Type),
+                   Type = enumService.GetEnumDescription(t.Type),
                },
                Payment = new TeacherViewModel.TeacherPayment
                {
-                   Id = Convert.ToInt32(ts.PaymentType),
-                   Type = ts.PaymentType,
-                   Name = enumService.GetEnumDescription(ts.PaymentType),
-                   FixSalary = ts.FixSalary,
-                   SalaryAmountPerHour = ts.SalaryAmountPerHour,
-                   SalaryPercentPerStudent = ts.SalaryPercentPerStudent,
+                   Id = Convert.ToInt32(t.PaymentType),
+                   Type = t.PaymentType,
+                   Name = enumService.GetEnumDescription(t.PaymentType),
+                   FixSalary = t.FixSalary,
+                   SalaryAmountPerHour = t.SalaryAmountPerHour,
+                   SalaryPercentPerStudent = t.SalaryPercentPerStudent,
                },
-               JoiningDate = ts.JoiningDate,
-               Info = ts.Info,
-               Courses = ts.Courses.Select(c => new TeacherViewModel.CourseInfo
+               JoiningDate = t.JoiningDate,
+               Info = t.Info,
+               Courses = t.TeacherCourses.Select(c => new TeacherViewModel.CourseInfo
                {
-                   Id = c.Id,
-                   Name = c.Name,
+                   Id = c.Course.Id,
+                   Name = c.Course.Name
                })
            })
            .FirstOrDefaultAsync()
@@ -257,7 +259,7 @@ public class TeacherService(
     {
         var teacherQuery = unitOfWork.Teachers
             .SelectAllAsQueryable(t => t.CompanyId == companyId,
-            includes: ["User", "Enrollments"]);
+            includes: ["User", "TeacherCourses", "TeacherCourses.Course"]);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -269,12 +271,12 @@ public class TeacherService(
                 t.User.Email.Contains(search));
         }
 
-        if (status != null || status != 0)
+        if (status != null && status != 0)
             teacherQuery = teacherQuery.Where(t => t.Status == status);
 
-        teacherQuery = paginationService.Paginate(teacherQuery, @params);
+        var paginatedTeachers = await paginationService.Paginate(teacherQuery, @params).ToListAsync();
 
-        var teachers = await teacherQuery.Select(t => new TeacherTableViewModel
+        var teachers = paginatedTeachers.Select(t => new TeacherTableViewModel
         {
             Id = t.Id,
             FirstName = t.User.FirstName,
@@ -295,12 +297,12 @@ public class TeacherService(
                 Id = Convert.ToInt32(t.Type),
                 Name = enumService.GetEnumDescription(t.Type),
             },
-            Courses = t.Courses.Select(c => new TeacherTableViewModel.CourseInfo
+            Courses = t.TeacherCourses.Select(c => new TeacherTableViewModel.CourseInfo
             {
-                Id = c.Id,
-                Name = c.Name
+                Id = c.Course.Id,
+                Name = c.Course.Name
             })
-        }).ToListAsync();
+        }).ToList();
 
         return teachers;
     }

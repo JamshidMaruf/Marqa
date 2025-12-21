@@ -1,4 +1,4 @@
-using Marqa.Domain.Enums;
+﻿using Marqa.Domain.Enums;
 
 namespace Marqa.Service.Services.Students.Models;
 
@@ -11,6 +11,7 @@ public class StudentViewForUpdateModel
     public string Email { get; set; }
     public Gender Gender { get; set; }
     public StudentStatus Status { get; set; }
+    public DateOnly DateOfBirth { get; set; }
     public string FatherFirstName { get; set; }
     public string FatherLastName { get; set; }
     public string FatherPhone { get; set; }
@@ -20,7 +21,6 @@ public class StudentViewForUpdateModel
     public string GuardianFirstName { get; set; }
     public string GuardianLastName { get; set; }
     public string GuardianPhone { get; set; }
-    public DateOnly DateOfBirth { get; set; }
     public List<StudentCourseData> Courses { get; set; }
     
     public class StudentCourseData

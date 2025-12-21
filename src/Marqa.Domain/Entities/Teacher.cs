@@ -23,6 +23,6 @@ public class Teacher : Auditable
     // Navigation
     public User User { get; set; }
     public Company Company { get; set; }
-    public ICollection<Course> Courses { get; set; }
+    public ICollection<CourseTeacher> TeacherCourses { get; set; }
     public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
 }
