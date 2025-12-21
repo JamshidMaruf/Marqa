@@ -8,6 +8,7 @@ public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreate
 {
     public EnrollmentCreateModelValidator(IUnitOfWork unitOfWork)
     {
+        RuleFor(model => model.StudentId).GreaterThan(0).WithMessage("Student id must be greater than zero.");
         RuleFor(model => model.StudentId)
             .MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId))
             .WithMessage("Student is not found.");
