@@ -96,20 +96,6 @@ public class EnrollmentsController(
         });
     }
 
-    [HttpGet("{studentId:int}/active-courses")]
-    [ProducesResponseType(typeof(Response<IEnumerable<NonFrozenEnrollmentModel>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
-    {
-        var students = await courseService.GetActiveStudentCoursesAsync(studentId);
-        return Ok(new Response<IEnumerable<NonFrozenEnrollmentModel>>
-        {
-            StatusCode = 200,
-            Message = "success",
-            Data = students
-        });
-    }
-
     [HttpGet("specific-enrollment-statuses")]
     [ProducesResponseType(typeof(Response<EnrollmentStatusViewModel>), StatusCodes.Status200OK)]
     public IActionResult GetSpecificEnrollmentStatuses()

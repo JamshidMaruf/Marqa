@@ -6,15 +6,8 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TeacherAssessmentsController : ControllerBase
+public class TeacherAssessmentsController(ITeacherAssessmentService assessmentService) : ControllerBase
 {
-    private readonly ITeacherAssessmentService assessmentService;
-
-    public TeacherAssessmentsController(ITeacherAssessmentService assessmentService)
-    {
-        assessmentService = assessmentService;
-    }
-
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] TeacherAssessmentCreateModel model)
     {

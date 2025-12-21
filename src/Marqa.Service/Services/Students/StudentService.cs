@@ -3,6 +3,7 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Service.Services.Students.Models.DetailModels;
@@ -17,6 +18,7 @@ public class StudentService(
     IUnitOfWork unitOfWork,
     IStudentPointHistoryService studentPointHistoryService,
     IFileService fileService,
+    IEnumService enumService,
     IPaginationService paginationService,
     IValidator<StudentCreateModel> createValidator,
     IValidator<StudentUpdateModel> updateValidator) : IStudentService
@@ -195,13 +197,34 @@ public class StudentService(
             .SelectAsync(
                 predicate: s => s.Id == id,
                 includes: ["StudentDetail", "User"])
-            ?? throw new NotFoundException($"Student is not found");
+            ?? throw new NotFoundException($"Student with ID {id} not found");
+
+        bool hasActiveEnrollments = await unitOfWork.Enrollments
+            .CheckExistAsync(e =>
+                e.StudentId == id &&
+                e.Status == EnrollmentStatus.Active);
+
+        if (hasActiveEnrollments)
+        {
+            throw new RequestRefusedException("Student has active courses. " +
+                "first detach the student from his courses, then delete!");
+        }
 
         unitOfWork.StudentDetails.MarkAsDeleted(existStudent.StudentDetail);
 
         unitOfWork.Users.MarkAsDeleted(existStudent.User);
 
         unitOfWork.Students.MarkAsDeleted(existStudent);
+        var studentEnrollments = await unitOfWork.Enrollments
+            .SelectAllAsQueryable(e => e.StudentId == id && !e.IsDeleted)
+            .ToListAsync();
+
+        foreach (var enrollment in studentEnrollments)
+        {
+            enrollment.Status = EnrollmentStatus.Dropped;
+            unitOfWork.Enrollments.Update(enrollment);
+        }
+
         await unitOfWork.SaveAsync();
     }
 
@@ -339,7 +362,7 @@ public class StudentService(
                 CourseId = x.CourseId,
                 CourseName = x.Course.Name,
                 CourseStatusId = ((int)x.Course.Status),
-                CourseStatusName = Enum.GetName(x.Course.Status)
+                CourseStatusName = enumService.GetEnumDescription(x.Course.Status)
             }).ToList()
         };
     }
@@ -395,7 +418,7 @@ public class StudentService(
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
-                            CourseStatus = Enum.GetName(c.Course.Status)
+                            CourseStatus = enumService.GetEnumDescription(c.Status)
                         }).ToList()
                     })
                     .ToListAsync();
@@ -416,7 +439,7 @@ public class StudentService(
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
-                            CourseStatus = Enum.GetName(c.Course.Status)
+                            CourseStatus = enumService.GetEnumDescription(c.Status)
                         }).ToList()
                     }))
                     .ToListAsync();
@@ -441,14 +464,14 @@ public class StudentService(
             {
                 CourseId = c.CourseId,
                 CourseName = c.Course.Name,
-                CourseStatus = Enum.GetName(c.Course.Status)
+                CourseStatus = enumService.GetEnumDescription(c.Status)
             }).ToList()
         }).ToList();
     }
 
     public async ValueTask<StudentsInfo> GetStudentsInfo(int companyid)
     {
-        var courses =  unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyid);
+        var courses = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyid);
 
         var students = new List<Student>();
         foreach (var course in courses)
