@@ -17,12 +17,18 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
-        var existCourse = await unitOfWork.Courses.CheckExistAsync(c => c.Id == model.CourseId);
-        
-        if(!existCourse)
-            throw new NotFoundException("Course is not found");
+        var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
+            ?? throw new NotFoundException("Course is not found");
 
         await enrollmentCreateValidator.ValidateAndThrowAsync(model);
+
+        decimal coursePrice = 0m;
+        if (model.PaymentType == CoursePaymentType.Fixed)
+            coursePrice = model.Amount;
+        else if (model.PaymentType == CoursePaymentType.DiscountFree)
+            coursePrice = existCourse.Price;
+        else if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
+            coursePrice = existCourse.Price / 100 * (100 - model.Amount);
 
         var enrollment = new Enrollment
         {
@@ -31,9 +37,10 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             PaymentType = model.PaymentType,
             Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
             EnrolledDate = model.EnrollmentDate,
-            Status = model.Status
+            Status = model.Status,
+            CoursePrice = coursePrice
         };
-        
+
         unitOfWork.Enrollments.Insert(enrollment);
 
         await unitOfWork.SaveAsync();
@@ -100,7 +107,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
         await unitOfWork.SaveAsync();
 
-        foreach(var enrollment in enrollments)
+        foreach (var enrollment in enrollments)
         {
             unitOfWork.Enrollments.DetachFromChangeTracker(enrollment);
         }
@@ -115,7 +122,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 StudentId = model.StudentId,
                 ActivateDate = model.EndDate.Value
             };
-            
+
             BackgroundJob.Schedule(
                 () => UnFreezeStudentAsync(unFreezeModel),
                 model.EndDate.Value);
@@ -130,7 +137,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             .SelectAllAsQueryable(predicate: e =>
                 e.StudentId == model.StudentId &&
                 e.Status == EnrollmentStatus.Frozen &&
-                model.CourseIds.Contains(e.CourseId), 
+                model.CourseIds.Contains(e.CourseId),
                 includes: "EnrollmentFrozens")
             .ToListAsync();
 
@@ -172,7 +179,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
             if (targetCourse.MaxStudentCount == targetCourse.Enrollments.Count)
                 throw new RequestRefusedException("This course has reached its maximum number of students.");
-                
+
             if (model.PaymentType == CoursePaymentType.DiscountInPercentage)
                 if (model.Amount > 100 || model.Amount < 0)
                     throw new ArgumentIsNotValidException("Invalid amount");
@@ -182,7 +189,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                         throw new ArgumentIsNotValidException("Invalid amount");
 
             if (model.DateOfTransfer > DateTime.UtcNow)
-                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");                
+                throw new ArgumentIsNotValidException("Enrollment date cannot be in the future");
             #endregion
 
             // 4. Add new course record
@@ -263,8 +270,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         .SelectAllAsQueryable()
         .AnyAsync(e =>
             e.StudentId == model.StudentId &&
-            e.Status == EnrollmentStatus.Active &&
-            e.Status == EnrollmentStatus.Test);
+            (e.Status == EnrollmentStatus.Active ||
+            e.Status == EnrollmentStatus.Test));
 
         if (!haveActiveEnrollments)
         {
@@ -280,8 +287,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         .SelectAllAsQueryable()
         .AnyAsync(e =>
             e.StudentId == model.StudentId &&
-            e.Status == EnrollmentStatus.Active &&
-            e.Status == EnrollmentStatus.Test);
+            (e.Status == EnrollmentStatus.Active ||
+            e.Status == EnrollmentStatus.Test));
 
         if (!haveActiveEnrollments)
         {

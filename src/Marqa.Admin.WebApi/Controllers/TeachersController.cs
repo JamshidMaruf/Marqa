@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Exceptions;
+﻿using Marqa.Domain.Enums;
+using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Teachers;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
@@ -6,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class TeachersController(ITeacherService teacherService) : ControllerBase
+public class TeachersController(ITeacherService teacherService) : BaseController
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(TeacherCreateModel model)
@@ -73,9 +72,9 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
     }
 
     [HttpGet("company/{companyId:int}")]
-    public async Task<IActionResult> GetAllTeachersAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId)
+    public async Task<IActionResult> GetAllTeachersAsync(int companyId, [FromQuery] PaginationParams @params, [FromQuery] string? search, [FromQuery] TeacherStatus? status)
     {
-        var result = await teacherService.GetAllAsync(companyId, search, subjectId);
+        var result = await teacherService.GetAllAsync(companyId, @params, search, status);
 
         return Ok(new Response<IEnumerable<TeacherTableViewModel>>
         {

@@ -6,6 +6,8 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Teachers.Models;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Teachers;
@@ -14,7 +16,8 @@ public class TeacherService(
     IUnitOfWork unitOfWork,
     IValidator<TeacherCreateModel> validatorTeacherCreate,
     IValidator<TeacherUpdateModel> validatorTeacherUpdate,
-    IEnumService enumService) : ITeacherService
+    IEnumService enumService,
+    IPaginationService paginationService) : ITeacherService
 {
     public async Task CreateAsync(TeacherCreateModel model)
     {
@@ -250,7 +253,7 @@ public class TeacherService(
         return teacher;
     }
 
-    public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, string search = null, int? subjectId = null)
+    public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, PaginationParams @params, string search = null, TeacherStatus? status = null)
     {
         var teacherQuery = unitOfWork.Teachers
             .SelectAllAsQueryable(t => t.CompanyId == companyId,
@@ -265,6 +268,11 @@ public class TeacherService(
                 t.User.Phone.Contains(search) ||
                 t.User.Email.Contains(search));
         }
+
+        if (status != null || status != 0)
+            teacherQuery = teacherQuery.Where(t => t.Status == status);
+
+        teacherQuery = paginationService.Paginate(teacherQuery, @params);
 
         var teachers = await teacherQuery.Select(t => new TeacherTableViewModel
         {

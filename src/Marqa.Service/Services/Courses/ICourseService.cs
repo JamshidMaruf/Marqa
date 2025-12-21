@@ -23,7 +23,7 @@ public interface ICourseService : IScopedService
     Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); // for dashboard panel
     Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
     Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
-    Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
+    Task<List<CourseNamesModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
     Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId);
     Task CreateTeacherAssessmentAsync(TeacherAssessment model);

@@ -38,7 +38,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             await unitOfWork.SaveAsync();
 
             var teacherCourses = new List<CourseTeacher>();
-            foreach(var teacherId in model.TeacherIds)
+            foreach (var teacherId in model.TeacherIds)
             {
                 teacherCourses.Add(new CourseTeacher
                 {
@@ -58,8 +58,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 courseWeekDays.Add(new CourseWeekday
                 {
                     Weekday = weekDay.DayOfWeek,
-                    StartTime =  weekDay.StartTime,
-                    EndTime =  weekDay.EndTime,
+                    StartTime = weekDay.StartTime,
+                    EndTime = weekDay.EndTime,
                     CourseId = createdCourse.Id
                 });
 
@@ -88,7 +88,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             throw;
         }
     }
-    
+
     public async Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId)
     {
         var courses = await unitOfWork.Courses
@@ -102,17 +102,17 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         return courses;
     }
-    
+
     public async Task UpdateAsync(int id, CourseUpdateModel model)
     {
         await courseUpdateValidator.EnsureValidatedAsync(model);
 
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable(c => !c.IsDeleted,
-            includes: ["Lessons", "CourseWeekdays"])
+            includes: ["Lessons", "CourseWeekdays", "Enrollments"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
-        
+
         existCourse.Price = model.Price;
         existCourse.StartDate = model.StartDate;
         existCourse.EndDate = model.Status == CourseStatus.Closed ? DateOnly.FromDateTime(DateTime.UtcNow) : model.EndDate;
@@ -121,6 +121,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         existCourse.MaxStudentCount = model.MaxStudentCount;
         existCourse.Description = model.Description;
         existCourse.Level = model.Level;
+
 
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
@@ -135,10 +136,21 @@ public class CourseService(IUnitOfWork unitOfWork,
 
             await unitOfWork.SaveAsync();
 
-            foreach(var courseTeacher in existCourse.CourseTeachers)
+            foreach (var courseTeacher in existCourse.CourseTeachers)
                 unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
-            
+
             await unitOfWork.SaveAsync();
+
+            if (existCourse.Price != model.Price)
+            {
+                foreach (var enrollment in existCourse.Enrollments)
+                {
+                    enrollment.CoursePrice = model.Price;
+                    unitOfWork.Enrollments.Update(enrollment);
+                }
+
+                await unitOfWork.SaveAsync();
+            }
 
             var teacherCourses = new List<CourseTeacher>();
             foreach (var teacherId in model.TeacherIds)
@@ -147,7 +159,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                     TeacherId = teacherId,
                     CourseId = existCourse.Id
                 });
-            
+
             await unitOfWork.CourseTeachers.InsertRangeAsync(teacherCourses);
             await unitOfWork.SaveAsync();
 
@@ -155,8 +167,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                 unitOfWork.CourseWeekdays.Insert(new CourseWeekday
                 {
                     CourseId = id,
-                    StartTime =  weekDay.StartTime,
-                    EndTime =  weekDay.EndTime,
+                    StartTime = weekDay.StartTime,
+                    EndTime = weekDay.EndTime,
                     Weekday = weekDay.DayOfWeek,
                 });
 
@@ -186,7 +198,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         var existCourse = await unitOfWork.Courses
             .SelectAllAsQueryable(
             predicate: c => !c.IsDeleted,
-            includes: [ "Lessons", "Lessons.LessonTeachers", "CourseWeekdays", "Enrollments", "TeacherCourses"])
+            includes: ["Lessons", "Lessons.LessonTeachers", "CourseWeekdays", "Enrollments", "TeacherCourses"])
             .FirstOrDefaultAsync(t => t.Id == id)
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
@@ -195,14 +207,14 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         foreach (var weekday in existCourse.CourseWeekdays)
             unitOfWork.CourseWeekdays.MarkAsDeleted(weekday);
-        
-        foreach(var enrollment in existCourse.Enrollments)
+
+        foreach (var enrollment in existCourse.Enrollments)
             unitOfWork.Enrollments.MarkAsDeleted(enrollment);
 
         foreach (var lessonTeacher in existCourse.Lessons.SelectMany(l => l.Teachers))
             unitOfWork.LessonTeachers.MarkAsDeleted(lessonTeacher);
-        
-        foreach(var courseTeacher in existCourse.CourseTeachers)
+
+        foreach (var courseTeacher in existCourse.CourseTeachers)
             unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
 
         unitOfWork.Courses.MarkAsDeleted(existCourse);
@@ -268,7 +280,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 MaxStudentCount = c.MaxStudentCount,
                 Price = c.Price,
                 Description = c.Description,
-                Subject =c.Subject,
+                Subject = c.Subject,
                 Teachers = c.CourseTeachers.Select(ct => new CourseUpdateViewModel.TeacherInfo
                 {
                     Id = ct.Teacher.Id,
@@ -296,7 +308,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     }
 
     public async Task<List<CourseTableViewModel>> GetAllAsync(
-        int companyId, 
+        int companyId,
         string search,
         CourseStatus? status = null)
     {
@@ -305,8 +317,8 @@ public class CourseService(IUnitOfWork unitOfWork,
         if (!string.IsNullOrEmpty(search))
         {
             var searchText = search.ToLower();
-            query = query.Where(t => 
-                t.Name.ToLower().Contains(searchText) || 
+            query = query.Where(t =>
+                t.Name.ToLower().Contains(searchText) ||
                 t.Description.ToLower().Contains(searchText) ||
                 t.Subject.ToLower().Contains(searchText));
         }
@@ -397,20 +409,18 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToListAsync();
     }
 
-    public async Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId)
+    public async Task<List<CourseNamesModel>> GetActiveStudentCoursesAsync(int studentId)
     {
         return await unitOfWork.Enrollments
             .SelectAllAsQueryable(predicate: c =>
                 c.StudentId == studentId &&
-                c.Status == EnrollmentStatus.Active &&
-                (c.Course.Status == CourseStatus.Active ||
-                c.Course.Status == CourseStatus.Upcoming))
-            .Select(c => new NonFrozenEnrollmentModel
+                c.Status == EnrollmentStatus.Active)
+            .Select(c => new CourseNamesModel
             {
                 Id = c.Id,
-                Name = c.Course.Name,
-                Level = c.Course.Level
-            }).ToListAsync();
+                Name = c.Course.Name
+            })
+            .ToListAsync();
     }
 
     public async Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId)
@@ -419,12 +429,12 @@ public class CourseService(IUnitOfWork unitOfWork,
             .SelectAllAsQueryable(predicate: c =>
                 c.StudentId == studentId &&
                 c.Status == EnrollmentStatus.Frozen,
-                includes: [ "Course", "EnrollmentFrozens" ]).ToListAsync();
+                includes: ["Course", "EnrollmentFrozens"]).ToListAsync();
 
         var mappedFrozenModels = new List<FrozenEnrollmentModel>();
-        foreach(var enrollment in enrollments)
+        foreach (var enrollment in enrollments)
         {
-            if(enrollment.Status == EnrollmentStatus.Frozen)
+            if (enrollment.Status == EnrollmentStatus.Frozen)
             {
                 var last = enrollment.EnrollmentFrozens
                     .OrderByDescending(e => e.CreatedAt)
@@ -471,7 +481,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             }).ToList()
         };
     }
-    
+
     public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)
     {
         var transaction = await unitOfWork.BeginTransactionAsync();
@@ -551,7 +561,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         var lessonTeachers = new List<LessonTeacher>();
 
-        foreach(var teacherId in teacherIds)
+        foreach (var teacherId in teacherIds)
         {
             lessonTeachers.Add(new LessonTeacher
             {
