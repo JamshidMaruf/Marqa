@@ -24,4 +24,10 @@ public class Teacher : Auditable
     public User User { get; set; }
     public Company Company { get; set; }
     public ICollection<Course> Courses { get; set; }
+<<<<<<< HEAD
+    public ICollection<TeacherSubject> TeacherSubjects { get; set; }
+    public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
+
+=======
+>>>>>>> 4349aaf5de0572d2df9d8df2facfe851f3ea9d31
 }

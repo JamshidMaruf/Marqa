@@ -24,4 +24,6 @@ public class Course : Auditable
     public ICollection<Lesson> Lessons { get; set; }
     public ICollection<Exam> Exams { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; }
+    public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
+
 }

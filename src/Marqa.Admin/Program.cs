@@ -1,5 +1,9 @@
-﻿using Marqa.Admin.Extensions;
+﻿using FluentValidation;
+using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
+using Marqa.Service.Services.TeacherAssessments;
+using Marqa.Service.Services.TeacherAssessments.Models;
+using Marqa.Service.Validators;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +52,6 @@ builder.Services.AddControllers(options =>
     options.Conventions.Add(new RouteTokenTransformerConvention(
         new LowerCaseControllerName()));
 });
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
