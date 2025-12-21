@@ -471,19 +471,11 @@ public class StudentService(
 
     public async ValueTask<StudentsInfo> GetStudentsInfo(int companyid)
     {
-        var courses = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyid);
-
-        var students = new List<Student>();
-        foreach (var course in courses)
-        {
-            //students.AddRange(unitOfWork.Students.SelectAllAsQueryable(s => s.Courses.Any(c => c.CourseId == course.Id)));
-        }
-        
-        students = students.Distinct().ToList();
+        var students = unitOfWork.Students.SelectAllAsQueryable(s => s.CompanyId == companyid);
 
         return new StudentsInfo
         {
-            TotalStudents = students.Count,
+            TotalStudents = students.Count(),
             TotalDroppedStudents = students.Count(s => s.Status == StudentStatus.Dropped),
             TotalCompletedStudents = students.Count(s => s.Status == StudentStatus.Completed),
             TotalActiveStudents = students.Count(s => s.Status == StudentStatus.Active),

@@ -14,6 +14,7 @@ public interface IStudentService : IScopedService
     Task<int> GetByPhoneAsync(string phone);
     Task<int> GetStudentParentByPhoneAsync(string phone);
     Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId);
+    ValueTask<StudentsInfo> GetStudentsInfo(int companyid);
     Task UploadProfilePictureAsync(int studentId, IFormFile picture);
     Task<List<StudentListModel>> GetAllAsync(
         PaginationParams @params,
