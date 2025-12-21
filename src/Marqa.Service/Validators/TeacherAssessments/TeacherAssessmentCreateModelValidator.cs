@@ -24,7 +24,7 @@ public class TeacherAssessmentCreateModelValidator : AbstractValidator<TeacherAs
             .WithMessage("Invalid rating value");
 
         RuleFor(x => x.Description)
-            .MaximumLength(1000)
+            .NotEmpty()
             .WithMessage("Description not empty");
     }
 }
