@@ -293,7 +293,7 @@ public class StudentService(
                 CourseName = c.Course.Name,
                 Subject = c.Course.Subject,
                 TeachersFullName = c.Course.CourseTeachers.Select(c => $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}"),
-                CourseStatusName = Enum.GetName(c.Status),
+                CourseStatusName = enumService.GetEnumDescription(c.Status),
                 CourseLevel = c.Course.Level
             })
             .ToList(),
