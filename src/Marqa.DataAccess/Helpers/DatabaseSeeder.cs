@@ -1,4 +1,4 @@
-using Marqa.Domain.Entities;
+﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -436,7 +436,6 @@ public static class DatabaseSeeder
             {
                 Id = 1,
                 StudentId = 1,
-                CompanyId = 1,
                 FatherFirstName = "Vali",
                 FatherLastName = "Valiyev",
                 FatherPhone = "+998901010101",
@@ -451,7 +450,6 @@ public static class DatabaseSeeder
             {
                 Id = 2,
                 StudentId = 2,
-                CompanyId = 1,
                 FatherFirstName = "Rahim",
                 FatherLastName = "Rahimov",
                 FatherPhone = "+998902010201",
@@ -466,7 +464,6 @@ public static class DatabaseSeeder
             {
                 Id = 3,
                 StudentId = 3,
-                CompanyId = 1,
                 FatherFirstName = "Ergash",
                 FatherLastName = "Ergashev",
                 FatherPhone = "+998903010301",
@@ -481,7 +478,6 @@ public static class DatabaseSeeder
             {
                 Id = 4,
                 StudentId = 4,
-                CompanyId = 1,
                 FatherFirstName = "Usmon",
                 FatherLastName = "Usmonov",
                 FatherPhone = "+998904010401",
@@ -496,7 +492,6 @@ public static class DatabaseSeeder
             {
                 Id = 5,
                 StudentId = 5,
-                CompanyId = 1,
                 FatherFirstName = "Qodir",
                 FatherLastName = "Qodirov",
                 FatherPhone = "+998905010501",

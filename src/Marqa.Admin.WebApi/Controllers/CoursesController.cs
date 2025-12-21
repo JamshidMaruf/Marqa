@@ -70,14 +70,13 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
-    [HttpGet("companies/{companyId:int}/courses")]
+    [HttpGet("companies/{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(
         int companyId, 
-        [FromQuery] string? search, 
-        [FromQuery] int? subjectId, 
+        [FromQuery] string? search,  
         [FromQuery] CourseStatus status)
     {
-        var courses = await courseService.GetAllAsync(companyId, search, subjectId, status);
+        var courses = await courseService.GetAllAsync(companyId, search, status);
 
         return Ok(new Response<List<CourseTableViewModel>>
         {
@@ -100,7 +99,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
-    [HttpGet("upcoming")]
+    [HttpGet("upcomings/{courseId:int}/students")]
     public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
     {
         var course = await courseService.GetUpcomingCourseStudentsAsync(courseId);

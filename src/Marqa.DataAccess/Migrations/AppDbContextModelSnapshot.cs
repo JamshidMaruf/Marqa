@@ -2603,10 +2603,6 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("company_id");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -2675,24 +2671,9 @@ namespace Marqa.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_student_details");
 
-                    b.HasIndex("CompanyId")
-                        .HasDatabaseName("ix_student_details_company_id");
-
                     b.HasIndex("StudentId")
                         .IsUnique()
                         .HasDatabaseName("ix_student_details_student_id");
-
-                    b.HasIndex("FatherPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_father_phone_company_id");
-
-                    b.HasIndex("GuardianPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_guardian_phone_company_id");
-
-                    b.HasIndex("MotherPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_mother_phone_company_id");
 
                     b.ToTable("student_details", (string)null);
 
@@ -2700,7 +2681,6 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FatherFirstName = "Vali",
                             FatherLastName = "Valiyev",
@@ -2715,7 +2695,6 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 2,
-                            CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FatherFirstName = "Rahim",
                             FatherLastName = "Rahimov",
@@ -2730,7 +2709,6 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 3,
-                            CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FatherFirstName = "Ergash",
                             FatherLastName = "Ergashev",
@@ -2745,7 +2723,6 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 4,
-                            CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FatherFirstName = "Usmon",
                             FatherLastName = "Usmonov",
@@ -2760,7 +2737,6 @@ namespace Marqa.DataAccess.Migrations
                         new
                         {
                             Id = 5,
-                            CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             FatherFirstName = "Qodir",
                             FatherLastName = "Qodirov",
@@ -3343,6 +3319,72 @@ namespace Marqa.DataAccess.Migrations
                     b.ToTable("teacher_payment_operations", (string)null);
                 });
 
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherSalary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date_time");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<decimal?>("FixSalary")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("fix_salary");
+
+                    b.Property<int>("ForMonth")
+                        .HasColumnType("integer")
+                        .HasColumnName("for_month");
+
+                    b.Property<short>("ForYear")
+                        .HasColumnType("smallint")
+                        .HasColumnName("for_year");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("integer")
+                        .HasColumnName("payment_type");
+
+                    b.Property<decimal?>("SalaryAmountPerHour")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("salary_amount_per_hour");
+
+                    b.Property<decimal?>("SalaryPercentPerStudent")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("salary_percent_per_student");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_teacher_salarys");
+
+                    b.ToTable("teacher_salarys", (string)null);
+                });
+
             modelBuilder.Entity("Marqa.Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -3622,7 +3664,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasConstraintName("fk_courses_companys_company_id");
 
                     b.HasOne("Marqa.Domain.Entities.Teacher", null)
-                        .WithMany("Courses")
+                        .WithMany("Enrollments")
                         .HasForeignKey("TeacherId")
                         .HasConstraintName("fk_courses_teacher_teacher_id");
 
@@ -3726,7 +3768,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasConstraintName("fk_enrollments_courses_course_id");
 
                     b.HasOne("Marqa.Domain.Entities.Student", "Student")
-                        .WithMany("Courses")
+                        .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -4106,21 +4148,12 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.StudentDetail", b =>
                 {
-                    b.HasOne("Marqa.Domain.Entities.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_student_details_companys_company_id");
-
                     b.HasOne("Marqa.Domain.Entities.Student", "Student")
                         .WithOne("StudentDetail")
                         .HasForeignKey("Marqa.Domain.Entities.StudentDetail", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_student_details_students_student_id");
-
-                    b.Navigation("Company");
 
                     b.Navigation("Student");
                 });
@@ -4362,7 +4395,7 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Student", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("Enrollments");
 
                     b.Navigation("ExamResults");
 
@@ -4379,7 +4412,7 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("Enrollments");
                 });
 #pragma warning restore 612, 618
         }

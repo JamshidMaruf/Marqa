@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Enrollments.Models;
 
@@ -10,16 +9,8 @@ public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreate
     public EnrollmentCreateModelValidator(IUnitOfWork unitOfWork)
     {
         RuleFor(model => model.StudentId)
-            .NotEmpty()
-            .GreaterThan(0);
-
-        RuleFor(model => model.StudentId)
             .MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(s => s.Id == studentId))
             .WithMessage("Student is not found.");
-
-        RuleFor(model => model.CourseId)
-            .NotEmpty()
-            .GreaterThan(0);
 
         RuleFor(model => model.CourseId)
            .MustAsync(async (courseId, cancellation) => await unitOfWork.Courses.CheckExistAsync(c => c.Id == courseId))
@@ -37,11 +28,17 @@ public class EnrollmentCreateModelValidator : AbstractValidator<EnrollmentCreate
             .NotNull();
         
         RuleFor(e => e.Amount)
-           .Must((model, amount) => EnrollmentValidatorHelper.ValidateAmount(model, amount))
+           .Must(EnrollmentValidatorHelper.ValidateAmount)
            .WithMessage(model => model.PaymentType == CoursePaymentType.DiscountInPercentage
                ? "Amount must be between 0 and 100 for discount"
                : "Amount must be positive");
 
+        RuleFor(e => new { e.CourseId, e.StudentId })
+             .MustAsync(async (x, cancellation) => !await unitOfWork.Enrollments.CheckExistAsync(e =>
+                e.StudentId == x.StudentId &&
+                 e.CourseId == x.CourseId))
+             .WithMessage("Student already enrolled to this course.");
+        
         RuleFor(e => new { e.CourseId, e.StudentId })
              .MustAsync(async (x, cancellation) => await EnrollmentValidatorHelper.ValidateCourseCapacityAsync(unitOfWork, x.CourseId, x.StudentId))
              .WithMessage("This course has reached its maximum number of students.");

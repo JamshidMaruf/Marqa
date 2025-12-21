@@ -1,4 +1,4 @@
-﻿﻿﻿using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -85,8 +85,7 @@ public class StudentService(
                 MotherPhone = motherPhoneResult.IsSuccessful ? motherPhoneResult.Phone : null,
                 GuardianFirstName = model.StudentDetailCreateModel.GuardianFirstName,
                 GuardianLastName = model.StudentDetailCreateModel.GuardianLastName,
-                GuardianPhone = guardianPhoneResult.IsSuccessful ? guardianPhoneResult.Phone : null,
-                CompanyId = model.CompanyId
+                GuardianPhone = guardianPhoneResult.IsSuccessful ? guardianPhoneResult.Phone : null
             });
 
             await unitOfWork.SaveAsync();
@@ -197,10 +196,8 @@ public class StudentService(
                 includes: ["StudentDetail", "User"])
             ?? throw new NotFoundException($"Student is not found");
 
-        if (existStudent.StudentDetail != null)
-        {
-            unitOfWork.StudentDetails.MarkAsDeleted(existStudent.StudentDetail);
-        }
+        unitOfWork.StudentDetails.MarkAsDeleted(existStudent.StudentDetail);
+
         unitOfWork.Users.MarkAsDeleted(existStudent.User);
 
         unitOfWork.Students.MarkAsDeleted(existStudent);
@@ -234,17 +231,14 @@ public class StudentService(
                 includes: [
                     "StudentDetail",
                     "User",
-                    "Courses.Course",
-                    "Courses.Course.Teacher.User",
-                    "Courses.Course.Subject",
+                    "Enrollments.Course",
+                    "Enrollments.Course.CourseTeachers.Teacher.User",
                     "PaymentOperations",
-                    "Courses",
+                    "PaymentOperations.Course",
+                    "Enrollments",
                     "ExamResults",
                     "PointHistories"])
             ?? throw new NotFoundException($"Student is not found");
-
-        if (existStudent.StudentDetail == null)
-            throw new NotFoundException("Student details not found");
 
         return new StudentViewModel
         {
@@ -271,11 +265,11 @@ public class StudentService(
                 GuardianLastName = existStudent.StudentDetail.GuardianLastName,
                 GuardianPhone = existStudent.StudentDetail.GuardianPhone
             },
-            Courses = existStudent.Courses.Select(c => new StudentCourseViewData
+            Courses = existStudent.Enrollments.Select(c => new StudentCourseViewData
             {
                 CourseName = c.Course.Name,
                 Subject = c.Course.Subject,
-                //  TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
+                TeachersFullName = c.Course.CourseTeachers.Select(c => $"{c.Teacher.User.FirstName} {c.Teacher.User.LastName}"),
                 CourseStatusName = Enum.GetName(c.Status),
                 CourseLevel = c.Course.Level
             })
@@ -294,7 +288,7 @@ public class StudentService(
                 DateTime = p.DateTime,
                 Description = p.Description,
                 PaymentOperationType = p.PaymentOperationType,
-                //  CoursePrice = p.CoursePrice
+                CoursePrice = p.Course.Price
             })
             .ToList(),
             PointHistories = existStudent.PointHistories.Select(p => new StudentPointHistoryData
@@ -314,7 +308,7 @@ public class StudentService(
         var existStudent = await unitOfWork.Students
             .SelectAsync(
                 predicate: t => t.Id == id,
-                includes: ["StudentDetail", "User", "Courses"])
+                includes: ["StudentDetail", "User", "Enrollments"])
             ?? throw new NotFoundException($"Student is not found");
 
         if (existStudent.StudentDetail == null)
@@ -339,12 +333,12 @@ public class StudentService(
             GuardianLastName = existStudent.StudentDetail.GuardianLastName,
             GuardianPhone = existStudent.StudentDetail.GuardianPhone,
             Status = existStudent.Status,
-            Courses = existStudent.Courses.Select(x => new StudentViewForUpdateModel.StudentCourseData
+            Courses = existStudent.Enrollments.Select(x => new StudentViewForUpdateModel.StudentCourseData
             {
                 CourseId = x.CourseId,
                 CourseName = x.Course.Name,
                 CourseStatusId = ((int)x.Course.Status),
-                CourseStatusName = Enum.GetName(x.Course.Status),
+                CourseStatusName = Enum.GetName(x.Course.Status)
             }).ToList()
         };
     }
@@ -358,13 +352,13 @@ public class StudentService(
     {
         var query = unitOfWork.Students
             .SelectAllAsQueryable(
-                predicate: s => !s.IsDeleted && s.CompanyId == companyId,
-                includes: ["User", "Courses", "Courses.Course"]);
+                predicate: s => s.CompanyId == companyId,
+                includes: ["User", "Enrollments", "Enrollments.Course"]);
 
         if (!string.IsNullOrEmpty(search))
         {
             var searchText = search.ToLower();
-            query = query.Where(s => 
+            query = query.Where(s =>
                 s.User.FirstName.ToLower().Contains(searchText) ||
                 s.User.LastName.ToLower().Contains(searchText) ||
                 s.User.Phone.ToLower().Contains(searchText) ||
@@ -372,7 +366,7 @@ public class StudentService(
         }
 
         if (courseId.HasValue)
-            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == courseId));
+            query = query.Where(s => s.Enrollments.Any(sc => sc.CourseId == courseId));
 
         if (status.HasValue)
         {
@@ -396,7 +390,7 @@ public class StudentService(
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
                         Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentCourseListData
+                        Courses = e.Student.Enrollments.Select(c => new StudentCourseListData
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
@@ -417,7 +411,7 @@ public class StudentService(
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
                         Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentCourseListData
+                        Courses = e.Student.Enrollments.Select(c => new StudentCourseListData
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
@@ -428,7 +422,7 @@ public class StudentService(
             }
             else if (status == StudentFilteringStatus.GroupLess)
             {
-                query = query.Where(s => s.Courses.Count == 0);
+                query = query.Where(s => s.Enrollments.Count == 0);
             }
         }
 
@@ -442,7 +436,7 @@ public class StudentService(
             FirstName = x.User.FirstName,
             LastName = x.User.LastName,
             Phone = x.User.Phone,
-            Courses = x.Courses.Select(c => new StudentCourseListData
+            Courses = x.Enrollments.Select(c => new StudentCourseListData
             {
                 CourseId = c.CourseId,
                 CourseName = c.Course.Name,
@@ -476,7 +470,7 @@ public class StudentService(
     public async Task<List<StudentViewModel>> GetAllByCourseIdAsync(int courseId)
     {
         var students = await unitOfWork.Courses
-            .SelectAllAsQueryable(c => c.Id == courseId && !c.IsDeleted)
+            .SelectAllAsQueryable(c => c.Id == courseId)
             .SelectMany(c => c.Enrollments)
             .Select(sc => new StudentViewModel
             {

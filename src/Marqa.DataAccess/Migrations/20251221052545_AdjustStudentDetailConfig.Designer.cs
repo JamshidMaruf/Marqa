@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251220205015_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251221052545_AdjustStudentDetailConfig")]
+    partial class AdjustStudentDetailConfig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2685,18 +2685,6 @@ namespace Marqa.DataAccess.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_student_details_student_id");
 
-                    b.HasIndex("FatherPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_father_phone_company_id");
-
-                    b.HasIndex("GuardianPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_guardian_phone_company_id");
-
-                    b.HasIndex("MotherPhone", "CompanyId")
-                        .IsUnique()
-                        .HasDatabaseName("ix_student_details_mother_phone_company_id");
-
                     b.ToTable("student_details", (string)null);
 
                     b.HasData(
@@ -3344,6 +3332,72 @@ namespace Marqa.DataAccess.Migrations
                         .HasDatabaseName("ix_teacher_payment_operations_teacher_id");
 
                     b.ToTable("teacher_payment_operations", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.TeacherSalary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date_time");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<decimal?>("FixSalary")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("fix_salary");
+
+                    b.Property<int>("ForMonth")
+                        .HasColumnType("integer")
+                        .HasColumnName("for_month");
+
+                    b.Property<short>("ForYear")
+                        .HasColumnType("smallint")
+                        .HasColumnName("for_year");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("integer")
+                        .HasColumnName("payment_type");
+
+                    b.Property<decimal?>("SalaryAmountPerHour")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("salary_amount_per_hour");
+
+                    b.Property<decimal?>("SalaryPercentPerStudent")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("salary_percent_per_student");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_teacher_salarys");
+
+                    b.ToTable("teacher_salarys", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.User", b =>

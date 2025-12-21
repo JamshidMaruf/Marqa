@@ -9,7 +9,7 @@ public class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
     public void Configure(EntityTypeBuilder<Enrollment> builder)
     {   
         builder.HasOne(sc => sc.Student)
-            .WithMany(s => s.Courses)
+            .WithMany(s => s.Enrollments)
             .HasForeignKey(sc => sc.StudentId)
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired();

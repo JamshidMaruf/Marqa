@@ -13,6 +13,4 @@ public class StudentDetail : Auditable
     public string GuardianPhone { get; set; }
     public int StudentId { get; set; }
     public Student Student { get; set; }
-    public int CompanyId { get; set; }
-    public Company Company { get; set; }
 }

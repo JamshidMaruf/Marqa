@@ -298,7 +298,6 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task<List<CourseTableViewModel>> GetAllAsync(
         int companyId, 
         string search,
-        int? subjectId = null,
         CourseStatus? status = null)
     {
         var query = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyId);
@@ -312,7 +311,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 t.Subject.ToLower().Contains(searchText));
         }
 
-        if (status != null)
+        if (status != null && status != 0)
             query = query.Where(t => t.Status == status);
 
         return await query
@@ -457,7 +456,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         var course = await courseQuery.FirstOrDefaultAsync();
 
         if (course == null)
-            throw new Exception("Upcoming course not found.");
+            throw new Exception("Course not found.");
 
         return new UpcomingCourseViewModel
         {
@@ -587,6 +586,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                         Date = currentDate,
                         Teachers = lessonTeachers
                     });
+
                     lessonCount++;
                 }
             }

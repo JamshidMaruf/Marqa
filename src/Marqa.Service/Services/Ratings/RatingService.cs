@@ -25,9 +25,9 @@ public class RatingService(IUnitOfWork unitOfWork,
         {
             ratings.Add(new Rating
             {
-                CourseId = student.Courses.FirstOrDefault().Id,
+                CourseId = student.Enrollments.FirstOrDefault().Id,
                 Course = await unitOfWork.Courses
-                .SelectAllAsQueryable(c => c.Id == student.Courses.FirstOrDefault().Id)
+                .SelectAllAsQueryable(c => c.Id == student.Enrollments.FirstOrDefault().Id)
                     .Select(c => new Rating.CourseInfo
                     {
                         CourseId = c.Id,
@@ -53,7 +53,7 @@ public class RatingService(IUnitOfWork unitOfWork,
     public async Task<IEnumerable<Rating>> GetStudentRatingsByCourseAsync(int courseId)
     {
         var students = unitOfWork.Students
-            .SelectAllAsQueryable(s => s.Courses.Any(), includes: "User");
+            .SelectAllAsQueryable(s => s.Enrollments.Any(), includes: "User");
 
         var ratings = new List<Rating>();
 
@@ -158,7 +158,7 @@ public class RatingService(IUnitOfWork unitOfWork,
         {
             var query = unitOfWork.Students
                 .SelectAllAsQueryable(s => !s.IsDeleted)
-                .Include(s => s.Courses)
+                .Include(s => s.Enrollments)
                 .ThenInclude(c => c.Course)
                 .Include(s => s.User)
                 .Where(s => s.CompanyId == companyId);
@@ -178,7 +178,7 @@ public class RatingService(IUnitOfWork unitOfWork,
                     ImageName = s.Asset.FileName,
                     ImagePath = s.Asset.FilePath,
                     ImageExtension = s.Asset.FileExtension,
-                    Courses = s.Courses.Select(c => new RatingPageRatingResult.CourseInfo
+                    Courses = s.Enrollments.Select(c => new RatingPageRatingResult.CourseInfo
                     {
                         Id = c.CourseId,
                         Name = c.Course.Name

@@ -3625,7 +3625,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasConstraintName("fk_courses_companys_company_id");
 
                     b.HasOne("Marqa.Domain.Entities.Teacher", null)
-                        .WithMany("Courses")
+                        .WithMany("Enrollments")
                         .HasForeignKey("TeacherId")
                         .HasConstraintName("fk_courses_teacher_teacher_id");
 
@@ -3729,7 +3729,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasConstraintName("fk_enrollments_courses_course_id");
 
                     b.HasOne("Marqa.Domain.Entities.Student", "Student")
-                        .WithMany("Courses")
+                        .WithMany("Enrollments")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -4365,7 +4365,7 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Student", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("Enrollments");
 
                     b.Navigation("ExamResults");
 
@@ -4382,7 +4382,7 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("Enrollments");
                 });
 #pragma warning restore 612, 618
         }

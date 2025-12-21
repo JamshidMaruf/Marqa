@@ -35,21 +35,21 @@ public class TeacherService(
 
         try
         {
-            //var user = 
+            var user = new User()
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Phone = teacherPhone.Phone,
+                Email = model.Email,
+                PasswordHash = PasswordHelper.Hash(model.Password),
+                Role = UserRole.Employee
+            };
 
-            //await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
 
             var teacher = unitOfWork.Teachers.Insert(new Teacher
             {
-                User = new User()
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Phone = teacherPhone.Phone,
-                    Email = model.Email,
-                    PasswordHash = PasswordHelper.Hash(model.Password),
-                    Role = UserRole.Employee
-                },
+                UserId = user.Id,
                 CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
@@ -254,7 +254,7 @@ public class TeacherService(
     {
         var teacherQuery = unitOfWork.Teachers
             .SelectAllAsQueryable(t => t.CompanyId == companyId,
-            includes: ["User", "Courses"]);
+            includes: ["User", "Enrollments"]);
 
         if (!string.IsNullOrWhiteSpace(search))
         {
