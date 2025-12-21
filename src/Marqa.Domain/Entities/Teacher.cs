@@ -25,5 +25,4 @@ public class Teacher : Auditable
     public Company Company { get; set; }
     public ICollection<Course> Courses { get; set; }
     public ICollection<TeacherAssessment> TeacherAssessments { get; set; }
-
 }

@@ -87,16 +87,16 @@ public class StudentsController(
         });
     }
 
-    [HttpPut("{studentId}/courses/{courseId}/status/{statusId}")]
+    [HttpPatch("{studentId}/courses/{courseId}/status/{statusId}")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateStudentCourseStatusAsync(
         int studentId,
         int courseId,
-        EnrollmentStatus status)
+        EnrollmentStatus statusId)
     {
-        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
+        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, statusId);
         return Ok(new Response
         {
             StatusCode = 200,
@@ -117,6 +117,20 @@ public class StudentsController(
             StatusCode = 200,
             Message = "success",
             Data = result
+        });
+    }
+
+    [HttpGet("{studentId:int}/active-courses")]
+    [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
+    {
+        var students = await courseService.GetActiveStudentCoursesAsync(studentId);
+        return Ok(new Response<IEnumerable<CourseNamesModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = students
         });
     }
 

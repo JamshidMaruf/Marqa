@@ -7,8 +7,8 @@ public enum TeacherStatus
     [Description("Faol")] 
     Active = 1,
 
-    [Description("Nofaol")] 
-    Inactive = 2,
+    [Description("Chiqib ketgan")] 
+    Left = 2,
 
     [Description("Ta'tilda")] 
     OnLeave = 3

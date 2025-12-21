@@ -31,7 +31,7 @@ public class EnrollmentsController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DetachAsync(DetachModel model)
     {
-        await enrollmentService.DeleteAsync(model);
+        await enrollmentService.DetachAsync(model);
         return Ok(new Response
         {
             StatusCode = 201,
@@ -93,20 +93,6 @@ public class EnrollmentsController(
         {
             StatusCode = 201,
             Message = "Student has been transferred successfully"
-        });
-    }
-
-    [HttpGet("{studentId:int}/active-courses")]
-    [ProducesResponseType(typeof(Response<IEnumerable<NonFrozenEnrollmentModel>>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOnlyActiveStudentCoursesAsync(int studentId)
-    {
-        var students = await courseService.GetActiveStudentCoursesAsync(studentId);
-        return Ok(new Response<IEnumerable<NonFrozenEnrollmentModel>>
-        {
-            StatusCode = 200,
-            Message = "success",
-            Data = students
         });
     }
 

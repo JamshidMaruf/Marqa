@@ -10,6 +10,7 @@ public class Enrollment : Auditable
     public CoursePaymentType PaymentType { get; set; }
     public decimal Amount { get; set; }
     public EnrollmentStatus Status { get; set; }
+    public decimal CoursePrice { get; set; }
 
     // Navigation
     public Student Student { get; set; }

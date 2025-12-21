@@ -5,7 +5,7 @@ namespace Marqa.Admin.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BannersController(IBannerService bannerService) : ControllerBase
+public class BannersController(IBannerService bannerService) : BaseController
 {
     [HttpPost]
     public async Task<IActionResult> CreateAsync(BannerCreateModel model)
