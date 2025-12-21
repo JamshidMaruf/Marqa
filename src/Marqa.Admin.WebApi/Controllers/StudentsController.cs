@@ -94,9 +94,9 @@ public class StudentsController(
     public async Task<IActionResult> UpdateStudentCourseStatusAsync(
         int studentId,
         int courseId,
-        EnrollmentStatus status)
+        EnrollmentStatus statusId)
     {
-        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, status);
+        await studentService.UpdateStudentCourseStatusAsync(studentId, courseId, statusId);
         return Ok(new Response
         {
             StatusCode = 200,
@@ -155,17 +155,18 @@ public class StudentsController(
         });
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetStudentsInfoByCompanyAsync(int companyId)
-    {
-        var result = await studentService.GetStudentsInfo(companyId);
-        return Ok(new Response<StudentsInfo>
-        {
-            StatusCode = 200,
-            Message = "success",
-            Data = result
-        });
-    }
+    //[HttpGet]
+    //public async Task<IActionResult> GetStudentsInfoByCompanyAsync(int companyId)
+    //{
+    //    //var result = await studentService.GetStudentsInfo(companyId);
+    //    //return Ok(new Response<StudentsInfo>
+    //    //{
+    //    //    StatusCode = 200,
+    //    //    Message = "success",
+    //    //    Data = result
+    //    //});
+    //    return Ok();
+    //}
     
     
 }
