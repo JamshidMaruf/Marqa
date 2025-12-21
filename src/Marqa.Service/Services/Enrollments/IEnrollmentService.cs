@@ -6,7 +6,7 @@ public interface IEnrollmentService : IScopedService
     Task FreezeStudentAsync(FreezeModel model);
     Task UnFreezeStudentAsync(UnFreezeModel model);
     Task CreateAsync(EnrollmentCreateModel model);
-    Task DeleteAsync(DetachModel model);
+    Task DetachAsync(DetachModel model);
     Task MoveStudentCourseAsync(StudentTransferModel model);
     EnrollmentStatusViewModel GetSpecificEnrollmentStatuses();
 }

@@ -188,6 +188,7 @@ public class StudentService(
         }
     }
 
+    // agar active courselari bolsa ochirishga yol qoymaslik kerak
     public async Task DeleteAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -452,7 +453,7 @@ public class StudentService(
         var students = new List<Student>();
         foreach (var course in courses)
         {
-            students.AddRange(unitOfWork.Students.SelectAllAsQueryable(s => s.Courses.Any(c => c.CourseId == course.Id)));
+            //students.AddRange(unitOfWork.Students.SelectAllAsQueryable(s => s.Courses.Any(c => c.CourseId == course.Id)));
         }
         
         students = students.Distinct().ToList();

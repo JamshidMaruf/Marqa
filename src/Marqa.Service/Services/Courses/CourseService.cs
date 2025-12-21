@@ -384,17 +384,20 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId)
     {
-        return await unitOfWork.Courses
+        var courses = await unitOfWork.Courses
             .SelectAllAsQueryable(predicate: c =>
                 c.CompanyId == companyId &&
-                !c.Enrollments.Any(e => e.StudentId == studentId) &&
                 (c.Status == CourseStatus.Active ||
-                 c.Status == CourseStatus.Upcoming))
+                 c.Status == CourseStatus.Upcoming),
+                 includes: "Enrollments").ToListAsync();
+
+
+         return courses.Where(c => !c.Enrollments.Any(e => e.StudentId == studentId))
             .Select(c => new CourseMinimalListModel
-            {
+            { 
                 Id = c.Id,
                 Name = c.Name
-            }).ToListAsync();
+            }).ToList();
     }
 
     public async Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId)

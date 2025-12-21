@@ -8,7 +8,6 @@ public class StudentTransferModel
     public int FromCourseId { get; set; }
     public int ToCourseId { get; set; }
     public DateTime DateOfTransfer { get; set; }
-    public EnrollmentStatus Status { get; set; }
     public CoursePaymentType PaymentType { get; set; }
     public decimal Amount { get; set; }
     public string Reason { get; set; }
