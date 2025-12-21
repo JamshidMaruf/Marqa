@@ -447,29 +447,20 @@ public class CourseService(IUnitOfWork unitOfWork,
 
     public async Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId)
     {
-        var courseQuery = unitOfWork.Courses
-            .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)
-            .Include(c => c.Enrollments)
-                .ThenInclude(e => e.Student)
-                    .ThenInclude(s => s.User);
-
-        var course = await courseQuery.FirstOrDefaultAsync();
-
-        if (course == null)
-            throw new Exception("Course not found.");
-
-        return new UpcomingCourseViewModel
-        {
-            EnrolledStudentCount = course.Enrollments.Count,
-            AvailableSeats = course.MaxStudentCount - course.Enrollments.Count,
-            MaxStudentCount = course.MaxStudentCount,
-
-            Students = course.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
-            {
-                FullName = $"{e.Student?.User?.FirstName} {e.Student?.User?.LastName}".Trim(),
-                DateOfEnrollment = e.EnrolledDate
-            }).ToList()
-        };
+        return await unitOfWork.Courses
+                   .SelectAllAsQueryable(c => c.Id == courseId && c.Status == CourseStatus.Upcoming)
+                   .Select(c => new UpcomingCourseViewModel
+                   {
+                       MaxStudentCount = c.MaxStudentCount,
+                       EnrolledStudentCount = c.Enrollments.Count,
+                       AvailableSeats = c.MaxStudentCount - c.Enrollments.Count,
+                       Students = c.Enrollments.Select(e => new UpcomingCourseViewModel.StudentData
+                       {
+                           FullName = (e.Student.User.FirstName + " " + e.Student.User.LastName).Trim(),
+                           DateOfEnrollment = e.EnrolledDate
+                       }).ToList()
+                   }).FirstOrDefaultAsync()
+               ?? throw new NotFoundException("Course was not found");
     }
     
     public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)

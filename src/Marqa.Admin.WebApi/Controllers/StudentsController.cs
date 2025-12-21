@@ -155,7 +155,7 @@ public class StudentsController(
         });
     }
 
-    [HttpGet]
+    [HttpGet("{companyId:int}/stats")]
     public async Task<IActionResult> GetStudentsInfoByCompanyAsync(int companyId)
     {
         var result = await studentService.GetStudentsInfo(companyId);
@@ -166,6 +166,4 @@ public class StudentsController(
             Data = result
         });
     }
-    
-    
 }

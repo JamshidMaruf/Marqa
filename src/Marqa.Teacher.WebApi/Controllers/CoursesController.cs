@@ -64,7 +64,7 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("companies/{companyId:int}/courses")]
     public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search, [FromQuery] int? subjectId, [FromQuery] CourseStatus? status)
     {
-        var courses = await courseService.GetAllAsync(companyId, search, subjectId, status);
+        var courses = await courseService.GetAllAsync(companyId, search, status);
 
         return Ok(new Response<List<CourseTableViewModel>>
         {
