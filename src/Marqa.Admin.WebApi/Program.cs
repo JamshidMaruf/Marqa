@@ -63,8 +63,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-builder.Services.AddScoped<ITeacherAssessmentService, TeacherAssessmentService>();
-
 
 var app = builder.Build();
 
