@@ -294,12 +294,9 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
         if (!haveActiveEnrollments)
         {
-            if (student.Status != StudentStatus.Active)
-            {
-                student.Status = StudentStatus.Dropped;
-                unitOfWork.Students.Update(student);
-                await unitOfWork.SaveAsync();
-            }
+            student.Status = StudentStatus.Dropped;
+            unitOfWork.Students.Update(student);
+           await unitOfWork.SaveAsync();
         }
     }
 }
