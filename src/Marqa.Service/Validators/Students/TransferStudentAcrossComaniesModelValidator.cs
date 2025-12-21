@@ -15,7 +15,7 @@ public class TransferStudentModelValidator : AbstractValidator<StudentTransferMo
     {
         RuleFor(x => x.StudentId)
             .GreaterThan(0).WithMessage("StudentId must be greater than 0.");
-        RuleFor(x => x.StudentId).MustAsync(async (studentId, cancellation) => await unitOfWork.StudentPaymentOperations.CheckExistAsync(p => p.Id == studentId))
+        RuleFor(x => x.StudentId).MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(p => p.Id == studentId))
             .WithMessage("Student not found.");
 
         RuleFor(x => x.FromCourseId)

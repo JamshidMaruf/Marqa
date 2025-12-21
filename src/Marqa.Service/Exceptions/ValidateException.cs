@@ -1,12 +1,6 @@
 ﻿namespace Marqa.Service.Exceptions;
-public class ValidateException : Exception
+public class ValidateException(List<string> errors) : Exception("Validation failed")
 {
-    public List<string> Errors { get; }
-    public int StatusCode { get; }
-    public ValidateException(List<string> errors)
-        : base("Validation failed")
-    {
-        Errors = errors;
-        StatusCode = 400; // Bad Request
-    }
+    public List<string> Errors { get; } = errors;
+    public int StatusCode { get; } = 400; // Bad Request
 }
