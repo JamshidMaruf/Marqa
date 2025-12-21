@@ -472,12 +472,15 @@ public class StudentService(
     {
         var students = await unitOfWork.Students.SelectAllAsQueryable(s => s.CompanyId == companyId).ToListAsync();
 
+        var activeStudentCount = students.Count(s => s.Status == StudentStatus.Active);
+
         return new StudentsInfo
         {
-            TotalStudents = students.Count(),
+            TotalStudents = students.Count,
             TotalDroppedStudents = students.Count(s => s.Status == StudentStatus.Dropped),
             TotalCompletedStudents = students.Count(s => s.Status == StudentStatus.Completed),
-            TotalActiveStudents = students.Count(s => s.Status == StudentStatus.Active),
+            TotalActiveStudents = activeStudentCount,
+            TotalActiveStudentPercentage = students.Count != 0 ? (double) activeStudentCount / students.Count * 100 : 0d,
             TotalInactiveStudents = students.Count(s => s.Status == StudentStatus.InActive)
         };
     }
