@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Exceptions;
+﻿﻿using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Teachers;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
@@ -63,7 +63,7 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
                 Message = ex.Message
             });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return StatusCode(500, new Response
             {

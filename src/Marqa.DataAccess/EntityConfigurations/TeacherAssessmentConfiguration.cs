@@ -8,32 +8,6 @@ public class TeacherAssessmentConfiguration : IEntityTypeConfiguration<TeacherAs
 {
     public void Configure(EntityTypeBuilder<TeacherAssessment> builder)
     {
-        // Table name
-        builder.ToTable("teacher_assessments");
-
-        // Primary key
-        builder.HasKey(ta => ta.Id);
-
-        // Properties
-        builder.Property(ta => ta.TeacherId)
-            .IsRequired();
-
-        builder.Property(ta => ta.StudentId)
-            .IsRequired();
-
-        builder.Property(ta => ta.CourseId)
-            .IsRequired();
-
-        builder.Property(ta => ta.Rating)
-            .IsRequired()
-            .HasConversion<int>();
-
-        builder.Property(ta => ta.Description)
-            .HasMaxLength(1000);
-
-        builder.Property(ta => ta.SubmittedDateTime)
-            .IsRequired();
-
         // Relationships
         builder.HasOne(ta => ta.Teacher)
             .WithMany(t => t.TeacherAssessments)

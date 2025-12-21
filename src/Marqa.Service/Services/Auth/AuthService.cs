@@ -10,6 +10,7 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Service.Services.Settings;
+using Marqa.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +39,8 @@ public class AuthService(
         
         (string name, int id) role = ("student", 0);
         
+        (string name, int id) company = ("", 0);
+        
         if (existUser.Role == UserRole.Employee)
         {
             var employeeRole = await unitOfWork.Employees
@@ -52,6 +55,13 @@ public class AuthService(
                 .FirstOrDefaultAsync() ;
             
             role.name = employeeRole.Name;
+
+            var employeeCompany = await unitOfWork.Employees
+                .SelectAllAsQueryable(e => e.UserId == existUser.Id, includes: "Company")
+                .Select(c => new { c.Company.Name, c.Company.Id })
+                .FirstOrDefaultAsync();
+            
+            company = (employeeCompany.Name, employeeCompany.Id);
         }
         
         var accessToken = await jwtService.GenerateJwtToken(existUser, role.name);
@@ -94,7 +104,9 @@ public class AuthService(
                 Phone = existUser.Phone,
                 Email = existUser.Email,
                 Role = role.name,
-                Permissions = permissions
+                Permissions = permissions,
+                CompanyId = company.id,
+                CompanyName = company.name
             },
             Token = new LoginResponseModel.TokenData
             {

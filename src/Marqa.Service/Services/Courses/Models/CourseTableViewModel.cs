@@ -6,7 +6,7 @@ public class CourseTableViewModel
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public SubjectInfo Subject { get; set; }
+    public string Subject { get; set; }
     public string Level { get; set; }
     public CourseStatus Status { get; set; }
     public IEnumerable<TeacherInfo> Teachers { get; set; }
@@ -27,11 +27,5 @@ public class CourseTableViewModel
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-    }
-
-    public class SubjectInfo
-    {
-        public int SubjectId { get; set; }
-        public string SubjectName { get; set; }
     }
 }

@@ -23,7 +23,7 @@ public class PaginationService : IPaginationService
         _httpContextService.AddResponseHeader("X-Pagination", json);
 
         return source
-            .Skip((@params.PageIndex - 1) * @params.PageSize)
+            .Skip((@params.PageNumber - 1) * @params.PageSize)
             .Take(@params.PageSize);
     }
 }

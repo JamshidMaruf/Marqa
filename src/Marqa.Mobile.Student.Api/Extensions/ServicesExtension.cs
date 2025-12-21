@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿﻿using System.Text;
 using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
@@ -19,7 +19,6 @@ using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -45,7 +44,6 @@ public static class ServicesExtension
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IPointSettingService, PointSettingService>();
         services.AddScoped<IExamService, ExamService>();
         services.AddScoped<IRatingService, RatingService>();
@@ -55,17 +53,21 @@ public static class ServicesExtension
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
-    public async static Task AddJWTServiceAsync(this IServiceCollection services)
+    public static async Task AddJWTServiceAsync(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
-        bool check = await serviceProvider
-            .GetService<IRepository<User>>()
-            .CanConnectAsync();
+        var repository = serviceProvider.GetService<IRepository<User>>();
+        if (repository == null)
+            return;
+
+        bool check = await repository.CanConnectAsync();
 
         if (check)
         {
             var settingService = serviceProvider.GetService<ISettingService>();
+            if (settingService == null)
+                return;
 
             var jwtSettings = await settingService.GetByCategoryAsync("JWT");
 

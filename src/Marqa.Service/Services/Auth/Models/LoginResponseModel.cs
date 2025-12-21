@@ -13,6 +13,8 @@ public class LoginResponseModel
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
+        public int CompanyId { get; set; }
+        public string CompanyName { get; set; }
         public List<string> Permissions { get; set; }
     }
     

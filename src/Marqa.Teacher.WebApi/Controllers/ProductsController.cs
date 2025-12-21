@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.Products;
+﻿﻿using Marqa.Service.Services.Products;
 using Marqa.Service.Services.Products.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +60,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("getAll/{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string search = null)
+    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search = null)
     {
         var products = await productService.GetAllAsync(companyId, search);
         

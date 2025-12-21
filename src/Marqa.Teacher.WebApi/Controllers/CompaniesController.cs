@@ -1,5 +1,4 @@
-﻿using Marqa.Service.Services.Auth;
-using Marqa.Service.Services.Companies;
+﻿﻿using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,7 @@ namespace Marqa.Teacher.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CompaniesController(ICompanyService companyService, IAuthService authService) : ControllerBase
+public class CompaniesController(ICompanyService companyService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(CompanyCreateModel model)

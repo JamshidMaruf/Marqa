@@ -1,7 +1,8 @@
-﻿﻿﻿using Hangfire;
+﻿﻿﻿﻿using Hangfire;
 using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.DataAccess.Contexts;
+using Marqa.Service.Services.TeacherAssessments;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -28,7 +29,8 @@ builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UsePostgreSqlStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+    .UsePostgreSqlStorage(options => 
+        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"))));
 
 // Add the processing server as IHostedService
 builder.Services.AddHangfireServer();
@@ -61,6 +63,7 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+builder.Services.AddScoped<ITeacherAssessmentService, TeacherAssessmentService>();
 
 
 var app = builder.Build();

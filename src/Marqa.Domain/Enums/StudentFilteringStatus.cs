@@ -10,18 +10,12 @@ public enum StudentFilteringStatus
     [Description("Aktiv")]
     Active = 1,
 
-    [Description("Yaqinlashayotgan")]
-    Upcoming = 2,
-
     [Description("Tugatgan")]
-    Completed = 3,
-
-    [Description("Yopilgan")]
-    Closed = 4,
+    Completed = 2,
 
     [Description("Muzlatilgan")]
-    Frozen = 5,
+    Frozen = 3,
 
     [Description("Guruhsiz")]
-    GroupLess = 6,
+    GroupLess = 4,
 }

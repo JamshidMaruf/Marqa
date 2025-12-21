@@ -30,7 +30,7 @@ public class TeacherAssessmentService(
             TeacherId = model.TeacherId,
             StudentId = model.StudentId,
             CourseId = model.CourseId,
-            Rating = model.Rating,
+            Rate = model.Rating,
             Description = model.Description,
             SubmittedDateTime = DateTime.UtcNow
         };
