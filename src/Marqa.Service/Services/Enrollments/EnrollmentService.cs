@@ -46,7 +46,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         await unitOfWork.SaveAsync();
     }
 
-    public async Task DeleteAsync(DetachModel model)
+    public async Task DetachAsync(DetachModel model)
     {
         var existStudent = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId)
             ?? throw new NotFoundException("Student is not found");
@@ -146,12 +146,15 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             enrollment.Status = EnrollmentStatus.Active;
         }
 
+        // add job schedule
+
         await unitOfWork.EnrollmentFrozens.MarkRangeAsDeletedAsync(enrollments.Select(e => e.EnrollmentFrozens.Last()));
         await unitOfWork.SaveAsync();
     }
 
     public async Task MoveStudentCourseAsync(StudentTransferModel model)
     {
+        //add hangfire to schedule the transfer time
         await transferValidator.EnsureValidatedAsync(model);
 
         using var transaction = await unitOfWork.BeginTransactionAsync();
@@ -198,7 +201,6 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
                 StudentId = model.StudentId,
                 CourseId = model.ToCourseId,
                 EnrolledDate = model.DateOfTransfer,
-                Status = model.Status,
                 Amount = model.PaymentType == CoursePaymentType.DiscountFree ? 0m : model.Amount,
                 PaymentType = model.PaymentType,
             };

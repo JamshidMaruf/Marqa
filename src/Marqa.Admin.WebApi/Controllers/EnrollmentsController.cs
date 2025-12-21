@@ -31,7 +31,7 @@ public class EnrollmentsController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DetachAsync(DetachModel model)
     {
-        await enrollmentService.DeleteAsync(model);
+        await enrollmentService.DetachAsync(model);
         return Ok(new Response
         {
             StatusCode = 201,
