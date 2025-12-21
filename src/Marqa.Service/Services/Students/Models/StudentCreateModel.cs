@@ -11,10 +11,8 @@ public class StudentCreateModel
     public string Email { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
+    public StudentStatus Status { get; set; }
     public int CompanyId { get; set; }
-
-
-    //student details
 
     public StudentDetailCreateModel StudentDetailCreateModel { get; set; }
 

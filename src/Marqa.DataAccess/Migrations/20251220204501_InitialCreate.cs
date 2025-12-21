@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marqa.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class SnakeCaseTest : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,8 +24,8 @@ namespace Marqa.DataAccess.Migrations
                     file_path = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: true),
                     file_extension = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -45,8 +45,8 @@ namespace Marqa.DataAccess.Migrations
                     email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     director = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -65,8 +65,8 @@ namespace Marqa.DataAccess.Migrations
                     expiry_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     is_used = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -85,8 +85,8 @@ namespace Marqa.DataAccess.Migrations
                     action = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -107,8 +107,8 @@ namespace Marqa.DataAccess.Migrations
                     is_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     qr_code = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -128,8 +128,8 @@ namespace Marqa.DataAccess.Migrations
                     operation = table.Column<int>(type: "integer", nullable: false),
                     is_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -148,13 +148,37 @@ namespace Marqa.DataAccess.Migrations
                     category = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     is_encrypted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_settings", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    first_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    last_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    password_hash = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false),
+                    is_use_system = table.Column<bool>(type: "boolean", nullable: false),
+                    role = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,8 +197,8 @@ namespace Marqa.DataAccess.Migrations
                     start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -197,8 +221,8 @@ namespace Marqa.DataAccess.Migrations
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     company_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -221,8 +245,8 @@ namespace Marqa.DataAccess.Migrations
                     company_id = table.Column<int>(type: "integer", nullable: false),
                     name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -248,8 +272,8 @@ namespace Marqa.DataAccess.Migrations
                     company_id = table.Column<int>(type: "integer", nullable: false),
                     asset_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -270,56 +294,154 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "subjects",
+                name: "refresh_tokens",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    company_id = table.Column<int>(type: "integer", nullable: false),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    token = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    revoked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_by_ip = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    revoked_by_ip = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_subjects", x => x.id);
+                    table.PrimaryKey("pk_refresh_tokens", x => x.id);
                     table.ForeignKey(
-                        name: "fk_subjects_companys_company_id",
-                        column: x => x.company_id,
-                        principalTable: "companies",
+                        name: "fk_refresh_tokens_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "users",
+                name: "students",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    first_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    last_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    phone = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    password_hash = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
-                    is_active = table.Column<bool>(type: "boolean", nullable: false),
-                    is_use_system = table.Column<bool>(type: "boolean", nullable: false),
-                    role = table.Column<int>(type: "integer", nullable: false),
+                    student_access_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    balance = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
+                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
+                    gender = table.Column<int>(type: "integer", nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
                     company_id = table.Column<int>(type: "integer", nullable: false),
+                    asset_id = table.Column<int>(type: "integer", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_users", x => x.id);
+                    table.PrimaryKey("pk_students", x => x.id);
                     table.ForeignKey(
-                        name: "fk_users_companys_company_id",
+                        name: "fk_students_assets_asset_id",
+                        column: x => x.asset_id,
+                        principalTable: "assets",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_students_companys_company_id",
                         column: x => x.company_id,
                         principalTable: "companies",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_students_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "teachers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    company_id = table.Column<int>(type: "integer", nullable: false),
+                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
+                    gender = table.Column<int>(type: "integer", nullable: false),
+                    joining_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    qualification = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    info = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
+                    type = table.Column<int>(type: "integer", nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    fix_salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
+                    salary_percent_per_student = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
+                    salary_amount_per_hour = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
+                    payment_type = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_teachers", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_teachers_companys_company_id",
+                        column: x => x.company_id,
+                        principalTable: "companies",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_teachers_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "employees",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    company_id = table.Column<int>(type: "integer", nullable: false),
+                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
+                    salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
+                    gender = table.Column<int>(type: "integer", nullable: false),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    joining_date = table.Column<DateOnly>(type: "date", nullable: false),
+                    specialization = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    info = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
+                    role_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_employees", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_employees_companys_company_id",
+                        column: x => x.company_id,
+                        principalTable: "companies",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_employees_employee_role_role_id",
+                        column: x => x.role_id,
+                        principalTable: "employee_roles",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "fk_employees_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -333,8 +455,8 @@ namespace Marqa.DataAccess.Migrations
                     role_id = table.Column<int>(type: "integer", nullable: false),
                     permission_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -367,8 +489,8 @@ namespace Marqa.DataAccess.Migrations
                     date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     payment_method = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -389,173 +511,6 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "employees",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
-                    salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    gender = table.Column<int>(type: "integer", nullable: false),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    joining_date = table.Column<DateOnly>(type: "date", nullable: false),
-                    specialization = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    info = table.Column<string>(type: "character varying(4000)", maxLength: 4000, nullable: true),
-                    role_id = table.Column<int>(type: "integer", nullable: false),
-                    company_id = table.Column<int>(type: "integer", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_employees", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_employees_companys_company_id",
-                        column: x => x.company_id,
-                        principalTable: "companies",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_employees_employee_role_role_id",
-                        column: x => x.role_id,
-                        principalTable: "employee_roles",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_employees_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "refresh_tokens",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    token = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    revoked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_by_ip = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    revoked_by_ip = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_refresh_tokens", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_refresh_tokens_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "students",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    student_access_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    balance = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
-                    gender = table.Column<int>(type: "integer", nullable: false),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    asset_id = table.Column<int>(type: "integer", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_students", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_students_assets_asset_id",
-                        column: x => x.asset_id,
-                        principalTable: "assets",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "fk_students_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "teachers",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    user_id = table.Column<int>(type: "integer", nullable: false),
-                    date_of_birth = table.Column<DateOnly>(type: "date", nullable: false),
-                    gender = table.Column<int>(type: "integer", nullable: false),
-                    joining_date = table.Column<DateOnly>(type: "date", nullable: false),
-                    qualification = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    info = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    type = table.Column<int>(type: "integer", nullable: false),
-                    status = table.Column<int>(type: "integer", nullable: false),
-                    fix_salary = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
-                    salary_percent_per_student = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
-                    salary_amount_per_hour = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: true),
-                    payment_type = table.Column<int>(type: "integer", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_teachers", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_teachers_user_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "employee_payment_operations",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    employee_id = table.Column<int>(type: "integer", nullable: false),
-                    payment_number = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    payment_method = table.Column<int>(type: "integer", nullable: false),
-                    operation_type = table.Column<int>(type: "integer", nullable: false),
-                    amount = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
-                    date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_employee_payment_operations", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_employee_payment_operations_employees_employee_id",
-                        column: x => x.employee_id,
-                        principalTable: "employees",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "baskets",
                 columns: table => new
                 {
@@ -564,8 +519,8 @@ namespace Marqa.DataAccess.Migrations
                     student_id = table.Column<int>(type: "integer", nullable: false),
                     total_price = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -590,8 +545,8 @@ namespace Marqa.DataAccess.Migrations
                     status = table.Column<int>(type: "integer", nullable: false),
                     number = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -622,8 +577,8 @@ namespace Marqa.DataAccess.Migrations
                     student_id = table.Column<int>(type: "integer", nullable: false),
                     company_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -657,8 +612,8 @@ namespace Marqa.DataAccess.Migrations
                     given_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     operation = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -684,15 +639,16 @@ namespace Marqa.DataAccess.Migrations
                     status = table.Column<int>(type: "integer", nullable: false),
                     level = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     max_student_count = table.Column<int>(type: "integer", nullable: false),
+                    student_count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
                     description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     company_id = table.Column<int>(type: "integer", nullable: false),
-                    subject_id = table.Column<int>(type: "integer", nullable: false),
+                    subject = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     row_version = table.Column<long>(type: "bigint", rowVersion: true, nullable: false, defaultValue: 1L),
                     teacher_id = table.Column<int>(type: "integer", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -704,11 +660,6 @@ namespace Marqa.DataAccess.Migrations
                         principalTable: "companies",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_courses_subject_subject_id",
-                        column: x => x.subject_id,
-                        principalTable: "subjects",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "fk_courses_teacher_teacher_id",
                         column: x => x.teacher_id,
@@ -730,8 +681,8 @@ namespace Marqa.DataAccess.Migrations
                     date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -746,31 +697,30 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "teacher_subjects",
+                name: "employee_payment_operations",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    teacher_id = table.Column<int>(type: "integer", nullable: false),
-                    subject_id = table.Column<int>(type: "integer", nullable: false),
+                    employee_id = table.Column<int>(type: "integer", nullable: false),
+                    payment_number = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    payment_method = table.Column<int>(type: "integer", nullable: false),
+                    operation_type = table.Column<int>(type: "integer", nullable: false),
+                    amount = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
+                    date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_teacher_subjects", x => x.id);
+                    table.PrimaryKey("pk_employee_payment_operations", x => x.id);
                     table.ForeignKey(
-                        name: "fk_teacher_subjects_subjects_subject_id",
-                        column: x => x.subject_id,
-                        principalTable: "subjects",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_teacher_subjects_teachers_teacher_id",
-                        column: x => x.teacher_id,
-                        principalTable: "teachers",
+                        name: "fk_employee_payment_operations_employees_employee_id",
+                        column: x => x.employee_id,
+                        principalTable: "employees",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -787,8 +737,8 @@ namespace Marqa.DataAccess.Migrations
                     price = table.Column<int>(type: "integer", nullable: false),
                     inline_price = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -820,8 +770,8 @@ namespace Marqa.DataAccess.Migrations
                     order_id = table.Column<int>(type: "integer", nullable: false),
                     product_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -849,8 +799,8 @@ namespace Marqa.DataAccess.Migrations
                     course_id = table.Column<int>(type: "integer", nullable: false),
                     teacher_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -881,8 +831,8 @@ namespace Marqa.DataAccess.Migrations
                     end_time = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
                     course_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -909,8 +859,8 @@ namespace Marqa.DataAccess.Migrations
                     amount = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -941,8 +891,8 @@ namespace Marqa.DataAccess.Migrations
                     end_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     course_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -972,9 +922,11 @@ namespace Marqa.DataAccess.Migrations
                     is_completed = table.Column<bool>(type: "boolean", nullable: false),
                     course_id = table.Column<int>(type: "integer", nullable: false),
                     teacher_id = table.Column<int>(type: "integer", nullable: false),
+                    price = table.Column<decimal>(type: "numeric(18,3)", precision: 18, scale: 3, nullable: false),
+                    is_attended = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -986,11 +938,6 @@ namespace Marqa.DataAccess.Migrations
                         principalTable: "courses",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_lessons_employees_teacher_id",
-                        column: x => x.teacher_id,
-                        principalTable: "employees",
-                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1010,8 +957,8 @@ namespace Marqa.DataAccess.Migrations
                     student_id = table.Column<int>(type: "integer", nullable: false),
                     row_version = table.Column<long>(type: "bigint", rowVersion: true, nullable: false, defaultValue: 1L),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1031,6 +978,45 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "teacher_assessments",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    teacher_id = table.Column<int>(type: "integer", nullable: false),
+                    student_id = table.Column<int>(type: "integer", nullable: false),
+                    course_id = table.Column<int>(type: "integer", nullable: false),
+                    rating = table.Column<int>(type: "integer", nullable: false),
+                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_teacher_assessments", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_teacher_assessments_courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_teacher_assessments_students_student_id",
+                        column: x => x.student_id,
+                        principalTable: "students",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_teacher_assessments_teachers_teacher_id",
+                        column: x => x.teacher_id,
+                        principalTable: "teachers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "enrollment_cancellations",
                 columns: table => new
                 {
@@ -1040,8 +1026,8 @@ namespace Marqa.DataAccess.Migrations
                     cancelled_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1067,8 +1053,8 @@ namespace Marqa.DataAccess.Migrations
                     is_in_definite = table.Column<bool>(type: "boolean", nullable: false),
                     reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1093,8 +1079,8 @@ namespace Marqa.DataAccess.Migrations
                     transfer_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1124,8 +1110,8 @@ namespace Marqa.DataAccess.Migrations
                     max_score = table.Column<float>(type: "real", nullable: false),
                     is_given_certificate = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1156,8 +1142,8 @@ namespace Marqa.DataAccess.Migrations
                     score = table.Column<double>(type: "double precision", nullable: false),
                     teacher_feedback = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1187,8 +1173,8 @@ namespace Marqa.DataAccess.Migrations
                     deadline = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     description = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1213,8 +1199,8 @@ namespace Marqa.DataAccess.Migrations
                     status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     late_time_in_minutes = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1243,8 +1229,8 @@ namespace Marqa.DataAccess.Migrations
                     asset_id = table.Column<int>(type: "integer", nullable: false),
                     lesson_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1265,6 +1251,36 @@ namespace Marqa.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "lesson_teachers",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    teacher_id = table.Column<int>(type: "integer", nullable: false),
+                    lesson_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    is_deleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_lesson_teachers", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_lesson_teachers_lessons_lesson_id",
+                        column: x => x.lesson_id,
+                        principalTable: "lessons",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_lesson_teachers_teacher_teacher_id",
+                        column: x => x.teacher_id,
+                        principalTable: "teachers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "lesson_videos",
                 columns: table => new
                 {
@@ -1273,8 +1289,8 @@ namespace Marqa.DataAccess.Migrations
                     lesson_id = table.Column<int>(type: "integer", nullable: false),
                     asset_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1304,8 +1320,8 @@ namespace Marqa.DataAccess.Migrations
                     score = table.Column<float>(type: "real", nullable: false),
                     given_points = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1328,8 +1344,8 @@ namespace Marqa.DataAccess.Migrations
                     home_task_id = table.Column<int>(type: "integer", nullable: false),
                     asset_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1362,8 +1378,8 @@ namespace Marqa.DataAccess.Migrations
                     uploaded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1392,8 +1408,8 @@ namespace Marqa.DataAccess.Migrations
                     asset_id = table.Column<int>(type: "integer", nullable: false),
                     student_home_task_id = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -1418,8 +1434,8 @@ namespace Marqa.DataAccess.Migrations
                 columns: new[] { "id", "address", "created_at", "deleted_at", "director", "email", "is_deleted", "name", "phone", "updated_at" },
                 values: new object[,]
                 {
-                    { 1, "address", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Salim", "email", false, "TechStar", "947157279", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, "address", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Murodjon", "email", false, "test", "123456987", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, "Toshkent, Chilonzor tumani, 1-kvartal", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Alisher Karimov", "info@marqa.uz", false, "Marqa Education Center", "+998901234567", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, "Toshkent, Mirzo Ulug'bek tumani", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Sardor Rahimov", "info@smartacademy.uz", false, "Smart Academy", "+998901112233", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.InsertData(
@@ -1427,43 +1443,116 @@ namespace Marqa.DataAccess.Migrations
                 columns: new[] { "id", "category", "created_at", "deleted_at", "key", "updated_at", "value" },
                 values: new object[,]
                 {
-                    { 1, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "JWT.Issuer", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://marqa.uz" },
-                    { 2, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "JWT.Audience", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://marqa.uz" },
-                    { 3, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "JWT.Key", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "949eddf8-4560-4cf2-8efe-2f6daea075e9" },
-                    { 4, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "JWT.Expires", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "24" },
-                    { 5, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eskiz.Email", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "wonderboy1w3@gmail.com" }
+                    { 1, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "JWT.Issuer", null, "https://marqa.uz" },
+                    { 2, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "JWT.Audience", null, "https://marqa.uz" },
+                    { 3, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "JWT.Key", null, "949eddf8-4560-4cf2-8efe-2f6daea075e9" },
+                    { 4, "JWT", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "JWT.Expires", null, "24" },
+                    { 5, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Eskiz.Email", null, "wonderboy1w3@gmail.com" }
                 });
 
             migrationBuilder.InsertData(
                 table: "settings",
                 columns: new[] { "id", "category", "created_at", "deleted_at", "is_encrypted", "key", "updated_at", "value" },
-                values: new object[] { 6, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), true, "Eskiz.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "kWq42ByF3HK+8IL9H6qlL4LVzwTS5VF9dfd41ePZ9T2khUGm9AO6ju1aRVIvnCUr" });
+                values: new object[] { 6, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, true, "Eskiz.SecretKey", null, "kWq42ByF3HK+8IL9H6qlL4LVzwTS5VF9dfd41ePZ9T2khUGm9AO6ju1aRVIvnCUr" });
 
             migrationBuilder.InsertData(
                 table: "settings",
                 columns: new[] { "id", "category", "created_at", "deleted_at", "key", "updated_at", "value" },
                 values: new object[,]
                 {
-                    { 7, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eskiz.From", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "4546" },
-                    { 8, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eskiz.SendMessageUrl", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://notify.eskiz.uz/api/message/sms/send" },
-                    { 9, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "Eskiz.LoginUrl", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "https://notify.eskiz.uz/api/auth/login" },
-                    { 10, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "StudentApp.AppId", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ffae892ea37a4cb2b029da12957df65a" },
-                    { 11, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "StudentApp.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "OwN7bATuNDPZCzTMw1Ua4g==" },
-                    { 12, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TeacherApp.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "4Xdu1cmIFi3P7GvGvFj3Zg==" },
-                    { 13, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "TeacherApp.AppId", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "bb52e3fd30f84ece8bd3db686b701104" },
-                    { 14, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ParentApp.SecretKey", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "LHpMHeBIvvjxBmZOUDqg1A==" },
-                    { 15, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "ParentApp.AppId", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "71286a64bc1b4c41beadbed6c0c973ec" },
-                    { 16, "RefreshToken", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "RefreshToken.Expires.RememberMe", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "30" },
-                    { 17, "RefreshToken", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "RefreshToken.Expires.Standard", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "7" }
+                    { 7, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Eskiz.From", null, "4546" },
+                    { 8, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Eskiz.SendMessageUrl", null, "https://notify.eskiz.uz/api/message/sms/send" },
+                    { 9, "Eskiz", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Eskiz.LoginUrl", null, "https://notify.eskiz.uz/api/auth/login" },
+                    { 10, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "StudentApp.AppId", null, "ffae892ea37a4cb2b029da12957df65a" },
+                    { 11, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "StudentApp.SecretKey", null, "OwN7bATuNDPZCzTMw1Ua4g==" },
+                    { 12, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "TeacherApp.SecretKey", null, "4Xdu1cmIFi3P7GvGvFj3Zg==" },
+                    { 13, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "TeacherApp.AppId", null, "bb52e3fd30f84ece8bd3db686b701104" },
+                    { 14, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "ParentApp.SecretKey", null, "LHpMHeBIvvjxBmZOUDqg1A==" },
+                    { 15, "App", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "ParentApp.AppId", null, "71286a64bc1b4c41beadbed6c0c973ec" },
+                    { 16, "RefreshToken", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "RefreshToken.Expires.RememberMe", null, "30" },
+                    { 17, "RefreshToken", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "RefreshToken.Expires.Standard", null, "7" }
                 });
 
             migrationBuilder.InsertData(
-                table: "subjects",
+                table: "users",
+                columns: new[] { "id", "created_at", "deleted_at", "email", "first_name", "is_active", "is_deleted", "is_use_system", "last_name", "password_hash", "phone", "role", "updated_at" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "admin@marqa.uz", "Admin", true, false, true, "Marqa", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998900000001", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "javlon@marqa.uz", "Javlon", true, false, true, "Toshmatov", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998901111111", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "nilufar@marqa.uz", "Nilufar", true, false, true, "Karimova", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998902222222", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "john@marqa.uz", "John", true, false, true, "Smith", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998903333333", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "akmal@marqa.uz", "Akmal", true, false, true, "Saidov", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998904444444", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "ali@student.uz", "Ali", true, false, false, "Valiyev", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998905555555", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "malika@student.uz", "Malika", true, false, false, "Rahimova", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998906666666", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "bobur@student.uz", "Bobur", true, false, false, "Ergashev", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998907777777", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "zarina@student.uz", "Zarina", true, false, false, "Usmonova", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998908888888", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "jasur@student.uz", "Jasur", true, false, false, "Qodirov", "$2a$11$rBLRfA3oDYZwLHvPQVmFpuKvfL7R5tMKhN9mVPQxVQvMzR5F3KWXW", "+998909999999", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "courses",
+                columns: new[] { "id", "company_id", "created_at", "deleted_at", "description", "end_date", "is_deleted", "lesson_count", "level", "max_student_count", "name", "price", "start_date", "status", "student_count", "subject", "teacher_id", "updated_at" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateOnly(2024, 6, 15), false, 0, "Beginner", 15, "English Beginner A1", 500000m, new DateOnly(2024, 1, 15), 1, 3, "English", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateOnly(2024, 7, 1), false, 0, "Intermediate", 12, "English Intermediate B1", 600000m, new DateOnly(2024, 2, 1), 1, 2, "English", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateOnly(2024, 6, 20), false, 0, "Advanced", 10, "Mathematics Advanced", 550000m, new DateOnly(2024, 1, 20), 1, 2, "Mathematics", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, new DateOnly(2024, 8, 1), false, 0, "Olympiad", 8, "Physics Olympiad Prep", 700000m, new DateOnly(2024, 3, 1), 1, 1, "Physics", null, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "employee_roles",
                 columns: new[] { "id", "company_id", "created_at", "deleted_at", "is_deleted", "name", "updated_at" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Oliy matematika", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), false, "Ona tili", new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "Administrator", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "Manager", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "Receptionist", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, false, "Administrator", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                });
+
+            migrationBuilder.InsertData(
+                table: "students",
+                columns: new[] { "id", "asset_id", "balance", "company_id", "created_at", "date_of_birth", "deleted_at", "gender", "is_deleted", "status", "student_access_id", "updated_at", "user_id" },
+                values: new object[,]
+                {
+                    { 1, null, 500000m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(2008, 3, 15), null, 1, false, 1, "STU-2024-001", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 6 },
+                    { 2, null, 750000m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(2007, 8, 22), null, 2, false, 1, "STU-2024-002", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 7 },
+                    { 3, null, 0m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(2009, 12, 5), null, 1, false, 1, "STU-2024-003", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 8 },
+                    { 4, null, 1200000m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(2006, 5, 18), null, 2, false, 1, "STU-2024-004", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 9 },
+                    { 5, null, 300000m, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(2008, 11, 30), null, 1, false, 1, "STU-2024-005", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 10 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "teachers",
+                columns: new[] { "id", "company_id", "created_at", "date_of_birth", "deleted_at", "fix_salary", "gender", "info", "is_deleted", "joining_date", "payment_type", "qualification", "salary_amount_per_hour", "salary_percent_per_student", "status", "type", "updated_at", "user_id" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1985, 3, 10), null, 8000000m, 1, "Native English speaker with 10 years experience", false, new DateOnly(2022, 9, 1), 1, "IELTS 8.5, CELTA certified", null, null, 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 4 },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1988, 7, 25), null, null, 1, "Experienced math teacher, olimpiad coach", false, new DateOnly(2023, 2, 1), 2, "PhD in Mathematics", null, 30m, 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 5 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "employees",
+                columns: new[] { "id", "company_id", "created_at", "date_of_birth", "deleted_at", "gender", "info", "is_deleted", "joining_date", "role_id", "salary", "specialization", "status", "updated_at", "user_id" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1985, 5, 15), null, 1, "Main administrator", false, new DateOnly(2020, 1, 1), 1, 10000000m, "System Administration", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 1 },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1990, 8, 20), null, 1, "Branch manager", false, new DateOnly(2023, 1, 1), 2, 5000000m, "Management", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 2 },
+                    { 3, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), new DateOnly(1995, 3, 10), null, 2, "Front desk", false, new DateOnly(2023, 6, 1), 3, 3500000m, "Reception", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), 3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "student_details",
+                columns: new[] { "id", "company_id", "created_at", "deleted_at", "father_first_name", "father_last_name", "father_phone", "guardian_first_name", "guardian_last_name", "guardian_phone", "is_deleted", "mother_first_name", "mother_last_name", "mother_phone", "student_id", "updated_at" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Vali", "Valiyev", "+998901010101", null, null, null, false, "Gulnora", "Valiyeva", "+998901020102", 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Rahim", "Rahimov", "+998902010201", null, null, null, false, "Dilnoza", "Rahimova", "+998902020202", 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 3, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Ergash", "Ergashev", "+998903010301", null, null, null, false, "Zulayho", "Ergasheva", "+998903020302", 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 4, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Usmon", "Usmonov", "+998904010401", null, null, null, false, "Feruza", "Usmonova", "+998904020402", 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 5, 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "Qodir", "Qodirov", "+998905010501", null, null, null, false, "Nodira", "Qodirova", "+998905020502", 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -1505,11 +1594,6 @@ namespace Marqa.DataAccess.Migrations
                 name: "ix_courses_company_id",
                 table: "courses",
                 column: "company_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_courses_subject_id",
-                table: "courses",
-                column: "subject_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_courses_teacher_id",
@@ -1648,6 +1732,16 @@ namespace Marqa.DataAccess.Migrations
                 column: "lesson_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_lesson_teachers_lesson_id",
+                table: "lesson_teachers",
+                column: "lesson_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_lesson_teachers_teacher_id",
+                table: "lesson_teachers",
+                column: "teacher_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_lesson_videos_asset_id",
                 table: "lesson_videos",
                 column: "asset_id");
@@ -1661,11 +1755,6 @@ namespace Marqa.DataAccess.Migrations
                 name: "ix_lessons_course_id",
                 table: "lessons",
                 column: "course_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_lessons_teacher_id",
-                table: "lessons",
-                column: "teacher_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_order_items_order_id",
@@ -1810,14 +1899,29 @@ namespace Marqa.DataAccess.Migrations
                 column: "asset_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_students_company_id",
+                table: "students",
+                column: "company_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_students_user_id",
                 table: "students",
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_subjects_company_id",
-                table: "subjects",
-                column: "company_id");
+                name: "ix_teacher_assessments_course_id",
+                table: "teacher_assessments",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_teacher_assessments_student_id",
+                table: "teacher_assessments",
+                column: "student_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_teacher_assessments_teacher_id",
+                table: "teacher_assessments",
+                column: "teacher_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_teacher_payment_operations_teacher_id",
@@ -1825,14 +1929,9 @@ namespace Marqa.DataAccess.Migrations
                 column: "teacher_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_teacher_subjects_subject_id",
-                table: "teacher_subjects",
-                column: "subject_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_teacher_subjects_teacher_id",
-                table: "teacher_subjects",
-                column: "teacher_id");
+                name: "ix_teachers_company_id",
+                table: "teachers",
+                column: "company_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_teachers_user_id",
@@ -1840,14 +1939,9 @@ namespace Marqa.DataAccess.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_users_company_id",
+                name: "ix_users_phone",
                 table: "users",
-                column: "company_id");
-
-            migrationBuilder.CreateIndex(
-                name: "ix_users_phone_company_id",
-                table: "users",
-                columns: new[] { "phone", "company_id" },
+                column: "phone",
                 unique: true);
         }
 
@@ -1894,6 +1988,9 @@ namespace Marqa.DataAccess.Migrations
                 name: "lesson_files");
 
             migrationBuilder.DropTable(
+                name: "lesson_teachers");
+
+            migrationBuilder.DropTable(
                 name: "lesson_videos");
 
             migrationBuilder.DropTable(
@@ -1933,13 +2030,16 @@ namespace Marqa.DataAccess.Migrations
                 name: "student_point_histories");
 
             migrationBuilder.DropTable(
+                name: "teacher_assessments");
+
+            migrationBuilder.DropTable(
                 name: "teacher_payment_operations");
 
             migrationBuilder.DropTable(
-                name: "teacher_subjects");
+                name: "baskets");
 
             migrationBuilder.DropTable(
-                name: "baskets");
+                name: "employees");
 
             migrationBuilder.DropTable(
                 name: "enrollments");
@@ -1963,6 +2063,9 @@ namespace Marqa.DataAccess.Migrations
                 name: "student_home_tasks");
 
             migrationBuilder.DropTable(
+                name: "employee_roles");
+
+            migrationBuilder.DropTable(
                 name: "exams");
 
             migrationBuilder.DropTable(
@@ -1981,22 +2084,13 @@ namespace Marqa.DataAccess.Migrations
                 name: "courses");
 
             migrationBuilder.DropTable(
-                name: "employees");
-
-            migrationBuilder.DropTable(
-                name: "subjects");
-
-            migrationBuilder.DropTable(
                 name: "teachers");
 
             migrationBuilder.DropTable(
-                name: "employee_roles");
+                name: "companies");
 
             migrationBuilder.DropTable(
                 name: "users");
-
-            migrationBuilder.DropTable(
-                name: "companies");
         }
     }
 }

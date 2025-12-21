@@ -1,16 +1,13 @@
-﻿using Marqa.Domain.Enums;
+﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Enums.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class EnumsController : ControllerBase
+public class EnumsController : BaseController
 {
     private readonly IEnumService _enumService;
 
@@ -20,7 +17,7 @@ public class EnumsController : ControllerBase
     }
 
     [HttpGet("genders")]
-    public async Task<IActionResult> GetGenders()
+    public IActionResult GetGenders()
     {
         var result = _enumService.GetEnumValues<Gender>();
         return Ok(new Response<List<EnumGetModel>>
@@ -32,7 +29,7 @@ public class EnumsController : ControllerBase
     }
 
     [HttpGet("report-periods")]
-    public async Task<IActionResult> GetReportPeriods()
+    public IActionResult GetReportPeriods()
     {
         var result = _enumService.GetEnumValues<ReportPeriod>();
         return Ok(new Response<List<EnumGetModel>>
@@ -44,7 +41,7 @@ public class EnumsController : ControllerBase
     }
 
     [HttpGet("payment-operation-types")]
-    public async Task<IActionResult> GetPaymentOperationTypes()
+    public IActionResult GetPaymentOperationTypes()
     {
         var result = _enumService.GetEnumValues<PaymentOperationType>();
         return Ok(new Response<List<EnumGetModel>>
@@ -56,7 +53,7 @@ public class EnumsController : ControllerBase
     }
 
     [HttpGet("employee-statuses")]
-    public async Task<IActionResult> GetEmployeeStatuses()
+    public IActionResult GetEmployeeStatuses()
     {
         var result = _enumService.GetEnumValues<EmployeeStatus>();
         return Ok(new Response<List<EnumGetModel>>
@@ -68,10 +65,8 @@ public class EnumsController : ControllerBase
     }
     
     [HttpGet("enrollment-status")]
-    public async Task<IActionResult> GetEnrollmentStatusAsync()
+    public IActionResult GetEnrollmentStatus()
     {
-        var r = EnrollmentStatus.Active;
-        r.GetDisplayName();
         var result = _enumService.GetEnumValues<EnrollmentStatus>();
         return Ok(new Response<List<EnumGetModel>>
         {
@@ -80,8 +75,9 @@ public class EnumsController : ControllerBase
             Data = result
         });
     }
+
     [HttpGet("course-payment-type")]
-    public async Task<IActionResult> GetCoursePaymentTypeAsync()
+    public IActionResult GetCoursePaymentType()
     {
         var result = _enumService.GetEnumValues<CoursePaymentType>();
         return Ok(new Response<List<EnumGetModel>>
@@ -91,8 +87,9 @@ public class EnumsController : ControllerBase
             Data = result
         });
     }
+
     [HttpGet("employee-payment-operation-type")]
-    public async Task<IActionResult> GetEmployeePaymentOperationType()
+    public IActionResult GetEmployeePaymentOperationType()
     {
         var result = _enumService.GetEnumValues<EmployeePaymentOperationType>();
         return Ok(new Response<List<EnumGetModel>>
@@ -102,8 +99,9 @@ public class EnumsController : ControllerBase
             Data = result
         });
     }
+
     [HttpGet("payment-method")]
-    public async Task<IActionResult> GetPaymentMethod()
+    public IActionResult GetPaymentMethod()
     {
         var result = _enumService.GetEnumValues<PaymentMethod>();
         return Ok(new Response<List<EnumGetModel>>
@@ -113,8 +111,9 @@ public class EnumsController : ControllerBase
             Data = result
         });
     }
+
     [HttpGet("student-status")]
-    public async Task<IActionResult> GetStudentStatus()
+    public IActionResult GetStudentStatus()
     {
         var result = _enumService.GetEnumValues<StudentStatus>();
         return Ok(new Response<List<EnumGetModel>>
@@ -126,11 +125,24 @@ public class EnumsController : ControllerBase
     }
 
     [HttpGet("current-yearly-months")]
-    public async Task<IActionResult> GetYearlyMonths()
+    public IActionResult GetYearlyMonths()
     {
         var result = _enumService.GetCurrentYearlyMonths();
 
         return Ok(new Response<YearlyMonths>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    
+    [HttpGet("student-filtering-status")]
+    public IActionResult GetStudentFilteringStatus()
+    {
+        var result = _enumService.GetEnumValues<StudentFilteringStatus>();
+
+        return Ok(new Response<List<EnumGetModel>>
         {
             StatusCode = 200,
             Message = "success",

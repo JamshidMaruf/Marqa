@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿﻿﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -6,9 +6,10 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students.Models;
 using Marqa.Service.Services.Students.Models.DetailModels;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using static Marqa.Service.Services.Students.Models.StudentViewModel;
 
 namespace Marqa.Service.Services.Students;
 
@@ -16,6 +17,7 @@ public class StudentService(
     IUnitOfWork unitOfWork,
     IStudentPointHistoryService studentPointHistoryService,
     IFileService fileService,
+    IPaginationService paginationService,
     IValidator<StudentCreateModel> createValidator,
     IValidator<StudentUpdateModel> updateValidator) : IStudentService
 {
@@ -24,7 +26,7 @@ public class StudentService(
         await createValidator.EnsureValidatedAsync(model);
 
         var existingStudent = await unitOfWork.Students
-            .CheckExistAsync(e => e.User.Phone == model.Phone && e.User.CompanyId == model.CompanyId);
+            .CheckExistAsync(e => e.User.Phone == model.Phone && e.CompanyId == model.CompanyId);
 
         if (existingStudent)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
@@ -55,8 +57,7 @@ public class StudentService(
                 LastName = model.LastName,
                 Phone = studentPhoneResult.Phone,
                 Email = model.Email,
-                Role = UserRole.Student,
-                CompanyId = model.CompanyId
+                Role = UserRole.Student
             });
 
             await unitOfWork.SaveAsync();
@@ -64,8 +65,10 @@ public class StudentService(
             var createdStudent = new Student()
             {
                 UserId = user.Id,
+                CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
-                Gender = model.Gender
+                Gender = model.Gender,
+                Status = model.Status
             };
 
             unitOfWork.Students.Insert(createdStudent);
@@ -124,7 +127,7 @@ public class StudentService(
 
         var phoneExists = await unitOfWork.Students
             .CheckExistAsync(e => e.User.Phone == model.Phone
-                          && e.User.CompanyId == existStudent.User.CompanyId
+                          && e.CompanyId == existStudent.CompanyId
                           && e.Id != id);
 
         if (phoneExists)
@@ -157,6 +160,7 @@ public class StudentService(
             existStudent.User.FirstName = model.FirstName;
             existStudent.User.LastName = model.LastName;
             existStudent.Gender = model.Gender;
+            existStudent.Status = model.Status;
             existStudent.DateOfBirth = model.DateOfBirth;
             existStudent.User.Phone = studentPhoneResult.Phone;
             existStudent.User.Email = model.Email;
@@ -267,22 +271,22 @@ public class StudentService(
                 GuardianLastName = existStudent.StudentDetail.GuardianLastName,
                 GuardianPhone = existStudent.StudentDetail.GuardianPhone
             },
-            Courses = existStudent.Courses.Select(c => new StudentCourseData
+            Courses = existStudent.Courses.Select(c => new StudentCourseViewData
             {
                 CourseName = c.Course.Name,
-                Subject = c.Course.Subject.Name,
+                Subject = c.Course.Subject,
                 //  TeacherFullName = $"{c.Course.Teacher.User.FirstName} {c.Course.Teacher.User.LastName}",
                 CourseStatusName = Enum.GetName(c.Status),
                 CourseLevel = c.Course.Level
             })
             .ToList(),
-            ExamResults = existStudent.ExamResults.Select(r => new ExamResult
+            ExamResults = existStudent.ExamResults.Select(r => new StudentExamResultData
             {
                 Title = r.Exam.Title,
                 Score = r.Score
             })
             .ToList(),
-            PaymentOperations = existStudent.PaymentOperations.Select(p => new PaymentOperation
+            PaymentOperations = existStudent.PaymentOperations.Select(p => new StudentPaymentOperationData
             {
                 PaymentNumber = p.PaymentNumber,
                 PaymentMethod = p.PaymentMethod,
@@ -293,7 +297,7 @@ public class StudentService(
                 //  CoursePrice = p.CoursePrice
             })
             .ToList(),
-            PointHistories = existStudent.PointHistories.Select(p => new StudentViewModel.StudentPointHistory
+            PointHistories = existStudent.PointHistories.Select(p => new StudentPointHistoryData
             {
                 CurrentPoint = p.CurrentPoint,
                 GivenDate = p.GivenDateTime,
@@ -345,58 +349,42 @@ public class StudentService(
         };
     }
 
-    public async Task<List<StudentListModel>> GetAllAsync(StudentFilterModel filterModel)
+    public async Task<List<StudentListModel>> GetAllAsync(
+        PaginationParams @params,
+        int companyId,
+        string search = null,
+        int? courseId = null,
+        StudentFilteringStatus? status = null)
     {
         var query = unitOfWork.Students
-            .SelectAllAsQueryable(s => !s.IsDeleted);
+            .SelectAllAsQueryable(
+                predicate: s => !s.IsDeleted && s.CompanyId == companyId,
+                includes: ["User", "Courses", "Courses.Course"]);
 
-        query = query.Where(s => s.User.CompanyId == filterModel.CompanyId);
-
-
-        if (!string.IsNullOrEmpty(filterModel.SearchText))
+        if (!string.IsNullOrEmpty(search))
         {
-            var searchText = filterModel.SearchText.ToLower();
-            query = query.Where(s => s.User.FirstName.ToLower().Contains(searchText) ||
-                                     s.User.LastName.ToLower().Contains(searchText) ||
-                                     s.User.Phone.ToLower().Contains(searchText) ||
-                                     s.User.Email.ToLower().Contains(searchText));
+            var searchText = search.ToLower();
+            query = query.Where(s => 
+                s.User.FirstName.ToLower().Contains(searchText) ||
+                s.User.LastName.ToLower().Contains(searchText) ||
+                s.User.Phone.ToLower().Contains(searchText) ||
+                s.User.Email.ToLower().Contains(searchText));
         }
 
-        if (filterModel.CourseId != null && filterModel.CourseId != 0)
-            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == filterModel.CourseId));
+        if (courseId.HasValue)
+            query = query.Where(s => s.Courses.Any(sc => sc.CourseId == courseId));
 
-        if (filterModel.Status != null)
+        if (status.HasValue)
         {
-            if (filterModel.Status == StudentFilteringStatus.Active)
+            if (status == StudentFilteringStatus.Active)
             {
                 query = query.Where(s => s.Status == StudentStatus.Active);
             }
-            else if (filterModel.Status == StudentFilteringStatus.Completed)
+            else if (status == StudentFilteringStatus.Completed)
             {
                 query = query.Where(s => s.Status == StudentStatus.Completed);
             }
-            else if (filterModel.Status == StudentFilteringStatus.Upcoming)
-            {
-                return await unitOfWork.Courses.SelectAllAsQueryable(c =>
-                c.Status == CourseStatus.Upcoming)
-                    .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
-                    {
-                        Id = e.Student.Id,
-                        Status = e.Student.Status,
-                        Balance = e.Student.Balance,
-                        FirstName = e.Student.User.FirstName,
-                        LastName = e.Student.User.LastName,
-                        Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
-                        {
-                            CourseId = c.CourseId,
-                            CourseName = c.Course.Name,
-                            CourseStatus = Enum.GetName(c.Course.Status)
-                        }).ToList()
-                    }))
-                    .ToListAsync();
-            }
-            else if (filterModel.Status == StudentFilteringStatus.Frozen)
+            else if (status == StudentFilteringStatus.Frozen)
             {
                 return await unitOfWork.Enrollments
                     .SelectAllAsQueryable(e => e.Status == EnrollmentStatus.Frozen)
@@ -408,7 +396,7 @@ public class StudentService(
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
                         Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        Courses = e.Student.Courses.Select(c => new StudentCourseListData
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
@@ -417,7 +405,7 @@ public class StudentService(
                     })
                     .ToListAsync();
             }
-            else if (filterModel.Status == StudentFilteringStatus.Completed)
+            else if (status == StudentFilteringStatus.Completed)
             {
                 return await unitOfWork.Courses.SelectAllAsQueryable(c =>
                 c.Status == CourseStatus.Completed)
@@ -429,7 +417,7 @@ public class StudentService(
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
                         Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
+                        Courses = e.Student.Courses.Select(c => new StudentCourseListData
                         {
                             CourseId = c.CourseId,
                             CourseName = c.Course.Name,
@@ -438,34 +426,15 @@ public class StudentService(
                     }))
                     .ToListAsync();
             }
-            else if (filterModel.Status == StudentFilteringStatus.Closed)
-            {
-                return await unitOfWork.Courses.SelectAllAsQueryable(c =>
-                c.Status == CourseStatus.Closed)
-                    .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
-                    {
-                        Id = e.Student.Id,
-                        Status = e.Student.Status,
-                        Balance = e.Student.Balance,
-                        FirstName = e.Student.User.FirstName,
-                        LastName = e.Student.User.LastName,
-                        Phone = e.Student.User.Phone,
-                        Courses = e.Student.Courses.Select(c => new StudentListModel.StudentCourseData
-                        {
-                            CourseId = c.CourseId,
-                            CourseName = c.Course.Name,
-                            CourseStatus = Enum.GetName(c.Course.Status)
-                        }).ToList()
-                    }))
-                    .ToListAsync();
-            }
-            else if (filterModel.Status == StudentFilteringStatus.GroupLess)
+            else if (status == StudentFilteringStatus.GroupLess)
             {
                 query = query.Where(s => s.Courses.Count == 0);
             }
         }
 
-        return await query.Select(x => new StudentListModel
+        var pagedStudents = await paginationService.Paginate(query, @params).ToListAsync();
+
+        return pagedStudents.Select(x => new StudentListModel
         {
             Id = x.Id,
             Status = x.Status,
@@ -473,13 +442,13 @@ public class StudentService(
             FirstName = x.User.FirstName,
             LastName = x.User.LastName,
             Phone = x.User.Phone,
-            Courses = x.Courses.Select(c => new StudentListModel.StudentCourseData
+            Courses = x.Courses.Select(c => new StudentCourseListData
             {
                 CourseId = c.CourseId,
                 CourseName = c.Course.Name,
                 CourseStatus = Enum.GetName(c.Course.Status)
             }).ToList()
-        }).ToListAsync();
+        }).ToList();
     }
 
     public async ValueTask<StudentsInfo> GetStudentsInfo(int companyid)

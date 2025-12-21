@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+﻿﻿﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
@@ -20,9 +21,11 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var employeePhone = model.Phone.TrimPhoneNumber();
         if (!employeePhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Invalid phone number!");
-        var existEmployeePhone = await unitOfWork.Employees.SelectAsync(e => e.User.Phone == employeePhone.Phone && e.User.CompanyId == model.CompanyId);
+        
+        var existEmployeePhone = await unitOfWork.Employees.SelectAsync(e => e.User.Phone == employeePhone.Phone && e.CompanyId == model.CompanyId);
         if (existEmployeePhone != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
+        
         var transaction = await unitOfWork.BeginTransactionAsync();
         try
         {
@@ -34,7 +37,8 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 Email = model.Email,
                 PasswordHash = PasswordHelper.Hash(model.Password),
                 Role = UserRole.Employee,
-                CompanyId = model.CompanyId,
+                IsActive = true,
+                IsUseSystem = model.IsUseSystem
             });
             await unitOfWork.SaveAsync();
 
@@ -42,6 +46,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             {
                 User = user,
                 UserId = user.Id,
+                CompanyId = model.CompanyId,
                 DateOfBirth = model.DateOfBirth,
                 Gender = model.Gender,
                 Status = model.Status,
@@ -56,7 +61,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             await transaction.CommitAsync();
             return createdEmployee;
         }
-        catch (Exception e)
+        catch
         {
             await transaction.RollbackAsync();
             throw;
@@ -70,14 +75,14 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var existEmployee = await unitOfWork.Employees.SelectAsync(e => e.Id == id, includes: "User")
             ?? throw new NotFoundException($"Employee was not found");
 
-        var existEmployeeRole = await unitOfWork.EmployeeRoles.CheckExistAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.User.CompanyId);
+        var existEmployeeRole = await unitOfWork.EmployeeRoles.CheckExistAsync(e => e.Id == model.RoleId && e.CompanyId == existEmployee.CompanyId);
 
         if (!existEmployeeRole)
             throw new NotFoundException($"No employee role was found with ID = {model.RoleId}");
         var trimmedPhone = model.Phone.TrimPhoneNumber();
         var existPhone = await unitOfWork.Employees.SelectAsync(e =>
                             e.User.Phone == trimmedPhone.Phone &&
-                            e.User.CompanyId == existEmployee.User.CompanyId &&
+                            e.CompanyId == existEmployee.CompanyId &&
                             e.Id != id, includes: "User");
 
         if (existPhone != null)
@@ -121,8 +126,9 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
-                FirstName = e.User.Phone,
-                LastName = e.User.Phone,
+                CompanyId = e.CompanyId,
+                FirstName = e.User.FirstName,
+                LastName = e.User.LastName,
                 Phone = e.User.Phone,
                 Email = e.User.Email,
                 DateOfBirth = e.DateOfBirth,
@@ -150,8 +156,9 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             .Select(e => new EmployeeViewModel
             {
                 Id = e.Id,
-                FirstName = e.User.Phone,
-                LastName = e.User.Phone,
+                CompanyId = e.CompanyId,
+                FirstName = e.User.FirstName,
+                LastName = e.User.LastName,
                 Phone = e.User.Phone,
                 Email = e.User.Email,
                 DateOfBirth = e.DateOfBirth,
@@ -182,7 +189,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
     public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
     {
         var employees = unitOfWork.Employees
-            .SelectAllAsQueryable(e => e.User.CompanyId == companyId);
+            .SelectAllAsQueryable(e => e.CompanyId == companyId);
 
         if (!string.IsNullOrWhiteSpace(search))
             employees = employees.Where(e =>
@@ -195,8 +202,9 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         return await employees.Select(e => new EmployeeViewModel
         {
             Id = e.Id,
+            CompanyId = e.CompanyId,
             FirstName = e.User.FirstName,
-            LastName = e.User.Phone,
+            LastName = e.User.LastName,
             Phone = e.User.Phone,
             Email = e.User.Email,
             DateOfBirth = e.DateOfBirth,

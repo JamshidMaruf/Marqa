@@ -1,4 +1,4 @@
-﻿using Hangfire;
+﻿﻿using Hangfire;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
@@ -13,8 +13,7 @@ namespace Marqa.Service.Services.HomeTasks;
 
 public class HomeTaskService(
     IUnitOfWork unitOfWork,
-    IFileService fileService,
-    ISmsService smsService
+    IFileService fileService
     ) : IHomeTaskService
 {
     public async Task CreateAsync(HomeTaskCreateModel model)
@@ -28,16 +27,14 @@ public class HomeTaskService(
 
         await unitOfWork.SaveAsync();
 
-        var students = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId,
-            includes: ["Course.Students", "Course.Students.Student.User"]);
-
-        var message = "Homework has been uploaded!";
-
-        //foreach (var student in students.Course.Enrollments)
-        //{
-        //    BackgroundJob.Enqueue(() =>
-        //    smsService.SendNotificationAsync(student.Student.User.Phone, message));
-        //}
+        // TODO: Implement SMS notification for students
+        // var students = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId,
+        //     includes: ["Course.Students", "Course.Students.Student.User"]);
+        // foreach (var student in students.Course.Enrollments)
+        // {
+        //     BackgroundJob.Enqueue(() =>
+        //     smsService.SendNotificationAsync(student.Student.User.Phone, "Homework has been uploaded!"));
+        // }
     }
     
     public async Task UploadHomeTaskFileAsync(int homeTaskId, IFormFile file)

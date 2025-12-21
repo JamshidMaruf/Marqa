@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : ControllerBase
+public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) : BaseController
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(EmployeeRoleCreateModel model)

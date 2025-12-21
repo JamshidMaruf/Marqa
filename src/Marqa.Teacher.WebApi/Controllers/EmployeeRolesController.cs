@@ -1,4 +1,4 @@
-﻿using Marqa.Service.Services.EmployeeRoles;
+﻿﻿using Marqa.Service.Services.EmployeeRoles;
 using Marqa.Service.Services.EmployeeRoles.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -59,8 +59,9 @@ public class EmployeeRolesController(IEmployeeRoleService employeeRoleService) :
     }
 
     [HttpGet("{companyId}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, bool? canTeach = null)
+    public IActionResult GetAll(int companyId, bool? canTeach = null)
     {
+       // TODO: Implement GetAllAsync
        // var companies = await employeeRoleService.GetAllAsync(companyId,canTeach);
 
         return Ok(new Response<List<EmployeeRoleViewModel>>

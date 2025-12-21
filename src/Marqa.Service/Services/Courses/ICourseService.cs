@@ -12,6 +12,7 @@ public interface ICourseService : IScopedService
     Task<CourseViewModel> GetAsync(int id);
     Task<CourseUpdateViewModel> GetForUpdateAsync(int id);
     Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, int? subjectId, CourseStatus? status);
+    Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId);
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); // for mobile
     
     /// <summary>
@@ -20,7 +21,7 @@ public interface ICourseService : IScopedService
     /// <param name="studentId"></param>
     /// <returns></returns>
     Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); // for dashboard panel
-    Task<List<MinimalCourseDataModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
+    Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
     Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
     Task<List<NonFrozenEnrollmentModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);

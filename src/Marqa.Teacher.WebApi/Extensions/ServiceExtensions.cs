@@ -1,30 +1,14 @@
-﻿using System.Text;
+﻿﻿using System.Text;
 using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Services.Auth;
-using Marqa.Service.Services.Companies;
-using Marqa.Service.Services.Courses;
-using Marqa.Service.Services.EmployeeRoles;
-using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Exams;
-using Marqa.Service.Services.Files;
-using Marqa.Service.Services.HomeTasks;
-using Marqa.Service.Services.Lessons;
 using Marqa.Service.Services.Permissions;
-using Marqa.Service.Services.Permissions.Models;
-using Marqa.Service.Services.PointSettings;
-using Marqa.Service.Services.Products;
-using Marqa.Service.Services.Ratings;
 using Marqa.Service.Services.Settings;
-using Marqa.Service.Services.StudentPointHistories;
-using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Subjects;
 using Marqa.Service.Validators.Companies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 namespace Marqa.Teacher.WebApi.Extensions;
 
@@ -43,17 +27,21 @@ public static class ServicesExtension
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 
-    public async static Task AddJWTServiceAsync(this IServiceCollection services)
+    public static async Task AddJWTServiceAsync(this IServiceCollection services)
     {
         var serviceProvider = services.BuildServiceProvider();
 
-        bool check = await serviceProvider
-            .GetService<IRepository<User>>()
-            .CanConnectAsync();
+        var repository = serviceProvider.GetService<IRepository<User>>();
+        if (repository == null)
+            return;
+
+        bool check = await repository.CanConnectAsync();
 
         if (check)
         {
             var settingService = serviceProvider.GetService<ISettingService>();
+            if (settingService == null)
+                return;
 
             var jwtSettings = await settingService.GetByCategoryAsync("JWT");
 
