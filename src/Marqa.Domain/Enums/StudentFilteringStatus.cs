@@ -17,5 +17,5 @@ public enum StudentFilteringStatus
     Frozen = 3,
 
     [Description("Guruhsiz")]
-    GroupLess = 4,
+    GroupLess = 4
 }

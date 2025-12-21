@@ -26,7 +26,7 @@ public class StudentCourseViewData
 {
     public string CourseName { get; set; }
     public string Subject { get; set; }
-    public string TeacherFullName { get; set; }
+    public IEnumerable<string> TeachersFullName { get; set; }
     public string CourseStatusName { get; set; }
     public string CourseLevel { get; set; }
 }

@@ -25,13 +25,6 @@ public class StudentDetailCreateModelValidator : AbstractValidator<StudentDetail
 
         RuleFor(x => x.GuardianLastName)
             .MaximumLength(255).WithMessage("Guardian's LastName must not exceed 50 characters");
-
-
-        RuleFor(x => x)
-            .Must(x => !string.IsNullOrEmpty(x.FatherPhone) ||
-                      !string.IsNullOrEmpty(x.MotherPhone) ||
-                      !string.IsNullOrEmpty(x.GuardianPhone))
-            .WithMessage("At least one parent/guardian phone number must be provided");
     }
 }
 

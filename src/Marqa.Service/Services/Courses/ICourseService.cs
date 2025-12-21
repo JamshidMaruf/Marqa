@@ -11,7 +11,7 @@ public interface ICourseService : IScopedService
     Task DeleteAsync(int id);
     Task<CourseViewModel> GetAsync(int id);
     Task<CourseUpdateViewModel> GetForUpdateAsync(int id);
-    Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, int? subjectId, CourseStatus? status);
+    Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, CourseStatus? status);
     Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId);
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); // for mobile
     

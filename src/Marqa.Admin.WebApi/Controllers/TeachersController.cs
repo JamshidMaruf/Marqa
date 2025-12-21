@@ -1,4 +1,4 @@
-﻿﻿using Marqa.Service.Exceptions;
+﻿using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Teachers;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
@@ -37,40 +37,13 @@ public class TeachersController(ITeacherService teacherService) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
-        try
-        {
-            await teacherService.DeleteAsync(id);
+        await teacherService.DeleteAsync(id);
 
-            return Ok(new Response
-            {
-                StatusCode = 200,
-                Message = "Teacher deleted successfully"
-            });
-        }
-        catch (NotFoundException ex)
+        return Ok(new Response
         {
-            return NotFound(new Response
-            {
-                StatusCode = 404,
-                Message = ex.Message
-            });
-        }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("active course"))
-        {
-            return BadRequest(new Response
-            {
-                StatusCode = 400,
-                Message = ex.Message
-            });
-        }
-        catch (Exception)
-        {
-            return StatusCode(500, new Response
-            {
-                StatusCode = 500,
-                Message = "An error occurred while deleting the teacher"
-            });
-        }
+            StatusCode = 200,
+            Message = "Teacher deleted successfully"
+        });
     }
 
     [HttpGet("{id:int}")]
