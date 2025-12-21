@@ -144,6 +144,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         foreach (var enrollment in enrollments)
         {
             enrollment.Status = EnrollmentStatus.Active;
+            unitOfWork.Enrollments.Update(enrollment);
         }
 
         // add job schedule
@@ -296,7 +297,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         {
             student.Status = StudentStatus.Dropped;
             unitOfWork.Students.Update(student);
-           await unitOfWork.SaveAsync();
+            await unitOfWork.SaveAsync();
         }
     }
 }
