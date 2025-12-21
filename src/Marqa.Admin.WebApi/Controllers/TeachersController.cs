@@ -94,5 +94,18 @@ public class TeachersController(ITeacherService teacherService) : BaseController
             Data = result
         });
     }
+    [HttpGet("statistics")]
+    public async Task<IActionResult> GetStatistics(int companyId)
+    {
+        var statistics = await teacherService.GetStatisticsAsync(companyId);
+
+        return Ok(new Response<TeachersStatistics>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = statistics
+        });
+    }
+
 }
 

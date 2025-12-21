@@ -422,6 +422,27 @@ public class TeacherService(
 
         return paymentTypes;
     }
+    public async Task<TeachersStatistics> GetStatisticsAsync(int companyId)
+    {
+        var query = unitOfWork.Teachers
+            .SelectAllAsQueryable(t =>
+                t.CompanyId == companyId);
+
+        var stats = await query
+            .GroupBy(t => 1) 
+            .Select(g => new TeachersStatistics
+            {
+                TotalTeachersCount = g.Count(),
+                TotalLeadTeachersCount = g.Count(t => t.Type == TeacherType.Lead),
+                TotalAssistantTeachersCount = g.Count(t => t.Type == TeacherType.Assistant),
+                TotalActiveTeacherCount = g.Count(t => t.Status == TeacherStatus.Active),
+                TotalLeftTeacherCount = g.Count(t => t.Status == TeacherStatus.Left),
+                TotalOnLeaveTeacherCount = g.Count(t => t.Status == TeacherStatus.OnLeave)
+            })
+            .FirstOrDefaultAsync();
+
+        return stats ?? new TeachersStatistics(); 
+    }
 
     public Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId)
     {

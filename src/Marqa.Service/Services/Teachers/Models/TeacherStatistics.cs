@@ -8,4 +8,5 @@ public class TeacherStatistics
     public int NewStudentCount { get; set; }
     public int DroppedStudentCount { get; set; }
     public int TotalResult { get; set; }
+
 }

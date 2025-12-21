@@ -15,4 +15,6 @@ public interface ITeacherService : IScopedService
     Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month);
     List<TeacherPaymentGetModel> GetTeacherPaymentTypes();
     Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId);
+    Task<TeachersStatistics> GetStatisticsAsync(int companyId);
+
 }
