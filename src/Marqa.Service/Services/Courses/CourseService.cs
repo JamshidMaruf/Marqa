@@ -382,7 +382,7 @@ public class CourseService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId)
+    public async Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int companyId, int studentId)
     {
         var courses = await unitOfWork.Courses
             .SelectAllAsQueryable(predicate: c =>
