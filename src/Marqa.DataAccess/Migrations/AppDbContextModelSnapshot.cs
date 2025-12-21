@@ -403,10 +403,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("subject");
 
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("integer")
-                        .HasColumnName("teacher_id");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
@@ -416,9 +412,6 @@ namespace Marqa.DataAccess.Migrations
 
                     b.HasIndex("CompanyId")
                         .HasDatabaseName("ix_courses_company_id");
-
-                    b.HasIndex("TeacherId")
-                        .HasDatabaseName("ix_courses_teacher_id");
 
                     b.ToTable("courses", (string)null);
 
@@ -892,6 +885,11 @@ namespace Marqa.DataAccess.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("integer")
                         .HasColumnName("course_id");
+
+                    b.Property<decimal>("CoursePrice")
+                        .HasPrecision(18, 3)
+                        .HasColumnType("numeric(18,3)")
+                        .HasColumnName("course_price");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -3674,11 +3672,6 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_courses_companys_company_id");
 
-                    b.HasOne("Marqa.Domain.Entities.Teacher", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("TeacherId")
-                        .HasConstraintName("fk_courses_teacher_teacher_id");
-
                     b.Navigation("Company");
                 });
 
@@ -3692,7 +3685,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasConstraintName("fk_course_teachers_courses_course_id");
 
                     b.HasOne("Marqa.Domain.Entities.Teacher", "Teacher")
-                        .WithMany()
+                        .WithMany("TeacherCourses")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -4427,9 +4420,9 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Teacher", b =>
                 {
-                    b.Navigation("Courses");
-
                     b.Navigation("TeacherAssessments");
+
+                    b.Navigation("TeacherCourses");
                 });
 #pragma warning restore 612, 618
         }

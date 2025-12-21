@@ -51,8 +51,8 @@ public static class ServicesExtensions
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
 
         // Exception handlers
-        services.AddExceptionHandler<AlreadyExitExceptionHandler>();
         services.AddExceptionHandler<ValidateExceptionHandler>();
+        services.AddExceptionHandler<AlreadyExitExceptionHandler>();
         services.AddExceptionHandler<ArgumentIsNotValidExceptionHandler>();
         services.AddExceptionHandler<NotFoundExceptionHandler>();
         services.AddExceptionHandler<NotMatchedExceptionHandler>();

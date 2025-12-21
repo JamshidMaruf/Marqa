@@ -190,7 +190,6 @@ public class StudentService(
         }
     }
 
-    // agar active courselari bolsa ochirishga yol qoymaslik kerak
     public async Task DeleteAsync(int id)
     {
         var existStudent = await unitOfWork.Students
@@ -469,9 +468,9 @@ public class StudentService(
         }).ToList();
     }
 
-    public async ValueTask<StudentsInfo> GetStudentsInfo(int companyid)
+    public async ValueTask<StudentsInfo> GetStudentsInfo(int companyId)
     {
-        var students = unitOfWork.Students.SelectAllAsQueryable(s => s.CompanyId == companyid);
+        var students = await unitOfWork.Students.SelectAllAsQueryable(s => s.CompanyId == companyId).ToListAsync();
 
         return new StudentsInfo
         {
@@ -479,7 +478,7 @@ public class StudentService(
             TotalDroppedStudents = students.Count(s => s.Status == StudentStatus.Dropped),
             TotalCompletedStudents = students.Count(s => s.Status == StudentStatus.Completed),
             TotalActiveStudents = students.Count(s => s.Status == StudentStatus.Active),
-            TotalInactiveStudents = students.Count(s => s.Status == StudentStatus.Active)
+            TotalInactiveStudents = students.Count(s => s.Status == StudentStatus.InActive)
         };
     }
 
