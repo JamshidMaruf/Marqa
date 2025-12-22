@@ -29,11 +29,11 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\+?\d{9,15}$").WithMessage("Invalid phone number format.");
+            .Matches(@"^\d{9,15}$").WithMessage("Invalid phone number format.");
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress();
+            .EmailAddress()
+            .When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.Gender)
             .IsInEnum().WithMessage("Invalid gender value.");
@@ -51,11 +51,6 @@ public class TeacherUpdateModelValidator : AbstractValidator<TeacherUpdateModel>
             .NotEmpty().WithMessage("Joining date is required.")
             .Must(d => d <= DateOnly.FromDateTime(DateTime.UtcNow))
             .WithMessage("Joining date cannot be a future date.");
-
-        RuleFor(x => x.SubjectIds)
-            .NotEmpty().WithMessage("At least one subject is required.")
-            .Must(ids => ids.Distinct().Count() == ids.Count)
-            .WithMessage("Duplicate subject IDs are not allowed.");
     }
 
     private bool BeAValidPastDate(DateOnly dob)

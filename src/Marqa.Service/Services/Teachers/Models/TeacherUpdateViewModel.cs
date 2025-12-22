@@ -28,14 +28,13 @@ public class TeacherUpdateViewModel
         public int Id { get; set; }
         public string Name { get; set; }
     }
-    
+
     public class TeacherPayment
     {
         public int Id { get; set; }
-        public TeacherPaymentType Type { get; set; }
-        public string Name{get;set;}
+        public string Name { get; set; }
         public decimal? FixSalary { get; set; }
-        public decimal? SalaryPercentPerStudent {  get; set; }
+        public decimal? SalaryPercentPerStudent { get; set; }
         public decimal? SalaryAmountPerHour { get; set; }
     }
 

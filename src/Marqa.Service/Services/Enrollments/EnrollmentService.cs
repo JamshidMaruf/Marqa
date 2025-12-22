@@ -20,7 +20,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         var existCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.CourseId)
             ?? throw new NotFoundException("Course is not found");
 
-        await enrollmentCreateValidator.ValidateAndThrowAsync(model);
+        await enrollmentCreateValidator.EnsureValidatedAsync(model);
 
         decimal coursePrice = 0m;
         if (model.PaymentType == CoursePaymentType.Fixed)

@@ -1,4 +1,4 @@
-﻿﻿using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -68,7 +68,7 @@ public class TeacherService(
                 SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
                 SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
             });
-            
+
             await unitOfWork.SaveAsync();
             await transaction.CommitAsync();
         }
@@ -89,11 +89,10 @@ public class TeacherService(
         var existPhone = await unitOfWork.Teachers.SelectAsync(e =>
             e.User.Phone == model.Phone &&
             e.CompanyId == existTeacher.CompanyId &&
-            e.Id != id, includes: "User");
+            e.Id != id);
 
         if (existPhone != null)
             throw new AlreadyExistException($"Employee with this phone {model.Phone} already exists");
-
 
         var teacherPhone = model.Phone.TrimPhoneNumber();
         if (!teacherPhone.IsSuccessful)
@@ -115,6 +114,8 @@ public class TeacherService(
         existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
         existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
 
+        unitOfWork.Teachers.Update(existTeacher);
+
         await unitOfWork.SaveAsync();
     }
 
@@ -129,7 +130,7 @@ public class TeacherService(
         var activeCourses = await unitOfWork.CourseTeachers
             .SelectAllAsQueryable(ct => ct.TeacherId == id,
                 includes: "Course")
-            .Where(ct => ct.Course.Status == CourseStatus.Active && 
+            .Where(ct => ct.Course.Status == CourseStatus.Active &&
                          ct.Course.Status == CourseStatus.Upcoming)
             .Select(ct => ct.Course.Name)
             .ToListAsync();
@@ -140,19 +141,11 @@ public class TeacherService(
 
             throw new InvalidOperationException(
                 $"Cannot delete teacher '{teacherName}'. " +
-                $"This teacher has {activeCourses.Count} active course(s): {string.Join(", ", activeCourses)}. " +
-                "Please reassign courses to another teacher first.");
+                $"This teacher has {activeCourses.Count} active or upcoming course(s): {string.Join(", ", activeCourses)}. " +
+                "Please detach or reassign courses to another teacher first");
         }
 
-
-        var courseTeachers = await unitOfWork.CourseTeachers
-            .SelectAllAsQueryable(ct => ct.TeacherId == id)
-            .ToListAsync();
-
-        foreach (var courseTeacher in courseTeachers)
-        {
-            unitOfWork.CourseTeachers.MarkAsDeleted(courseTeacher);
-        }
+        unitOfWork.Users.MarkAsDeleted(teacherForDeletion.User);
 
         unitOfWork.Teachers.MarkAsDeleted(teacherForDeletion);
         await unitOfWork.SaveAsync();
@@ -189,7 +182,6 @@ public class TeacherService(
                Payment = new TeacherViewModel.TeacherPayment
                {
                    Id = Convert.ToInt32(t.PaymentType),
-                   Type = t.PaymentType,
                    Name = enumService.GetEnumDescription(t.PaymentType),
                    FixSalary = t.FixSalary,
                    SalaryAmountPerHour = t.SalaryAmountPerHour,
@@ -240,7 +232,6 @@ public class TeacherService(
                 Payment = new TeacherUpdateViewModel.TeacherPayment
                 {
                     Id = Convert.ToInt32(t.PaymentType),
-                    Type = t.PaymentType,
                     Name = enumService.GetEnumDescription(t.PaymentType),
                     FixSalary = t.FixSalary,
                     SalaryAmountPerHour = t.SalaryAmountPerHour,
@@ -424,14 +415,15 @@ public class TeacherService(
 
         return paymentTypes;
     }
+
     public async Task<TeachersStatistics> GetStatisticsAsync(int companyId)
     {
         var query = unitOfWork.Teachers
             .SelectAllAsQueryable(t =>
                 t.CompanyId == companyId);
 
-        var stats = await query
-            .GroupBy(t => 1) 
+        var statistics = await query
+            .GroupBy(t => 1)
             .Select(g => new TeachersStatistics
             {
                 TotalTeachersCount = g.Count(),
@@ -443,7 +435,7 @@ public class TeacherService(
             })
             .FirstOrDefaultAsync();
 
-        return stats ?? new TeachersStatistics(); 
+        return statistics ?? new TeachersStatistics();
     }
 
     public Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId)

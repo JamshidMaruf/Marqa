@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using Marqa.Service.Services.Teachers.Models;
 
 namespace Marqa.Service.Validators.Teachers;
@@ -36,11 +37,11 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\+?\d{9,15}$").WithMessage("Invalid phone number format.");
+            .Matches(@"^\d{9,15}$").WithMessage("Invalid phone number format.");
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress();
+            .EmailAddress()
+            .When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required.")
@@ -62,11 +63,6 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .NotEmpty().WithMessage("Joining date is required.")
             .Must(d => d <= DateOnly.FromDateTime(DateTime.UtcNow))
             .WithMessage("Joining date cannot be in the future.");
-
-        RuleFor(x => x.SubjectIds)
-            .NotEmpty().WithMessage("At least one subject is required.")
-            .Must(list => list.All(id => id > 0))
-            .WithMessage("Invalid subject ID.");
     }
 
     private bool BeAValidAge(DateOnly dob)

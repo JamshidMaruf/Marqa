@@ -2,7 +2,6 @@
 using Hangfire.PostgreSql;
 using Marqa.Admin.WebApi.Extensions;
 using Marqa.DataAccess.Contexts;
-using Marqa.Service.Services.TeacherAssessments;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

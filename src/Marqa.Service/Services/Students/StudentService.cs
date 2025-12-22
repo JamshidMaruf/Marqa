@@ -10,7 +10,7 @@ using Marqa.Service.Services.Students.Models.DetailModels;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
 
 namespace Marqa.Service.Services.Students;
 
@@ -375,7 +375,7 @@ public class StudentService(
                 predicate: s => s.CompanyId == companyId,
                 includes: ["User", "Enrollments", "Enrollments.Course"]);
 
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrWhiteSpace(search))
         {
             var searchText = search.ToLower();
             query = query.Where(s =>
@@ -512,7 +512,7 @@ public class StudentService(
             })
             .ToListAsync();
 
-        if (!students.Any())
+        if (students.Count > 0)
             throw new NotFoundException("Course is not found or has no students");
 
         return students;

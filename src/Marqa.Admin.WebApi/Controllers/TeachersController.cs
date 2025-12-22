@@ -3,11 +3,11 @@ using Marqa.Service.Exceptions;
 using Marqa.Service.Services.Teachers;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-public class TeachersController(ITeacherService teacherService) : BaseController
+public class TeachersController(ITeacherService teacherService) : BaseController 
 {
     [HttpPost]
     public async Task<IActionResult> PostAsync(TeacherCreateModel model)

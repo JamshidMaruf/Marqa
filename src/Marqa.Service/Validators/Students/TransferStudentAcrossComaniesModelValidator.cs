@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
-using Marqa.Service.Services.Courses.Models;
+﻿using FluentValidation;
 using Marqa.Service.Services.Enrollments.Models;
 
 namespace Marqa.Service.Validators.Students;
