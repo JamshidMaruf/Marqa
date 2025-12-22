@@ -16,6 +16,7 @@ public class TeacherCreateModel
     public Gender Gender { get; set; }
     public TeacherType Type { get; set; }
     public TeacherStatus Status { get; set; }
+    public DateOnly JoiningDate { get; set; }
 
     //Salary
     public decimal? FixSalary { get; set; }
@@ -23,6 +24,4 @@ public class TeacherCreateModel
     public decimal? SalaryAmountPerHour { get; set; }
     public TeacherPaymentType PaymentType { get; set; }
 
-    public DateOnly JoiningDate { get; set; }
-    public List<int> SubjectIds { get; set; }
 }

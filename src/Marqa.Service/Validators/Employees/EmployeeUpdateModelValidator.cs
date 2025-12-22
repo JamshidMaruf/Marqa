@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services.Employees.Models;
 
 namespace Marqa.Service.Validators.Employees;
@@ -21,12 +20,12 @@ public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateMode
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required.")
-            .Matches(@"^\+998\d{9}$")
+            .Matches(@"^998\d{9}$")
             .WithMessage("Phone number is invalid format.");
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Invalid Email format.");
+            .EmailAddress()
+            .When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.Gender)
             .IsInEnum().WithMessage("Invalid gender value.");
@@ -40,6 +39,7 @@ public class EmployeeUpdateModelValidator : AbstractValidator<EmployeeUpdateMode
 
         RuleFor(x => x.RoleId)
             .GreaterThan(0).WithMessage("RoleId is required.");
+        
         RuleFor(x => x.RoleId)
             .MustAsync(async (roleId, token) =>
             {

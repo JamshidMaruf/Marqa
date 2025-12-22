@@ -19,8 +19,8 @@ public class StudentUpdateModelValidator : AbstractValidator<StudentUpdateModel>
             .Matches(@"998\d{9}$").WithMessage("Phone number is not valid");
 
         RuleFor(x => x.Email)
-            .EmailAddress().WithMessage("Email is not valid")
-            .When(x => !string.IsNullOrEmpty(x.Email));
+            .EmailAddress()
+            .When(x => !string.IsNullOrWhiteSpace(x.Email));
 
         RuleFor(x => x.DateOfBirth)
             .NotEmpty().WithMessage("DateOfBirth is required")
