@@ -314,9 +314,10 @@ public class CourseService(IUnitOfWork unitOfWork,
         string search,
         CourseStatus? status = null)
     {
-        var query = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyId);
+        var query = unitOfWork.Courses.SelectAllAsQueryable(c => c.CompanyId == companyId,
+            includes: ["CourseTeachers.Teacher.User", "CourseWeekdays", "Enrollments"]);
 
-        if (!string.IsNullOrEmpty(search))
+        if (!string.IsNullOrWhiteSpace(search))
         {
             var searchText = search.ToLower();
             query = query.Where(t =>
@@ -353,7 +354,8 @@ public class CourseService(IUnitOfWork unitOfWork,
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
                 })
-            }).ToList();
+            })
+            .ToList();
     }
 
     public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
