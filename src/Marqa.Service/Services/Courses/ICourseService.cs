@@ -1,6 +1,7 @@
 ﻿﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Shared.Models;
 
 namespace Marqa.Service.Services.Courses;
 
@@ -11,7 +12,7 @@ public interface ICourseService : IScopedService
     Task DeleteAsync(int id);
     Task<CourseViewModel> GetAsync(int id);
     Task<CourseUpdateViewModel> GetForUpdateAsync(int id);
-    Task<List<CourseTableViewModel>> GetAllAsync(int companyId, string search, CourseStatus? status);
+    Task<List<CourseTableViewModel>> GetAllAsync(PaginationParams @params,int companyId, string search, CourseStatus? status);
     Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId);
     Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); // for mobile
     
@@ -34,4 +35,5 @@ public interface ICourseService : IScopedService
     /// <param name="model"></param>
     /// <returns></returns>
     Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model);
+    Task<CoursesStatistics> GetStatisticsAsync(int companyId);
 }

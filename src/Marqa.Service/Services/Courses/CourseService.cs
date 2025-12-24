@@ -4,11 +4,14 @@ using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Courses;
 
 public class CourseService(IUnitOfWork unitOfWork,
+    IPaginationService paginationService,
     IValidator<CourseCreateModel> courseCreateValidator,
     IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
 {
@@ -225,8 +228,7 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task<CourseViewModel> GetAsync(int id)
     {
         return await unitOfWork.Courses
-            .SelectAllAsQueryable(
-            predicate: c => !c.IsDeleted)
+            .SelectAllAsQueryable(t => t.Id == id)
             .Select(c => new CourseViewModel
             {
                 Id = c.Id,
@@ -258,10 +260,9 @@ public class CourseService(IUnitOfWork unitOfWork,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
                 })
-                .OrderBy(l => l.Date)
-                .ToList(),
+                .OrderBy(l => l.Date).ToList(),
             })
-            .FirstOrDefaultAsync(t => t.Id == id)
+            .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
     }
 
@@ -301,13 +302,14 @@ public class CourseService(IUnitOfWork unitOfWork,
                     EndTime = cl.EndTime,
                     StartTime = cl.StartTime,
                     Room = cl.Room,
-                }).OrderBy(l => l.Date)
+                }).OrderBy(l => l.Date).ToList()
             })
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
     }
 
     public async Task<List<CourseTableViewModel>> GetAllAsync(
+        PaginationParams @params,
         int companyId,
         string search,
         CourseStatus? status = null)
@@ -326,7 +328,9 @@ public class CourseService(IUnitOfWork unitOfWork,
         if (status != null && status != 0)
             query = query.Where(t => t.Status == status);
 
-        return await query
+        var courses = await paginationService.Paginate(query, @params).ToListAsync();
+
+        return courses
             .Select(c => new CourseTableViewModel
             {
                 Id = c.Id,
@@ -349,8 +353,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
                 })
-            })
-            .ToListAsync();
+            }).ToList();
     }
 
     public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
@@ -529,6 +532,37 @@ public class CourseService(IUnitOfWork unitOfWork,
     public Task CreateTeacherAssessmentAsync(TeacherAssessment model)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<CoursesStatistics> GetStatisticsAsync(int companyId)
+    {
+        int totalCourses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.CompanyId == companyId)
+            .CountAsync();
+
+        var groupedCourses = await unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.CompanyId == companyId)
+            .GroupBy(c => c.Status)
+            .Select(c => new
+            {
+                Status = c.Key,
+                Count = c.Count()
+            })
+            .ToListAsync();
+
+        int totalStudents = await unitOfWork.Students
+            .SelectAllAsQueryable(c => c.CompanyId == companyId)
+            .CountAsync();
+
+        return new CoursesStatistics
+        {
+            TotalCourses = totalCourses,
+            TotalActiveCourses = groupedCourses.Where(c => c.Status == CourseStatus.Active).Select(c => c.Count).FirstOrDefault(),
+            TotalUpcomingCourses = groupedCourses.Where(c => c.Status == CourseStatus.Upcoming).Select(c => c.Count).FirstOrDefault(),
+            TotalClosedCourses = groupedCourses.Where(c => c.Status == CourseStatus.Closed).Select(c => c.Count).FirstOrDefault(),
+            TotalCompletedCourses = groupedCourses.Where(c => c.Status == CourseStatus.Completed).Select(c => c.Count).FirstOrDefault(),
+            TotalStudents = totalStudents
+        };
     }
 
     private async Task GenerateLessonAsync(
