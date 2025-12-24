@@ -19,7 +19,5 @@ public class TransferStudentModelValidator : AbstractValidator<StudentTransferMo
         RuleFor(x => x.ToCourseId).MustAsync(async (courseId, cancellation) =>  await unitOfWork.Courses.CheckExistAsync(p => p.Id == courseId))
             .WithMessage("ToCourse not found.");
        
-        RuleFor(x => x.DateOfTransfer)
-            .LessThanOrEqualTo(DateTime.Now).WithMessage("DateOfTransfer cannot be in the future.");
     }
 }
