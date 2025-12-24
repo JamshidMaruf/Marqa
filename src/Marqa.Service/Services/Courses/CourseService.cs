@@ -420,7 +420,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 c.Status == EnrollmentStatus.Active)
             .Select(c => new CourseNamesModel
             {
-                Id = c.CourseId,
+                Id = c.Course.Id,
                 Name = c.Course.Name
             })
             .ToListAsync();

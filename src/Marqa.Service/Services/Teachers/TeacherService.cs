@@ -64,8 +64,8 @@ public class TeacherService(
                 Type = model.Type,
                 Status = model.Status,
                 PaymentType = model.PaymentType,
-                FixSalary = TeacherSalaryType.Fixed == model.PaymentType ? model.FixSalary : 0,
-                SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
+                FixSalary = TeacherSalaryType.Fixed == model.PaymentType || TeacherSalaryType.Mixed == model.PaymentType ? model.FixSalary : 0,
+                SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType || TeacherSalaryType.Mixed == model.PaymentType ? model.SalaryPercentPerStudent : 0,
                 SalaryAmountPerHour = TeacherSalaryType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
             });
 
@@ -110,8 +110,8 @@ public class TeacherService(
         existTeacher.Status = model.Status;
         existTeacher.Type = model.Type;
         existTeacher.PaymentType = model.PaymentType;
-        existTeacher.FixSalary = TeacherSalaryType.Fixed == model.PaymentType ? model.FixSalary : 0;
-        existTeacher.SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
+        existTeacher.FixSalary = TeacherSalaryType.Fixed == model.PaymentType || TeacherSalaryType.Mixed == model.PaymentType ? model.FixSalary : 0;
+        existTeacher.SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType || TeacherSalaryType.Mixed == model.PaymentType ? model.SalaryPercentPerStudent : 0;
         existTeacher.SalaryAmountPerHour = TeacherSalaryType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
 
         unitOfWork.Teachers.Update(existTeacher);

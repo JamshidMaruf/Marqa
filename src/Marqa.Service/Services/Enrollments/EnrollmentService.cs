@@ -68,8 +68,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         await freezeValidator.ValidateAsync(model);
         await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
         
-        BackgroundJob.Schedule(() => enrollmentJobService.FreezeAsync(model),
-            model.StartDate);
+        BackgroundJob.Schedule<IEnrollmentJobService>(job => job.FreezeAsync(model),
+            model.StartDate.ToUniversalTime());
     }
 
     public async Task UnFreezeStudentAsync(UnFreezeModel model)
@@ -82,7 +82,6 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
 
     public async Task MoveStudentCourseAsync(StudentTransferModel model)
     {
-        //add hangfire to schedule the transfer time
         await transferValidator.EnsureValidatedAsync(model);
         await enrollmentCreateValidator.ValidateAsync(new EnrollmentCreateModel
         {
@@ -101,6 +100,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         {
             throw new ArgumentIsNotValidException($"Target course will be finished");
         }
+
         BackgroundJob.Schedule(() => enrollmentJobService.TransferAsync(model),
             model.DateOfTransfer
         );
@@ -143,6 +143,4 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         if (missings.Count > 0)
             throw new ArgumentIsNotValidException($"These groups were not found for this student: {string.Join(", ", missings)}");
     }
-    
-    
 }
