@@ -37,6 +37,16 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : Auditabl
         _context.Update(entity);
     }
 
+    public Task UpdateRangeAsync(IEnumerable<TEntity> entities)
+    {
+        foreach(var entity in entities)
+        {
+            entity.UpdatedAt = DateTime.UtcNow;
+        }
+        _context.UpdateRange(entities);
+
+        return Task.CompletedTask;
+    }
     public void MarkAsDeleted(TEntity entity)
     {
         entity.DeletedAt = DateTime.UtcNow;

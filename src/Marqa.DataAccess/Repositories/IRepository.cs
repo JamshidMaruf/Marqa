@@ -10,7 +10,8 @@ public interface IRepository<TEntity> where TEntity : Auditable
     Task InsertRangeAsync(IEnumerable<TEntity> entities);
     
     void Update(TEntity entity);
-    
+
+    Task UpdateRangeAsync(IEnumerable<TEntity> entities);
     /// <summary>
     /// Marks the entity as deleted. But does not delete the actual record from database
     /// </summary>
