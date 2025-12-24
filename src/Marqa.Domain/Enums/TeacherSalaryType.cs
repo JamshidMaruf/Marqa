@@ -2,7 +2,7 @@
 
 namespace Marqa.Domain.Enums;
 
-public enum TeacherPaymentType
+public enum TeacherSalaryType
 {
     [Description("Qat'iy oylik")]
     Fixed = 1, 

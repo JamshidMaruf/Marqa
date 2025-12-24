@@ -46,6 +46,7 @@ public class TeachersController(ITeacherService teacherService) : BaseController
     }
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(Response<TeacherViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAsync(int id)
     {
         var result = await teacherService.GetAsync(id);
@@ -59,6 +60,7 @@ public class TeachersController(ITeacherService teacherService) : BaseController
     }
 
     [HttpGet("{id:int}/update")]
+    [ProducesResponseType(typeof(Response<TeacherUpdateViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetForUpdateAsync(int id)
     {
         var result = await teacherService.GetForUpdateAsync(id);
@@ -72,18 +74,25 @@ public class TeachersController(ITeacherService teacherService) : BaseController
     }
 
     [HttpGet("company/{companyId:int}")]
-    public async Task<IActionResult> GetAllTeachersAsync(int companyId, [FromQuery] PaginationParams @params, [FromQuery] string? search, [FromQuery] TeacherStatus? status)
+    [ProducesResponseType(typeof(Response<List<TeacherTableViewModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllTeachersAsync(
+        int companyId, 
+        [FromQuery] PaginationParams @params, 
+        [FromQuery] string? search, 
+        [FromQuery] TeacherStatus? status)
     {
         var result = await teacherService.GetAllAsync(companyId, @params, search, status);
 
-        return Ok(new Response<IEnumerable<TeacherTableViewModel>>
+        return Ok(new Response<List<TeacherTableViewModel>>
         {
             StatusCode = 200,
             Message = "success",
             Data = result
         });
     }
+    
     [HttpGet("teachers/payment-types")]
+    [ProducesResponseType(typeof(Response<List<TeacherPaymentGetModel>>), StatusCodes.Status200OK)]
     public IActionResult GetTeacherPaymentTypes()
     {
         var result = teacherService.GetTeacherPaymentTypes();
@@ -94,7 +103,8 @@ public class TeachersController(ITeacherService teacherService) : BaseController
             Data = result
         });
     }
-    [HttpGet("statistics")]
+    [HttpGet("company/{companyId:int}/statistics")]
+    [ProducesResponseType(typeof(Response<TeachersStatistics>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStatistics(int companyId)
     {
         var statistics = await teacherService.GetStatisticsAsync(companyId);
@@ -106,6 +116,5 @@ public class TeachersController(ITeacherService teacherService) : BaseController
             Data = statistics
         });
     }
-
 }
 

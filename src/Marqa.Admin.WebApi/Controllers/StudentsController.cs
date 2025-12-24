@@ -106,7 +106,7 @@ public class StudentsController(
 
 
     [HttpGet("{studentId:int}/courses")]
-    //[ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response<IEnumerable<CourseNamesModel>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetStudentCourses(int studentId)

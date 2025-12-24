@@ -134,59 +134,31 @@ public class StudentService(
         if (phoneExists)
             throw new AlreadyExistException($"Student with this phone {model.Phone} already exists");
 
+        existStudent.User.FirstName = model.FirstName;
+        existStudent.User.LastName = model.LastName;
+        existStudent.Gender = model.Gender;
+        existStudent.Status = model.Status;
+        existStudent.DateOfBirth = model.DateOfBirth;
+        existStudent.User.Phone = studentPhoneResult.Phone;
+        existStudent.User.Email = model.Email;
 
-        var studentCourses = await unitOfWork.Enrollments
-            .SelectAllAsQueryable(e => e.StudentId == existStudent.Id)
-            .ToListAsync();
-
-
-        var transaction = await unitOfWork.BeginTransactionAsync();
-
-        try
+        unitOfWork.Students.Update(existStudent);
+        await unitOfWork.SaveAsync();
+            
+        if (existStudent.StudentDetail != null)
         {
-            foreach (var studentCourse in studentCourses)
-            {
-                foreach (var course in model.Courses)
-                {
-                    if (studentCourse.CourseId == course.CourseId)
-                    {
-                        studentCourse.Status = (EnrollmentStatus)course.CourseStatusId;
-                        unitOfWork.Enrollments.Update(studentCourse);
-                    }
-                }
-            }
-
+            existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
+            existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
+            existStudent.StudentDetail.FatherPhone = fatherPhoneResult.Phone;
+            existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
+            existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
+            existStudent.StudentDetail.MotherPhone = motherPhoneResult.Phone;
+            existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
+            existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
+            existStudent.StudentDetail.GuardianPhone = guardianPhoneResult.Phone;
+                
+            unitOfWork.StudentDetails.Update(existStudent.StudentDetail);
             await unitOfWork.SaveAsync();
-
-            existStudent.User.FirstName = model.FirstName;
-            existStudent.User.LastName = model.LastName;
-            existStudent.Gender = model.Gender;
-            existStudent.Status = model.Status;
-            existStudent.DateOfBirth = model.DateOfBirth;
-            existStudent.User.Phone = studentPhoneResult.Phone;
-            existStudent.User.Email = model.Email;
-
-            if (existStudent.StudentDetail != null)
-            {
-                existStudent.StudentDetail.FatherFirstName = model.StudentDetailUpdateModel.FatherFirstName;
-                existStudent.StudentDetail.FatherLastName = model.StudentDetailUpdateModel.FatherLastName;
-                existStudent.StudentDetail.FatherPhone = fatherPhoneResult.Phone;
-                existStudent.StudentDetail.MotherFirstName = model.StudentDetailUpdateModel.MotherFirstName;
-                existStudent.StudentDetail.MotherLastName = model.StudentDetailUpdateModel.MotherLastName;
-                existStudent.StudentDetail.MotherPhone = motherPhoneResult.Phone;
-                existStudent.StudentDetail.GuardianFirstName = model.StudentDetailUpdateModel.GuardianFirstName;
-                existStudent.StudentDetail.GuardianLastName = model.StudentDetailUpdateModel.GuardianLastName;
-                existStudent.StudentDetail.GuardianPhone = guardianPhoneResult.Phone;
-            }
-
-            await unitOfWork.SaveAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
         }
     }
 

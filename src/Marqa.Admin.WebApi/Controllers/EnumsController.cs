@@ -149,4 +149,43 @@ public class EnumsController : BaseController
             Data = result
         });
     }
+    
+    [HttpGet("teacher-types")]
+    public IActionResult GetTeacherTypes()
+    {
+        var result = _enumService.GetEnumValues<TeacherType>();
+
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    
+    [HttpGet("teacher-salary-types")]
+    public IActionResult GetTeacherSalaryTypes()
+    {
+        var result = _enumService.GetEnumValues<TeacherSalaryType>();
+
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    
+    [HttpGet("teacher-statuses")]
+    public IActionResult GetTeacherStatuses()
+    {
+        var result = _enumService.GetEnumValues<TeacherStatus>();
+
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
 }

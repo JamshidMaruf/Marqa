@@ -27,6 +27,10 @@ public class TeacherCreateModelValidator : AbstractValidator<TeacherCreateModel>
             .NotEmpty().WithMessage("Qualification is required.")
             .MaximumLength(200);
 
+        RuleFor(x => x.Email)
+            .EmailAddress()
+            .When(x => !string.IsNullOrWhiteSpace(x.Email));
+        
         RuleFor(x => x.Info)
             .MaximumLength(500)
             .When(x => !string.IsNullOrWhiteSpace(x.Info));

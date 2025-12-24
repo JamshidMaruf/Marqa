@@ -6,32 +6,9 @@ public class TeacherTableViewModel
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Phone { get; set; }
-    public GenderInfo Gender { get; set; }
+    public DateOnly JoiningDate { get; set; }
+    public string Qualification { get; set; }
     public StatusInfo Status { get; set; }
     public TeacherTypeInfo Type { get; set; }
-    public IEnumerable<CourseInfo> Courses { get; set; }
-
-    public class GenderInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-    
-    public class StatusInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-    
-    public class TeacherTypeInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-    
-    public class CourseInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public List<CourseInfo> Courses { get; set; }
 }
