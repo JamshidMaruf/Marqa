@@ -72,11 +72,12 @@ public class CoursesController(ICourseService courseService) : BaseController
 
     [HttpGet("companies/{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(
-        int companyId, 
+        int companyId,
+        [FromQuery] PaginationParams @params,
         [FromQuery] string? search,  
         [FromQuery] CourseStatus status)
     {
-        var courses = await courseService.GetAllAsync(companyId, search, status);
+        var courses = await courseService.GetAllAsync(@params, companyId, search, status);
 
         return Ok(new Response<List<CourseTableViewModel>>
         {
@@ -123,4 +124,16 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    [HttpGet("{companyId:int}/statistics")]
+    public async Task<IActionResult> GetStatisticsAsync(int companyId)
+    {
+        var result = await courseService.GetStatisticsAsync(companyId);
+
+        return Ok(new Response<CoursesStatistics>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
 }

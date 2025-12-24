@@ -22,6 +22,5 @@ public interface IStudentService : IScopedService
         string? searchText = null,
         int? courseId = null,
         StudentFilteringStatus? status = null);
-    
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
 }
