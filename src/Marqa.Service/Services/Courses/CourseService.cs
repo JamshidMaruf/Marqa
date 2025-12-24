@@ -479,6 +479,18 @@ public class CourseService(IUnitOfWork unitOfWork,
                ?? throw new NotFoundException("Course was not found");
     }
 
+    public async Task<List<StudentList>> GetStudentsListAsync(int courseId)
+    {
+        return await unitOfWork.Students
+            .SelectAllAsQueryable(s => s.Enrollments.Any(e => e.CourseId == courseId && e.Status == EnrollmentStatus.Active))
+            .Select(s => new StudentList
+            {
+                Id = s.Id,
+                FirstName = s.User.FirstName,
+                LastName = s.User.LastName
+            }).ToListAsync();
+    }
+
     public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)
     {
         var transaction = await unitOfWork.BeginTransactionAsync();

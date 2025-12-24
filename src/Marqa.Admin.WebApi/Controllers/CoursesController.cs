@@ -1,6 +1,7 @@
 ﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)
     {
@@ -32,6 +34,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {
@@ -44,6 +47,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAsync(int id)
     {
@@ -57,6 +61,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpGet("{id:int}/update")]
     public async Task<IActionResult> GetByUpdateAsync(int id)
     {
@@ -70,6 +75,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpGet("companies/{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(
         int companyId,
@@ -87,6 +93,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
     
+    
     [HttpGet("minimal-list/{companyId:int}")]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
@@ -100,6 +107,7 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
     [HttpGet("upcomings/{courseId:int}/students")]
     public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
     {
@@ -112,6 +120,20 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
 
+    
+    [HttpGet("list/{courseId:int}/students")]
+    public async Task<IActionResult> GetStudentsListAsync(int courseId)
+    {
+        var students = await courseService.GetStudentsListAsync(courseId);
+        return Ok(new Response<List<StudentList>>
+        {
+            StatusCode = 200,
+            Message = "success", 
+            Data = students
+        });
+    }
+
+    
     [HttpPost("bulk-enroll-students")]
     public async Task<IActionResult> BulkEnrollStudentsAsync([FromBody] BulkEnrollStudentsModel model)
     {
