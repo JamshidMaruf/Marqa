@@ -420,7 +420,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 c.Status == EnrollmentStatus.Active)
             .Select(c => new CourseNamesModel
             {
-                Id = c.Id,
+                Id = c.CourseId,
                 Name = c.Course.Name
             })
             .ToListAsync();
@@ -445,7 +445,7 @@ public class CourseService(IUnitOfWork unitOfWork,
 
                 mappedFrozenModels.Add(new FrozenEnrollmentModel
                 {
-                    Id = enrollment.Id,
+                    Id = enrollment.CourseId,
                     Name = enrollment.Course.Name,
                     Level = enrollment.Course.Level,
                     FrozenDate = last.StartDate,

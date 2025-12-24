@@ -18,36 +18,4 @@ public class TeacherViewModel
     public string Qualification { get; set; }
     public IEnumerable<CourseInfo> Courses { get; set; }
     public TeacherTypeInfo TypeInfo { get; set; }
-
-    public class GenderInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-    public class StatusInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class TeacherPayment
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public decimal? FixSalary { get; set; }
-        public decimal? SalaryPercentPerStudent { get; set; }
-        public decimal? SalaryAmountPerHour { get; set; }
-    }
-
-    public class CourseInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class TeacherTypeInfo
-    {
-        public int Id { get; set; }
-        public string Type { get; set; }
-    }
 }

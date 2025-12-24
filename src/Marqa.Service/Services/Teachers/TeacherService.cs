@@ -52,7 +52,7 @@ public class TeacherService(
 
             await unitOfWork.SaveAsync();
 
-            var teacher = unitOfWork.Teachers.Insert(new Teacher
+            unitOfWork.Teachers.Insert(new Teacher
             {
                 UserId = user.Id,
                 CompanyId = model.CompanyId,
@@ -64,9 +64,9 @@ public class TeacherService(
                 Type = model.Type,
                 Status = model.Status,
                 PaymentType = model.PaymentType,
-                FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.FixSalary : 0,
-                SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
-                SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
+                FixSalary = TeacherSalaryType.Fixed == model.PaymentType ? model.FixSalary : 0,
+                SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0,
+                SalaryAmountPerHour = TeacherSalaryType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0
             });
 
             await unitOfWork.SaveAsync();
@@ -110,9 +110,9 @@ public class TeacherService(
         existTeacher.Status = model.Status;
         existTeacher.Type = model.Type;
         existTeacher.PaymentType = model.PaymentType;
-        existTeacher.FixSalary = TeacherPaymentType.Fixed == model.PaymentType ? model.FixSalary : 0;
-        existTeacher.SalaryPercentPerStudent = TeacherPaymentType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
-        existTeacher.SalaryAmountPerHour = TeacherPaymentType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
+        existTeacher.FixSalary = TeacherSalaryType.Fixed == model.PaymentType ? model.FixSalary : 0;
+        existTeacher.SalaryPercentPerStudent = TeacherSalaryType.Percentage == model.PaymentType ? model.SalaryPercentPerStudent : 0;
+        existTeacher.SalaryAmountPerHour = TeacherSalaryType.Hourly == model.PaymentType ? model.SalaryAmountPerHour : 0;
 
         unitOfWork.Teachers.Update(existTeacher);
 
@@ -159,7 +159,7 @@ public class TeacherService(
            {
                Id = t.Id,
                DateOfBirth = t.DateOfBirth,
-               Gender = new TeacherViewModel.GenderInfo
+               Gender = new GenderInfo
                {
                    Id = Convert.ToInt32(t.Gender),
                    Name = enumService.GetEnumDescription(t.Gender),
@@ -169,17 +169,17 @@ public class TeacherService(
                Email = t.User.Email,
                Phone = t.User.Phone,
                Qualification = t.Qualification,
-               Status = new TeacherViewModel.StatusInfo
+               Status = new StatusInfo
                {
                    Id = Convert.ToInt32(t.Status),
                    Name = enumService.GetEnumDescription(t.Status),
                },
-               TypeInfo = new TeacherViewModel.TeacherTypeInfo
+               TypeInfo = new TeacherTypeInfo
                {
                    Id = Convert.ToInt32(t.Type),
-                   Type = enumService.GetEnumDescription(t.Type),
+                   Name = enumService.GetEnumDescription(t.Type),
                },
-               Payment = new TeacherViewModel.TeacherPayment
+               Payment = new TeacherPayment
                {
                    Id = Convert.ToInt32(t.PaymentType),
                    Name = enumService.GetEnumDescription(t.PaymentType),
@@ -189,7 +189,7 @@ public class TeacherService(
                },
                JoiningDate = t.JoiningDate,
                Info = t.Info,
-               Courses = t.TeacherCourses.Select(c => new TeacherViewModel.CourseInfo
+               Courses = t.TeacherCourses.Select(c => new CourseInfo
                {
                    Id = c.Course.Id,
                    Name = c.Course.Name
@@ -209,7 +209,7 @@ public class TeacherService(
             {
                 Id = t.Id,
                 DateOfBirth = t.DateOfBirth,
-                Gender = new TeacherUpdateViewModel.GenderInfo
+                Gender = new GenderInfo
                 {
                     Id = Convert.ToInt32(t.Gender),
                     Name = enumService.GetEnumDescription(t.Gender),
@@ -219,17 +219,17 @@ public class TeacherService(
                 Email = t.User.Email,
                 Phone = t.User.Phone,
                 Qualification = t.Qualification,
-                Status = new TeacherUpdateViewModel.StatusInfo
+                Status = new StatusInfo
                 {
                     Id = Convert.ToInt32(t.Status),
                     Name = enumService.GetEnumDescription(t.Status),
                 },
-                Type = new TeacherUpdateViewModel.TeacherTypeInfo
+                Type = new TeacherTypeInfo
                 {
                     Id = Convert.ToInt32(t.Type),
                     Name = enumService.GetEnumDescription(t.Type),
                 },
-                Payment = new TeacherUpdateViewModel.TeacherPayment
+                Payment = new TeacherPayment
                 {
                     Id = Convert.ToInt32(t.PaymentType),
                     Name = enumService.GetEnumDescription(t.PaymentType),
@@ -246,7 +246,11 @@ public class TeacherService(
         return teacher;
     }
 
-    public async Task<List<TeacherTableViewModel>> GetAllAsync(int companyId, PaginationParams @params, string search = null, TeacherStatus? status = null)
+    public async Task<List<TeacherTableViewModel>> GetAllAsync(
+        int companyId,
+        PaginationParams @params,
+        string search = null,
+        TeacherStatus? status = null)
     {
         var teacherQuery = unitOfWork.Teachers
             .SelectAllAsQueryable(t => t.CompanyId == companyId,
@@ -273,26 +277,24 @@ public class TeacherService(
             FirstName = t.User.FirstName,
             LastName = t.User.LastName,
             Phone = t.User.Phone,
-            Gender = new TeacherTableViewModel.GenderInfo
-            {
-                Id = Convert.ToInt32(t.Gender),
-                Name = enumService.GetEnumDescription(t.Gender),
-            },
-            Status = new TeacherTableViewModel.StatusInfo
+            JoiningDate = t.JoiningDate,
+            Qualification = t.Qualification,
+            Status = new StatusInfo
             {
                 Id = Convert.ToInt32(t.Status),
                 Name = enumService.GetEnumDescription(t.Status),
             },
-            Type = new TeacherTableViewModel.TeacherTypeInfo
+            Type = new TeacherTypeInfo
             {
                 Id = Convert.ToInt32(t.Type),
                 Name = enumService.GetEnumDescription(t.Type),
             },
-            Courses = t.TeacherCourses.Select(c => new TeacherTableViewModel.CourseInfo
+            Courses = t.TeacherCourses.Select(c => new CourseInfo
             {
                 Id = c.Course.Id,
-                Name = c.Course.Name
-            })
+                Name = c.Course.Name,
+                Status = c.Course.Status.ToString()
+            }).ToList()
         }).ToList();
 
         return teachers;
@@ -319,7 +321,7 @@ public class TeacherService(
         result.GroupsCount = activeCourses.Count;
         result.ActiveStudentsCount = activeStudentsCount;
 
-        if (teacher.PaymentType == TeacherPaymentType.Fixed)
+        if (teacher.PaymentType == TeacherSalaryType.Fixed)
         {
             foreach (var course in activeCourses)
             {
@@ -334,7 +336,7 @@ public class TeacherService(
                 result.TotalSalary += Convert.ToDecimal(teacher.FixSalary);
             }
         }
-        else if (teacher.PaymentType == TeacherPaymentType.Percentage)
+        else if (teacher.PaymentType == TeacherSalaryType.Percentage)
         {
             foreach (var course in activeCourses)
             {
@@ -350,7 +352,7 @@ public class TeacherService(
                 result.TotalSalary += Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
             }
         }
-        else if (teacher.PaymentType == TeacherPaymentType.Hourly)
+        else if (teacher.PaymentType == TeacherSalaryType.Hourly)
         {
             var attendedLessons = await unitOfWork.Lessons
                 .SelectAllAsQueryable(l =>
@@ -383,7 +385,7 @@ public class TeacherService(
             }
 
         }
-        else if (teacher.PaymentType == TeacherPaymentType.Mixed)
+        else if (teacher.PaymentType == TeacherSalaryType.Mixed)
         {
             foreach (var course in activeCourses)
             {
@@ -406,7 +408,7 @@ public class TeacherService(
 
     public List<TeacherPaymentGetModel> GetTeacherPaymentTypes()
     {
-        var enumValues = enumService.GetEnumValues<TeacherPaymentType>();
+        var enumValues = enumService.GetEnumValues<TeacherSalaryType>();
         var paymentTypes = enumValues.Select(ev => new TeacherPaymentGetModel
         {
             Id = ev.Id,

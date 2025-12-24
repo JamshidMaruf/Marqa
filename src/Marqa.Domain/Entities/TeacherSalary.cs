@@ -8,7 +8,7 @@ public class TeacherSalary : Auditable
     public decimal? FixSalary { get; set; }
     public decimal? SalaryPercentPerStudent { get; set; }
     public decimal? SalaryAmountPerHour { get; set; }
-    public TeacherPaymentType PaymentType { get; set; }
+    public TeacherSalaryType SalaryType { get; set; }
     public DateTime CreatedDateTime { get; set; }
     public short ForYear { get; set; }
     public Month ForMonth { get; set; }

@@ -12,14 +12,5 @@ public class StudentUpdateModel
     public StudentStatus Status { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
-    public List<StudentCourseUpdateData> Courses { get; set; }
-
-    //details
     public StudentDetailUpdateModel StudentDetailUpdateModel { get; set; }
-}
-
-public class StudentCourseUpdateData
-{
-    public int? CourseId { get; set; }
-    public int? CourseStatusId { get; set; }
 }

@@ -22,6 +22,6 @@ public class TeacherCreateModel
     public decimal? FixSalary { get; set; }
     public decimal? SalaryPercentPerStudent { get; set; }
     public decimal? SalaryAmountPerHour { get; set; }
-    public TeacherPaymentType PaymentType { get; set; }
+    public TeacherSalaryType PaymentType { get; set; }
 
 }
