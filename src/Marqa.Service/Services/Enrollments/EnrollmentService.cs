@@ -68,7 +68,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             {
                 EnrollmentId = enrollment.Id,
                 Reason = model.Reason,
-                CancelledAt = DateTime.UtcNow,
+                CancelledAt = model.DeactivatedDate,
             });
         }
 
