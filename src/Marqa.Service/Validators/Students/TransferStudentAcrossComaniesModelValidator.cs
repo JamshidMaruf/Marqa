@@ -5,31 +5,21 @@ namespace Marqa.Service.Validators.Students;
 public class TransferStudentModelValidator : AbstractValidator<StudentTransferModel>
 {
     public TransferStudentModelValidator(IUnitOfWork unitOfWork)
-    {
-        RuleFor(x => x.StudentId)
-            .GreaterThan(0).WithMessage("StudentId must be greater than 0.");
-       
+    {   
         RuleFor(x => x.StudentId).MustAsync(async (studentId, cancellation) => await unitOfWork.Students.CheckExistAsync(p => p.Id == studentId))
             .WithMessage("Student not found.");
-
-        RuleFor(x => x.FromCourseId)
-            .GreaterThan(0).WithMessage("FromGroupId must be greater than 0.");
         
-        RuleFor(x => x.FromCourseId).MustAsync(async (courseId, cancellation) => await unitOfWork.Companies.CheckExistAsync(p => p.Id == courseId))
+        RuleFor(x => x.FromCourseId).MustAsync(async (courseId, cancellation) => await unitOfWork.Courses.CheckExistAsync(p => p.Id == courseId))
             .WithMessage("FromCourse not found.");
 
+        
         RuleFor(x => x.ToCourseId)
-            .GreaterThan(0).WithMessage("ToGroupId must be greater than 0.")
             .NotEqual(x => x.FromCourseId).WithMessage("ToGroupId must be different from FromGroupId.");
-       
-        RuleFor(x => x.ToCourseId).MustAsync(async (courseId, cancellation) =>  await unitOfWork.Companies.CheckExistAsync(p => p.Id == courseId))
+        
+        RuleFor(x => x.ToCourseId).MustAsync(async (courseId, cancellation) =>  await unitOfWork.Courses.CheckExistAsync(p => p.Id == courseId))
             .WithMessage("ToCourse not found.");
-        
+       
         RuleFor(x => x.DateOfTransfer)
-            .Must(x => x > DateTime.UtcNow).WithMessage("DateOfTransfer cannot be in the future.");
-        
-        RuleFor(x => x.Reason)
-            .NotEmpty().WithMessage("Reason is required.")
-            .MaximumLength(500).WithMessage("Reason cannot exceed 500 characters.");
+            .LessThanOrEqualTo(DateTime.Now).WithMessage("DateOfTransfer cannot be in the future.");
     }
 }

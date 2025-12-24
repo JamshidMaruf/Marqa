@@ -41,6 +41,13 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             CoursePrice = coursePrice
         };
 
+        var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId);
+
+        if (student.Status is not StudentStatus.Active)
+            student.Status = StudentStatus.Active;
+
+        unitOfWork.Students.Update(student);
+
         unitOfWork.Enrollments.Insert(enrollment);
 
         await unitOfWork.SaveAsync();
@@ -146,6 +153,13 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             enrollment.Status = EnrollmentStatus.Active;
             unitOfWork.Enrollments.Update(enrollment);
         }
+
+        var student = await unitOfWork.Students.SelectAsync(s => s.Id == model.StudentId);
+
+        if (student.Status is not StudentStatus.Active)
+            student.Status = StudentStatus.Active;
+
+        unitOfWork.Students.Update(student);
 
         // add job schedule
 
@@ -291,7 +305,8 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
         .AnyAsync(e =>
             e.StudentId == model.StudentId &&
             (e.Status == EnrollmentStatus.Active ||
-            e.Status == EnrollmentStatus.Test));
+            e.Status == EnrollmentStatus.Test ||
+            e.Status == EnrollmentStatus.Frozen));
 
         if (!haveActiveEnrollments)
         {

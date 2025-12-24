@@ -1,7 +1,5 @@
-﻿using Hangfire;
-using Marqa.Service.Services.Auth;
+﻿using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Auth.Models;
-using Marqa.Service.Services.Messages;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
