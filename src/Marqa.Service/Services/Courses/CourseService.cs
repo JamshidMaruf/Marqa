@@ -199,10 +199,9 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task DeleteAsync(int id)
     {
         var existCourse = await unitOfWork.Courses
-            .SelectAllAsQueryable(
-            predicate: c => !c.IsDeleted,
-            includes: ["Lessons", "Lessons.LessonTeachers", "CourseWeekdays", "Enrollments", "TeacherCourses"])
-            .FirstOrDefaultAsync(t => t.Id == id)
+            .SelectAsync(
+            predicate: t => t.Id == id,
+            includes: ["Lessons", "Lessons.Teachers", "CourseWeekdays", "Enrollments", "CourseTeachers"])
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
         foreach (var lesson in existCourse.Lessons)
