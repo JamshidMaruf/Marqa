@@ -7,7 +7,7 @@ namespace Marqa.Service.Validators.Products
     {
         public ProductUpdateModelValidator()
         {
-            RuleFor(p => p.Name).NotEmpty().Length(255);
+            RuleFor(p => p.Name).NotEmpty().MaximumLength(255);
             RuleFor(p => p.Price).NotNull();
         }
     }

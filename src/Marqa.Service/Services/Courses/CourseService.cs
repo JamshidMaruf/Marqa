@@ -524,7 +524,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 .Select(e => e.StudentId)
                 .ToListAsync();
 
-            if (existingEnrollments.Any())
+            if (existingEnrollments.Count > 0)
                 throw new AlreadyExistException($"{existingEnrollments.Count} student(s) already enrolled in this course");
 
             var enrollments = model.StudentIds.Select(studentId => new Enrollment
