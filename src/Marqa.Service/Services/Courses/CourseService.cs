@@ -13,7 +13,8 @@ namespace Marqa.Service.Services.Courses;
 public class CourseService(IUnitOfWork unitOfWork,
     IPaginationService paginationService,
     IValidator<CourseCreateModel> courseCreateValidator,
-    IValidator<CourseUpdateModel> courseUpdateValidator) : ICourseService
+    IValidator<CourseUpdateModel> courseUpdateValidator,
+    IValidator<CourseMergeModel> courseMergeValidator) : ICourseService
 {
     public async Task CreateAsync(CourseCreateModel model)
     {
@@ -305,6 +306,12 @@ public class CourseService(IUnitOfWork unitOfWork,
             })
             .FirstOrDefaultAsync()
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
+    }
+
+    public async Task MergeAsync(CourseMergeModel model)
+    {
+        await courseMergeValidator.ValidateAsync(model);
+        
     }
 
     public async Task<List<CourseTableViewModel>> GetAllAsync(
