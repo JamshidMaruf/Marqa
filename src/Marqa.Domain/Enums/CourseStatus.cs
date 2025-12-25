@@ -14,5 +14,8 @@ public enum CourseStatus
     Completed = 3,
     
     [Description("Yopilgan")]
-    Closed = 4
+    Closed = 4,
+    
+    [Description("Birlashtirilgan")]
+    Merged = 5
 }
