@@ -1,11 +1,7 @@
-﻿﻿using Hangfire;
-using Marqa.DataAccess.UnitOfWork;
-using Marqa.Domain.Entities;
+﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
-using Marqa.Service.Services.Files;
 using Marqa.Service.Services.HomeTasks.Models;
-using Marqa.Service.Services.Messages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 

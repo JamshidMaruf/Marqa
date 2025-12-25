@@ -6,7 +6,8 @@ public class Product : Auditable
     public string Description { get; set; }
     public int Price { get; set; }
     public int CompanyId { get; set; }
-    public int AssetId { get; set; }
+    public int? AssetId { get; set; }
+    public bool IsDisplayed { get; set; }
 
     public Company Company { get; set; }
     public Asset Asset { get; set; }

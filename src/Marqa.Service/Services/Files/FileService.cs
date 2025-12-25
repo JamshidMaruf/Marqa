@@ -27,7 +27,7 @@ public class FileService : IFileService
         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
         var fullPath = Path.Combine(rootPath, fileName);
 
-        await using var stream = new FileStream(fullPath, FileMode.Create);
+        using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 
         return (fileName, fullPath);
