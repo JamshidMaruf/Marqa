@@ -60,9 +60,9 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     }
 
     [HttpGet("{companyId}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search)
+    public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params, int companyId, [FromQuery] string? search)
     {
-        var result = await employeeService.GetAllAsync(companyId, search);
+        var result = await employeeService.GetAllAsync(@params, companyId, search);
 
         return Ok(new Response<IEnumerable<EmployeeViewModel>>
         {
