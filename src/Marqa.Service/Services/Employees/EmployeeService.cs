@@ -1,4 +1,4 @@
-﻿﻿﻿using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -6,13 +6,16 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees.Models;
 using Marqa.Shared.Helpers;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
 
 public class EmployeeService(IUnitOfWork unitOfWork,
     IValidator<EmployeeCreateModel> validatorEmployeeCreate,
-    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate) : IEmployeeService
+    IValidator<EmployeeUpdateModel> validatorEmployeeUpdate,
+    IPaginationService paginationService) : IEmployeeService
 {
     public async Task<Employee> CreateAsync(EmployeeCreateModel model)
     {
@@ -186,7 +189,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         return employee.Id;
     }
 
-    public async Task<List<EmployeeViewModel>> GetAllAsync(int companyId, string search)
+    public async Task<List<EmployeeViewModel>> GetAllAsync(PaginationParams @params, int companyId, string search)
     {
         var employees = unitOfWork.Employees
             .SelectAllAsQueryable(e => e.CompanyId == companyId);
@@ -198,8 +201,9 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 e.User.Phone.Contains(search) ||
                 e.User.Email.Contains(search) ||
                 e.Specialization.Contains(search));
-
-        return await employees.Select(e => new EmployeeViewModel
+        var pagedEmployees = await paginationService.Paginate(employees, @params).ToListAsync();
+        
+        return pagedEmployees.Select(e => new EmployeeViewModel
         {
             Id = e.Id,
             CompanyId = e.CompanyId,
@@ -220,6 +224,6 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 Id = e.RoleId,
                 Name = e.Role.Name
             }
-        }).ToListAsync();
+        }).ToList();
     }
 }
