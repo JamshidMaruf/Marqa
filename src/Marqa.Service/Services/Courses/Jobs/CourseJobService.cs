@@ -9,12 +9,12 @@ public class CourseJobService(IUnitOfWork unitOfWork) : ICourseJobService
     public async Task MergeAsync(CourseMergeModel model)
     {
         var fromCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.FromCourseId,
-            includes: "Enrollments.Student");
-        
+            includes: ["Enrollments.Student", "Enrollments"]);
+
         var toCourse = await unitOfWork.Courses.SelectAsync(c => c.Id == model.ToCourseId,
             includes: "Enrollments");
 
-        foreach (var student in fromCourse.Enrollments.Select(x => x.Student) )
+        foreach (var student in fromCourse.Enrollments.Select(x => x.Student))
         {
             unitOfWork.Enrollments.Insert(new Enrollment
             {
@@ -27,5 +27,16 @@ public class CourseJobService(IUnitOfWork unitOfWork) : ICourseJobService
                 Status = EnrollmentStatus.Active
             });
         }
+
+        if (toCourse.MaxStudentCount < toCourse.CurrentStudentCount + fromCourse.CurrentStudentCount)
+            toCourse.MaxStudentCount += fromCourse.CurrentStudentCount;
+        toCourse.CurrentStudentCount += fromCourse.CurrentStudentCount;
+
+        fromCourse.Status = CourseStatus.Merged;
+
+        unitOfWork.Courses.Update(toCourse);
+        unitOfWork.Courses.Update(fromCourse);
+
+        await unitOfWork.SaveAsync();
     }
 }

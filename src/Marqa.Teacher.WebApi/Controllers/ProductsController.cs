@@ -60,11 +60,11 @@ public class ProductsController(IProductService productService) : ControllerBase
     }
 
     [HttpGet("getAll/{companyId:int}")]
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search = null)
+    public async Task<IActionResult> GetAllAsync(int companyId, PaginationParams @params, string? search = null)
     {
-        var products = await productService.GetAllAsync(companyId, search);
+        var products = await productService.GetAllAsync(companyId, @params, search);
         
-        return Ok(new Response<List<ProductViewModel>>
+        return Ok(new Response<List<ProductTableModel>>
         {
             StatusCode = 200,
             Message = "success",

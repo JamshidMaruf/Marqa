@@ -1,9 +1,12 @@
 ﻿using FluentValidation;
+using Hangfire;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Courses.Jobs;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Enums;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +15,7 @@ namespace Marqa.Service.Services.Courses;
 
 public class CourseService(IUnitOfWork unitOfWork,
     IPaginationService paginationService,
+    IEnumService enumService,
     IValidator<CourseCreateModel> courseCreateValidator,
     IValidator<CourseUpdateModel> courseUpdateValidator,
     IValidator<CourseMergeModel> courseMergeValidator) : ICourseService
@@ -249,7 +253,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
-                    Name = Enum.GetName(w.Weekday),
+                    Name = enumService.GetEnumDescription(w.Weekday),
                 })
                 .ToList(),
                 Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
@@ -291,7 +295,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
-                    Name = Enum.GetName(w.Weekday),
+                    Name = enumService.GetEnumDescription(w.Weekday),
                     StartTime = w.StartTime,
                     EndTime = w.EndTime
                 }),
@@ -311,7 +315,9 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task MergeAsync(CourseMergeModel model)
     {
         await courseMergeValidator.ValidateAsync(model);
-        
+
+        BackgroundJob.Schedule<ICourseJobService>(job => job.MergeAsync(model),
+            model.DateofMerge);
     }
 
     public async Task<List<CourseTableViewModel>> GetAllAsync(
@@ -358,38 +364,10 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Weekdays = c.CourseWeekdays.Select(w => new CourseTableViewModel.WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
-                    Name = Enum.GetName(w.Weekday),
+                    Name = enumService.GetEnumDescription(w.Weekday),
                 })
             })
             .ToList();
-    }
-
-    public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
-    {
-        return await unitOfWork.Enrollments
-            .SelectAllAsQueryable(predicate: c => c.StudentId == studentId)
-            .Include(c => c.Course)
-            .ThenInclude(c => c.Lessons)
-            .Select(c => new MainPageCourseViewModel
-            {
-                CourseId = c.CourseId,
-                LessonNumber = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).Number,
-                CourseName = c.Course.Name,
-                HomeTaskStatus = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).HomeTaskStatus,
-            })
-            .ToListAsync();
-    }
-
-    public Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId)
-    {
-        return unitOfWork.Enrollments.SelectAllAsQueryable(
-            predicate: sc => sc.StudentId == studentId)
-            .Select(sc => new CoursePageCourseViewModel
-            {
-                Id = sc.CourseId,
-                Name = sc.Course.Name
-            })
-            .ToListAsync();
     }
 
     public async Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId)
@@ -485,6 +463,41 @@ public class CourseService(IUnitOfWork unitOfWork,
                        }).ToList()
                    }).FirstOrDefaultAsync()
                ?? throw new NotFoundException("Course was not found");
+    }
+
+    public async Task<List<MergedCourseViewModel>> GetMergedCoursesAsync(int companyId, PaginationParams @params)
+    {
+        var query = unitOfWork.Courses
+            .SelectAllAsQueryable(c => c.CompanyId == companyId && 
+            !c.IsDeleted && 
+            c.Status == CourseStatus.Merged)
+            .IgnoreQueryFilters();
+
+        return await paginationService.Paginate(query, @params)
+            .Select(c => new MergedCourseViewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                LessonCount = c.LessonCount,
+                Status = c.Status,
+                Level = c.Level,
+                MaxStudentCount = c.MaxStudentCount,
+                StudentCountAtMergeTime = c.CurrentStudentCount,
+                Price = c.Price,
+                Subject = c.Subject,
+                Teachers = c.CourseTeachers.Select(ct => new MergedCourseViewModel.TeacherInfo
+                {
+                    Id = ct.Teacher.Id,
+                    FirstName = ct.Teacher.User.FirstName,
+                    LastName = ct.Teacher.User.LastName
+                }),
+                Weekdays = c.CourseWeekdays.Select(w => new MergedCourseViewModel.WeekInfo
+                {
+                    Id = Convert.ToInt32(w.Weekday),
+                    Name = Enum.GetName(w.Weekday)
+                })
+            })
+            .ToListAsync(); 
     }
 
     public async Task<List<StudentList>> GetStudentsListAsync(int courseId)
@@ -657,4 +670,37 @@ public class CourseService(IUnitOfWork unitOfWork,
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
     }
+
+
+
+
+    #region ForStudentMobile
+    public async Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId)
+    {
+        return await unitOfWork.Enrollments
+            .SelectAllAsQueryable(predicate: c => c.StudentId == studentId)
+            .Include(c => c.Course)
+            .ThenInclude(c => c.Lessons)
+            .Select(c => new MainPageCourseViewModel
+            {
+                CourseId = c.CourseId,
+                LessonNumber = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).Number,
+                CourseName = c.Course.Name,
+                HomeTaskStatus = (c.Course.Lessons.Where(l => l.IsCompleted).OrderByDescending(l => l.Date).First()).HomeTaskStatus,
+            })
+            .ToListAsync();
+    }
+
+    public Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId)
+    {
+        return unitOfWork.Enrollments.SelectAllAsQueryable(
+            predicate: sc => sc.StudentId == studentId)
+            .Select(sc => new CoursePageCourseViewModel
+            {
+                Id = sc.CourseId,
+                Name = sc.Course.Name
+            })
+            .ToListAsync();
+    }
+    #endregion
 }
