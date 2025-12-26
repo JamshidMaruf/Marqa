@@ -4,6 +4,7 @@ using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Files.Models;
 using Marqa.Service.Services.Products.Models;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
@@ -60,7 +61,7 @@ public class ProductService(IUnitOfWork unitOfWork,
 
         unitOfWork.Products.MarkAsDeleted(result);
 
-        unitOfWork.Assets.MarkAsDeleted(result.Asset);
+        await unitOfWork.ProductImages.MarkRangeAsDeletedAsync(result.Images);
 
         await unitOfWork.SaveAsync();
     }
@@ -141,32 +142,45 @@ public class ProductService(IUnitOfWork unitOfWork,
             .ToListAsync();
     }
 
-    public async Task UploadPictureAsync(int productId, IFormFile file)
+    public async Task UploadPictureAsync(int productId, List<IFormFile> files)
     {
         var product = await unitOfWork.Products.SelectAsync(p => p.Id == productId)
             ?? throw new NotFoundException("Product was not found!");
 
-        var fileExtension = Path.GetExtension(file.FileName);
+        var uploadedImages = new List<Asset>();
 
-        if (!fileService.IsImageExtension(fileExtension))
-            throw new ArgumentIsNotValidException("File is not valid. Please send only image file!");
-
-        var imageData = await fileService.UploadAsync(file, "images/products");
-
-        var transaction = await unitOfWork.BeginTransactionAsync();
-        try
+        foreach (var file in files)
         {
-            var uploadedPicture = unitOfWork.Assets.Insert(new Asset
+            var fileExtension = Path.GetExtension(file.FileName);
+
+            if (!fileService.IsImageExtension(fileExtension))
+                throw new ArgumentIsNotValidException("File is not valid. Please send only image file!");
+
+            var imageData = await fileService.UploadAsync(file, "images/products");
+
+            uploadedImages.Add(new Asset
             {
                 FileName = imageData.FileName,
                 FilePath = imageData.FilePath,
                 FileExtension = fileExtension
             });
+        }
+
+        var transaction = await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            await unitOfWork.Assets.InsertRangeAsync(uploadedImages);
 
             await unitOfWork.SaveAsync();
 
-            product.AssetId = uploadedPicture.Id;
-            unitOfWork.Products.Update(product);
+            foreach (var uploadedImage in uploadedImages)
+            {
+                unitOfWork.ProductImages.Insert(new ProductImage
+                {
+                    ImageId = uploadedImage.Id,
+                    ProductId = product.Id
+                });
+            }
 
             await unitOfWork.SaveAsync();
 
@@ -177,6 +191,7 @@ public class ProductService(IUnitOfWork unitOfWork,
             await transaction.RollbackAsync();
             throw;
         }
+
     }
 
     public async Task RemoveImageAsync(int productId, int imageId)

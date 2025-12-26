@@ -1,5 +1,6 @@
-﻿﻿using Marqa.Service.Exceptions;
+﻿using Marqa.Service.Exceptions;
 using Marqa.Service.Helpers;
+using Marqa.Service.Services.Files.Models;
 using Marqa.Shared.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -14,7 +15,7 @@ public class FileService : IFileService
         _environmentService = environmentService;
     }
 
-    public async Task<(string FileName, string FilePath)> UploadAsync(IFormFile file, string folder)
+    public async Task<FileMetaData> UploadAsync(IFormFile file, string folder)
     {
         if (file is null || file.Length <= 0)
             throw new ArgumentIsNotValidException("File not uploaded");
@@ -30,7 +31,11 @@ public class FileService : IFileService
         using var stream = new FileStream(fullPath, FileMode.Create);
         await file.CopyToAsync(stream);
 
-        return (fileName, fullPath);
+        return new FileMetaData
+        {
+            FileName = fileName,
+            FilePath = fullPath
+        };
     }
 
     public bool IsImageExtension(string extension) =>

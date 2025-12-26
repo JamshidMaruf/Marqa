@@ -88,9 +88,9 @@ public class ProductsController(IProductService productService) : BaseController
     }
 
     [HttpPatch("{id:int}/upload-image")]
-    public async Task<IActionResult> UploadImageAsync(int id, IFormFile image)
+    public async Task<IActionResult> UploadImageAsync(int id, List<IFormFile> images)
     {
-        await productService.UploadPictureAsync(id, image);
+        await productService.UploadPictureAsync(id, images);
 
         return Ok(new Response
         {
