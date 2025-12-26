@@ -132,20 +132,6 @@ public class LessonService(
         await unitOfWork.SaveAsync();
     }
 
-    private async Task EnsureAllStudentsExistAsync(int courseId, IEnumerable<int> studentIds)
-    {
-        var enrollments = new HashSet<int>(
-            await unitOfWork.Courses.SelectAllAsQueryable(c => c.Id == courseId)
-            .SelectMany(c => c.Enrollments.Select(e => e.StudentId))
-            .FirstOrDefaultAsync());
-
-        //TODO:check for enrollment status too
-        var missings = studentIds.Where(id => !enrollments.Contains(id)).ToList();
-
-        if (missings.Count > 0)
-            throw new ArgumentIsNotValidException($"These students were not found for this course: {string.Join(", ", missings)}");
-    }
-
     public Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId)
     {
         return unitOfWork.Lessons.SelectAllAsQueryable(l => l.CourseId == courseId)
@@ -158,5 +144,73 @@ public class LessonService(
                 HomeTaskStatus = l.HomeTaskStatus
             })
             .ToListAsync();
+    }
+
+    public async Task<List<StudentAttendanceModel>> GetCourseStudentsForCheckUpAsync(int lessonId)
+    {
+        var lesson = await unitOfWork.Lessons
+            .SelectAsync(l => l.Id == lessonId);
+
+        if (lesson.IsAttended)
+        {
+            var studentAttendaceData = await unitOfWork.LessonAttendances
+                .SelectAllAsQueryable(la => la.LessonId == lesson.Id)
+                .Select(l => new StudentAttendanceModel
+                {
+                    StudentId = l.StudentId,
+                    StudentName = $"{l.Student.User.FirstName} {l.Student.User.LastName}".Trim(),
+                    Status = l.Status,
+                    LateTimeInMinutes = l.LateTimeInMinutes
+                }).ToListAsync();
+
+            var studentIds = studentAttendaceData.Select(s => s.StudentId);
+
+            var lessonAttendances = await unitOfWork.Enrollments
+                .SelectAllAsQueryable(e => 
+                    e.CourseId == lesson.CourseId && 
+                    !studentIds.Contains(e.StudentId) &&
+                    e.Status != EnrollmentStatus.Dropped && 
+                    e.Status != EnrollmentStatus.Completed)
+                .Select(l => new StudentAttendanceModel
+                {
+                    StudentId = l.StudentId,
+                    StudentName = $"{l.Student.User.FirstName} {l.Student.User.LastName}".Trim(),
+                    Status = l.Status == EnrollmentStatus.Frozen ? AttendanceStatus.Frozen : AttendanceStatus.None
+                })
+                .ToListAsync();
+
+            studentAttendaceData.AddRange(lessonAttendances);
+
+            return studentAttendaceData;
+        }
+        else
+        {
+            return await unitOfWork.Enrollments
+                .SelectAllAsQueryable(e => 
+                    e.CourseId == lesson.CourseId && 
+                    e.Status != EnrollmentStatus.Dropped && 
+                    e.Status != EnrollmentStatus.Completed)
+                .Select(l => new StudentAttendanceModel
+                {
+                    StudentId = l.StudentId,
+                    StudentName = $"{l.Student.User.FirstName} {l.Student.User.LastName}".Trim(),
+                    Status = l.Status == EnrollmentStatus.Frozen ? AttendanceStatus.Frozen : AttendanceStatus.None
+                })
+                .ToListAsync();
+        }
+    }
+
+    private async Task EnsureAllStudentsExistAsync(int courseId, IEnumerable<int> studentIds)
+    {
+        var enrollments = new HashSet<int>(
+            await unitOfWork.Courses.SelectAllAsQueryable(c => c.Id == courseId)
+            .SelectMany(c => c.Enrollments.Select(e => e.StudentId))
+            .FirstOrDefaultAsync());
+
+        //TODO:check for enrollment status too
+        var missings = studentIds.Where(id => !enrollments.Contains(id)).ToList();
+
+        if (missings.Count > 0)
+            throw new ArgumentIsNotValidException($"These students were not found for this course: {string.Join(", ", missings)}");
     }
 }

@@ -6,9 +6,7 @@ using Marqa.Shared.Models;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LessonsController(ILessonService lessonService) : Controller
+public class LessonsController(ILessonService lessonService) : BaseController
 {
     [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] LessonUpdateModel model)
@@ -22,7 +20,7 @@ public class LessonsController(ILessonService lessonService) : Controller
         });
     }
    
-    [HttpPost("Check-up")]
+    [HttpPost("check-up")]
     public async Task<IActionResult> CheckUpAsync(LessonAttendanceModel model)
     {
         await lessonService.CheckUpAsync(model);
@@ -31,6 +29,19 @@ public class LessonsController(ILessonService lessonService) : Controller
         {
             StatusCode = 200,
             Message = "success",
+        });
+    }
+
+    [HttpPost("{id:int}/students")]
+    public async Task<IActionResult> GetStudentsAsync(int id)
+    {
+        var result = await lessonService.GetCourseStudentsForCheckUpAsync(id);
+
+        return Ok(new Response<List<StudentAttendanceModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
         });
     }
 }
