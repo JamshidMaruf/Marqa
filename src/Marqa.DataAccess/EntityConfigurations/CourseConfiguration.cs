@@ -1,4 +1,5 @@
 ﻿using Marqa.Domain.Entities;
+using Marqa.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +9,8 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
     public void Configure(EntityTypeBuilder<Course> builder)
     {
+        builder.HasQueryFilter(c => c.Status != CourseStatus.Merged);
+
         builder.Property<long>("RowVersion").HasDefaultValue(1).IsRowVersion();
 
         builder.Property(p => p.Description)

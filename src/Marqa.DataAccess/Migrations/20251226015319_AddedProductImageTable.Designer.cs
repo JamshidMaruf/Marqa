@@ -397,7 +397,7 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("status");
 
-                    b.Property<int>("StudentCount")
+                    b.Property<int>("CurrentStudentCount")
                         .HasColumnType("integer")
                         .HasColumnName("student_count");
 

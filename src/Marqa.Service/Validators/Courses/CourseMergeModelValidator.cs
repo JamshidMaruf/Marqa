@@ -12,11 +12,11 @@ public class CourseMergeModelValidator : AbstractValidator<CourseMergeModel>
             {
                 return await unitOfWork.Courses.CheckExistAsync(c => c.Id == id);
             }).WithMessage("FromCourseId does not exist");
+
         RuleFor(model => model.ToCourseId)
             .MustAsync(async (id, cancellation) =>
             {
                 return await unitOfWork.Courses.CheckExistAsync(c => c.Id == id);
             }).WithMessage("ToCourseId does not exist");
-        
     }
 }

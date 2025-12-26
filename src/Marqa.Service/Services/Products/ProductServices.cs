@@ -1,10 +1,7 @@
-﻿using System.ComponentModel;
-using System.Security.Cryptography.Xml;
-using FluentValidation;
+﻿using FluentValidation;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Services.Files.Models;
 using Marqa.Service.Services.Products.Models;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
@@ -13,7 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Products;
 
-public class ProductService(IUnitOfWork unitOfWork,
+public class ProductService(
+    IUnitOfWork unitOfWork,
     IPaginationService paginationService,
     IFileService fileService,
     IValidator<ProductCreateModel> productCreateValidator,

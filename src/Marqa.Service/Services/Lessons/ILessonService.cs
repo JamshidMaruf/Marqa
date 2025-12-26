@@ -12,5 +12,6 @@ public interface ILessonService : IScopedService
     Task VideoUploadAsync(int id, IFormFile video);
     Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId);
     Task<List<StudentAttendanceModel>> GetCourseStudentsForCheckUpAsync(int lessonId);
+    Task<List<CourseLesson>> GetCoursesLessonsAsync(DateOnly date);
 }
 

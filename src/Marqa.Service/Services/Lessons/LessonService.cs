@@ -213,4 +213,37 @@ public class LessonService(
         if (missings.Count > 0)
             throw new ArgumentIsNotValidException($"These students were not found for this course: {string.Join(", ", missings)}");
     }
+    public async Task<List<CourseLesson>> GetCoursesLessonsAsync(DateOnly date)
+    {
+        return await unitOfWork.Lessons
+            .SelectAllAsQueryable(l => l.Date == date)
+            .Select(l => new CourseLesson
+                {
+                    CourseId = l.CourseId,
+                    CourseName = l.Course.Name,
+
+                    TeacherId = l.TeacherId,
+                    TeacherName = l.Teachers
+                        .Where(t => t.TeacherId == l.TeacherId)
+                        .Select(t => t.Teacher.User.FirstName)
+                        .FirstOrDefault(),
+
+                    CourseStudentsCount = l.Course.MaxStudentCount,
+                    CoursePresentStudentsCount = l.Attendances
+                        .Count(a => a.Status == AttendanceStatus.Present),
+
+                    AttendPercentage = l.Course.MaxStudentCount == 0
+                        ? 0
+                        : Math.Round(
+                            (decimal)l.Attendances.Count(a => a.Status == AttendanceStatus.Present) * 100
+                            / l.Course.MaxStudentCount,
+                            2),
+
+                    IsCheckedUp = l.IsAttended,
+                    LessonId = l.Id,
+                    LessonNumber = l.Number
+                })
+            .ToListAsync();
+    }
+
 }
