@@ -63,6 +63,7 @@ public interface IUnitOfWork : IDisposable
 
     // 11. E-commerce (Shop and Orders)
     IRepository<Product> Products { get; }
+    IRepository<ProductImage> ProductImages { get; }
     IRepository<Order> Orders { get; }
     IRepository<OrderItem> OrderItems { get; }
     IRepository<Basket> Baskets { get; }

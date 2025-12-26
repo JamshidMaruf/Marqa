@@ -15,7 +15,7 @@ namespace Marqa.Service.Services.Products
             int companyId, 
             PaginationParams @params, 
             string search = null);
-        Task UploadPictureAsync(int productId, IFormFile file);
+        Task UploadPictureAsync(int productId, List<IFormFile> files);
         Task RemoveImageAsync(int productId, int imageId);
     }
 }

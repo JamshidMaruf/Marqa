@@ -14,12 +14,17 @@ public class OrderViewModel
     {
         public int ProductId { get; set; }
         public string ProductName { get; set; }
-        public string ProductImageName { get; set; }
-        public string ProductImagePath { get; set; }
-        public string ProductImageExtension { get; set; }
+        public IEnumerable<ProductImageInfo> ProductImages { get; set; }
         public string ProductDescription { get; set; }
         public int Quantity { get; set; }
         public int Price { get; set; }
         public int InlinePrice {  get; set; }
+    }
+
+    public class ProductImageInfo
+    {
+        public string ProductImageName { get; set; }
+        public string ProductImagePath { get; set; }
+        public string ProductImageExtension { get; set; }
     }
 }
