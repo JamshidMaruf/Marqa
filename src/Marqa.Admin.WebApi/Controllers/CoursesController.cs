@@ -106,7 +106,6 @@ public class CoursesController(ICourseService courseService) : BaseController
             Data = courses
         });
     }
-
     
     [HttpGet("upcomings/{courseId:int}/students")]
     public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
@@ -156,6 +155,31 @@ public class CoursesController(ICourseService courseService) : BaseController
             StatusCode = 200,
             Message = "success",
             Data = result
+        });
+    }
+
+    [HttpPost("merge")]
+    public async Task<IActionResult> MergeAsync([FromBody] CourseMergeModel model)
+    {
+        await courseService.MergeAsync(model);
+
+        return Ok(new Response
+        {
+            StatusCode = 200,
+            Message = "courses merged successfully"
+        });
+    }
+
+    [HttpGet("merged/{companyId:int}")]
+    public async Task<IActionResult> GetAllMergedAsync(int companyId, [FromQuery] PaginationParams @params)
+    {
+        var courses = await courseService.GetMergedCoursesAsync(companyId, @params);
+
+        return Ok(new Response<List<MergedCourseViewModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = courses
         });
     }
 }

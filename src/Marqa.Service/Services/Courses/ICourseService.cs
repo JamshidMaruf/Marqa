@@ -15,22 +15,20 @@ public interface ICourseService : IScopedService
     Task MergeAsync(CourseMergeModel model);
     Task<List<CourseTableViewModel>> GetAllAsync(PaginationParams @params,int companyId, string search, CourseStatus? status);
     Task<List<CourseMinimalListModel>> GetMinimalListAsync(int companyId);
-    Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); // for mobile
-    
+
     /// <summary>
     /// returns all student active courses
     /// </summary>
     /// <param name="studentId"></param>
     /// <returns></returns>
-    Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); // for dashboard panel
-    Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId); // for dashboard panel  
-    Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);  // for mobile
+    Task<List<CourseNamesModel>> GetAllStudentCourseNamesAsync(int studentId); 
+    Task<List<CourseMinimalListModel>> GetUnEnrolledStudentCoursesAsync(int studentId, int companyId);
     Task<List<CourseNamesModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
     Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId);
+    Task<List<MergedCourseViewModel>> GetMergedCoursesAsync(int companyId, PaginationParams @params);
     Task<List<StudentList>> GetStudentsListAsync(int courseId);
     Task CreateTeacherAssessmentAsync(TeacherAssessment model);
-
     /// <summary>
     /// This method bulk enrolls students into a course based on the provided model.
     /// </summary>
@@ -38,4 +36,10 @@ public interface ICourseService : IScopedService
     /// <returns></returns>
     Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model);
     Task<CoursesStatistics> GetStatisticsAsync(int companyId);
+
+
+    #region ForStudentMobile
+    Task<List<MainPageCourseViewModel>> GetCoursesByStudentIdAsync(int studentId); 
+    Task<List<CoursePageCourseViewModel>> GetCourseNamesByStudentIdAsync(int studentId);
+    #endregion
 }
