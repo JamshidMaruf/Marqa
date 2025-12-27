@@ -17,5 +17,15 @@ public class CourseUpdateModelValidator : AbstractValidator<CourseUpdateModel>
 
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
         RuleFor(c => c.MaxStudentCount).GreaterThan(0);
+        RuleFor(c => c.StartDate).Must(BeValidDate)
+                .WithMessage("StartDate not in the weekdays you have chosen!");
+    }
+
+    public bool BeValidDate(CourseUpdateModel model, DateOnly startDate)
+    {
+        if (!model.Weekdays.Select(w => w.DayOfWeek).Contains(startDate.DayOfWeek))
+            return false;
+
+        return true;
     }
 }
