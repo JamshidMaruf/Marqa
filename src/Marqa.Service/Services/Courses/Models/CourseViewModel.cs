@@ -18,26 +18,4 @@ public class CourseViewModel
     public string Description { get; set; }
     public IEnumerable<WeekInfo> Weekdays { get; set; }
     public IEnumerable<LessonInfo> Lessons { get; set; }
-
-    public class WeekInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class TeacherInfo
-    {
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
-    
-    public class LessonInfo
-    {
-        public int Id { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
-        public DateOnly Date { get; set; }
-        public string Room { get; set; }
-    }
 }

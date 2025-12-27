@@ -241,19 +241,19 @@ public class CourseService(IUnitOfWork unitOfWork,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = enumService.GetEnumDescription(w.Weekday),
                 })
                 .ToList(),
-                Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
+                Lessons = c.Lessons.Select(cl => new LessonInfo
                 {
                     Id = cl.Id,
                     Date = cl.Date,
@@ -283,20 +283,20 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Price = c.Price,
                 Description = c.Description,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseUpdateViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = enumService.GetEnumDescription(w.Weekday),
                     StartTime = w.StartTime,
                     EndTime = w.EndTime
                 }),
-                Lessons = c.Lessons.Select(cl => new CourseUpdateViewModel.LessonInfo
+                Lessons = c.Lessons.Select(cl => new LessonInfo
                 {
                     Id = cl.Id,
                     Date = cl.Date,
@@ -352,13 +352,13 @@ public class CourseService(IUnitOfWork unitOfWork,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseTableViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseTableViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = enumService.GetEnumDescription(w.Weekday),

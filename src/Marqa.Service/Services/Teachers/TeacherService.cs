@@ -300,6 +300,22 @@ public class TeacherService(
         return teachers;
     }
 
+    public async Task<List<TeacherMinimalListModel>> GetMinimalListAsync(int companyId)
+    {
+        return await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId, includes: "User")
+            .OrderBy(t => t.User.LastName)
+            .ThenBy(t => t.User.FirstName)
+            .Select(t => new TeacherMinimalListModel
+            {
+                Id = t.Id,
+                FirstName = t.User.FirstName,
+                LastName = t.User.LastName,
+                TypeName = t.Type.ToString()
+            })
+            .ToListAsync();
+    }
+
     public async Task<CalculatedTeacherSalaryModel> CalculateTeacherSalaryAsync(int teacherId, int year, Month month)
     {
         var teacher = await unitOfWork.Teachers.SelectAsync(t => t.Id == teacherId)
