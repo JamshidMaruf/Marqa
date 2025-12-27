@@ -162,9 +162,12 @@ public class OrderService(IUnitOfWork unitOfWork,
             {
                 ProductId = ot.Product.Id,
                 ProductName = ot.Product.Name,
-                ProductImageName = ot.Product.Asset.FileName,
-                ProductImagePath = ot.Product.Asset.FilePath,
-                ProductImageExtension = ot.Product.Asset.FileExtension,
+                ProductImages = ot.Product.Images.Select(i => new OrderViewModel.ProductImageInfo
+                {
+                    ProductImageName = i.Image.FileName,
+                    ProductImagePath = i.Image.FilePath,
+                    ProductImageExtension = i.Image.FileExtension,
+                }),
                 ProductDescription = ot.Product.Description,
                 Quantity = ot.Quantity,
                 Price = ot.Price,
@@ -190,14 +193,18 @@ public class OrderService(IUnitOfWork unitOfWork,
             {
                 ProductId = ot.Product.Id,
                 ProductName = ot.Product.Name,
-                ProductImageName = ot.Product.Asset.FileName,
-                ProductImagePath = ot.Product.Asset.FilePath,
-                ProductImageExtension = ot.Product.Asset.FileExtension,
+                ProductImages = ot.Product.Images.Select(i => new OrderViewModel.ProductImageInfo
+                {
+                    ProductImageName = i.Image.FileName,
+                    ProductImagePath = i.Image.FilePath,
+                    ProductImageExtension = i.Image.FileExtension,
+                }),
                 ProductDescription = ot.Product.Description,
                 Quantity = ot.Quantity,
                 Price = ot.Price,
                 InlinePrice = ot.InlinePrice
-            }).ToList()
+            })
+            .ToList()
         }).ToList();
     }
 

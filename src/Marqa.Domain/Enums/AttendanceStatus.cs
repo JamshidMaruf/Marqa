@@ -9,5 +9,5 @@ public enum AttendanceStatus
     [Description("Kechikkan")] Late = 2,
     [Description("Kelmagan")] Absent = 3,
     [Description("Sababli")] Excused = 4,
-    [Description("Muzlatilgan")] Fronzen = 5,
+    [Description("Muzlatilgan")] Frozen = 5
 }

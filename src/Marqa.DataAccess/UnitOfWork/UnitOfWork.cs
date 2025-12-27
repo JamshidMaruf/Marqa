@@ -66,6 +66,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     // 11. E-commerce (Shop and Orders)
     public IRepository<Product> Products { get; } = new Repository<Product>(context);
+    public IRepository<ProductImage> ProductImages { get; } = new Repository<ProductImage>(context);
     public IRepository<Order> Orders { get; } = new Repository<Order>(context);
     public IRepository<OrderItem> OrderItems { get; } = new Repository<OrderItem>(context);
     public IRepository<Basket> Baskets { get; } = new Repository<Basket>(context);
@@ -85,7 +86,6 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     // 15. Security and OTP
     public IRepository<OTP> OTPs { get; } = new Repository<OTP>(context);
-
 
 
     public async Task SaveAsync()

@@ -339,6 +339,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
+                    b.Property<int>("CurrentStudentCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("current_student_count");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
@@ -394,10 +398,6 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("status");
 
-                    b.Property<int>("StudentCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("student_count");
-
                     b.Property<string>("Subject")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -421,6 +421,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 1,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentStudentCount = 3,
                             EndDate = new DateOnly(2024, 6, 15),
                             IsDeleted = false,
                             LessonCount = 0,
@@ -430,7 +431,6 @@ namespace Marqa.DataAccess.Migrations
                             Price = 500000m,
                             StartDate = new DateOnly(2024, 1, 15),
                             Status = 1,
-                            StudentCount = 3,
                             Subject = "English",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -439,6 +439,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 2,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentStudentCount = 2,
                             EndDate = new DateOnly(2024, 7, 1),
                             IsDeleted = false,
                             LessonCount = 0,
@@ -448,7 +449,6 @@ namespace Marqa.DataAccess.Migrations
                             Price = 600000m,
                             StartDate = new DateOnly(2024, 2, 1),
                             Status = 1,
-                            StudentCount = 2,
                             Subject = "English",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -457,6 +457,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 3,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentStudentCount = 2,
                             EndDate = new DateOnly(2024, 6, 20),
                             IsDeleted = false,
                             LessonCount = 0,
@@ -466,7 +467,6 @@ namespace Marqa.DataAccess.Migrations
                             Price = 550000m,
                             StartDate = new DateOnly(2024, 1, 20),
                             Status = 1,
-                            StudentCount = 2,
                             Subject = "Mathematics",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -475,6 +475,7 @@ namespace Marqa.DataAccess.Migrations
                             Id = 4,
                             CompanyId = 1,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CurrentStudentCount = 1,
                             EndDate = new DateOnly(2024, 8, 1),
                             IsDeleted = false,
                             LessonCount = 0,
@@ -484,7 +485,6 @@ namespace Marqa.DataAccess.Migrations
                             Price = 700000m,
                             StartDate = new DateOnly(2024, 3, 1),
                             Status = 1,
-                            StudentCount = 1,
                             Subject = "Physics",
                             UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -2058,10 +2058,6 @@ namespace Marqa.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AssetId")
-                        .HasColumnType("integer")
-                        .HasColumnName("asset_id");
-
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer")
                         .HasColumnName("company_id");
@@ -2083,6 +2079,10 @@ namespace Marqa.DataAccess.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_deleted");
 
+                    b.Property<bool>("IsDisplayed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_displayed");
+
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
@@ -2099,9 +2099,6 @@ namespace Marqa.DataAccess.Migrations
                     b.HasKey("Id")
                         .HasName("pk_products");
 
-                    b.HasIndex("AssetId")
-                        .HasDatabaseName("ix_products_asset_id");
-
                     b.HasIndex("CompanyId")
                         .HasDatabaseName("ix_products_company_id");
 
@@ -2109,6 +2106,51 @@ namespace Marqa.DataAccess.Migrations
                         .HasDatabaseName("ix_products_name");
 
                     b.ToTable("products", (string)null);
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int>("ImageId")
+                        .HasColumnType("integer")
+                        .HasColumnName("image_id");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_product_images");
+
+                    b.HasIndex("ImageId")
+                        .HasDatabaseName("ix_product_images_image_id");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("ix_product_images_product_id");
+
+                    b.ToTable("product_images", (string)null);
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.RefreshToken", b =>
@@ -4070,13 +4112,6 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Product", b =>
                 {
-                    b.HasOne("Marqa.Domain.Entities.Asset", "Asset")
-                        .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_products_assets_asset_id");
-
                     b.HasOne("Marqa.Domain.Entities.Company", "Company")
                         .WithMany("Products")
                         .HasForeignKey("CompanyId")
@@ -4084,9 +4119,28 @@ namespace Marqa.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_products_companys_company_id");
 
-                    b.Navigation("Asset");
-
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Marqa.Domain.Entities.ProductImage", b =>
+                {
+                    b.HasOne("Marqa.Domain.Entities.Asset", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_images_assets_image_id");
+
+                    b.HasOne("Marqa.Domain.Entities.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_product_images_products_product_id");
+
+                    b.Navigation("Image");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Marqa.Domain.Entities.RefreshToken", b =>
@@ -4396,6 +4450,8 @@ namespace Marqa.DataAccess.Migrations
 
             modelBuilder.Entity("Marqa.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("OrderItems");
                 });
 

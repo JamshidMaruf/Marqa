@@ -56,10 +56,22 @@ public class EmployeesController(IEmployeeService employeeService) : BaseControl
         });
     }
 
-    [HttpGet("by-company/{companyId}")]    
-    public async Task<IActionResult> GetAllAsync(int companyId, [FromQuery] string? search)
+    [HttpGet("{id:int}/update")]
+    public async Task<IActionResult> GetForUpdateAsync(int id)
     {
-        var result = await employeeService.GetAllAsync(companyId, search);
+        var employee = await employeeService.GetForUpdateAsync(id);
+        return Ok(new Response<EmployeeViewModel>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = employee
+        });
+    }
+
+    [HttpGet("by-company/{companyId}")]    
+    public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params, int companyId, [FromQuery] string? search)
+    {
+        var result = await employeeService.GetAllAsync(@params, companyId, search);
 
         return Ok(new Response<IEnumerable<EmployeeViewModel>>
         {

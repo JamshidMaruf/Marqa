@@ -330,7 +330,7 @@ public class TeacherService(
 
         var activeCourses = await query.Select(la => la.Lesson.Course).Distinct().ToListAsync();
 
-        var activeStudentsCount = activeCourses.Sum(c => c.StudentCount);
+        var activeStudentsCount = activeCourses.Sum(c => c.CurrentStudentCount);
 
         var result = new CalculatedTeacherSalaryModel();
 
@@ -345,7 +345,7 @@ public class TeacherService(
                 {
                     CourseId = course.Id,
                     CourseName = course.Name,
-                    ActiveStudentsCount = course.StudentCount,
+                    ActiveStudentsCount = course.CurrentStudentCount,
                     FixSalary = Convert.ToDecimal(teacher.FixSalary)
                 });
 
@@ -360,12 +360,12 @@ public class TeacherService(
                 {
                     CourseId = course.Id,
                     CourseName = course.Name,
-                    ActiveStudentsCount = course.StudentCount,
+                    ActiveStudentsCount = course.CurrentStudentCount,
                     Percent = Convert.ToDecimal(teacher.SalaryPercentPerStudent),
-                    Total = Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
+                    Total = Convert.ToDecimal(((course.CurrentStudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
                 });
 
-                result.TotalSalary += Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
+                result.TotalSalary += Convert.ToDecimal(((course.CurrentStudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
             }
         }
         else if (teacher.PaymentType == TeacherSalaryType.Hourly)
@@ -391,7 +391,7 @@ public class TeacherService(
                 {
                     CourseId = course.Id,
                     CourseName = course.Name,
-                    ActiveStudentsCount = course.StudentCount,
+                    ActiveStudentsCount = course.CurrentStudentCount,
                     Hours = attendedLessonInHours,
                     Amount = Convert.ToDecimal(teacher.SalaryAmountPerHour),
                     Total = Convert.ToDecimal((decimal)attendedLessonInHours * teacher.SalaryAmountPerHour)
@@ -409,13 +409,13 @@ public class TeacherService(
                 {
                     CourseId = course.Id,
                     CourseName = course.Name,
-                    ActiveStudentsCount = course.StudentCount,
+                    ActiveStudentsCount = course.CurrentStudentCount,
                     FixSalary = Convert.ToDecimal(teacher.FixSalary),
                     Percent = Convert.ToInt32(teacher.SalaryPercentPerStudent),
-                    Total = Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
+                    Total = Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.CurrentStudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent)
                 });
 
-                result.TotalSalary += Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.StudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
+                result.TotalSalary += Convert.ToDecimal(teacher.FixSalary) + Convert.ToDecimal(((course.CurrentStudentCount * course.Price) / 100) * teacher.SalaryPercentPerStudent);
             }
         }
 

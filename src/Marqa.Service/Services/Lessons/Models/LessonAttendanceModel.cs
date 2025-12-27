@@ -5,7 +5,12 @@ namespace Marqa.Service.Services.Lessons.Models;
 public class LessonAttendanceModel
 {
     public int LessonId { get; set; }
-    public int StudentId { get; set; }
-    public AttendanceStatus Status { get; set; }
-    public int LateTimeInMinutes { get; set; }
+    public List<StudentData> Students { get; set; }
+
+    public class StudentData
+    {
+        public int Id { get; set; }
+        public AttendanceStatus Status { get; set; }
+        public int? LateTimeInMinutes { get; set; }
+    }
 }
