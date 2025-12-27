@@ -82,6 +82,8 @@ public class LessonService(
         var lesson = await unitOfWork.Lessons.SelectAsync(l => l.Id == model.LessonId)
             ?? throw new NotFoundException($"Lesson was not found with ID = {model.LessonId}");
 
+        EnsureAllStatusesValid(model);
+
         await EnsureAllStudentsExistAsync(lesson.CourseId, model.Students.Select(s => s.Id));
 
         if (lesson.Number == 1 && !lesson.IsAttended)
@@ -202,19 +204,6 @@ public class LessonService(
         }
     }
 
-    private async Task EnsureAllStudentsExistAsync(int courseId, IEnumerable<int> studentIds)
-    {
-        var enrollments = new HashSet<int>(
-            await unitOfWork.Courses.SelectAllAsQueryable(c => c.Id == courseId)
-            .Select(c => c.Enrollments.Select(e => e.StudentId))
-            .FirstOrDefaultAsync());
-
-        //TODO:check for enrollment status too for more data integrity
-        var missings = studentIds.Where(id => !enrollments.Contains(id)).ToList();
-
-        if (missings.Count > 0)
-            throw new ArgumentIsNotValidException($"These students were not found for this course: {string.Join(", ", missings)}");
-    }
     public async Task<List<CourseLesson>> GetCoursesLessonsAsync(DateOnly date)
     {
         return await unitOfWork.Lessons
@@ -279,5 +268,26 @@ public class LessonService(
             TotalAbsentStudentCount = totalAbsentStudentsCount,
             AttendancePercentage = attendancePercentage
         };
+    }
+
+    private async Task EnsureAllStudentsExistAsync(int courseId, IEnumerable<int> studentIds)
+    {
+        var enrollments = new HashSet<int>(
+            await unitOfWork.Courses.SelectAllAsQueryable(c => c.Id == courseId)
+            .Select(c => c.Enrollments.Select(e => e.StudentId))
+            .FirstOrDefaultAsync());
+
+        var missings = studentIds.Where(id => !enrollments.Contains(id)).ToList();
+
+        if (missings.Count > 0)
+            throw new ArgumentIsNotValidException($"These students were not found for this course: {string.Join(", ", missings)}");
+    }
+
+    private void EnsureAllStatusesValid(LessonAttendanceModel model)
+    {
+        if (model.Students.Any(s =>
+                s.Status == AttendanceStatus.None ||
+                s.Status == AttendanceStatus.Frozen))
+            throw new ArgumentIsNotValidException("Invalid status(es) inputed");
     }
 }
