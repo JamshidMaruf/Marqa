@@ -84,10 +84,12 @@ public class LessonService(
 
         await EnsureAllStudentsExistAsync(lesson.CourseId, model.Students.Select(s => s.Id));
 
-        if (lesson.Number == 1)
+        if (lesson.Number == 1 && !lesson.IsAttended)
         {
             var course = await unitOfWork.Courses.SelectAsync(c => c.Id == lesson.CourseId);
             course.Status = CourseStatus.Active;
+
+            unitOfWork.Courses.Update(course);
         }
 
         if (!lesson.IsCompleted)
@@ -204,10 +206,10 @@ public class LessonService(
     {
         var enrollments = new HashSet<int>(
             await unitOfWork.Courses.SelectAllAsQueryable(c => c.Id == courseId)
-            .SelectMany(c => c.Enrollments.Select(e => e.StudentId))
+            .Select(c => c.Enrollments.Select(e => e.StudentId))
             .FirstOrDefaultAsync());
 
-        //TODO:check for enrollment status too
+        //TODO:check for enrollment status too for more data integrity
         var missings = studentIds.Where(id => !enrollments.Contains(id)).ToList();
 
         if (missings.Count > 0)
