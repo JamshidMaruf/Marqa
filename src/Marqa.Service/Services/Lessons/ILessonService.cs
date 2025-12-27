@@ -13,5 +13,6 @@ public interface ILessonService : IScopedService
     Task<List<LessonViewModel>> GetByCourseIdAsync(int courseId);
     Task<List<StudentAttendanceModel>> GetCourseStudentsForCheckUpAsync(int lessonId);
     Task<List<CourseLesson>> GetCoursesLessonsAsync(DateOnly date);
+    Task<CurrentAttendanceStatistics> GetStatisticsAsync(int companyId);
 }
 
