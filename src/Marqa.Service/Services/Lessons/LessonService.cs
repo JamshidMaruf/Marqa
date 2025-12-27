@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
@@ -86,30 +87,14 @@ public class LessonService(
 
         await EnsureAllStudentsExistAsync(lesson.CourseId, model.Students.Select(s => s.Id));
 
-        if (lesson.Number == 1 && !lesson.IsAttended)
-        {
-            var course = await unitOfWork.Courses.SelectAsync(c => c.Id == lesson.CourseId);
-            course.Status = CourseStatus.Active;
-
-            unitOfWork.Courses.Update(course);
-        }
+        await EnsureCourseStatusIsActivatedWhenFirstLessonStartedAsync(lesson);
 
         if (!lesson.IsCompleted)
             lesson.IsCompleted = true;
 
         if (!lesson.IsAttended)
         {
-            foreach (var studentData in model.Students)
-            {
-                unitOfWork.LessonAttendances.Insert(new LessonAttendance
-                {
-                    LessonId = model.LessonId,
-                    StudentId = studentData.Id,
-                    Status = studentData.Status,
-                    LateTimeInMinutes = studentData.Status == AttendanceStatus.Late ? studentData.LateTimeInMinutes.Value : 0
-                });
-
-            }
+            CreateLessonAttendances(model);
 
             lesson.IsAttended = true;
             unitOfWork.Lessons.Update(lesson);
@@ -121,16 +106,9 @@ public class LessonService(
                     model.Students.Select(s => s.Id).Contains(la.StudentId))
                 .ToListAsync();
 
-            foreach (var lessonAttendance in lessonAttendances)
-            {
-                var student = model.Students.Where(s => s.Id == lessonAttendance.StudentId).FirstOrDefault()
-                    ?? throw new NotFoundException($"No Student was not found with ID {lessonAttendance.StudentId}");
+            InsertStudentsThatAreNotCheckedUp(lessonAttendances, model);
 
-                lessonAttendance.Status = student.Status;
-                lessonAttendance.LateTimeInMinutes = student.Status == AttendanceStatus.Late ? student.LateTimeInMinutes.Value : 0;
-            }
-
-            await unitOfWork.LessonAttendances.UpdateRangeAsync(lessonAttendances);
+            await UpdateStudentAttendanceStatusAsync(lessonAttendances, model);
         }
 
         await unitOfWork.SaveAsync();
@@ -170,10 +148,10 @@ public class LessonService(
             var studentIds = studentAttendaceData.Select(s => s.StudentId);
 
             var lessonAttendances = await unitOfWork.Enrollments
-                .SelectAllAsQueryable(e => 
-                    e.CourseId == lesson.CourseId && 
+                .SelectAllAsQueryable(e =>
+                    e.CourseId == lesson.CourseId &&
                     !studentIds.Contains(e.StudentId) &&
-                    e.Status != EnrollmentStatus.Dropped && 
+                    e.Status != EnrollmentStatus.Dropped &&
                     e.Status != EnrollmentStatus.Completed)
                 .Select(l => new StudentAttendanceModel
                 {
@@ -190,9 +168,9 @@ public class LessonService(
         else
         {
             return await unitOfWork.Enrollments
-                .SelectAllAsQueryable(e => 
-                    e.CourseId == lesson.CourseId && 
-                    e.Status != EnrollmentStatus.Dropped && 
+                .SelectAllAsQueryable(e =>
+                    e.CourseId == lesson.CourseId &&
+                    e.Status != EnrollmentStatus.Dropped &&
                     e.Status != EnrollmentStatus.Completed)
                 .Select(l => new StudentAttendanceModel
                 {
@@ -209,45 +187,45 @@ public class LessonService(
         return await unitOfWork.Lessons
             .SelectAllAsQueryable(l => l.Date == date)
             .Select(l => new CourseLesson
-                {
-                    CourseId = l.CourseId,
-                    CourseName = l.Course.Name,
+            {
+                CourseId = l.CourseId,
+                CourseName = l.Course.Name,
 
-                    TeacherId = l.TeacherId,
-                    TeacherName = l.Teachers
+                TeacherId = l.TeacherId,
+                TeacherName = l.Teachers
                         .Where(t => t.TeacherId == l.TeacherId)
                         .Select(t => t.Teacher.User.FirstName)
                         .FirstOrDefault(),
 
-                    CourseStudentsCount = l.Course.MaxStudentCount,
-                    CoursePresentStudentsCount = l.Attendances
+                CourseStudentsCount = l.Course.MaxStudentCount,
+                CoursePresentStudentsCount = l.Attendances
                         .Count(a => a.Status == AttendanceStatus.Present),
 
-                    AttendPercentage = l.Course.MaxStudentCount == 0
+                AttendPercentage = l.Course.MaxStudentCount == 0
                         ? 0
                         : Math.Round(
                             (decimal)l.Attendances.Count(a => a.Status == AttendanceStatus.Present) * 100
                             / l.Course.MaxStudentCount,
                             2),
 
-                    IsCheckedUp = l.IsAttended,
-                    LessonId = l.Id,
-                    LessonNumber = l.Number
-                })
+                IsCheckedUp = l.IsAttended,
+                LessonId = l.Id,
+                LessonNumber = l.Number
+            })
             .ToListAsync();
     }
 
     public async Task<CurrentAttendanceStatistics> GetStatisticsAsync(int companyId)
     {
         var totalStudentsCount = await unitOfWork.Students
-            .SelectAllAsQueryable(s =>  s.CompanyId == companyId && 
+            .SelectAllAsQueryable(s => s.CompanyId == companyId &&
             s.Status == StudentStatus.Active).CountAsync();
 
         var totalPresentStudentsCount = await unitOfWork.LessonAttendances
-            .SelectAllAsQueryable(la => 
+            .SelectAllAsQueryable(la =>
                 la.Student.CompanyId == companyId &&
                 la.Lesson.Date == DateOnly.FromDateTime(DateTime.UtcNow) &&
-                (la.Status == AttendanceStatus.Present || 
+                (la.Status == AttendanceStatus.Present ||
                 la.Status == AttendanceStatus.Late))
             .CountAsync();
 
@@ -290,4 +268,68 @@ public class LessonService(
                 s.Status == AttendanceStatus.Frozen))
             throw new ArgumentIsNotValidException("Invalid status(es) inputed");
     }
+
+    #region CheckUpChunks
+    private void CreateLessonAttendances(LessonAttendanceModel model)
+    {
+        foreach (var studentData in model.Students)
+        {
+            unitOfWork.LessonAttendances.Insert(new LessonAttendance
+            {
+                LessonId = model.LessonId,
+                StudentId = studentData.Id,
+                Status = studentData.Status,
+                LateTimeInMinutes = studentData.Status == AttendanceStatus.Late ? studentData.LateTimeInMinutes.Value : 0
+            });
+        }
+    }
+
+    private async Task EnsureCourseStatusIsActivatedWhenFirstLessonStartedAsync(Lesson lesson)
+    {
+        if (lesson.Number == 1 && !lesson.IsAttended)
+        {
+            var course = await unitOfWork.Courses.SelectAsync(c => c.Id == lesson.CourseId);
+            course.Status = CourseStatus.Active;
+
+            unitOfWork.Courses.Update(course);
+        }
+    }
+
+    private void InsertStudentsThatAreNotCheckedUp(List<LessonAttendance> lessonAttendances, LessonAttendanceModel model)
+    {
+        var attendedStudentIds = lessonAttendances.Select(l => l.StudentId);
+        var missingStudents = model.Students.Where(s => !attendedStudentIds.Contains(s.Id));
+
+        if (missingStudents.Any())
+        {
+            foreach (var missingStudent in missingStudents)
+            {
+                unitOfWork.LessonAttendances.Insert(new LessonAttendance
+                {
+                    LessonId = model.LessonId,
+                    StudentId = missingStudent.Id,
+                    Status = missingStudent.Status,
+                    LateTimeInMinutes = missingStudent.Status == AttendanceStatus.Late ? missingStudent.LateTimeInMinutes.Value : 0
+                });
+
+            }
+        }
+    }
+
+    private async Task UpdateStudentAttendanceStatusAsync(List<LessonAttendance> lessonAttendances, LessonAttendanceModel model)
+    {
+        foreach (var lessonAttendance in lessonAttendances)
+        {
+            var student = model.Students.Where(s => s.Id == lessonAttendance.StudentId).FirstOrDefault();
+
+            if (student != null)
+            {
+                lessonAttendance.Status = student.Status;
+                lessonAttendance.LateTimeInMinutes = student.Status == AttendanceStatus.Late ? student.LateTimeInMinutes.Value : 0;
+            }
+        }
+        if (lessonAttendances.Count > 0)
+            await unitOfWork.LessonAttendances.UpdateRangeAsync(lessonAttendances);
+    }
+    #endregion
 }
