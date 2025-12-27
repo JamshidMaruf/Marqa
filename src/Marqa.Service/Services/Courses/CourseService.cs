@@ -10,6 +10,7 @@ using Marqa.Service.Services.Enums;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.WebEncoders;
 
 namespace Marqa.Service.Services.Courses;
 
@@ -85,8 +86,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                 model.Room,
                 model.TeacherIds,
                 weekDays);
-
-            await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
         }
@@ -190,8 +189,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                model.Room,
                model.TeacherIds,
                model.Weekdays);
-
-            await unitOfWork.SaveAsync();
 
             await transaction.CommitAsync();
         }
@@ -393,12 +390,12 @@ public class CourseService(IUnitOfWork unitOfWork,
                  includes: "Enrollments").ToListAsync();
 
 
-         return courses.Where(c => !c.Enrollments.Any(e => e.StudentId == studentId))
-            .Select(c => new CourseMinimalListModel
-            { 
-                Id = c.Id,
-                Name = c.Name
-            }).ToList();
+        return courses.Where(c => !c.Enrollments.Any(e => e.StudentId == studentId))
+           .Select(c => new CourseMinimalListModel
+           {
+               Id = c.Id,
+               Name = c.Name
+           }).ToList();
     }
 
     public async Task<List<CourseNamesModel>> GetActiveStudentCoursesAsync(int studentId)
@@ -468,8 +465,8 @@ public class CourseService(IUnitOfWork unitOfWork,
     public async Task<List<MergedCourseViewModel>> GetMergedCoursesAsync(int companyId, PaginationParams @params)
     {
         var query = unitOfWork.Courses
-            .SelectAllAsQueryable(c => c.CompanyId == companyId && 
-            !c.IsDeleted && 
+            .SelectAllAsQueryable(c => c.CompanyId == companyId &&
+            !c.IsDeleted &&
             c.Status == CourseStatus.Merged)
             .IgnoreQueryFilters();
 
@@ -497,7 +494,7 @@ public class CourseService(IUnitOfWork unitOfWork,
                     Name = Enum.GetName(w.Weekday)
                 })
             })
-            .ToListAsync(); 
+            .ToListAsync();
     }
 
     public async Task<List<StudentList>> GetStudentsListAsync(int courseId)
@@ -607,71 +604,71 @@ public class CourseService(IUnitOfWork unitOfWork,
      List<CourseWeekdayModel> weekDays)
     {
         var lessons = new List<Lesson>();
-        var initialLesson = new Lesson
-        {
-            CourseId = courseId,
-            StartTime = weekDays[0].StartTime,
-            EndTime = weekDays[0].EndTime,
-            Room = room,
-            Number = 1,
-            Date = startDate,
-
-        };
-
-        lessons.Add(initialLesson);
-
         var lessonTeachers = new List<LessonTeacher>();
 
-        foreach (var teacherId in teacherIds)
+        var firstLessonWeekDay = weekDays.Find(c => c.DayOfWeek == startDate.DayOfWeek);
+        var firstLesson = new Lesson
         {
-            lessonTeachers.Add(new LessonTeacher
+            CourseId = courseId,
+            StartTime = firstLessonWeekDay.StartTime,
+            EndTime = firstLessonWeekDay.EndTime,
+            Room = room,
+            Number = 1,
+            Date = startDate
+        };
+
+        lessons.Add(firstLesson);
+
+        var lessonCount = 1;
+        var currentDate = startDate.AddDays(1);
+        int i = weekDays.IndexOf(firstLessonWeekDay);
+
+        while (currentDate < endDate)
+        {
+            i = (i < weekDays.Count - 1) ? i + 1 : 0;
+
+            while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
             {
-                TeacherId = teacherId,
-                LessonId = initialLesson.Id
+                currentDate = currentDate.AddDays(1);
+            }
+
+            if (currentDate > endDate)
+                break;
+
+            lessons.Add(new Lesson
+            {
+                CourseId = courseId,
+                StartTime = weekDays[i].StartTime,
+                EndTime = weekDays[i].EndTime,
+                Room = room,
+                Number = ++lessonCount,
+                Date = currentDate
             });
         }
 
-        await unitOfWork.LessonTeachers.InsertRangeAsync(lessonTeachers);
+        await unitOfWork.Lessons.InsertRangeAsync(lessons);
+        await unitOfWork.SaveAsync();
 
-        var lessonCount = 1;
-        var count = 2;
-        var currentDate = startDate;
-
-        await Task.Run(() =>
+        foreach (var lesson in lessons)
         {
-            while (currentDate <= endDate)
+            foreach (var teacherId in teacherIds)
             {
-                for (int i = count; i < weekDays.Count; i++)
+                lessonTeachers.Add(new LessonTeacher
                 {
-                    while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
-                    {
-                        currentDate = currentDate.AddDays(1);
-                    }
-                    lessons.Add(new Lesson
-                    {
-                        CourseId = courseId,
-                        StartTime = weekDays[i].StartTime,
-                        EndTime = weekDays[i].EndTime,
-                        Room = room,
-                        Number = i,
-                        Date = currentDate,
-                        Teachers = lessonTeachers
-                    });
-
-                    lessonCount++;
-                }
+                    TeacherId = teacherId,
+                    LessonId = lesson.Id
+                });
             }
-        });
+        }
 
         var course = await unitOfWork.Courses.SelectAsync(c => c.Id == courseId);
 
         course.LessonCount = lessonCount;
         unitOfWork.Courses.Update(course);
 
-        await unitOfWork.Lessons.InsertRangeAsync(lessons);
+        await unitOfWork.LessonTeachers.InsertRangeAsync(lessonTeachers);
+        await unitOfWork.SaveAsync();
     }
-
-
 
 
     #region ForStudentMobile

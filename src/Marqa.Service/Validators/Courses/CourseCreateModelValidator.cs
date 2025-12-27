@@ -9,9 +9,9 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
         RuleFor(c => c.CompanyId).GreaterThan(0)
             .WithMessage("Company ID must be greater than 0");
         RuleFor(c => c.CompanyId)
-            .MustAsync(async (companyid, cancellationToken) =>
+            .MustAsync(async (companyId, cancellationToken) =>
             {
-                return await unitOfWork.Companies.CheckExistAsync(ex => ex.Id == companyid);
+                return await unitOfWork.Companies.CheckExistAsync(ex => ex.Id == companyId);
             }).WithMessage("Company does not exist.");
 
         RuleForEach(c => c.TeacherIds)
@@ -23,5 +23,16 @@ public class CourseCreateModelValidator : AbstractValidator<CourseCreateModel>
 
         RuleFor(c => c.Name).NotEmpty().MaximumLength(255);
         RuleFor(c => c.MaxStudentCount).GreaterThan(0);
+
+        RuleFor(c => c.StartDate).Must(BeValidDate)
+            .WithMessage("StartDate not in the weekdays you have chosen!");
+    }
+
+    public bool BeValidDate(CourseCreateModel model, DateOnly startDate)
+    {
+        if (!model.Weekdays.Select(w => w.DayOfWeek).Contains(startDate.DayOfWeek))
+            return false;
+
+        return true;
     }
 }   
