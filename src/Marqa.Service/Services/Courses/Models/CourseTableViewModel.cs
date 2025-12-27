@@ -15,17 +15,4 @@ public class CourseTableViewModel
     public decimal Price { get; set; }
     public int MaxStudentCount { get; set; }
     public int AvailableStudentCount { get; set; }
-
-    public class WeekInfo
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class TeacherInfo
-    {
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
 }

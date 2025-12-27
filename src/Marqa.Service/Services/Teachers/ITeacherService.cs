@@ -16,5 +16,6 @@ public interface ITeacherService : IScopedService
     List<TeacherPaymentGetModel> GetTeacherPaymentTypes();
     Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId);
     Task<TeachersStatistics> GetStatisticsAsync(int companyId);
+    Task<List<TeacherMinimalListModel>> GetMinimalListAsync(int companyId);
 
 }

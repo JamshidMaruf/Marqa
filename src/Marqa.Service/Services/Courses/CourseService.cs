@@ -240,19 +240,19 @@ public class CourseService(IUnitOfWork unitOfWork,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
                 })
                 .ToList(),
-                Lessons = c.Lessons.Select(cl => new CourseViewModel.LessonInfo
+                Lessons = c.Lessons.Select(cl => new LessonInfo
                 {
                     Id = cl.Id,
                     Date = cl.Date,
@@ -282,20 +282,20 @@ public class CourseService(IUnitOfWork unitOfWork,
                 Price = c.Price,
                 Description = c.Description,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseUpdateViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseUpdateViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
                     StartTime = w.StartTime,
                     EndTime = w.EndTime
                 }),
-                Lessons = c.Lessons.Select(cl => new CourseUpdateViewModel.LessonInfo
+                Lessons = c.Lessons.Select(cl => new LessonInfo
                 {
                     Id = cl.Id,
                     Date = cl.Date,
@@ -343,13 +343,13 @@ public class CourseService(IUnitOfWork unitOfWork,
                 AvailableStudentCount = c.Enrollments.Count,
                 Price = c.Price,
                 Subject = c.Subject,
-                Teachers = c.CourseTeachers.Select(ct => new CourseTableViewModel.TeacherInfo
+                Teachers = c.CourseTeachers.Select(ct => new TeacherInfo
                 {
                     Id = ct.Teacher.Id,
                     FirstName = ct.Teacher.User.FirstName,
                     LastName = ct.Teacher.User.LastName
                 }),
-                Weekdays = c.CourseWeekdays.Select(w => new CourseTableViewModel.WeekInfo
+                Weekdays = c.CourseWeekdays.Select(w => new WeekInfo
                 {
                     Id = Convert.ToInt32(w.Weekday),
                     Name = Enum.GetName(w.Weekday),
@@ -479,18 +479,6 @@ public class CourseService(IUnitOfWork unitOfWork,
                        }).ToList()
                    }).FirstOrDefaultAsync()
                ?? throw new NotFoundException("Course was not found");
-    }
-
-    public async Task<List<StudentList>> GetStudentsListAsync(int courseId)
-    {
-        return await unitOfWork.Students
-            .SelectAllAsQueryable(s => s.Enrollments.Any(e => e.CourseId == courseId && e.Status == EnrollmentStatus.Active))
-            .Select(s => new StudentList
-            {
-                Id = s.Id,
-                FirstName = s.User.FirstName,
-                LastName = s.User.LastName
-            }).ToListAsync();
     }
 
     public async Task BulkEnrollStudentsAsync(BulkEnrollStudentsModel model)

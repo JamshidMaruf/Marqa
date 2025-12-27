@@ -3,6 +3,7 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
+using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students.Models;
@@ -520,5 +521,20 @@ public class StudentService(
         studentCourse.Status = status;
 
         await unitOfWork.SaveAsync();
+    }
+    
+    public async Task<List<StudentList>> GetMinimalListAsync(int companyId)
+    {
+        return await unitOfWork.Students
+            .SelectAllAsQueryable(s => 
+                s.CompanyId == companyId &&
+                s.Status == StudentStatus.Active && 
+                s.Status == StudentStatus.InActive)
+            .Select(s => new StudentList
+            {
+                Id = s.Id,
+                FirstName = s.User.FirstName,
+                LastName = s.User.LastName
+            }).ToListAsync();
     }
 }

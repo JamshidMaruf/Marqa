@@ -27,7 +27,6 @@ public interface ICourseService : IScopedService
     Task<List<CourseNamesModel>> GetActiveStudentCoursesAsync(int studentId);
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
     Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId);
-    Task<List<StudentList>> GetStudentsListAsync(int courseId);
     Task CreateTeacherAssessmentAsync(TeacherAssessment model);
 
     /// <summary>

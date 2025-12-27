@@ -180,4 +180,18 @@ public class StudentsController(
             Data = result
         });
     }
+    
+    [HttpGet("minimal-list/company/{companyId:int}")]
+    [ProducesResponseType(typeof(Response<List<StudentList>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetStudentsListAsync(int companyId)
+    {
+        var students = await studentService.GetMinimalListAsync(companyId);
+        return Ok(new Response<List<StudentList>>
+        {
+            StatusCode = 200,
+            Message = "success", 
+            Data = students
+        });
+    }
+
 }

@@ -23,4 +23,6 @@ public interface IStudentService : IScopedService
         int? courseId = null,
         StudentFilteringStatus? status = null);
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);
+    Task<List<StudentList>> GetMinimalListAsync(int companyId);
+    
 }

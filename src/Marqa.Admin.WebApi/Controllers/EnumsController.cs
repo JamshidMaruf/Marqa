@@ -188,4 +188,17 @@ public class EnumsController : BaseController
             Data = result
         });
     }
+    
+    [HttpGet("course-statuses")]
+    public IActionResult GetCourseStatuses()
+    {
+        var result = _enumService.GetEnumValues<CourseStatus>();
+
+        return Ok(new Response<List<EnumGetModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
 }

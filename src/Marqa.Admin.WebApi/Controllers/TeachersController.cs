@@ -91,6 +91,20 @@ public class TeachersController(ITeacherService teacherService) : BaseController
         });
     }
     
+    [HttpGet("minimal-list/company/{companyId:int}")]
+    [ProducesResponseType(typeof(Response<List<TeacherMinimalListModel>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTeacherListAsync(int companyId)
+    {
+        var result = await teacherService.GetMinimalListAsync(companyId);
+
+        return Ok(new Response<List<TeacherMinimalListModel>>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+    
     [HttpGet("teachers/payment-types")]
     [ProducesResponseType(typeof(Response<List<TeacherPaymentGetModel>>), StatusCodes.Status200OK)]
     public IActionResult GetTeacherPaymentTypes()

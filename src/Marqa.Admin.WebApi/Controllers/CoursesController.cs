@@ -20,7 +20,6 @@ public class CoursesController(ICourseService courseService) : BaseController
             Message = "success"
         });
     }
-
     
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] CourseUpdateModel model)
@@ -33,7 +32,6 @@ public class CoursesController(ICourseService courseService) : BaseController
             Message = "success"
         });
     }
-
     
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
@@ -46,9 +44,9 @@ public class CoursesController(ICourseService courseService) : BaseController
             Message = "success"
         });
     }
-
     
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(Response<CourseViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAsync(int id)
     {
         var course = await courseService.GetAsync(id);
@@ -60,9 +58,9 @@ public class CoursesController(ICourseService courseService) : BaseController
             Data = course
         });
     }
-
     
     [HttpGet("{id:int}/update")]
+    [ProducesResponseType(typeof(Response<CourseUpdateViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByUpdateAsync(int id)
     {
         var course = await courseService.GetForUpdateAsync(id);
@@ -74,9 +72,9 @@ public class CoursesController(ICourseService courseService) : BaseController
             Data = course
         });
     }
-
     
-    [HttpGet("companies/{companyId:int}")]
+    [HttpGet("company/{companyId:int}")]
+    [ProducesResponseType(typeof(Response<List<CourseTableViewModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync(
         int companyId,
         [FromQuery] PaginationParams @params,
@@ -93,8 +91,8 @@ public class CoursesController(ICourseService courseService) : BaseController
         });
     }
     
-    
     [HttpGet("minimal-list/{companyId:int}")]
+    [ProducesResponseType(typeof(Response<List<CourseMinimalListModel>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAsync(int companyId)
     {
         var courses = await courseService.GetMinimalListAsync(companyId);
@@ -106,9 +104,9 @@ public class CoursesController(ICourseService courseService) : BaseController
             Data = courses
         });
     }
-
     
     [HttpGet("upcomings/{courseId:int}/students")]
+    [ProducesResponseType(typeof(Response<UpcomingCourseViewModel>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUpcomingCourseStudentsAsync(int courseId)
     {
         var course = await courseService.GetUpcomingCourseStudentsAsync(courseId);
@@ -119,20 +117,6 @@ public class CoursesController(ICourseService courseService) : BaseController
             Data = course
         });
     }
-
-    
-    [HttpGet("list/{courseId:int}/students")]
-    public async Task<IActionResult> GetStudentsListAsync(int courseId)
-    {
-        var students = await courseService.GetStudentsListAsync(courseId);
-        return Ok(new Response<List<StudentList>>
-        {
-            StatusCode = 200,
-            Message = "success", 
-            Data = students
-        });
-    }
-
     
     [HttpPost("bulk-enroll-students")]
     public async Task<IActionResult> BulkEnrollStudentsAsync([FromBody] BulkEnrollStudentsModel model)
@@ -147,6 +131,7 @@ public class CoursesController(ICourseService courseService) : BaseController
     }
 
     [HttpGet("{companyId:int}/statistics")]
+    [ProducesResponseType(typeof(Response<CoursesStatistics>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStatisticsAsync(int companyId)
     {
         var result = await courseService.GetStatisticsAsync(companyId);
