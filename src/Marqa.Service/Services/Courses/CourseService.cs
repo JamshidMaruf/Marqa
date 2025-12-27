@@ -623,31 +623,28 @@ public class CourseService(IUnitOfWork unitOfWork,
         var currentDate = startDate.AddDays(1);
         int i = weekDays.IndexOf(firstLessonWeekDay);
 
-        await Task.Run(() =>
+        while (currentDate < endDate)
         {
-            while (currentDate < endDate)
+            i = (i < weekDays.Count - 1) ? i + 1 : 0;
+
+            while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
             {
-                i = (i < weekDays.Count - 1) ? i + 1 : 0;
-
-                while (weekDays[i].DayOfWeek != currentDate.DayOfWeek)
-                {
-                    currentDate = currentDate.AddDays(1);
-                }
-
-                if (currentDate > endDate)
-                    break;
-
-                lessons.Add(new Lesson
-                {
-                    CourseId = courseId,
-                    StartTime = weekDays[i].StartTime,
-                    EndTime = weekDays[i].EndTime,
-                    Room = room,
-                    Number = ++lessonCount,
-                    Date = currentDate
-                });
+                currentDate = currentDate.AddDays(1);
             }
-        });
+
+            if (currentDate > endDate)
+                break;
+
+            lessons.Add(new Lesson
+            {
+                CourseId = courseId,
+                StartTime = weekDays[i].StartTime,
+                EndTime = weekDays[i].EndTime,
+                Room = room,
+                Number = ++lessonCount,
+                Date = currentDate
+            });
+        }
 
         await unitOfWork.Lessons.InsertRangeAsync(lessons);
         await unitOfWork.SaveAsync();
