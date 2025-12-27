@@ -10,7 +10,6 @@ using Marqa.Service.Services.Enums;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.WebEncoders;
 
 namespace Marqa.Service.Services.Courses;
 
@@ -623,7 +622,7 @@ public class CourseService(IUnitOfWork unitOfWork,
         var currentDate = startDate.AddDays(1);
         int i = weekDays.IndexOf(firstLessonWeekDay);
 
-        while (currentDate < endDate)
+        while (currentDate <= endDate)
         {
             i = (i < weekDays.Count - 1) ? i + 1 : 0;
 
