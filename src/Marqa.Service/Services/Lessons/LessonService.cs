@@ -246,4 +246,36 @@ public class LessonService(
             .ToListAsync();
     }
 
+    public async Task<CurrentAttendanceStatistics> GetStatisticsAsync(int companyId)
+    {
+        var totalStudentsCount = await unitOfWork.Students
+            .SelectAllAsQueryable(s =>  s.CompanyId == companyId && 
+            s.Status == StudentStatus.Active).CountAsync();
+
+        var totalPresentStudentsCount = await unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(la => 
+                la.Student.CompanyId == companyId &&
+                la.Lesson.Date == DateOnly.FromDateTime(DateTime.UtcNow) &&
+                (la.Status == AttendanceStatus.Present || 
+                la.Status == AttendanceStatus.Late))
+            .CountAsync();
+
+        var totalAbsentStudentsCount = await unitOfWork.LessonAttendances
+            .SelectAllAsQueryable(la =>
+                la.Student.CompanyId == companyId &&
+                la.Lesson.Date == DateOnly.FromDateTime(DateTime.UtcNow) &&
+                (la.Status == AttendanceStatus.Absent ||
+                la.Status == AttendanceStatus.Excused))
+            .CountAsync();
+
+        var attendancePercentage = Math.Round((((double)totalPresentStudentsCount / totalStudentsCount) * 100), 1);
+
+        return new CurrentAttendanceStatistics
+        {
+            TotalStudentCount = totalStudentsCount,
+            TotalPresentStudentCount = totalPresentStudentsCount,
+            TotalAbsentStudentCount = totalAbsentStudentsCount,
+            AttendancePercentage = attendancePercentage
+        };
+    }
 }
