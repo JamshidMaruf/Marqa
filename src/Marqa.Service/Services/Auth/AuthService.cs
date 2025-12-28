@@ -10,10 +10,7 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Service.Services.Settings;
-using Marqa.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Marqa.Service.Services.Auth;
 

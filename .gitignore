@@ -401,15 +401,13 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
-*.sln.iml
-/src/Presentation/Nop.Web/App_Data/appsettings.json
-/src/Presentation/Nop.Web/wwwroot/images/thumbs
-/src/Presentation/Nop.Web/App_Data/DataProtectionKeys
-/src/Presentation/Nop.Web/Plugins/GetDataProduct.Onec
-/src/Presentation/Nop.Web/Plugins
+
+appsettings.json
+appsettings.Development.json
+appsettings.*.json
+!appsettings.example.json
 
 /docker-compose.yml
 /.github/
 /docker-compose.yml
 /.github/workflows/pipeline.yml
-/src/Presentation/Nop.Web/App_Data/appsettings.json
