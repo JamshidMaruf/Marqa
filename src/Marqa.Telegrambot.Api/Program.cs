@@ -3,18 +3,19 @@ using Marqa.DataAccess.Contexts;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
 using Marqa.Service.Services;
-using Marqa.Service.Services.Employees;
-using Marqa.Service.Services.Messages;
-using Marqa.Service.Services.Settings;
-using Marqa.Service.Services.Students;
-using Marqa.Service.Services.Users;
 using Marqa.Service.Validators.Companies;
 using Marqa.Shared.Services;
 using Marqa.Telegrambot.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddLogging();
+
+//builder.Host.UseSerilog((context, configuration) =>
+//    configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddHostedService<ConfigureWebhook>();
 
@@ -62,22 +63,12 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 
 app.UseCors();
 
-app.UseEndpoints(endpoints =>
-{
-    var token = builder.Configuration["BotConfiguration:Token"];
-
-    endpoints?.MapControllerRoute(
-        name: "tgwebhook",
-        pattern: $"bot/{token}",
-        new { controller = "TelegramWebhook", action = "Post" });
-});
-
+app.MapGet("/", () => "NGROK OK");
 app.MapControllers();
-
 app.Run();

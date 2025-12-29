@@ -2,6 +2,7 @@
 using System.Text;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Messages.Models;
 using Marqa.Service.Services.Settings;
@@ -53,11 +54,15 @@ public class SmsService(
         return (entity.Id, entity.Type);
     }
 
-    public async Task<(string otp, bool doesExist)> GetOTPForTelegramBotAsync(string phone)
+    public async Task<(string otp, bool doesExist)> GetOTPForTelegramBotAsync(string phone, long chatId)
     {
-        var doesExist = await unitOfWork.Users.CheckExistAsync(u => u.Phone == phone);
+        var trimmedPhone = phone.TrimPhoneNumber();
+        if (!trimmedPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Phone is not valid");
 
-        if (!doesExist)
+        var user = await unitOfWork.Users.SelectAsync(u => u.Phone == trimmedPhone.Phone);
+
+        if (user == null)
             return (null, false);
 
         var otp = GenerateSixDigitNumber();
@@ -68,6 +73,10 @@ public class SmsService(
             Code = otp,
             ExpiryDate = DateTime.UtcNow.AddMinutes(2),
         });
+
+        user.TelegramChatId = chatId;
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveAsync();
 
         return (otp, true);
     }

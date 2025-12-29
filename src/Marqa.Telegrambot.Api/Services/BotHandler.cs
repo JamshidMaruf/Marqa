@@ -18,7 +18,7 @@ public class BotHandler(ILogger<BotHandler> logger,
         {
             UpdateType.Message => BotOnMessageRecievedAsync(update.Message),
 
-            UpdateType.CallbackQuery => BotOnCallbackQueryRecievedAsync(update.CallbackQuery),
+            //UpdateType.CallbackQuery => BotOnCallbackQueryRecievedAsync(update.CallbackQuery),
 
             _ => BotOnUnknownTypeRecievedAsync(update)
         };
@@ -29,13 +29,18 @@ public class BotHandler(ILogger<BotHandler> logger,
         }
         catch (Exception ex)
         {
-            await HandleErrorAsync(ex);
+            await HandleErrorAsync(ex, update);
         }
     }
 
-    public async Task HandleErrorAsync(Exception ex)
+    public async Task HandleErrorAsync(Exception ex, Update update)
     {
-        throw new NotImplementedException();
+        logger.LogError(ex.Message);
+
+        await botClient.SendMessage(
+               chatId: update.Message.Chat.Id,
+               text: $"{ex.Message}",
+               parseMode: ParseMode.Markdown);
     }
 
     private async Task BotOnMessageRecievedAsync(Message message)
@@ -44,9 +49,9 @@ public class BotHandler(ILogger<BotHandler> logger,
 
         long chatId = message.Chat.Id;
         string userFirstName = message.From.FirstName;
-        string text = message.Text.Trim();
+        string text = message.Text != null ? message.Text.Trim() : string.Empty;
 
-        if (text.ToLower() == "/start" || text.ToLower() == "/restart")
+        if (text.ToLower() == "/start")
         {
             await HandleStartCommandAsync(chatId, userFirstName);
         }
@@ -86,7 +91,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                         ),
                         InlineKeyboardButton.WithCallbackData(
                             "Yangilash", $"{HandleLoginCommandAsync(chatId)}"
-                        )  
+                        )
                     );
 
                     await botClient.SendMessage(
@@ -94,7 +99,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                         text: $"🔒 Code: `{result.otp}`" +
                               "🔗 Click and Login: https:/taleem.uz",
                         replyMarkup: keyboard,
-                        parseMode: ParseMode.MarkdownV2);
+                        parseMode: ParseMode.Markdown);
                     return;
                 }
                 else
@@ -102,7 +107,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                     await botClient.SendMessage(
                         chatId: chatId,
                         text: $"❌ You are not unknown to this platform!",
-                        parseMode: ParseMode.MarkdownV2);
+                        parseMode: ParseMode.Markdown);
                     return;
                 }
             }
@@ -110,10 +115,10 @@ public class BotHandler(ILogger<BotHandler> logger,
             {
                 await botClient.SendMessage(
                     chatId: chatId,
-                    text: 
+                    text:
                         $"Eski kodingizni hali ham ishlatishingiz mumkin!\n" +
                         $"Agar yangi kod olishni istasangiz 2 daqiqa kuting!",
-                    parseMode: ParseMode.MarkdownV2);
+                    parseMode: ParseMode.Markdown);
                 return;
             }
         }
@@ -132,6 +137,7 @@ public class BotHandler(ILogger<BotHandler> logger,
         var phone = message.Contact.PhoneNumber;
         var telegramUserId = message.Contact.UserId;
 
+
         if (telegramUserId != message.From.Id)
         {
             await botClient.SendMessage(
@@ -140,17 +146,19 @@ public class BotHandler(ILogger<BotHandler> logger,
                    $"Bu sizning telefon raqamingiz emas!\n" +
                    $"This is not your phone number!\n" +
                    $"Это не ваш номер телефона!",
+               replyMarkup: new ReplyKeyboardRemove(),
                parseMode: ParseMode.Markdown);
             return;
         }
 
-        var result = await smsService.GetOTPForTelegramBotAsync(phone);
+        var result = await smsService.GetOTPForTelegramBotAsync(phone, long chatId);
 
         if (result.doesExist)
         {
             await botClient.SendMessage(
                 chatId: chatId,
                 text: $"`{result.otp}`",
+                replyMarkup: new ReplyKeyboardRemove(),
                 parseMode: ParseMode.MarkdownV2);
 
             await botClient.SendMessage(
@@ -158,7 +166,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                 text: $"🇺🇿\n🔑 Yangi kod olish uchun /login ni bosing" +
                       $"🇺🇸\n🔑 To get a new code click /login" +
                       $"🇷🇺\n🔑 Чтобы получить новый код, нажмите /login",
-                parseMode: ParseMode.MarkdownV2);
+                parseMode: ParseMode.Markdown);
             return;
         }
         else
@@ -166,7 +174,8 @@ public class BotHandler(ILogger<BotHandler> logger,
             await botClient.SendMessage(
                 chatId: chatId,
                 text: $"❌ You are unknown to this platform!",
-                parseMode: ParseMode.MarkdownV2);
+                replyMarkup: new ReplyKeyboardRemove(),
+                parseMode: ParseMode.Markdown);
             return;
         }
     }
@@ -200,7 +209,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                     $"Привет, {userFirstName} 😊\n" +
                     $"Добро пожаловать в официальный бот платформы Taleem!\n" +
                     $"⬇️ Отправьте ваш контакт",
-                    parseMode: ParseMode.MarkdownV2,
+                    parseMode: ParseMode.Markdown,
                     replyMarkup: keyboard);
     }
 
@@ -211,6 +220,11 @@ public class BotHandler(ILogger<BotHandler> logger,
 
     private async Task BotOnUnknownTypeRecievedAsync(Update update)
     {
-        throw new NotImplementedException();
+        logger.LogInformation($"unknown update type recieved {update.Type}");
+
+        await botClient.SendMessage(
+            chatId: update.Message.Chat.Id,
+            text: $"we don't support this message type {update.Type}",
+            parseMode: ParseMode.Markdown);
     }
 }
