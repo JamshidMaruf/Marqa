@@ -1,6 +1,7 @@
 ﻿﻿using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Services.Courses.Models;
+using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 
 namespace Marqa.Service.Services.Courses;

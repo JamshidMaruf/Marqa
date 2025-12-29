@@ -1,11 +1,12 @@
 ﻿using Marqa.Service.Services.Lessons;
+using Marqa.Service.Services.Lessons.LessonSchedules.Models;
 using Marqa.Service.Services.Lessons.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.WebApi.Controllers;
 
-public class LessonsController(ILessonService lessonService) : BaseController
+public class LessonsController(ILessonService lessonService, ILessonSchedule lessonSchedule) : BaseController
 {
     [HttpPut("update/{id:int}")]
     public async Task<IActionResult> PutAsync(int id, [FromBody] LessonUpdateModel model)
@@ -54,6 +55,18 @@ public class LessonsController(ILessonService lessonService) : BaseController
             StatusCode = 200,
             Message = "success",
             Data = result
+        });
+    }
+
+    [HttpGet("{companyId:int}/schedule")]
+    public async Task<IActionResult> GetScheduleAsync(int companyId)
+    {
+        var schedule = await lessonSchedule.GetWeekLessonScheduleAsync(companyId);
+        return Ok(new Response<WeekLessonScheduleModel>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = schedule
         });
     }
 }

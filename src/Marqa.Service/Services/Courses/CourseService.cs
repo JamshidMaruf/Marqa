@@ -7,6 +7,7 @@ using Marqa.Service.Extensions;
 using Marqa.Service.Services.Courses.Jobs;
 using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Enums;
+using Marqa.Service.Services.Students.Models;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
