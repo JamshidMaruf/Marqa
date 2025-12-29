@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Employees;
 
-public class tEmployeeService(IUnitOfWork unitOfWork,
+public class EmployeeService(IUnitOfWork unitOfWork,
     IValidator<EmployeeCreateModel> validatorEmployeeCreate,
     IValidator<EmployeeUpdateModel> validatorEmployeeUpdate,
     IPaginationService paginationService) : IEmployeeService

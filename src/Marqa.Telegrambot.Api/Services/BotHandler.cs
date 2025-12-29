@@ -18,7 +18,7 @@ public class BotHandler(ILogger<BotHandler> logger,
         {
             UpdateType.Message => BotOnMessageRecievedAsync(update.Message),
 
-            //UpdateType.CallbackQuery => BotOnCallbackQueryRecievedAsync(update.CallbackQuery),
+            UpdateType.CallbackQuery => BotOnCallbackQueryRecievedAsync(update.CallbackQuery),
 
             _ => BotOnUnknownTypeRecievedAsync(update)
         };
@@ -49,6 +49,7 @@ public class BotHandler(ILogger<BotHandler> logger,
 
         long chatId = message.Chat.Id;
         string userFirstName = message.From.FirstName;
+
         string text = message.Text != null ? message.Text.Trim() : string.Empty;
 
         if (text.ToLower() == "/start")
@@ -86,18 +87,21 @@ public class BotHandler(ILogger<BotHandler> logger,
                 if (result.doesExist)
                 {
                     var keyboard = new InlineKeyboardMarkup(
-                        InlineKeyboardButton.WithCallbackData(
-                            "Login", "login;https:/taleem.uz/login"
+                        InlineKeyboardButton.WithUrl(
+                            "Login",
+                            "https://taleem.uz/login"
                         ),
                         InlineKeyboardButton.WithCallbackData(
-                            "Yangilash", $"{HandleLoginCommandAsync(chatId)}"
+                            "🔄 Yangilash",
+                            "refresh_login"
                         )
                     );
 
                     await botClient.SendMessage(
                         chatId: chatId,
-                        text: $"🔒 Code: `{result.otp}`" +
-                              "🔗 Click and Login: https:/taleem.uz",
+                        text: $"🔒 Code: `{result.otp}`\n" +
+                               "🔗 Click and Login:\n" +
+                               "https://taleem.uz/login",
                         replyMarkup: keyboard,
                         parseMode: ParseMode.Markdown);
                     return;
@@ -106,7 +110,7 @@ public class BotHandler(ILogger<BotHandler> logger,
                 {
                     await botClient.SendMessage(
                         chatId: chatId,
-                        text: $"❌ You are not unknown to this platform!",
+                        text: @"❌ You are not unknown to this platform!",
                         parseMode: ParseMode.Markdown);
                     return;
                 }
@@ -126,8 +130,8 @@ public class BotHandler(ILogger<BotHandler> logger,
         {
             await botClient.SendMessage(
                 chatId: chatId,
-                text: $"❌ You are unknown to this platform!",
-                parseMode: ParseMode.MarkdownV2);
+                text: "❌ You are unknown to this platform!",
+                parseMode: ParseMode.Markdown);
             return;
         }
     }
@@ -151,15 +155,17 @@ public class BotHandler(ILogger<BotHandler> logger,
             return;
         }
 
-        var result = await smsService.GetOTPForTelegramBotAsync(phone, long chatId);
+        var result = await smsService.GetOTPForTelegramBotAsync(phone, chatId);
 
         if (result.doesExist)
         {
             await botClient.SendMessage(
                 chatId: chatId,
-                text: $"`{result.otp}`",
+                text: $"🔒 Code: \n`{result.otp}`\n" +
+                      "🔗 Click and Login: \n" +
+                      "https://taleem.uz/login",
                 replyMarkup: new ReplyKeyboardRemove(),
-                parseMode: ParseMode.MarkdownV2);
+                parseMode: ParseMode.Markdown);
 
             await botClient.SendMessage(
                 chatId: chatId,
@@ -200,11 +206,11 @@ public class BotHandler(ILogger<BotHandler> logger,
                     $"🇺🇿" +
                     $"Salom {userFirstName} 😊" +
                     $"Taleem platformasining rasmiy botiga xush kelibsiz!\n" +
-                    $"⬇️ Kontaktingizni yuboring\n" +
+                    $"⬇️ Kontaktingizni yuboring\n\n" +
                     $"🇺s " +
                     $"Hi {userFirstName} 😊" +
                     $"Welcome to Taleem platform's offical bot!\n" +
-                    $"⬇️ Kontaktingizni yuboring\n" +
+                    $"⬇️ Kontaktingizni yuboring\n\n" +
                     $"🇷🇺" +
                     $"Привет, {userFirstName} 😊\n" +
                     $"Добро пожаловать в официальный бот платформы Taleem!\n" +
@@ -215,7 +221,68 @@ public class BotHandler(ILogger<BotHandler> logger,
 
     private async Task BotOnCallbackQueryRecievedAsync(CallbackQuery callbackQuery)
     {
-        throw new NotImplementedException();
+        if (callbackQuery.Message is null)
+        {
+            long chatId = callbackQuery.From.Id;
+            string callbackId = callbackQuery.Id;
+            string message = callbackQuery.Message.Text;
+
+            if (message == "refresh_login")
+            {
+                await HandleRefreshLoginAsync(chatId, callbackId, message);
+            }
+        }
+    }
+
+    private async Task HandleRefreshLoginAsync(long chatId, string callbackId, string message)
+    {
+        var phone = await userService.GetUserPhoneByChatIdAsync(chatId);
+
+        if (phone != null)
+        {
+            if (await smsService.IsExpired(phone))
+            {
+                var result = await smsService.GetOTPForTelegramBotAsync(phone);
+
+                if (result.doesExist)
+                {
+                    await botClient.SendMessage(
+                        chatId: chatId,
+                        text: $"🔒 Code: \n`{result.otp}`" +
+                               "🔗 Click and Login:\n" +
+                               "https://taleem.uz/login",
+                        parseMode: ParseMode.Markdown);
+                    return;
+                }
+                else
+                {
+                    await botClient.SendMessage(
+                        chatId: chatId,
+                        text: @"❌ You are not unknown to this platform!",
+                        parseMode: ParseMode.Markdown);
+                    return;
+                }
+            }
+            else
+            {
+                await botClient.AnswerCallbackQuery(
+                    callbackQueryId: callbackId,
+                    text:
+                        "Eski kodingizni hali ham ishlatishingiz mumkin!\n" +
+                        "Agar yangi kod olishni istasangiz 2 daqiqa kuting!",
+                    showAlert: true
+                );
+                return;
+            }
+        }
+        else
+        {
+            await botClient.SendMessage(
+                chatId: chatId,
+                text: "❌ Hmm, we couldn't find your data!",
+                parseMode: ParseMode.Markdown);
+            return;
+        }
     }
 
     private async Task BotOnUnknownTypeRecievedAsync(Update update)

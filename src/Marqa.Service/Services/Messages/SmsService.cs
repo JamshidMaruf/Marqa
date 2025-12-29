@@ -54,9 +54,10 @@ public class SmsService(
         return (entity.Id, entity.Type);
     }
 
-    public async Task<(string otp, bool doesExist)> GetOTPForTelegramBotAsync(string phone, long chatId)
+    public async Task<(string otp, bool doesExist)> GetOTPForTelegramBotAsync(string phone, long? chatId = null)
     {
         var trimmedPhone = phone.TrimPhoneNumber();
+
         if (!trimmedPhone.IsSuccessful)
             throw new ArgumentIsNotValidException("Phone is not valid");
 
@@ -69,13 +70,17 @@ public class SmsService(
 
         unitOfWork.OTPs.Insert(new OTP
         {
-            PhoneNumber = phone,
+            PhoneNumber = trimmedPhone.Phone,
             Code = otp,
             ExpiryDate = DateTime.UtcNow.AddMinutes(2),
         });
 
-        user.TelegramChatId = chatId;
-        unitOfWork.Users.Update(user);
+        if (user.TelegramChatId is null)
+        {
+            user.TelegramChatId = chatId;
+            unitOfWork.Users.Update(user);
+        }
+
         await unitOfWork.SaveAsync();
 
         return (otp, true);
@@ -83,8 +88,10 @@ public class SmsService(
 
     public async Task<bool> IsExpired(string phone)
     {
+        var trimmedPhone = phone.TrimPhoneNumber();
+
         var lastOTP = await unitOfWork.OTPs
-            .SelectAllAsQueryable(o => o.PhoneNumber == phone)
+            .SelectAllAsQueryable(o => o.PhoneNumber == trimmedPhone.Phone)
             .OrderByDescending(o => o.ExpiryDate)
             .FirstOrDefaultAsync();
 

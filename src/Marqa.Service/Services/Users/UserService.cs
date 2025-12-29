@@ -18,6 +18,6 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
     {
         var user = await unitOfWork.Users.SelectAsync(u => u.TelegramChatId == chatId);
 
-        return user.Phone;
+        return user is not null ? user.Phone : null;
     }
 }
