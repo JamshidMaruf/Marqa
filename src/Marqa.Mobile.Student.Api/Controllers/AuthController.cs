@@ -18,7 +18,7 @@ public class AuthController(ISmsService smsService, IAuthService authService) : 
         {
             StatusCode = 200,
             Message = "token_generated",
-            Data = authService.GenerateToken(model.AppId, model.SecretKey)
+            //Data = authService.GenerateToken(model.AppId, model.SecretKey)
         });
     }
 

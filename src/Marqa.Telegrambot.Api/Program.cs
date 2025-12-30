@@ -7,15 +7,11 @@ using Marqa.Service.Validators.Companies;
 using Marqa.Shared.Services;
 using Marqa.Telegrambot.Api.Services;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLogging();
-
-//builder.Host.UseSerilog((context, configuration) =>
-//    configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddHostedService<ConfigureWebhook>();
 
@@ -23,7 +19,7 @@ builder.Services.AddHttpClient("tgwebhook")
     .AddTypedClient<ITelegramBotClient>(httpClient => 
     new TelegramBotClient(builder.Configuration["BotConfiguration:Token"], httpClient));
 
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -63,7 +59,7 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection(); 
 
 app.UseRouting();
 

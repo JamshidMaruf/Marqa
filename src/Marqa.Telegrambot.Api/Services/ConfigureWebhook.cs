@@ -22,10 +22,6 @@ public class ConfigureWebhook(
 
         logger.LogInformation("Setting webhook...");
 
-        //await botClient.SendMessage(
-        //    chatId: 1631057205,
-        //    text: "Webhook O'rnatilmoqda...");
-
         await botClient.SetWebhook(
             url: webhookAddress,
             allowedUpdates: Array.Empty<UpdateType>(),
