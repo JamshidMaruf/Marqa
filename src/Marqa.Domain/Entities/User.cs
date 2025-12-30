@@ -4,6 +4,7 @@ namespace Marqa.Domain.Entities;
 
 public class User : Auditable
 {
+    public long? TelegramChatId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string Phone { get; set; }

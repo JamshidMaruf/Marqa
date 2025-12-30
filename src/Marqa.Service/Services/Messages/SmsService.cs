@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
-using Marqa.DataAccess.Repositories;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
+using Marqa.Service.Extensions;
 using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Messages.Models;
 using Marqa.Service.Services.Settings;
@@ -13,8 +13,8 @@ using Newtonsoft.Json;
 namespace Marqa.Service.Services.Messages;
 
 public class SmsService(
-    IRepository<OTP> otpRepository,
-    ISettingService settingService, 
+    IUnitOfWork unitOfWork,
+    ISettingService settingService,
     IStudentService studentService,
     IEmployeeService employeeService) : ISmsService
 {
@@ -22,13 +22,13 @@ public class SmsService(
     {
         var otp = GenerateSixDigitNumber();
 
-        otpRepository.Insert(new OTP
+        unitOfWork.OTPs.Insert(new OTP
         {
-            PhoneNumber = phone, 
+            PhoneNumber = phone,
             Code = otp,
             ExpiryDate = DateTime.UtcNow.AddMinutes(2),
         });
-        
+
         await SendMessageAsync(phone, otp);
     }
 
@@ -38,8 +38,8 @@ public class SmsService(
 
         if (entity.Id == 0)
             throw new NotFoundException("This phone number does not exist");
-        
-        var isVerified = await otpRepository
+
+        var isVerified = await unitOfWork.OTPs
             .SelectAllAsQueryable(t =>
                 t.PhoneNumber == phone &&
                 t.Code == code &&
@@ -50,15 +50,86 @@ public class SmsService(
 
         if (!isVerified)
             throw new ArgumentIsNotValidException("OTP incorrect");
-        
+
         return (entity.Id, entity.Type);
+    }
+
+    public async Task<(string otp, bool doesExist)> GetOTPForTelegramBotAsync(string phone, long? chatId = null)
+    {
+        var trimmedPhone = phone.TrimPhoneNumber();
+
+        if (!trimmedPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Phone is not valid");
+
+        var user = await unitOfWork.Users.SelectAsync(u => u.Phone == trimmedPhone.Phone);
+
+        if (user == null)
+            return (null, false);
+
+        var otp = GenerateSixDigitNumber();
+
+        unitOfWork.OTPs.Insert(new OTP
+        {
+            PhoneNumber = trimmedPhone.Phone,
+            Code = otp,
+            ExpiryDate = DateTime.UtcNow.AddMinutes(2),
+        });
+
+        if (user.TelegramChatId is null)
+        {
+            user.TelegramChatId = chatId;
+            unitOfWork.Users.Update(user);
+        }
+
+        await unitOfWork.SaveAsync();
+
+        return (otp, true);
+    }
+
+    public async Task<bool> IsExpired(string phone)
+    {
+        var trimmedPhone = phone.TrimPhoneNumber();
+
+        var lastOTP = await unitOfWork.OTPs
+            .SelectAllAsQueryable(o => o.PhoneNumber == trimmedPhone.Phone)
+            .OrderByDescending(o => o.ExpiryDate)
+            .FirstOrDefaultAsync();
+
+        if (lastOTP.ExpiryDate < DateTime.UtcNow)
+            return true;
+
+        return false;
+    }
+
+    public async Task SendNotificationAsync(string phone, string message)
+    {
+        var settings = await settingService.GetByCategoryAsync("Eskiz");
+
+        var url = settings["Eskiz.SendMessageUrl"];
+
+        var payload = new SendMessageModel
+        {
+            Phone = phone,
+            Message = message,
+            From = settings["Eskiz.From"],
+        };
+
+        var json = JsonConvert.SerializeObject(payload);
+
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var httpClient = new HttpClient();
+
+        var response = await httpClient.PostAsync(url, content);
+
+        response.EnsureSuccessStatusCode();
     }
 
     private async Task<(int Id, string Type)> GetEntity(string phone)
     {
         int entityId = 0;
         string entityType = "";
-        
+
         int studentId = await studentService.GetByPhoneAsync(phone);
         if (studentId is not default(int))
         {
@@ -86,63 +157,6 @@ public class SmsService(
         return (entityId, entityType);
     }
 
-    private string GenerateSixDigitNumber()
-    {
-        Random random = new Random();
-        var code = random.Next(100000, 1000000).ToString();
-        return code;
-    }
-    
-    private async Task<string> LoginAsync()
-    {
-        var settings = await settingService.GetByCategoryAsync("Eskiz");
-        
-        var url = settings["Eskiz.LoginUrl"];
-        var httpClient = new HttpClient();
-
-        var payload = new SmsPostModel()
-        {
-            Email = settings["Eskiz.Email"], SecretKey = settings["Eskiz.SecretKey"],
-        };
-        
-        var json = JsonConvert.SerializeObject(payload);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-        
-        var response = await httpClient.PostAsync(url, content);
-
-        response.EnsureSuccessStatusCode();
-        
-        var resultJson = await response.Content.ReadAsStringAsync();
-        
-        var result = JsonConvert.DeserializeObject<LoginResponseModel>(resultJson);
-        
-        return result.Data.Token;
-    }
-
-    public async Task SendNotificationAsync(string phone, string message)
-    {
-        var settings = await settingService.GetByCategoryAsync("Eskiz");
-
-        var url = settings["Eskiz.SendMessageUrl"];
-
-        var payload = new SendMessageModel
-        {
-            Phone = phone,
-            Message = message,
-            From = settings["Eskiz.From"],
-        };
-
-        var json = JsonConvert.SerializeObject(payload);
-
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        var httpClient = new HttpClient();
-
-        var response = await httpClient.PostAsync(url, content);
-
-        response.EnsureSuccessStatusCode();
-    }
-
     private async Task SendMessageAsync(string phone, string otp)
     {
         var settings = await settingService.GetByCategoryAsync("Eskiz");
@@ -150,24 +164,58 @@ public class SmsService(
         var token = await LoginAsync();
 
         var url = settings["Eskiz.SendMessageUrl"];
-        
+
         var payload = new SendMessageModel
         {
             Phone = phone,
             Message = otp,
             From = settings["Eskiz.From"],
         };
-        
+
         var json = JsonConvert.SerializeObject(payload);
-        
+
         var content = new StringContent(json, Encoding.UTF8, "application/json");
-        
+
         var httpClient = new HttpClient();
-        
+
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        
+
         var response = await httpClient.PostAsync(url, content);
 
         response.EnsureSuccessStatusCode();
+    }
+
+    private async Task<string> LoginAsync()
+    {
+        var settings = await settingService.GetByCategoryAsync("Eskiz");
+
+        var url = settings["Eskiz.LoginUrl"];
+        var httpClient = new HttpClient();
+
+        var payload = new SmsPostModel()
+        {
+            Email = settings["Eskiz.Email"],
+            SecretKey = settings["Eskiz.SecretKey"],
+        };
+
+        var json = JsonConvert.SerializeObject(payload);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await httpClient.PostAsync(url, content);
+
+        response.EnsureSuccessStatusCode();
+
+        var resultJson = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<LoginResponseModel>(resultJson);
+
+        return result.Data.Token;
+    }
+
+    private string GenerateSixDigitNumber()
+    {
+        Random random = new Random();
+        var code = random.Next(100000, 1000000).ToString();
+        return code;
     }
 }

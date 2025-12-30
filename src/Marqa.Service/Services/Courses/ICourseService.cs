@@ -28,7 +28,7 @@ public interface ICourseService : IScopedService
     Task<List<FrozenEnrollmentModel>> GetFrozenCoursesAsync(int studentId);
     Task<UpcomingCourseViewModel> GetUpcomingCourseStudentsAsync(int courseId);
     Task<List<MergedCourseViewModel>> GetMergedCoursesAsync(int companyId, PaginationParams @params);
-    Task<List<StudentList>> GetStudentsListAsync(int courseId);
+    //Task<List<StudentList>> GetStudentsListAsync(int courseId);
     Task CreateTeacherAssessmentAsync(TeacherAssessment model);
     /// <summary>
     /// This method bulk enrolls students into a course based on the provided model.
