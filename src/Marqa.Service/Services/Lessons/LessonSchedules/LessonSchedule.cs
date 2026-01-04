@@ -20,18 +20,18 @@ public class LessonSchedule(IUnitOfWork unitOfWork) : ILessonSchedule
             .ThenInclude(t => t.Teacher.User)
             .ToListAsync();
 
-        var Mondaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Monday);
-        var Tuesdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Tuesday);
-        var Wednesdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Wednesday);
-        var Thursdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Thursday);
-        var Fridaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Friday);
-        var Saturdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Saturday);
-        var Sundaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Sunday);
+        var mondaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Monday);
+        var tuesdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Tuesday);
+        var wednesdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Wednesday);
+        var thursdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Thursday);
+        var fridaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Friday);
+        var saturdaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Saturday);
+        var sundaycount = lessons.Count(l => l.Date.DayOfWeek == DayOfWeek.Sunday);
 
-        var DailylessonSchedules = new List<DailyLessonScheduleModel>();
+        var dailylessonSchedules = new List<DailyLessonScheduleModel>();
         foreach (var lesson in lessons)
         {
-            DailylessonSchedules.Add(new DailyLessonScheduleModel
+            dailylessonSchedules.Add(new DailyLessonScheduleModel
             {
                 DayOfWeek = lesson.Date.DayOfWeek,
                 CourseName = lesson.Course.Name,
@@ -46,14 +46,14 @@ public class LessonSchedule(IUnitOfWork unitOfWork) : ILessonSchedule
 
         return new WeekLessonScheduleModel
         {
-            MondayCount = Mondaycount,
-            TuesdayCount = Tuesdaycount,
-            WednesdayCount = Wednesdaycount,
-            ThursdayCount = Thursdaycount,
-            FridayCount = Fridaycount,
-            SaturdayCount = Saturdaycount,
-            SundayCount = Sundaycount,
-            DailyLessonSchedules = DailylessonSchedules
+            MondayCount = mondaycount,
+            TuesdayCount = tuesdaycount,
+            WednesdayCount = wednesdaycount,
+            ThursdayCount = thursdaycount,
+            FridayCount = fridaycount,
+            SaturdayCount = saturdaycount,
+            SundayCount = sundaycount,
+            DailyLessonSchedules = dailylessonSchedules
         };
     }
 }
