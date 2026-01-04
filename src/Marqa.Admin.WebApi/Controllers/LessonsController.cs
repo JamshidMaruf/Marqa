@@ -58,15 +58,15 @@ public class LessonsController(ILessonService lessonService, ILessonSchedule les
         });
     }
 
-    [HttpGet("{companyId:int}/schedule")]
-    public async Task<IActionResult> GetScheduleAsync(int companyId)
-    {
-        var schedule = await lessonSchedule.GetWeekLessonScheduleAsync(companyId);
-        return Ok(new Response<WeekLessonScheduleModel>
-        {
-            StatusCode = 200,
-            Message = "success",
-            Data = schedule
-        });
-    }
+    //[HttpGet("{companyId:int}/schedule")]
+    //public async Task<IActionResult> GetScheduleAsync(int companyId)
+    //{
+    //    var schedule = await lessonSchedule.GetWeekLessonScheduleAsync(companyId);
+    //    return Ok(new Response<WeekLessonScheduleModel>
+    //    {
+    //        StatusCode = 200,
+    //        Message = "success",
+    //        Data = schedule
+    //    });
+    //}
 }
