@@ -3,7 +3,6 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Services.Courses.Models;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students.Models;
@@ -11,7 +10,7 @@ using Marqa.Service.Services.Students.Models.DetailModels;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Students;
 
@@ -246,7 +245,11 @@ public class StudentService(
             Phone = existStudent.User.Phone,
             Email = existStudent.User.Email,
             Balance = existStudent.Balance,
-            Status = existStudent.Status,
+            Status = new StatusModel
+            {
+                Id = Convert.ToInt32(existStudent.Status),
+                Name = enumService.GetEnumDescription(existStudent.Status)
+            },
             TotalPoints = await studentPointHistoryService.GetAsync(existStudent.Id),
             Detail = new StudentDetailViewModel
             {
@@ -325,7 +328,11 @@ public class StudentService(
             GuardianFirstName = existStudent.StudentDetail.GuardianFirstName,
             GuardianLastName = existStudent.StudentDetail.GuardianLastName,
             GuardianPhone = existStudent.StudentDetail.GuardianPhone,
-            Status = existStudent.Status,
+            Status = new StudentViewForUpdateModel.StudentStatusData
+            {
+                Id = Convert.ToInt32(existStudent.Status),
+                Name = enumService.GetEnumDescription(existStudent.Status)
+            },
             Courses = existStudent.Enrollments.Select(x => new StudentViewForUpdateModel.StudentCourseData
             {
                 CourseId = x.CourseId,
@@ -358,7 +365,7 @@ public class StudentService(
                 s.User.Email.ToLower().Contains(searchText));
         }
 
-        if (courseId.HasValue)
+        if (courseId > 0)
             query = query.Where(s => s.Enrollments.Any(sc => sc.CourseId == courseId));
 
         if (status.HasValue)
@@ -378,7 +385,11 @@ public class StudentService(
                     .Select(e => new StudentListModel
                     {
                         Id = e.Student.Id,
-                        Status = e.Student.Status,
+                        Status = new StudentStatusInfo
+                        {
+                            Id = Convert.ToInt32(e.Status),
+                            Name = enumService.GetEnumDescription(e.Status)
+                        },
                         Balance = e.Student.Balance,
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
@@ -399,7 +410,11 @@ public class StudentService(
                     .SelectMany(c => c.Enrollments.Select(e => new StudentListModel
                     {
                         Id = e.Student.Id,
-                        Status = e.Student.Status,
+                        Status = new StudentStatusInfo
+                        {
+                            Id = Convert.ToInt32(e.Status),
+                            Name = enumService.GetEnumDescription(e.Status)
+                        },
                         Balance = e.Student.Balance,
                         FirstName = e.Student.User.FirstName,
                         LastName = e.Student.User.LastName,
@@ -424,7 +439,11 @@ public class StudentService(
         return pagedStudents.Select(x => new StudentListModel
         {
             Id = x.Id,
-            Status = x.Status,
+            Status =  new StudentStatusInfo
+            {
+                Id = Convert.ToInt32(x.Status),
+                Name = enumService.GetEnumDescription(x.Status)
+            },
             Balance = x.Balance,
             FirstName = x.User.FirstName,
             LastName = x.User.LastName,
@@ -434,8 +453,10 @@ public class StudentService(
                 CourseId = c.CourseId,
                 CourseName = c.Course.Name,
                 CourseStatus = enumService.GetEnumDescription(c.Status)
-            }).ToList()
-        }).ToList();
+            })
+            .ToList()
+        })
+        .ToList();
     }
 
     public async ValueTask<StudentsInfo> GetStudentsInfo(int companyId)

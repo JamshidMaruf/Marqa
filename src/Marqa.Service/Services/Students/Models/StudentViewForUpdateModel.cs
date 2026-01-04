@@ -10,7 +10,7 @@ public class StudentViewForUpdateModel
     public string Phone { get; set; }
     public string Email { get; set; }
     public Gender Gender { get; set; }
-    public StudentStatus Status { get; set; }
+    public StudentStatusData Status { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public string FatherFirstName { get; set; }
     public string FatherLastName { get; set; }
@@ -22,7 +22,13 @@ public class StudentViewForUpdateModel
     public string GuardianLastName { get; set; }
     public string GuardianPhone { get; set; }
     public List<StudentCourseData> Courses { get; set; }
-    
+
+    public class StudentStatusData
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public class StudentCourseData
     {
         public int CourseId { get; set; }

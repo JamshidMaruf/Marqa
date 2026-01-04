@@ -1,5 +1,6 @@
 ﻿﻿using Marqa.Domain.Enums;
 using Marqa.Service.Services.Students.Models.DetailModels;
+using Microsoft.AspNetCore.Http;
 
 namespace Marqa.Service.Services.Students.Models;
 
@@ -10,7 +11,7 @@ public class StudentViewModel
     public string LastName { get; set; }
     public DateOnly DateOfBirth { get; set; }
     public Gender Gender { get; set; }
-    public StudentStatus Status { get; set; }
+    public StatusModel Status { get; set; }
     public string Phone { get; set; }
     public string Email { get; set; }
     public decimal Balance { get; set; }
@@ -20,6 +21,12 @@ public class StudentViewModel
     public List<StudentExamResultData> ExamResults { get; set; }
     public List<StudentPaymentOperationData> PaymentOperations { get; set; }
     public List<StudentPointHistoryData> PointHistories { get; set; }
+}
+
+public class StatusModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
 }
 
 public class StudentCourseViewData

@@ -9,8 +9,14 @@ public class StudentListModel
     public string LastName { get; set; }
     public string Phone { get; set; }
     public decimal Balance { get; set; }
-    public StudentStatus Status { get; set; }
+    public StudentStatusInfo Status { get; set; }
     public List<StudentCourseListData> Courses { get; set; }
+}
+
+public class StudentStatusInfo
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
 }
 
 public class StudentCourseListData
