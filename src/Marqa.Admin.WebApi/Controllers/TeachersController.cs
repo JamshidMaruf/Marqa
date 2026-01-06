@@ -117,6 +117,8 @@ public class TeachersController(ITeacherService teacherService) : BaseController
             Data = result
         });
     }
+    
+    
     [HttpGet("company/{companyId:int}/statistics")]
     [ProducesResponseType(typeof(Response<TeachersStatistics>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStatistics(int companyId)

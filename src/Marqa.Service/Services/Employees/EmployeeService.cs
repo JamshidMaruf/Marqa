@@ -5,6 +5,7 @@ using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Helpers;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
@@ -152,11 +153,11 @@ public class EmployeeService(IUnitOfWork unitOfWork,
             ?? throw new NotFoundException($"No employee was found with ID = {id}");
     }
 
-    public async Task<EmployeeViewModel> GetForUpdateAsync(int id)
+    public async Task<EmployeeUpdateViewModel> GetForUpdateAsync(int id)
     {
         return await unitOfWork.Employees
             .SelectAllAsQueryable()
-            .Select(e => new EmployeeViewModel
+            .Select(e => new EmployeeUpdateViewModel
             {
                 Id = e.Id,
                 CompanyId = e.CompanyId,
@@ -172,7 +173,7 @@ public class EmployeeService(IUnitOfWork unitOfWork,
                 Specialization = e.Specialization,
                 Info = e.Info,
                 RoleId = e.RoleId,
-                Role = new EmployeeViewModel.EmployeeRoleInfo
+                Role = new EmployeeUpdateViewModel.EmployeeRoleInfo
                 {
                     Id = e.RoleId,
                     Name = e.Role.Name
@@ -187,6 +188,59 @@ public class EmployeeService(IUnitOfWork unitOfWork,
         var employee = await unitOfWork.Employees.SelectAsync(emp => emp.User.Phone == phone);
 
         return employee.Id;
+    }
+
+    public async Task<EmployeesStatistic> GetStatisticsAsync(int companyId)
+    {
+        var totalCount = await unitOfWork.Employees
+            .SelectAllAsQueryable(e => e.CompanyId == companyId).CountAsync();
+        
+        var totalActive = await unitOfWork.Employees.SelectAllAsQueryable(e => e.CompanyId == companyId)
+            .CountAsync(e => e.Status == EmployeeStatus.Active);
+        
+        var totalInActive = await unitOfWork.Employees.SelectAllAsQueryable(e => e.CompanyId == companyId)
+            .CountAsync(e => e.Status == EmployeeStatus.Inactive);
+        
+        var totalOnLeave = await unitOfWork.Employees.SelectAllAsQueryable(e => e.CompanyId == companyId)
+            .CountAsync(e => e.Status == EmployeeStatus.OnLeave);
+
+        var employees = await unitOfWork.Employees
+            .SelectAllAsQueryable(e => e.CompanyId == companyId).ToListAsync();
+  
+        decimal totalSalary = 0;
+        foreach (var employee in employees)
+        {
+            var operations = await unitOfWork.EmployeePaymentOperations
+                .SelectAllAsQueryable(e => e.EmployeeId == employee.Id)
+                .ToListAsync();
+
+            if (operations.Count > 0
+                && operations.Any(l => l.DateTime.Month == DateTime.UtcNow.Month
+                && l.OperationType == EmployeePaymentOperationType.Salary))
+            {
+                var last =  operations
+                    .FirstOrDefault(o => o.OperationType == EmployeePaymentOperationType.Salary
+                    && o.DateTime.Month == DateTime.UtcNow.Month);
+
+                if (last != null)
+                {
+                    totalSalary += employee.Salary > last.Amount ? employee.Salary -  last.Amount : 0;
+                }
+            }
+            else
+            {
+                totalSalary += employee.Salary;
+            }
+        }
+
+        return new EmployeesStatistic
+        {
+            TotalEmployeesCount = totalCount,
+            TotalActiveEmployeesCount = totalActive,
+            TotalInactiveEmployeesCount = totalInActive,
+            TotalOnLeaveEmployeesCount = totalOnLeave,
+            TotalSalary = totalSalary
+        };
     }
 
     public async Task<List<EmployeeViewModel>> GetAllAsync(PaginationParams @params, int companyId, string search)

@@ -436,24 +436,38 @@ public class TeacherService(
 
     public async Task<TeachersStatistics> GetStatisticsAsync(int companyId)
     {
-        var query = unitOfWork.Teachers
-            .SelectAllAsQueryable(t =>
-                t.CompanyId == companyId);
+        var totalTeachers = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId).CountAsync();
+        
+        var totalLeadTeachers = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId)
+            .CountAsync(t => t.Type ==  TeacherType.Lead);
+        
+        var totalAssistant = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId)
+            .CountAsync(t => t.Type == TeacherType.Assistant);
+        
+        var totalActiveTeachers = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId)
+            .CountAsync(t => t.Status == TeacherStatus.Active);
+        
+        var totalLeftTeachers = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId)
+            .CountAsync(t => t.Status == TeacherStatus.Left);
+        
+        var totalOnLeaveTeachers = await unitOfWork.Teachers
+            .SelectAllAsQueryable(t => t.CompanyId == companyId)
+            .CountAsync(t => t.Status == TeacherStatus.OnLeave);
 
-        var statistics = await query
-            .GroupBy(t => 1)
-            .Select(g => new TeachersStatistics
-            {
-                TotalTeachersCount = g.Count(),
-                TotalLeadTeachersCount = g.Count(t => t.Type == TeacherType.Lead),
-                TotalAssistantTeachersCount = g.Count(t => t.Type == TeacherType.Assistant),
-                TotalActiveTeacherCount = g.Count(t => t.Status == TeacherStatus.Active),
-                TotalLeftTeacherCount = g.Count(t => t.Status == TeacherStatus.Left),
-                TotalOnLeaveTeacherCount = g.Count(t => t.Status == TeacherStatus.OnLeave)
-            })
-            .FirstOrDefaultAsync();
-
-        return statistics ?? new TeachersStatistics();
+        return new TeachersStatistics
+        {
+            TotalTeachersCount = totalTeachers,
+            TotalLeadTeachersCount = totalLeadTeachers,
+            TotalAssistantTeachersCount = totalAssistant,
+            TotalActiveTeacherCount = totalActiveTeachers,
+            TotalLeftTeacherCount = totalLeftTeachers,
+            TotalOnLeaveTeacherCount = totalOnLeaveTeachers,
+        };
     }
 
     public Task<TeacherStatistics> GetTeacherStatisticsAsync(int teacherId)
