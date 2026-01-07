@@ -1,6 +1,5 @@
-﻿﻿using Marqa.Domain.Entities;
+﻿using Marqa.Domain.Entities;
 using Marqa.Service.Services.Employees.Models;
-using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
 
 namespace Marqa.Service.Services.Employees;
