@@ -31,6 +31,13 @@ builder.Services.AddHangfire(configuration => configuration
     .UsePostgreSqlStorage(options => 
         options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"))));
 
+// Limit hangfire retry attempts 
+GlobalJobFilters.Filters.Add(
+    new AutomaticRetryAttribute { 
+        Attempts = 5, 
+        DelaysInSeconds = new int[] { 300, 600, 900, 1200, 1500 } 
+    });
+
 // Add the processing server as IHostedService
 builder.Services.AddHangfireServer();
 

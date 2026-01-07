@@ -15,8 +15,7 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
     IValidator<EnrollmentCreateModel> enrollmentCreateValidator,
     IValidator<StudentTransferModel> transferValidator,
     IValidator<FreezeModel> freezeValidator,
-    IEnumService enumService,
-    IEnrollmentJobService enrollmentJobService) : IEnrollmentService
+    IEnumService enumService) : IEnrollmentService
 {
     public async Task CreateAsync(EnrollmentCreateModel model)
     {
@@ -59,30 +58,30 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
     public async Task DetachAsync(DetachModel model)
     {
         await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
-        BackgroundJob.Schedule(() => enrollmentJobService.DetachAsync(model), model.DeactivatedDate);
-
+        BackgroundJob.Schedule<IEnrollmentJobService>(job => job.DetachAsync(model), 
+            model.DeactivatedDate);
     }
 
     public async Task FreezeStudentAsync(FreezeModel model)
     {
-        await freezeValidator.ValidateAsync(model);
+        await freezeValidator.EnsureValidatedAsync(model);
         await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
         
         BackgroundJob.Schedule<IEnrollmentJobService>(job => job.FreezeAsync(model),
-            model.StartDate.ToUniversalTime());
+            model.StartDate);
     }
 
     public async Task UnFreezeStudentAsync(UnFreezeModel model)
     {
         await EnsureEnrollmentsExistAsync(model.StudentId, model.CourseIds);
-        BackgroundJob.Schedule(() => enrollmentJobService.UnfreezeAsync(model),
-            model.ActivateDate
-        );
+        BackgroundJob.Schedule<IEnrollmentJobService>(job => job.UnfreezeAsync(model),
+            model.ActivateDate);
     }
 
     public async Task MoveStudentCourseAsync(StudentTransferModel model)
     {
         await transferValidator.EnsureValidatedAsync(model);
+
         await enrollmentCreateValidator.ValidateAsync(new EnrollmentCreateModel
         {
             StudentId = model.StudentId,
@@ -92,16 +91,17 @@ public class EnrollmentService(IUnitOfWork unitOfWork,
             PaymentType = model.PaymentType,
             Status = model.Status,
         });
+
         var targetCourse = await unitOfWork.Courses
-                               .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed || c.Status != CourseStatus.Completed) 
+                               .SelectAsync(c => c.Id == model.ToCourseId && c.Status != CourseStatus.Closed && c.Status != CourseStatus.Completed) 
                            ?? throw new NotFoundException("Target course not found or finished");
         
         if (targetCourse.EndDate <= DateOnly.FromDateTime(model.DateOfTransfer))
         {
-            throw new ArgumentIsNotValidException($"Target course will be finished");
+            throw new ArgumentIsNotValidException("Target course will be finished or finished already!");
         }
 
-        BackgroundJob.Schedule(() => enrollmentJobService.TransferAsync(model),
+        BackgroundJob.Schedule<IEnrollmentJobService>(job => job.TransferAsync(model),
             model.DateOfTransfer
         );
     }

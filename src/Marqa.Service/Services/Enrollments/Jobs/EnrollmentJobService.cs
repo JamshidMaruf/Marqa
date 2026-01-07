@@ -46,13 +46,6 @@ public class EnrollmentJobService(IUnitOfWork unitOfWork) : IEnrollmentJobServic
 
         if (!model.IsInDefinite)
         {
-            var unFreezeModel = new UnFreezeModel
-            {
-                CourseIds = model.CourseIds,
-                StudentId = model.StudentId,
-                ActivateDate = model.EndDate.Value
-            };
-
             BackgroundJob.Schedule(
                 () => UnfreezeAsync(new UnFreezeModel
                 {
@@ -88,8 +81,6 @@ public class EnrollmentJobService(IUnitOfWork unitOfWork) : IEnrollmentJobServic
             student.Status = StudentStatus.Active;
 
         unitOfWork.Students.Update(student);
-
-        // add job schedule
 
         await unitOfWork.EnrollmentFrozens.UpdateRangeAsync(enrollments.Select(e => e.EnrollmentFrozens.First()));
         await unitOfWork.SaveAsync();

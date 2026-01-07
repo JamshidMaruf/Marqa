@@ -206,6 +206,9 @@ public class CourseService(IUnitOfWork unitOfWork,
             includes: ["Lessons", "Lessons.Teachers", "CourseWeekdays", "Enrollments", "CourseTeachers"])
             ?? throw new NotFoundException($"Course is not found with this ID {id}");
 
+        if (existCourse.CurrentStudentCount > 0)
+            throw new RequestRefusedException("Detach students first in order to delete this course!");
+
         foreach (var lesson in existCourse.Lessons)
             unitOfWork.Lessons.MarkAsDeleted(lesson);
 
