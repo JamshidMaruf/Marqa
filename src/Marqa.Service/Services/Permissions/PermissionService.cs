@@ -4,12 +4,15 @@ using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Permissions.Models;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Permissions;
 
 public class PermissionService(
     IUnitOfWork unitOfWork,
+    IPaginationService paginationService,
     IValidator<PermissionCreateModel> createValidator,
     IValidator<PermissionUpdateModel> updateValidator) : IPermissionService
 {
@@ -89,10 +92,26 @@ public class PermissionService(
             Description = permission.Description,
         };
     }
-    public async Task<List<PermissionViewModel>> GetAllAsync()
+
+    public async Task<List<PermissionViewModel>> GetAllAsync(PaginationParams @params, string search = null)
     {
-        var permissions = await unitOfWork.Permissions
-        .SelectAllAsQueryable(predicate: p => !p.IsDeleted) 
+        var query = unitOfWork.Permissions
+        .SelectAllAsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            string searchText = search.ToLower().Trim();
+
+            query = query.Where(p => 
+            p.Name.Contains(searchText) ||
+            p.Module.Contains(searchText) || 
+            p.Action.Contains(searchText) || 
+            p.Description.Contains(searchText));
+        }
+
+        query = paginationService.Paginate(query, @params);
+
+        return await query
         .OrderBy(p => p.Module)
         .ThenBy(p => p.Name)
         .Select(p => new PermissionViewModel
@@ -104,7 +123,10 @@ public class PermissionService(
             Description = p.Description,
         })
         .ToListAsync();
+    }
 
-        return permissions;
+    public async Task<int> GetPermissionsCountAsync()
+    {
+        return await unitOfWork.Permissions.SelectAllAsQueryable().CountAsync();
     }
 }

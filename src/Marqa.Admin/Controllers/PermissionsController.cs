@@ -1,5 +1,6 @@
 ﻿using Marqa.Service.Services.Permissions;
 using Marqa.Service.Services.Permissions.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,15 @@ namespace Marqa.Admin.Controllers;
 [Authorize]
 public class PermissionsController(IPermissionService permissionService) : Controller
 {
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(PaginationParams? @params, string? search)
     {
-        var result = await permissionService.GetAllAsync();
+        @params ??= new PaginationParams();
+
+        var result = await permissionService.GetAllAsync(@params, search);
+
+        ViewBag.CurrentPage = @params.PageNumber;
+        ViewBag.PageSize = @params.PageSize;
+        ViewBag.Search = search;
         
         return View(result);
     }

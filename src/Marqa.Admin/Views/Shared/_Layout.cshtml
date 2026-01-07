@@ -35,24 +35,6 @@
 					</a>
 				</li>
 
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Teachers" ? "active" : "")">
-					<a asp-controller="Teachers" asp-action="Index">
-						<i class="fas fa-code-branch"></i> Teachers
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employees" ? "active" : "")">
-					<a asp-controller="Employees" asp-action="Index">
-						<i class="fas fa-user-tie"></i> Employees
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Roles" ? "active" : "")">
-					<a asp-controller="Roles" asp-action="Index">
-						<i class="fas fa-user-shield"></i> Roles
-					</a>
-				</li>
-
 				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Permissions" ? "active" : "")">
 					<a asp-controller="Permissions" asp-action="Index">
 						<i class="fas fa-box"></i> Permissions
@@ -65,63 +47,27 @@
 					</a>
 				</li>
 
+				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Teachers" ? "active" : "")">
+					<a asp-controller="Teachers" asp-action="Index">
+						<i class="fas fa-code-branch"></i> Teachers
+					</a>
+				</li>
+
+				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employees" ? "active" : "")">
+					<a asp-controller="Employees" asp-action="Index">
+						<i class="fas fa-user-tie"></i> Employees
+					</a>
+				</li>
+
 				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Students" ? "active" : "")">
 					<a asp-controller="Students" asp-action="Index">
 						<i class="fas fa-user-friends"></i> Students
 					</a>
 				</li>
 
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")">
-					<a asp-controller="Products" asp-action="Index">
-						<i class="fas fa-truck"></i> Products
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Subjects" ? "active" : "")">
-					<a asp-controller="Subjects" asp-action="Index">
-						<i class="fas fa-truck"></i> Subjects
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "StudentPayments" ? "active" : "")">
-					<a asp-controller="StudentPayments" asp-action="Index">
-						<i class="fas fa-truck"></i> StudentPayments
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Ratings" ? "active" : "")">
-					<a asp-controller="Ratings" asp-action="Index">
-						<i class="fas fa-truck"></i> Ratings
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "PointSettings" ? "active" : "")">
-					<a asp-controller="PointSettings" asp-action="Index">
-						<i class="fas fa-truck"></i> PointSettings
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Orders" ? "active" : "")">
-					<a asp-controller="Orders" asp-action="Index">
-						<i class="fas fa-truck"></i> Orders
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Messages" ? "active" : "")">
-					<a asp-controller="Messages" asp-action="Index">
-						<i class="fas fa-truck"></i> Messages
-					</a>
-				</li>
-
 				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "EmployeeRoles" ? "active" : "")">
 					<a asp-controller="EmployeeRoles" asp-action="Index">
 						<i class="fas fa-truck"></i> EmployeeRoles
-					</a>
-				</li>
-
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Banners" ? "active" : "")">
-					<a asp-controller="Banners" asp-action="Index">
-						<i class="fas fa-truck"></i> Banners
 					</a>
 				</li>
 

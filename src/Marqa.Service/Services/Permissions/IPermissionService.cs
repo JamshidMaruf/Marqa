@@ -1,6 +1,7 @@
 ﻿﻿using Marqa.Service.Exceptions;
  using Marqa.Service.Services;
  using Marqa.Service.Services.Permissions.Models;
+using Marqa.Shared.Models;
 
  namespace Marqa.Service.Services.Permissions;
 public interface IPermissionService : IScopedService
@@ -46,6 +47,7 @@ public interface IPermissionService : IScopedService
     /// </summary>
     /// <returns>A task representing the asynchronous operation with a list of permission view models</returns>
     /// <exception cref="NotFoundException">Thrown when no permissions are found in the system</exception>
-    Task<List<PermissionViewModel>> GetAllAsync();
+    Task<List<PermissionViewModel>> GetAllAsync(PaginationParams @params, string search = null);
+    Task<int> GetPermissionsCountAsync();
 }
 

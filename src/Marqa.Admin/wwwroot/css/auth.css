@@ -59,7 +59,7 @@ body {
     animation: pulse 2s infinite;
   }
 
-@@keyframes pulse {
+@keyframes pulse {
   0%, 100% {
     transform: scale(1);
   }
