@@ -24,4 +24,6 @@
     <ProjectReference Include="..\Marqa.Shared\Marqa.Shared.csproj" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsetting_1json__JsonSchema="https://www.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
+
 </Project>
