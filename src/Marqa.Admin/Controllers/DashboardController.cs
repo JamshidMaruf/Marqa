@@ -24,11 +24,12 @@ public class DashboardController(
             var usersCount = await userService.GetAllUsersCount();
             var permissions = await permissionService.GetAllAsync();
             var settings = await settingService.GetAllAsync();
-            //var subscribers = await subscriptionService.GetAllSubscribersAsync();    
+            //var subscribers = await subscriptionService.GetAllAsync();    
             
             ViewBag.TotalCompanies = companies.Count();
             ViewBag.TotalUsers = usersCount;
             ViewBag.TotalSettings = settings.Count();
+            ViewBag.TotalPermissions = permissions.Count();
             //ViewBag.TotalSubscribers = subscribers.Count();
 
             return View();
@@ -39,6 +40,8 @@ public class DashboardController(
             ViewBag.TotalCompanies = 0;
             ViewBag.TotalUsers = 0;
             ViewBag.TotalSettings = 0;
+            ViewBag.TotalPermissions = 0;
+            ViewBag.DatabaseCondition = "problematic";
             //ViewBag.TotalSubscribers = 0;
             return View();
         }
