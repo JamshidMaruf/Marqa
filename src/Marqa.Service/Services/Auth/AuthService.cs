@@ -2,7 +2,7 @@
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Helpers;
+using Marqa.Shared.Helpers;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Service.Services.Settings;
 using Microsoft.EntityFrameworkCore;
@@ -239,18 +239,22 @@ public class AuthService(
 
     public async Task<LoginResponseModel> LoginAdminAsync(LoginModel model, string ipAddress)
     {
-        // temporary admin credentials 
-        const string ADMIN_PHONE = "998777777777";
-        const string ADMIN_PASSWORD = "root";
-
-        // Validate credentials
-        if (model.Phone != ADMIN_PHONE || model.Password != ADMIN_PASSWORD)
-            throw new UnauthorizedAccessException("Invalid phone or password");
-
         var user = new User
         {
-            Id = 0, FirstName = "Super", LastName = "Admin", Phone = ADMIN_PHONE
+            FirstName = "Super",
+            LastName = "Admin",
+            Phone = "998777777777",
+            IsActive = true,
+            IsUseSystem = true,
+            PasswordHash = "$2a$12$o83E6Kk.p1Z7oZwMhspsruLxcNZuicrvSBAgP05wfJASrDR0AXAUm",
+            Role = UserRole.Admin,
         };
+
+        // Validate credentials
+        if (model.Phone != user.Phone || model.Password != user.PasswordHash)
+            throw new UnauthorizedAccessException("Invalid phone or password");
+
+
         
         var accessToken = await jwtService.GenerateJwtToken(user,"SuperAdmin");
 

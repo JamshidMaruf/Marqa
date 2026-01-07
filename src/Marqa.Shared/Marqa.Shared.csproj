@@ -14,4 +14,8 @@
       <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="BCrypt.Net.BCrypt" Alias="Bcrypt" />
+  </ItemGroup>
+
 </Project>

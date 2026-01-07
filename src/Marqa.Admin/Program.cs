@@ -48,6 +48,9 @@ builder.Services.AddControllers(options =>
     options.Conventions.Add(new RouteTokenTransformerConvention(
         new LowerCaseControllerName()));
 });
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Marqa.DataAccess.Repositories;
 using Marqa.DataAccess.UnitOfWork;
+using Marqa.Service.Services;
 using Marqa.Service.Services.Auth;
 using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Courses;
@@ -20,6 +21,7 @@ using Marqa.Service.Services.StudentPointHistories;
 using Marqa.Service.Services.Students;
 using Marqa.Service.Services.Users;
 using Marqa.Service.Validators.Companies;
+using Marqa.Shared.Services;
 
 namespace Marqa.Admin.Extensions;
 
@@ -27,28 +29,35 @@ public static class ServiceExtensions
 {
     public static void AddMarqaServices(this IServiceCollection services)
     {
+        // Core infrastructure
         services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IJwtService, JwtService>();
-        services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<ICourseService, CourseService>();
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IEmployeeRoleService, EmployeeRoleService>();
-        services.AddScoped<IHomeTaskService, HomeTaskService>();
-        services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILessonService, LessonService>();
-        services.AddScoped<IStudentService, StudentService>();
-        services.AddScoped<IPointSettingService, PointSettingService>();
-        services.AddScoped<IExamService, ExamService>();
-        services.AddScoped<IRatingService, RatingService>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IStudentPointHistoryService, StudentPointHistoryService>();
-        services.AddScoped<IEncryptionService, EncryptionService>();
-        services.AddScoped<ISettingService, SettingService>();
-        services.AddScoped<IPermissionService, PermissionService>();
-        services.AddScoped<ISmsService, SmsService>();
+
+        // DI-based services 
+        services.AddScoped<IEnvironmentService, EnvironmentService>();
+        services.AddScoped<IHttpContextService, HttpContextService>();
+        services.AddScoped<IPaginationService, PaginationService>();
+
+        // Auto-register all services using Scrutor
+        services.Scan(scan => scan
+            .FromAssemblyOf<IScopedService>()
+            .AddClasses(classes => classes.AssignableTo<IScopedService>())
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<ISingletonService>()
+            .AddClasses(classes => classes.AssignableTo<ISingletonService>())
+            .AsImplementedInterfaces()
+            .WithSingletonLifetime());
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<ITransientService>()
+            .AddClasses(classes => classes.AssignableTo<ITransientService>())
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
+
+        // FluentValidation auto-registration
         services.AddValidatorsFromAssemblyContaining<CompanyCreateModelValidator>();
     }
 }

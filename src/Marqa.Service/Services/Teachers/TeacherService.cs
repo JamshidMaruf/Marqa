@@ -3,7 +3,7 @@ using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Helpers;
+using Marqa.Shared.Helpers;
 using Marqa.Service.Services.Enums;
 using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
