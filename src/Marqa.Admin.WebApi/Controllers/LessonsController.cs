@@ -32,7 +32,7 @@ public class LessonsController(ILessonService lessonService, ILessonSchedule les
         });
     }
 
-    [HttpPost("{id:int}/students")]
+    [HttpGet("{id:int}/students")]
     public async Task<IActionResult> GetStudentsAsync(int id)
     {
         var result = await lessonService.GetCourseStudentsForCheckUpAsync(id);
@@ -45,12 +45,25 @@ public class LessonsController(ILessonService lessonService, ILessonSchedule les
         });
     }
 
-    [HttpPost("{companyId:int}/statistics")]
+    [HttpGet("{companyId:int}/statistics")]
     public async Task<IActionResult> GetStatisticsAsync(int companyId)
     {
         var result = await lessonService.GetStatisticsAsync(companyId);
 
         return Ok(new Response<CurrentAttendanceStatistics>
+        {
+            StatusCode = 200,
+            Message = "success",
+            Data = result
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetLessonsAsync([FromQuery] DateOnly date)
+    {
+        var result = await lessonService.GetCoursesLessonsAsync(date);
+
+        return Ok(new Response<List<CourseLesson>>
         {
             StatusCode = 200,
             Message = "success",

@@ -5,8 +5,6 @@ using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Helpers;
 using Marqa.Service.Services.Employees.Models;
-using Marqa.Service.Services.Teachers.Models;
-using Marqa.Shared.Helpers;
 using Marqa.Shared.Models;
 using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;

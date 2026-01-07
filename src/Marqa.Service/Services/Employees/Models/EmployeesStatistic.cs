@@ -1,4 +1,4 @@
-﻿namespace Marqa.Service.Services.Teachers.Models;
+﻿namespace Marqa.Service.Services.Employees.Models;
 
 public class EmployeesStatistic
 {
