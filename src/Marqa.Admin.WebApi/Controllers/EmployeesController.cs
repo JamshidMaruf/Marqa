@@ -1,5 +1,6 @@
 ﻿using Marqa.Service.Services.Employees;
 using Marqa.Service.Services.Employees.Models;
+using Marqa.Service.Services.Teachers.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,7 +61,7 @@ public class EmployeesController(IEmployeeService employeeService) : BaseControl
     public async Task<IActionResult> GetForUpdateAsync(int id)
     {
         var employee = await employeeService.GetForUpdateAsync(id);
-        return Ok(new Response<EmployeeViewModel>
+        return Ok(new Response<EmployeeUpdateViewModel>
         {
             StatusCode = 200,
             Message = "success",
@@ -78,6 +79,20 @@ public class EmployeesController(IEmployeeService employeeService) : BaseControl
             StatusCode = 200,
             Message = "success",
             Data = result
+        });
+    }
+
+    
+    [HttpGet("by-company/{companyId}/statistics")]
+    [ProducesResponseType(typeof(Response<EmployeesStatistic>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetStatisticsAsync(int companyId)
+    {
+        var statistics = await employeeService.GetStatisticsAsync(companyId);
+        return Ok(new Response<EmployeesStatistic>
+        {
+            StatusCode = 200,
+            Message = "success", 
+            Data = statistics
         });
     }
 }
