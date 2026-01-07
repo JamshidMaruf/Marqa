@@ -15,10 +15,14 @@ public class PermissionsController(IPermissionService permissionService) : Contr
 
         var result = await permissionService.GetAllAsync(@params, search);
 
+        var permissionsCount = await permissionService.GetPermissionsCountAsync();
+        var totalPages = (int)Math.Ceiling(permissionsCount / (double)@params.PageSize);
+
         ViewBag.CurrentPage = @params.PageNumber;
         ViewBag.PageSize = @params.PageSize;
+        ViewBag.TotalPages = totalPages == 0 ? 1 : totalPages;
         ViewBag.Search = search;
-        
+
         return View(result);
     }
 

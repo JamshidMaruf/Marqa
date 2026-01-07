@@ -1,11 +1,12 @@
 @model List<PermissionViewModel>
 
-<h1>Permissions list</h1>
+<h1>Permissions</h1>
 
 @{
 	ViewData["Title"] = "Permissions";
 	int currentPage = ViewBag.CurrentPage ?? 1;
 	int pageSize = ViewBag.PageSize ?? 20;
+	int totalPages = ViewBag.TotalPages ?? 10;
 	string search = ViewBag.Search ?? "";
 }
 
@@ -162,17 +163,17 @@
 								@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
 								{
 									<i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
-									<p class="text-muted mt-3">No companies found matching "@ViewBag.Search"</p>
+									<p class="text-muted mt-3">No permissions found matching "@ViewBag.Search"</p>
 									<a href="@Url.Action("Index")" class="btn btn-outline-primary mt-2">
-										<i class="fas fa-list me-1"></i>Show all companies
+										<i class="fas fa-list me-1"></i>Show all permissions
 									</a>
 								}
 								else
 								{
 									<i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
-									<p class="text-muted mt-3">No companies found</p>
+									<p class="text-muted mt-3">No permissions found</p>
 									<a href="@Url.Action("Create")" class="btn btn-primary mt-2">
-										<i class="fas fa-plus me-1"></i>Add your first company
+										<i class="fas fa-plus me-1"></i>Add your first permission
 									</a>
 								}
 							</td>
@@ -182,54 +183,47 @@
 			</table>
 		</div>
 
-		<!-- Pagination Controls -->
-		<form method="get" class="d-flex align-items-center mt-3 gap-2">
-			<input type="hidden" name="search" value="@search" />
-
-			<a class="btn btn-outline-primary @(currentPage == 1 ? "disabled" : "")"
-			   href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })">
-				Previous
-			</a>
-
-			<span>Page @currentPage</span>
-
-			<a class="btn btn-outline-primary"
-			   href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">
-				Next
-			</a>
-
-			<!-- PageSize input -->
-			<div class="ms-auto d-flex align-items-center gap-2">
-				<label>Items per page:</label>
-				<input type="number" name="PageSize" min="1" value="@pageSize" class="form-control w-25" />
-				<button type="submit" class="btn btn-success">Apply</button>
+		<!-- Pagination Bar -->
+		<form method="get" class="d-flex align-items-center justify-content-between mt-3">
+			<div class="d-flex align-items-center gap-2">
+				<label>OnPage:</label>
+				<select name="PageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+					<option value="5" selected="@(pageSize == 5)">5 items</option>
+					<option value="10" selected="@(pageSize == 10)">10 items</option>
+					<option value="20" selected="@(pageSize == 20)">20 items</option>
+					<option value="50" selected="@(pageSize == 50)">50 items</option>
+				</select>
+				<input type="hidden" name="search" value="@search" />
 			</div>
+
+			<ul class="pagination mb-0">
+				<!-- First page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = 1, PageSize = pageSize, search })">«</a>
+				</li>
+
+				<!-- Previous page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })"><</a>
+				</li>
+
+				<!-- Current page -->
+				<li class="page-item active">
+					<span class="page-link">@currentPage</span>
+				</li>
+
+				<!-- Next page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">></a>
+				</li>
+
+				<!-- Last page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = totalPages, PageSize = pageSize, search })">»</a>
+				</li>
+			</ul>
 		</form>
 
-		<!-- Results. Count Footer -->
-		@if (Model.Any())
-		{
-			<div class="card-footer d-flex justify-content-between align-items-center">
-				<div>
-					<span class="text-muted">
-						Showing <strong>@Model.Count()</strong>
-						@(Model.Count() == 1 ? "permission" : "permissions")
-						@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
-						{
-							<span>matching "<strong>@ViewBag.Search</strong>"</span>
-						}
-					</span>
-				</div>
-				@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
-				{
-					<div>
-						<a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
-							<i class="fas fa-times me-1"></i>Clear search
-						</a>
-					</div>
-				}
-			</div>
-		}
 	</div>
 </div>
 
