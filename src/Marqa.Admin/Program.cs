@@ -1,9 +1,5 @@
-﻿using FluentValidation;
-using Marqa.Admin.Extensions;
+﻿using Marqa.Admin.Extensions;
 using Marqa.DataAccess.Contexts;
-using Marqa.Service.Services.TeacherAssessments;
-using Marqa.Service.Services.TeacherAssessments.Models;
-using Marqa.Service.Validators;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
