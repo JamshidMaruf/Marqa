@@ -13,17 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FluentValidation" Version="12.1.0" />
     <PackageReference Include="Hangfire.Core" Version="1.8.22" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Scrutor" Version="7.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Include="BCrypt.Net.BCrypt" Alias="Bcrypt" />
   </ItemGroup>
 
 </Project>

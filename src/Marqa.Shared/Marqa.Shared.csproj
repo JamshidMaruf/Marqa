@@ -7,11 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
       <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.3.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
       <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.3.0" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="BCrypt.Net.BCrypt" Alias="Bcrypt" />
+  </ItemGroup>
 
 </Project>

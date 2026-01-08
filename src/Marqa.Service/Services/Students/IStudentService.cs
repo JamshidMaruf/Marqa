@@ -19,7 +19,7 @@ public interface IStudentService : IScopedService
     Task<List<StudentListModel>> GetAllAsync(
         PaginationParams @params,
         int companyId,
-        string? searchText = null,
+        string searchText = null,
         int? courseId = null,
         StudentFilteringStatus? status = null);
     Task UpdateStudentCourseStatusAsync(int studentId, int courseId, EnrollmentStatus status);

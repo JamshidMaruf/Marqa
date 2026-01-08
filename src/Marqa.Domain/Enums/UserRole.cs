@@ -13,5 +13,7 @@ public enum UserRole
     Student = 2,
     
     [Description("O'qituvchi")]
-    Teacher = 3
+    Teacher = 3,
+
+    SuperAdmin = 4
 }

@@ -10,23 +10,6 @@
 		<h1 class="h4 mb-0 fw-700">Create Company</h1>
 	</div>
 
-	<!-- Alerts -->
-@if (TempData["Success"] != null)
-{
-	<div class="alert alert-success alert-dismissible fade show" role="alert">
-		<i class="fas fa-check-circle me-2"></i>@TempData["Success"]
-		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-	</div>
-}
-
-@if (TempData["Error"] != null)
-{
-	<div class="alert alert-danger alert-dismissible fade show" role="alert">
-		<i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
-		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-	</div>
-}
-
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="card">
@@ -50,6 +33,7 @@
 									<input asp-for="Director" class="form-control" placeholder="Enter full name" required>
 									<span asp-validation-for="Director" class="text-danger small"></span>
 								</div>
+							</div>
 						</div>
 
 						<!-- Contact Information -->
@@ -70,8 +54,8 @@
 						<div class="mb-3">
 							<div class="mb-3">
 								<label asp-for="Address" class="form-label">Addess <span class="text-danger">*</span></label>
-									<input asp-for="Address" type="text" class="form-control" placeholder="Enter address" required>
-									<span asp-validation-for="Address" class="text-danger small"></span>
+								<input asp-for="Address" type="text" class="form-control" placeholder="Enter address" required>
+								<span asp-validation-for="Address" class="text-danger small"></span>
 							</div>
 						</div>
 

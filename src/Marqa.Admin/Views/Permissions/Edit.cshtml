@@ -1,20 +1,23 @@
 @{
-	ViewData["Title"] = "Create";
+    ViewData["Title"] = "Update";
 }
 
-@model PermissionCreateModel;
+@model PermissionUpdateFormModel
 
 <div class="container-fluid py-3">
 	<!-- Header -->
 	<div class="mb-3">
-		<h1 class="h4 mb-0 fw-700">Create Permission</h1>
+		<h1 class="h4 mb-0 fw-700">Edit Company</h1>
 	</div>
 
 	<div class="row">
 		<div class="col-lg-8">
 			<div class="card">
 				<div class="card-body">
-					<form method="post" asp-action="Create">
+					<form method="post" asp-action="Edit" asp-route-id="ViewBag.Id">
+
+					    <input type="hidden" asp-for="Id" />
+
 
 						<!-- Permission Name -->
 						<div class="mb-3">
@@ -59,8 +62,8 @@
 							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
 								<i class="fas fa-times me-1"></i>Cancel
 							</a>
-							<button type="submit" class="btn btn-primary" style="color: green">
-								<i class="fas fa-save me-1"></i>Create
+							<button type="submit" class="btn btn-primary" style="color: gold">
+								<i class="fas fa-save me-1"></i>Update
 							</button>
 						</div>
 					</form>
@@ -71,7 +74,5 @@
 </div>
 
 @section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

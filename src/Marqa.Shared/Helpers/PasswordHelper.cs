@@ -1,4 +1,4 @@
-﻿namespace Marqa.Service.Helpers;
+﻿namespace Marqa.Shared.Helpers;
 
 public static class PasswordHelper
 {

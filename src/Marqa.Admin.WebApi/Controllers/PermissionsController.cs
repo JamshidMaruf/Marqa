@@ -24,9 +24,9 @@ public class PermissionsController(IPermissionService permissionService, IEmploy
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync(PaginationParams @params, string? search)
     {
-        var permissions = await permissionService.GetAllAsync();
+        var permissions = await permissionService.GetAllAsync(@params, search);
 
         return Ok(new Response<List<PermissionViewModel>>
         {

@@ -2,6 +2,10 @@
 
 @{
 	ViewData["Title"] = "Companies";
+	int currentPage = ViewBag.CurrentPage ?? 1;
+	int pageSize = ViewBag.PageSize ?? 20;
+	int totalPages = ViewBag.TotalPages ?? 10;
+	string search = ViewBag.Search ?? "";
 }
 
 <link rel="stylesheet" href="~/css/companies/index.css" asp-append-version="true" />
@@ -23,27 +27,10 @@
 					</p>
 			}
 		</div>
-		<a href="@Url.Action("Create")" class="btn btn-primary">
+		<a href="@Url.Action("Create")" class="btn btn-success">
 			<i class="fas fa-plus me-1"></i>Add Company
 		</a>
 	</div>
-
-	<!-- Alerts -->
-	@if (TempData["Success"] != null)
-	{
-			<div class="alert alert-success alert-dismissible fade show" role="alert">
-				<i class="fas fa-check-circle me-2"></i>@TempData["Success"]
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			</div>
-	}
-
-	@if (TempData["Error"] != null)
-	{
-			<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			</div>
-	}
 
 	<!-- Search Card -->
 	<div class="card mb-3">
@@ -129,7 +116,7 @@
 											<span>@company.Email</span>
 										</td>
 										<td>
-											<span class="badge bg-light text-dark">@company.Address</span>
+											<span>@company.Address</span>
 										</td>
 										<td class="text-center">
 											<div class="btn-group btn-group-sm" role="group">
@@ -197,30 +184,47 @@
 			</table>
 		</div>
 
-		<!-- Results. Count Footer -->
-		@if (Model.Any())
-		{
-				<div class="card-footer d-flex justify-content-between align-items-center">
-					<div>
-						<span class="text-muted">
-							Showing <strong>@Model.Count()</strong> 
-						@(Model.Count() == 1 ? "company" : "companies")
-						@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
-						{
-									<span>matching "<strong>@ViewBag.Search</strong>"</span>
-						}
-						</span>
-					</div>
-				@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
-				{
-							<div>
-								<a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
-									<i class="fas fa-times me-1"></i>Clear search
-								</a>
-							</div>
-				}
-				</div>
-		}
+		<!-- Pagination Bar -->
+		<form method="get" class="d-flex align-items-center justify-content-between mt-3">
+			<div class="d-flex align-items-center gap-2">
+				<label id="on-page"> OnPage: </label>
+				<select name="PageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+					<option value="5" selected="@(pageSize == 5)">5 items</option>
+					<option value="10" selected="@(pageSize == 10)">10 items</option>
+					<option value="20" selected="@(pageSize == 20)">20 items</option>
+					<option value="50" selected="@(pageSize == 50)">50 items</option>
+				</select>
+				<input type="hidden" name="search" value="@search" />
+			</div>
+
+			<ul class="pagination mb-0">
+				<!-- First page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = 1, PageSize = pageSize, search })">«</a>
+				</li>
+
+				<!-- Previous page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })"><</a>
+				</li>
+
+				<!-- Current page -->
+				<li class="page-item active">
+					<span class="page-link">@currentPage</span>
+				</li>
+
+				<!-- Next page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">></a>
+				</li>
+
+				<!-- Last page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = totalPages, PageSize = pageSize, search })">»</a>
+				</li>
+			</ul>
+		</form>
+
 	</div>
 </div>
 

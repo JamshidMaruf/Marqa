@@ -6,7 +6,7 @@ namespace Marqa.Service.Validators.Permissions;
 
 public class PermissionCreateValidator : AbstractValidator<PermissionCreateModel>
 {
-    private static readonly string[] ValidActions = { "Create", "Read", "Update", "Delete", "View", "Manage", "Execute", "Export", "Import" };
+    private static readonly string[] _validActions = { "Create", "Read", "Update", "Delete", "View", "Manage", "Execute", "Export", "Import" };
 
     public PermissionCreateValidator()
     {
@@ -18,12 +18,12 @@ public class PermissionCreateValidator : AbstractValidator<PermissionCreateModel
 
         RuleFor(p => p.Action)
             .NotEmpty().WithMessage("Action is required")
-            .Must(BeValidAction).WithMessage($"Action must be one of: {string.Join(", ", ValidActions)}");
+            .Must(BeValidAction).WithMessage($"Action must be one of: {string.Join(", ", _validActions)}");
     }
 
     private bool BeValidAction(string action)
     {
         return !string.IsNullOrWhiteSpace(action) &&
-               ValidActions.Contains(action, StringComparer.OrdinalIgnoreCase);
+               _validActions.Contains(action, StringComparer.OrdinalIgnoreCase);
     }
 }

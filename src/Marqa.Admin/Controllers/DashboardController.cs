@@ -1,10 +1,9 @@
 ﻿using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Permissions;
-using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
 using Marqa.Service.Services.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
 
 namespace Marqa.Admin.Controllers;
 
@@ -20,15 +19,16 @@ public class DashboardController(
         try
         {
             // Get statistics
-            var companies = await companyService.GetAllAsync();
+            var companiesCount = await companyService.GetCompaniesCountAsync();
             var usersCount = await userService.GetAllUsersCount();
-            var permissions = await permissionService.GetAllAsync();
-            var settings = await settingService.GetAllAsync();
-            //var subscribers = await subscriptionService.GetAllSubscribersAsync();    
-            
-            ViewBag.TotalCompanies = companies.Count();
+            var permissionsCount = await permissionService.GetPermissionsCountAsync();
+            var settingsCount = await settingService.GetSettingsCount();
+            //var subscribers = await subscriptionService.GetAllAsync();    
+
+            ViewBag.TotalCompanies = companiesCount;
             ViewBag.TotalUsers = usersCount;
-            ViewBag.TotalSettings = settings.Count();
+            ViewBag.TotalSettings = settingsCount;
+            ViewBag.TotalPermissions = permissionsCount;
             //ViewBag.TotalSubscribers = subscribers.Count();
 
             return View();
@@ -39,6 +39,8 @@ public class DashboardController(
             ViewBag.TotalCompanies = 0;
             ViewBag.TotalUsers = 0;
             ViewBag.TotalSettings = 0;
+            ViewBag.TotalPermissions = 0;
+            ViewBag.DatabaseCondition = "problematic";
             //ViewBag.TotalSubscribers = 0;
             return View();
         }

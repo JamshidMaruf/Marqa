@@ -1,10 +1,13 @@
-﻿using Marqa.Domain.Entities;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Numerics;
+using Marqa.Domain.Entities;
 using Marqa.Domain.Enums;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
-using Marqa.Service.Helpers;
 using Marqa.Service.Services.Auth.Models;
 using Marqa.Service.Services.Settings;
+using Marqa.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Auth;
@@ -239,18 +242,17 @@ public class AuthService(
 
     public async Task<LoginResponseModel> LoginAdminAsync(LoginModel model, string ipAddress)
     {
-        // temporary admin credentials 
-        const string ADMIN_PHONE = "998777777777";
-        const string ADMIN_PASSWORD = "root";
+        //    persist this command on postgresql (temporary data), password -> root
+        //INSERT INTO users(first_name, last_name, phone, is_active, is_use_system, password_hash, role, created_at, is_deleted)
+        //VALUES('Super', 'Admin', '998777777777', true, true, '$2a$12$o83E6Kk.p1Z7oZwMhspsruLxcNZuicrvSBAgP05wfJASrDR0AXAUm', 4, '2026-01-07 11:49:00+05', true);
 
-        // Validate credentials
-        if (model.Phone != ADMIN_PHONE || model.Password != ADMIN_PASSWORD)
+        var phone = model.Phone.TrimPhoneNumber().Phone;
+        var user = await unitOfWork.Users.SelectAsync(u => u.Phone == phone && u.Role == UserRole.SuperAdmin)
+            ?? throw new UnauthorizedAccessException("Invalid phone or password");
+
+        // Validate password
+        if (!PasswordHelper.Verify(model.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Invalid phone or password");
-
-        var user = new User
-        {
-            Id = 0, FirstName = "Super", LastName = "Admin", Phone = ADMIN_PHONE
-        };
         
         var accessToken = await jwtService.GenerateJwtToken(user,"SuperAdmin");
 

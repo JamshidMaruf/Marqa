@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-    <PackageReference Include="FontAwesome.MVC" Version="1.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -24,6 +23,13 @@
     <ProjectReference Include="..\Marqa.Shared\Marqa.Shared.csproj" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties appsetting_1json__JsonSchema="https://www.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Views\Employees\" />
+    <Folder Include="Views\Users\" />
+    <Folder Include="Views\Roles\" />
+    <Folder Include="Views\Students\" />
+    <Folder Include="Views\Teachers\" />
+    <Folder Include="wwwroot\css\settings\" />
+  </ItemGroup>
 
 </Project>
