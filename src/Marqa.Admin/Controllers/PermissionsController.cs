@@ -9,7 +9,7 @@ namespace Marqa.Admin.Controllers;
 [Authorize]
 public class PermissionsController(IPermissionService permissionService) : Controller
 {
-    public async Task<IActionResult> Index(PaginationParams? @params, string? search)
+    public async Task<IActionResult> Index(PaginationParams @params, string search)
     {
         @params ??= new PaginationParams();
 
@@ -38,35 +38,53 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         try
         {
             await permissionService.CreateAsync(model);
-        
+
             return RedirectToAction("Index");
         }
-        catch (Exception e)
+        catch (FluentValidation.ValidationException ex)
         {
-            ViewBag.ExceptionMessage = e.Message;
+            foreach (var error in ex.Errors)
+            {
+                ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+            }
+
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
             return View();
         }
     }
-    
+
     [HttpGet]
-    public async Task<IActionResult> Update(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var result = await permissionService.GetAsync(id);
-        return View(result);
+        try
+        {
+            var result = await permissionService.GetForUpdateFormAsync(id);
+            ViewBag.Id = id;
+            return View(result);
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction("Index");
+        }
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> Update(int id, PermissionUpdateModel model)
+    public async Task<IActionResult> Edit(int id, PermissionUpdateModel model)
     {
         try
         {
             await permissionService.UpdateAsync(id, model);
-        
+
             return RedirectToAction("Index");
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            ViewBag.ExceptionMessage = e.Message;
+            TempData["ErrorMessage"] = ex.Message;
             return View();
         }
     }

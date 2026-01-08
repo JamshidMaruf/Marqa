@@ -16,7 +16,7 @@ public class PermissionService(
     IValidator<PermissionCreateModel> createValidator,
     IValidator<PermissionUpdateModel> updateValidator) : IPermissionService
 {
-    
+
     public async Task CreateAsync(PermissionCreateModel model)
     {
         await createValidator.EnsureValidatedAsync(model);
@@ -66,7 +66,7 @@ public class PermissionService(
         unitOfWork.Permissions.Update(existPermission);
         await unitOfWork.SaveAsync();
     }
-   
+
     public async Task DeleteAsync(int id)
     {
         var existPermission = await unitOfWork.Permissions
@@ -76,7 +76,7 @@ public class PermissionService(
         unitOfWork.Permissions.MarkAsDeleted(existPermission);
         await unitOfWork.SaveAsync();
     }
-   
+
     public async Task<PermissionViewModel> GetAsync(long id)
     {
         var permission = await unitOfWork.Permissions
@@ -84,6 +84,22 @@ public class PermissionService(
             ?? throw new NotFoundException("Permission is not found");
 
         return new PermissionViewModel
+        {
+            Id = permission.Id,
+            Name = permission.Name,
+            Module = permission.Module,
+            Action = permission.Action,
+            Description = permission.Description,
+        };
+    }
+
+    public async Task<PermissionUpdateFormModel> GetForUpdateFormAsync(long id)
+    {
+        var permission = await unitOfWork.Permissions
+            .SelectAsync(p => p.Id == id)
+               ?? throw new NotFoundException("Permission is not found");
+
+        return new PermissionUpdateFormModel
         {
             Id = permission.Id,
             Name = permission.Name,
@@ -102,10 +118,10 @@ public class PermissionService(
         {
             string searchText = search.ToLower().Trim();
 
-            query = query.Where(p => 
+            query = query.Where(p =>
             p.Name.Contains(searchText) ||
-            p.Module.Contains(searchText) || 
-            p.Action.Contains(searchText) || 
+            p.Module.Contains(searchText) ||
+            p.Action.Contains(searchText) ||
             p.Description.Contains(searchText));
         }
 

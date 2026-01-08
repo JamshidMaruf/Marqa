@@ -1,5 +1,6 @@
 ﻿﻿using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
+using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,15 +9,23 @@ namespace Marqa.Admin.Controllers;
 [Authorize]
 public class CompaniesController(ICompanyService companyService) : Controller
 {
-    public async Task<IActionResult> Index(string? search = null)
+    public async Task<IActionResult> Index(PaginationParams @params, string search)
     {
         try
         {
+            @params ??= new PaginationParams();
+
+            var result = await companyService.GetAllAsync(@params, search);
+
+            var permissionsCount = await companyService.GetCompaniesCountAsync();
+            var totalPages = (int)Math.Ceiling(permissionsCount / (double)@params.PageSize);
+
+            ViewBag.CurrentPage = @params.PageNumber;
+            ViewBag.PageSize = @params.PageSize;
+            ViewBag.TotalPages = totalPages == 0 ? 1 : totalPages;
             ViewBag.Search = search;
 
-            var companies = await companyService.GetAllAsync(search);
-
-            return View(companies);
+            return View(result);
         }
         catch (Exception ex)
         {
@@ -60,7 +69,7 @@ public class CompaniesController(ICompanyService companyService) : Controller
     {
         try
         {
-            var companyDataToUpdate = await companyService.GetAsync(id);
+            var companyDataToUpdate = await companyService.GetForUpdateAsync(id);
             ViewBag.Id = id;
             return View(companyDataToUpdate);
         }

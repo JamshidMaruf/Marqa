@@ -4,34 +4,69 @@
 
 @model PermissionCreateModel;
 
-<h1>Create</h1>
+<div class="container-fluid py-3">
+	<!-- Header -->
+	<div class="mb-3">
+		<h1 class="h4 mb-0 fw-700">Create Permission</h1>
+	</div>
 
-<div class="row">
-	<div class="col-md-4">
-		<form asp-action="Create">
-			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-			<div class="form-group mb-3">
-				<label asp-for="Name" class="control-label"></label>
-				<input asp-for="Name" class="form-control" />
-			</div>
-			<div class="form-group mb-3">
-				<label asp-for="Module" class="control-label"></label>
-				<input asp-for="Module" class="form-control" />
-			</div>
-			<div class="form-group mb-3">
-				<label asp-for="Action" class="control-label"></label>
-				<input asp-for="Action" class="form-control" />
-			</div>
-			<div class="form-group mb-3">
-				<label asp-for="Description" class="control-label"></label>
-				<input asp-for="Description" class="form-control" />
-			</div>
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="card">
+				<div class="card-body">
+					<form method="post" asp-action="Create">
 
-			<div class="form-group">
-				<button type="submit" class="btn btn-success">Save</button>
-				<a type="button" asp-action="Index" class="btn btn-secondary">Back</a>
+						<!-- Permission Name -->
+						<div class="mb-3">
+							<div class="mb-3">
+								<label asp-for="Name" class="form-label"> Permission Name <span class="text-danger">*</span></label>
+								<input asp-for="Name" class="form-control" placeholder="Enter permission name" required>
+								<span asp-validation-for="Name" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<!-- Module Name -->
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label asp-for="Module" class="form-label">Module <span class="text-danger">*</span></label>
+									<input asp-for="Module" class="form-control" placeholder="Enter module name" required>
+									<span asp-validation-for="Module" class="text-danger small"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Action Name -->
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label asp-for="Action" class="form-label">Action <span class="text-danger">*</span></label>
+									<input asp-for="Action" class="form-control" placeholder="Enter action name" required>
+									<span asp-validation-for="Action" class="text-danger small"></span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Description -->
+						<div class="mb-3">
+							<label asp-for="Description" class="form-label">Description</label>
+							<input asp-for="Description" type="text" class="form-control" placeholder="Enter description">
+							<span asp-validation-for="Description" class="text-danger small"></span>
+						</div>
+
+						<!-- Buttons -->
+						<div class="d-flex gap-2 mt-3">
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Cancel
+							</a>
+							<button type="submit" class="btn btn-primary" style="color: green">
+								<i class="fas fa-save me-1"></i>Create
+							</button>
+						</div>
+					</form>
+				</div>
 			</div>
-		</form>
+		</div>
 	</div>
 </div>
 

@@ -1,8 +1,8 @@
-﻿@model CompanyUpdateFormModel
-
-@{
-	TempData["Edit"] = "Edit";
+@* @{
+    ViewData["Title"] = "Update";
 }
+
+@model PermissionUpdateFormModel
 
 <div class="container-fluid py-3">
 	<!-- Header -->
@@ -21,7 +21,7 @@
 								<label asp-for="Name" class="form-label">Company Name <span class="text-danger">*</span></label>
 								<input asp-for="Name" class="form-control" placeholder="Enter company name" required>
 								<span asp-validation-for="Name" class="text-danger small"></span>
-							</div>						
+							</div>
 						</div>
 
 						<!-- Contact Information -->
@@ -51,19 +51,9 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- Info Card -->
-		<div class="col-lg-4">
-			<div class="card">
-				<div class="card-body">
-					<h6 class="fw-700 mb-2">Information</h6>
-					<div class="mb-3">
-						<small class="text-muted">Company</small>
-						<p class="mb-0 fw-600">@Model.Name</p>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 </div>
 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} *@

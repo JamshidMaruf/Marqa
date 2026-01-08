@@ -2,6 +2,10 @@
 
 @{
 	ViewData["Title"] = "Companies";
+	int currentPage = ViewBag.CurrentPage ?? 1;
+	int pageSize = ViewBag.PageSize ?? 20;
+	int totalPages = ViewBag.TotalPages ?? 10;
+	string search = ViewBag.Search ?? "";
 }
 
 <link rel="stylesheet" href="~/css/companies/index.css" asp-append-version="true" />
@@ -179,6 +183,47 @@
 				</tbody>
 			</table>
 		</div>
+
+				<!-- Pagination Bar -->
+		<form method="get" class="d-flex align-items-center justify-content-between mt-3">
+			<div class="d-flex align-items-center gap-2">
+				<label>OnPage:</label>
+				<select name="PageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+					<option value="5" selected="@(pageSize == 5)">5 items</option>
+					<option value="10" selected="@(pageSize == 10)">10 items</option>
+					<option value="20" selected="@(pageSize == 20)">20 items</option>
+					<option value="50" selected="@(pageSize == 50)">50 items</option>
+				</select>
+				<input type="hidden" name="search" value="@search" />
+			</div>
+
+			<ul class="pagination mb-0">
+				<!-- First page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = 1, PageSize = pageSize, search })">«</a>
+				</li>
+
+				<!-- Previous page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })"><</a>
+				</li>
+
+				<!-- Current page -->
+				<li class="page-item active">
+					<span class="page-link">@currentPage</span>
+				</li>
+
+				<!-- Next page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">></a>
+				</li>
+
+				<!-- Last page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = totalPages, PageSize = pageSize, search })">»</a>
+				</li>
+			</ul>
+		</form>
 
 		<!-- Results. Count Footer -->
 		@if (Model.Any())

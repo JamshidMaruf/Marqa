@@ -19,15 +19,15 @@ public class DashboardController(
         try
         {
             // Get statistics
-            var companies = await companyService.GetAllAsync();
+            var companiesCount = await companyService.GetCompaniesCountAsync();
             var usersCount = await userService.GetAllUsersCount();
             var permissionsCount = await permissionService.GetPermissionsCountAsync();
-            var settings = await settingService.GetAllAsync();
+            var settingsCount = await settingService.GetSettingsCount();
             //var subscribers = await subscriptionService.GetAllAsync();    
-            
-            ViewBag.TotalCompanies = companies.Count();
+
+            ViewBag.TotalCompanies = companiesCount;
             ViewBag.TotalUsers = usersCount;
-            ViewBag.TotalSettings = settings.Count();
+            ViewBag.TotalSettings = settingsCount;
             ViewBag.TotalPermissions = permissionsCount;
             //ViewBag.TotalSubscribers = subscribers.Count();
 

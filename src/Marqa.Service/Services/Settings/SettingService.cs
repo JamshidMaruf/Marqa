@@ -8,7 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Settings;
 
-public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptionService,
+public class SettingService(
+    IUnitOfWork unitOfWork, 
+    IEncryptionService encryptionService,
     IValidator<SettingCreateModel> settingCreateValidator) : ISettingService
 {
     public async Task CreateAsync(SettingCreateModel model)
@@ -69,5 +71,10 @@ public class SettingService(IUnitOfWork unitOfWork, IEncryptionService encryptio
         return await unitOfWork.Settings
             .SelectAllAsQueryable()
             .ToListAsync();
+    }
+
+    public async Task<int> GetSettingsCount()
+    {
+        return await unitOfWork.Settings.SelectAllAsQueryable().CountAsync();
     }
 }

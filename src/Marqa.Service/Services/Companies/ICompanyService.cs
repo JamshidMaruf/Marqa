@@ -10,6 +10,7 @@ public interface ICompanyService : IScopedService
     Task UpdateAsync(int id, CompanyUpdateModel model);
     Task DeleteAsync(int id);
     Task<CompanyViewModel> GetAsync(int id);
-    Task<List<CompanyViewModel>> GetAllAsync(string? search = null);
-    Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params);
+    Task<CompanyUpdateFormModel> GetForUpdateAsync(int id);
+    Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params, string? search = null);
+    Task<int> GetCompaniesCountAsync();
 }

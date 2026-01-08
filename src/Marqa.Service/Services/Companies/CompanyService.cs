@@ -4,12 +4,14 @@ using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Companies.Models;
 using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Companies;
 
 public class CompanyService(
     IUnitOfWork unitOfWork,
+    IPaginationService paginationService,
     IValidator<CompanyCreateModel> createModelValidator,
     IValidator<CompanyUpdateModel> updateModelValidator) : ICompanyService
 {
@@ -69,17 +71,33 @@ public class CompanyService(
             Address = existCompany.Address,
             Phone = existCompany.Phone,
             Email = existCompany.Email,
-            Director = existCompany.Director,
+            Director = existCompany.Director
         };
     }
 
-    public async Task<List<CompanyViewModel>> GetAllAsync(string search = null)
+    public async Task<CompanyUpdateFormModel> GetForUpdateAsync(int id)
+    {
+        var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
+            ?? throw new NotFoundException("Company is not found");
+
+        return new CompanyUpdateFormModel
+        {
+            Id = existCompany.Id,
+            Name = existCompany.Name,
+            Address = existCompany.Address,
+            Phone = existCompany.Phone,
+            Email = existCompany.Email,
+            Director = existCompany.Director
+        };
+    }
+
+    public async Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params, string search = null)
     {
         var query = unitOfWork.Companies.SelectAllAsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            search = search.Trim(); 
+            search = search.Trim();
 
             query = query.Where(c =>
                 c.Name.Contains(search) ||
@@ -88,6 +106,8 @@ public class CompanyService(
                 c.Email.Contains(search) ||
                 c.Director.Contains(search));
         }
+
+        query = paginationService.Paginate(query, @params);
 
         return await query
             .Select(c => new CompanyViewModel
@@ -102,20 +122,8 @@ public class CompanyService(
             .ToListAsync();
     }
 
-    public async Task<List<CompanyViewModel>> GetAllAsync(PaginationParams @params)
+    public async Task<int> GetCompaniesCountAsync()
     {
-        var query = unitOfWork.Companies.SelectAllAsQueryable();
-
-        var paginatedCompanies = await query.ToListAsync();
-        
-        return paginatedCompanies.Select(c => new CompanyViewModel
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Address = c.Address,
-            Phone = c.Phone,
-            Email = c.Email,
-            Director = c.Director,
-        }).ToList();
+        return await unitOfWork.Companies.SelectAllAsQueryable().CountAsync();  
     }
 }

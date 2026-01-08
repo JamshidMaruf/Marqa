@@ -42,6 +42,8 @@ public interface IPermissionService : IScopedService
     /// <exception cref="NotFoundException">Thrown when the permission with the specified ID is not found</exception>
     Task<PermissionViewModel> GetAsync(long id);
 
+    Task<PermissionUpdateFormModel> GetForUpdateFormAsync(long id);
+
     /// <summary>
     /// Retrieves all permissions from the system ordered by module and name
     /// </summary>
