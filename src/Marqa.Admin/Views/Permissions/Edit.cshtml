@@ -1,4 +1,4 @@
-@* @{
+@{
     ViewData["Title"] = "Update";
 }
 
@@ -15,27 +15,46 @@
 			<div class="card">
 				<div class="card-body">
 					<form method="post" asp-action="Edit" asp-route-id="ViewBag.Id">
-						<!-- Branch Information -->
+
+					    <input type="hidden" asp-for="Id" />
+
+
+						<!-- Permission Name -->
 						<div class="mb-3">
 							<div class="mb-3">
-								<label asp-for="Name" class="form-label">Company Name <span class="text-danger">*</span></label>
-								<input asp-for="Name" class="form-control" placeholder="Enter company name" required>
+								<label asp-for="Name" class="form-label"> Permission Name <span class="text-danger">*</span></label>
+								<input asp-for="Name" class="form-control" placeholder="Enter permission name" required>
 								<span asp-validation-for="Name" class="text-danger small"></span>
 							</div>
 						</div>
 
-						<!-- Contact Information -->
+						<!-- Module Name -->
 						<div class="mb-3">
-							<div class="mb-3">
-								<label asp-for="Phone" class="form-label">Phone <span class="text-danger">*</span></label>
-								<input asp-for="Phone" type="tel" class="form-control" placeholder="+998..." required>
-								<span asp-validation-for="Phone" class="text-danger small"></span>
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label asp-for="Module" class="form-label">Module <span class="text-danger">*</span></label>
+									<input asp-for="Module" class="form-control" placeholder="Enter module name" required>
+									<span asp-validation-for="Module" class="text-danger small"></span>
+								</div>
 							</div>
-							<div class="mb-3">
-								<label asp-for="Address" class="form-label">Address <span class="text-danger">*</span></label>
-								<textarea asp-for="Address" class="form-control" placeholder="Enter branch address" rows="3" required></textarea>
-								<span asp-validation-for="Address" class="text-danger small"></span>
+						</div>
+
+						<!-- Action Name -->
+						<div class="mb-3">
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label asp-for="Action" class="form-label">Action <span class="text-danger">*</span></label>
+									<input asp-for="Action" class="form-control" placeholder="Enter action name" required>
+									<span asp-validation-for="Action" class="text-danger small"></span>
+								</div>
 							</div>
+						</div>
+
+						<!-- Description -->
+						<div class="mb-3">
+							<label asp-for="Description" class="form-label">Description</label>
+							<input asp-for="Description" type="text" class="form-control" placeholder="Enter description">
+							<span asp-validation-for="Description" class="text-danger small"></span>
 						</div>
 
 						<!-- Buttons -->
@@ -43,7 +62,7 @@
 							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
 								<i class="fas fa-times me-1"></i>Cancel
 							</a>
-							<button type="submit" class="btn btn-primary" style="color:gold">
+							<button type="submit" class="btn btn-primary" style="color: gold">
 								<i class="fas fa-save me-1"></i>Update
 							</button>
 						</div>
@@ -56,4 +75,4 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-} *@
+}

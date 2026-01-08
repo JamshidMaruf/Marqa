@@ -38,6 +38,7 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         try
         {
             await permissionService.CreateAsync(model);
+            TempData["SuccessMessage"] = "Permission created successfully!";
 
             return RedirectToAction("Index");
         }
@@ -68,7 +69,7 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         }
         catch (Exception ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["ErrorMessage"] = ex.Message;
             return RedirectToAction("Index");
         }
     }
@@ -89,9 +90,35 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         }
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-        await permissionService.DeleteAsync(id);
-        return RedirectToAction("Index");
+        try
+        {
+            await permissionService.DeleteAsync(id);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return View();
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        try
+        {
+            var result = await permissionService.GetAsync(id);
+
+            return PartialView("_Details", result);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToAction("Index");
+        }
     }
 }

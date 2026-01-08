@@ -94,6 +94,5 @@ public class CompaniesController(ICompanyService companyService) : Controller
             TempData["Error"] = ex.Message;
             return RedirectToAction("Index");
         }
-        //
     }
 }

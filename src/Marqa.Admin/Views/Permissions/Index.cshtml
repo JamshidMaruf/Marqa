@@ -114,46 +114,72 @@
 									<span>@permission.Action</span>
 								</td>
 								<td>
-									<span>@(permission.Description != null ? permission.Description.Take(15) + "..." : string.Empty)</span>
+									@{
+										var desc = permission.Description ?? "";
+										var shortDesc = desc.Length > 20 ? desc.Substring(0, 20) + "..." : desc;
+									}
+									<span>@shortDesc</span>
 								</td>
 								<td class="text-center">
 									<div class="btn-group btn-group-sm" role="group">
-										<a href="@Url.Action("Details", new { id = permission.Id })"
-										   style="border: 2px groove green" class="btn btn-outline-secondary" title="View">
+										<a href="javascript:void(0);"
+										   data-id="@permission.Id"
+										   data-url="@Url.Action("Details", "Permissions")"
+										   onclick="openDetailsModal(this)"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove green"
+										   title="View">
 											<i class="fas fa-eye"></i>
 										</a>
-										<a href="@Url.Action("Edit", new { id = permission.Id })" class="btn btn-outline-secondary"
-										   style="border: 2px groove yellow; margin-left: 5px; margin-right: 5px" title="Edit">
+										<a href="@Url.Action("Edit", new { id = permission.Id })"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove yellow; margin-left: 5px; margin-right: 5px"
+										   title="Edit">
 											<i class="fas fa-edit"></i>
 										</a>
-										<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-												style="border: 2px groove red" data-bs-target="#deleteModal@(permission.Id)" title="Delete">
+										<a href="javascript:void(0);"
+										   class="btn btn-outline-danger"
+										   style="border: 2px groove red"
+										   title="Delete"
+										   data-id="@permission.Id"
+										   data-name="@permission.Name"
+										   data-url="@Url.Action("Delete", "Permissions", new { id = permission.Id })"
+										   onclick="openDeleteModal(this)">
 											<i class="fas fa-trash"></i>
-										</button>
-									</div>
-
-									<!-- Delete Modal -->
-									<div class="modal fade" id="deleteModal@(permission.Id)" tabindex="-1">
-										<div class="modal-dialog">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5 class="modal-title">Delete Company</h5>
-													<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-												</div>
-												<div class="modal-body">
-													<p>Are you sure you want to delete <strong>@permission.Name</strong>?</p>
-													<p class="text-danger small"><i class="fas fa-warning me-2"></i>This action cannot be undone.</p>
-												</div>
-												<div class="modal-footer">
-													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-													<button type="button" class="btn btn-danger" onclick="deleteCompany(@permission.Id)">Delete</button>
-												</div>
-											</div>
-										</div>
+										</a>
 									</div>
 								</td>
 							</tr>
 						}
+
+						<!-- View Modal -->
+						<div class="modal fade" id="detailsModal" tabindex="-1">
+							<div class="modal-dialog modal-lg modal-dialog-centered">
+								<div class="modal-content" id="detailsModalContent">
+									<!-- _Details.cshtml will load items here -->
+								</div>
+							</div>
+						</div>
+
+						<!-- Delete Modal -->
+						<div class="modal fade" id="deleteModal" tabindex="-1">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Delete Permission</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete <strong id="deleteItemName"></strong>?</p>
+										<p class="text-danger small"><i class="fas fa-warning me-2"></i>This action cannot be undone.</p>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+										<button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+									</div>
+								</div>
+							</div>
+						</div>
 					}
 					else
 					{
