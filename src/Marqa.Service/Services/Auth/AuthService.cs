@@ -247,7 +247,7 @@ public class AuthService(
         //VALUES('Super', 'Admin', '998777777777', true, true, '$2a$12$o83E6Kk.p1Z7oZwMhspsruLxcNZuicrvSBAgP05wfJASrDR0AXAUm', 4, '2026-01-07 11:49:00+05', true);
 
         var phone = model.Phone.TrimPhoneNumber().Phone;
-        var user = await unitOfWork.Users.SelectAsync(u => u.Phone == phone)
+        var user = await unitOfWork.Users.SelectAsync(u => u.Phone == phone && u.Role == UserRole.SuperAdmin)
             ?? throw new UnauthorizedAccessException("Invalid phone or password");
 
         // Validate password
