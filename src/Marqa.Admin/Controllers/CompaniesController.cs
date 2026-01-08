@@ -1,5 +1,6 @@
 ﻿﻿using Marqa.Service.Services.Companies;
 using Marqa.Service.Services.Companies.Models;
+using Marqa.Service.Services.Permissions;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ public class CompaniesController(ICompanyService companyService) : Controller
         }
         catch
         {
-            TempData["Error"] = $"Error occured while loading create page";
+            TempData["ErrorMessage"] = $"Error occured while loading create page";
             return RedirectToAction("Index");
         }
     }
@@ -54,12 +55,12 @@ public class CompaniesController(ICompanyService companyService) : Controller
         try
         {
             await companyService.CreateAsync(model);
-            TempData["Success"] = "Company created successfully!";
+            TempData["SuccessMessage"] = "Company created successfully!";
             return RedirectToAction("Index");
         }
         catch (Exception ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["ErrorMessage"] = ex.Message;
             return RedirectToAction("Index");
         }
     }
@@ -86,12 +87,45 @@ public class CompaniesController(ICompanyService companyService) : Controller
         try
         {
             await companyService.UpdateAsync(id, model);
-            TempData["Success"] = "Company edited successfully!";
+            TempData["SuccessMessage"] = "Company edited successfully!";
             return RedirectToAction("Index");
         }
         catch (Exception ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await companyService.DeleteAsync(id);
+            TempData["SuccessMessage"] = "Company deleted successfully!";
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return View();
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        try
+        {
+            var result = await companyService.GetAsync(id);
+
+            return PartialView("_Details", result);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
             return RedirectToAction("Index");
         }
     }
