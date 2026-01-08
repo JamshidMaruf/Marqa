@@ -1,4 +1,5 @@
-﻿using Marqa.Service.Services.Permissions;
+﻿using Marqa.Service.Services.Companies;
+using Marqa.Service.Services.Permissions;
 using Marqa.Service.Services.Permissions.Models;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +30,15 @@ public class PermissionsController(IPermissionService permissionService) : Contr
     [HttpGet]
     public IActionResult Create()
     {
-        return View();
+        try
+        {
+            return View();
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return View("Index");
+        }
     }
 
     [HttpPost]
@@ -80,7 +89,7 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         try
         {
             await permissionService.UpdateAsync(id, model);
-
+            TempData["SuccessMessage"] = "Permission edited successfully!";
             return RedirectToAction("Index");
         }
         catch (Exception ex)
@@ -97,6 +106,7 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         try
         {
             await permissionService.DeleteAsync(id);
+            TempData["SuccessMessage"] = "Permission deleted successfully!";
             return RedirectToAction("Index");
         }
         catch (Exception ex)

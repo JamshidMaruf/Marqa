@@ -1,0 +1,39 @@
+﻿@{
+	Layout = null;
+}
+
+@{
+	TempData["Title"] = "Details";
+}
+
+@model CompanyViewModel
+
+<div class="modal-header">
+	<h5 class="modal-title">Permission Details</h5>
+	<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+	<dl class="row">
+		<dt class="col-sm-4">Name</dt>
+		<dd class="col-sm-8">@Model.Name</dd>
+
+		<dt class="col-sm-4">Director</dt>
+		<dd class="col-sm-8">@Model.Director</dd>
+
+		<dt class="col-sm-4">Phone</dt>
+		<dd class="col-sm-8">@Model.Phone</dd>
+
+		<dt class="col-sm-4">Email</dt>
+		<dd class="col-sm-8">@Model.Email</dd>
+
+		<dt class="col-sm-4">Address</dt>
+		<dd class="col-sm-8">@Model.Address</dd>
+	</dl>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+		Close
+	</button>
+</div>

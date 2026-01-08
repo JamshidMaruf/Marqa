@@ -19,11 +19,16 @@ public class CompanyService(
     {
         await createModelValidator.EnsureValidatedAsync(model);
 
+        var polishedPhone = model.Phone.TrimPhoneNumber();
+
+        if (!polishedPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Phone number is invalid");
+
         unitOfWork.Companies.Insert(new Company
         {
             Name = model.Name,
             Address = model.Address,
-            Phone = model.Phone,
+            Phone = polishedPhone.Phone,
             Email = model.Email,
             Director = model.Director
         });
@@ -38,9 +43,14 @@ public class CompanyService(
         var existCompany = await unitOfWork.Companies.SelectAsync(c => c.Id == id)
             ?? throw new NotFoundException("Company is not found");
 
+        var polishedPhone = model.Phone.TrimPhoneNumber();
+
+        if (!polishedPhone.IsSuccessful)
+            throw new ArgumentIsNotValidException("Phone number is invalid");
+
         existCompany.Name = model.Name;
         existCompany.Address = model.Address;
-        existCompany.Phone = model.Phone;
+        existCompany.Phone = polishedPhone.Phone;
         existCompany.Email = model.Email;
         existCompany.Director = model.Director;
 

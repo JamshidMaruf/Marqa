@@ -1,40 +1,79 @@
-﻿async function deleteCompany(companyId) {
-  try {
-    // Get CSRF token
-    const token = document.querySelector('input[name="__RequestVerificationToken"]');
+﻿let deleteId = null;
+let deleteUrl = null;
 
-    // Create form data
-    const formData = new URLSearchParams();
-    formData.append('id', companyId);
-    if (token) {
-      formData.append('__RequestVerificationToken', token.value);
-    }
+function openDeleteModal(element) {
+  deleteId = element.getAttribute('data-id');
+  deleteUrl = element.getAttribute('data-url');
 
-    const response = await fetch('@Url.Action("Delete")', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: formData
+  const name = element.getAttribute('data-name');
+  document.getElementById('deleteItemName').innerText = name;
+
+  const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  modal.show();
+}
+
+// Make sure this runs after DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', async () => {
+      try {
+        // Get anti-forgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('id', deleteId);
+        if (token) {
+          formData.append('__RequestVerificationToken', token.value);
+        }
+
+        // Send delete request
+        const response = await fetch(deleteUrl, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'RequestVerificationToken': token ? token.value : ''
+          }
+        });
+
+        if (response.redirected) {
+          // If redirected (which happens on success), reload the page
+          window.location.href = response.url;
+        } else if (response.ok) {
+          // Close modal
+          const modalEl = document.getElementById('deleteModal');
+          const modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+
+          // Reload page
+          location.reload();
+        } else {
+          throw new Error('Delete failed with status: ' + response.status);
+        }
+
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('Error deleting company: ' + error.message);
+      }
     });
-
-    if (response.ok) {
-      // Close all modals
-      const modals = document.querySelectorAll('.modal.show');
-      modals.forEach(modal => {
-        const bsModal = bootstrap.Modal.getInstance(modal);
-        if (bsModal) bsModal.hide();
-      });
-
-      // Reload page
-      location.reload();
-    } else {
-      const text = await response.text();
-      console.error('Error response:', text);
-      alert('Error deleting company: ' + response.status);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error deleting company: ' + error.message);
   }
+});
+
+function openDetailsModal(button) {
+  const id = button.dataset.id;
+  const baseUrl = button.dataset.url;
+
+  fetch(`${baseUrl}?id=${id}`)
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("detailsModalContent").innerHTML = html;
+
+      new bootstrap.Modal(
+        document.getElementById("detailsModal")
+      ).show();
+    });
 }
