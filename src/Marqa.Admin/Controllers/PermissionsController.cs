@@ -12,19 +12,27 @@ public class PermissionsController(IPermissionService permissionService) : Contr
 {
     public async Task<IActionResult> Index(PaginationParams @params, string search)
     {
-        @params ??= new PaginationParams();
+        try
+        {
+            @params ??= new PaginationParams();
 
-        var result = await permissionService.GetAllAsync(@params, search);
+            var result = await permissionService.GetAllAsync(@params, search);
 
-        var permissionsCount = await permissionService.GetPermissionsCountAsync();
-        var totalPages = (int)Math.Ceiling(permissionsCount / (double)@params.PageSize);
+            var permissionsCount = await permissionService.GetPermissionsCountAsync();
+            var totalPages = (int)Math.Ceiling(permissionsCount / (double)@params.PageSize);
 
-        ViewBag.CurrentPage = @params.PageNumber;
-        ViewBag.PageSize = @params.PageSize;
-        ViewBag.TotalPages = totalPages == 0 ? 1 : totalPages;
-        ViewBag.Search = search;
+            ViewBag.CurrentPage = @params.PageNumber;
+            ViewBag.PageSize = @params.PageSize;
+            ViewBag.TotalPages = totalPages == 0 ? 1 : totalPages;
+            ViewBag.Search = search;
 
-        return View(result);
+            return View(result);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"Error loading companies: {ex.Message}";
+            return View(new List<PermissionViewModel>());
+        }
     }
 
     [HttpGet]

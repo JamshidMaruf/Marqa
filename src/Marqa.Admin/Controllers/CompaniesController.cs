@@ -30,7 +30,7 @@ public class CompaniesController(ICompanyService companyService) : Controller
         }
         catch (Exception ex)
         {
-            TempData["Error"] = $"Error loading companies: {ex.Message}";
+            TempData["ErrorMessage"] = $"Error loading companies: {ex.Message}";
             return View(new List<CompanyViewModel>());
         }
     }
@@ -76,7 +76,7 @@ public class CompaniesController(ICompanyService companyService) : Controller
         }
         catch (Exception ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["ErrorMessage"] = ex.Message;
             return RedirectToAction("Index");
         }
     }
