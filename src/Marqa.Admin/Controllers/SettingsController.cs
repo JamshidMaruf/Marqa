@@ -12,4 +12,18 @@ public class SettingsController(ISettingService settingService) : Controller
         var result = await settingService.GetAllAsync();
         return View(result);
     }
+
+    [HttpPost]
+    public IActionResult Create()
+    {
+        try
+        {
+            return View();
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return View("Index");
+        }
+    }
 }

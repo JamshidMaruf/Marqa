@@ -30,7 +30,15 @@ public class PermissionsController(IPermissionService permissionService) : Contr
     [HttpGet]
     public IActionResult Create()
     {
-        return View();
+        try
+        {
+            return View();
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return View("Index");
+        }
     }
 
     [HttpPost]
