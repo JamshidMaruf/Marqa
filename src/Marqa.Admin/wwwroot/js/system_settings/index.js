@@ -1,8 +1,8 @@
-﻿let deleteId = null;
+﻿let deleteKey = null;
 let deleteUrl = null;
 
 function openDeleteModal(element) {
-  deleteId = element.getAttribute('data-id');
+  deleteKey = element.getAttribute('data-id');
   deleteUrl = element.getAttribute('data-url');
 
   const name = element.getAttribute('data-name');
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Create form data
         const formData = new FormData();
-        formData.append('id', deleteId);
+        formData.append('key', deleteKey);
         if (token) {
           formData.append('__RequestVerificationToken', token.value);
         }

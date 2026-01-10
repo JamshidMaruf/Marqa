@@ -125,17 +125,11 @@
 										   title="View">
 											<i class="fas fa-eye"></i>
 										</a>
-										<a href="@Url.Action("Edit", new { id = systemSetting.Id })"
-										   class="btn btn-outline-secondary"
-										   style="border: 2px groove yellow; margin-left: 5px; margin-right: 5px"
-										   title="Edit">
-											<i class="fas fa-edit"></i>
-										</a>
 										<a href="javascript:void(0);"
 										   class="btn btn-outline-danger"
-										   style="border: 2px groove red"
+										   style="border: 2px groove red; margin-left: 5px;"
 										   title="Delete"
-										   data-id="@systemSetting.Id"
+										   data-id="@systemSetting.Key"
 										   data-name="@systemSetting.Key"
 										   data-url="@Url.Action("Delete", "SystemSettings", new { id = systemSetting.Id })"
 										   onclick="openDeleteModal(this)">
