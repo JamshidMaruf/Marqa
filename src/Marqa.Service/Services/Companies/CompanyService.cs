@@ -127,7 +127,7 @@ public class CompanyService(
                 Address = c.Address,
                 Phone = c.Phone,
                 Email = c.Email,
-                Director = c.Director,
+                Director = c.Director
             })
             .ToListAsync();
     }

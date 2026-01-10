@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Employees\" />
-    <Folder Include="Views\Users\" />
     <Folder Include="Views\Roles\" />
     <Folder Include="Views\Students\" />
     <Folder Include="Views\Teachers\" />

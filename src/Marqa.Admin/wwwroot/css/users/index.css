@@ -1,0 +1,32 @@
+﻿.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-group .btn {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+.avatar-sm {
+  flex-shrink: 0;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+  .btn-success:hover {
+    background-color: #00ff90;
+    border-color: #1e7e34;
+  }
+
+  .btn-success:focus,
+  .btn-success:active {
+    background-color: #1e7e34;
+    border-color: #1c7430;
+  }
+
+#on-page {
+  padding: 5px
+}

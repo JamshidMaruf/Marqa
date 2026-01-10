@@ -4,6 +4,7 @@ namespace Marqa.Domain.Enums;
 
 public enum UserRole
 {
+    [Description("Admin")]
     Admin = 0,
     
     [Description("Ishchi")]
@@ -15,5 +16,6 @@ public enum UserRole
     [Description("O'qituvchi")]
     Teacher = 3,
 
-    SuperAdmin = 4
+    [Description("Ota-ona")]
+    Parent = 4
 }
