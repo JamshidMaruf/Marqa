@@ -28,7 +28,7 @@
     <Folder Include="Views\Roles\" />
     <Folder Include="Views\Students\" />
     <Folder Include="Views\Teachers\" />
-    <Folder Include="wwwroot\css\settings\" />
+    <Folder Include="wwwroot\css\system_settings\" />
   </ItemGroup>
 
 </Project>

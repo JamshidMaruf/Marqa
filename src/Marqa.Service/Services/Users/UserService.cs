@@ -31,6 +31,8 @@ public class UserService(
             ?? throw new NotFoundException("User was not found!");
 
         user.IsBlocked = user.IsBlocked == true ? false : true;
+        user.IsActive = user.IsBlocked == true ? false : true;
+
         unitOfWork.Users.Update(user);
 
         await unitOfWork.SaveAsync();

@@ -30,7 +30,7 @@ public class PermissionsController(IPermissionService permissionService) : Contr
         }
         catch (Exception ex)
         {
-            TempData["ErrorMessage"] = $"Error loading companies: {ex.Message}";
+            TempData["ErrorMessage"] = $"Error loading permissions: {ex.Message}";
             return View(new List<PermissionViewModel>());
         }
     }

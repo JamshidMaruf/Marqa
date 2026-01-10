@@ -22,7 +22,7 @@ public class DashboardController(
             var companiesCount = await companyService.GetCompaniesCountAsync();
             var usersCount = await userService.GetAllUsersCount();
             var permissionsCount = await permissionService.GetPermissionsCountAsync();
-            var settingsCount = await settingService.GetSettingsCount();
+            var settingsCount = await settingService.GetSettingsCountAsync();
             //var subscribers = await subscriptionService.GetAllAsync();    
 
             ViewBag.TotalCompanies = companiesCount;
