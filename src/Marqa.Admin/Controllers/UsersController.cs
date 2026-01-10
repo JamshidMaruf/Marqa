@@ -30,7 +30,7 @@ public class UsersController(IUserService userService) : Controller
         }
         catch (Exception ex)
         {
-            TempData["ErrorMessage"] = $"Error loading companies: {ex.Message}";
+            TempData["ErrorMessage"] = $"Error loading users: {ex.Message}";
             return View(new List<PermissionViewModel>());
         }
     }

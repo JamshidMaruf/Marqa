@@ -41,9 +41,9 @@
 					</a>
 				</li>
 
-				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Settings" ? "active" : "")">
-					<a asp-controller="Settings" asp-action="Index">
-						<i class="fas fa-tags"></i> Settings
+				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "System Settings" ? "active" : "")">
+					<a asp-controller="SystemSettings" asp-action="Index">
+						<i class="fas fa-tags"></i> System Settings
 					</a>
 				</li>
 
@@ -99,9 +99,6 @@
 								<span>@User.Identity?.Name</span>
 							</a>
 							<ul class="dropdown-menu dropdown-menu-end">
-								<li><a class="dropdown-item" asp-controller="Permissions" asp-action="Index"><i class="fas fa-user me-2"></i>Profile</a></li>
-								<li><a class="dropdown-item" asp-controller="Settings" asp-action="Index"><i class="fas fa-cog me-2"></i>Settings</a></li>
-								<li><hr class="dropdown-divider"></li>
 								<li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
 							</ul>
 						</div>

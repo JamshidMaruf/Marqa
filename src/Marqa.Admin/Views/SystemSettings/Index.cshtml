@@ -1,0 +1,250 @@
+@model List<Setting>
+
+@{
+	ViewData["Title"] = "System Settings";
+	int currentPage = ViewBag.CurrentPage ?? 1;
+	int pageSize = ViewBag.PageSize ?? 20;
+	int totalPages = ViewBag.TotalPages ?? 10;
+	string search = ViewBag.Search ?? "";
+}
+
+<link rel="stylesheet" href="~/css/system_settings/index.css" asp-append-version="true" />
+
+<div class="container-fluid py-3">
+	@Html.AntiForgeryToken()
+
+	<!-- Header -->
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<div>
+			<h1 class="h4 mb-0 fw-700">System Settings</h1>
+			@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+			{
+				<p class="text-muted mb-0">
+					<small>
+						<i class="fas fa-search me-1"></i>
+						Showing results for: "<strong>@ViewBag.Search</strong>"
+					</small>
+				</p>
+			}
+		</div>
+		<a href="@Url.Action("Create")" class="btn btn-success">
+			<i class="fas fa-plus me-1"></i>Add System-Setting
+		</a>
+	</div>
+
+	<!-- Search Card -->
+	<div class="card mb-3">
+		<div class="card-body">
+			<form method="get" class="row g-2">
+				<div class="col-md-9">
+					<div class="input-group">
+						<span class="input-group-text">
+							<i class="fas fa-search"></i>
+						</span>
+						<input type="text"
+							   name="search"
+							   class="form-control"
+							   placeholder="Search by key and category..."
+							   value="@ViewBag.Search" />
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="d-flex gap-2">
+						<button type="submit" class="btn btn-primary flex-grow-1">
+							<i class="fas fa-search me-1"></i>Search
+						</button>
+						@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+						{
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Clear
+							</a>
+						}
+					</div>
+				</div>
+			</form>
+
+			<!-- Search Results Info -->
+			@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+			{
+				<div class="mt-3">
+					<div class="alert alert-info alert-dismissible fade show mb-0 py-2" role="alert">
+						<div class="d-flex align-items-center">
+							<i class="fas fa-info-circle me-2"></i>
+							<div>
+								<span class="fw-600">@Model.Count()</span>
+								@(Model.Count() == 1 ? "system_setting" : "system_settings") found matching
+								"<strong>@ViewBag.Search</strong>"
+							</div>
+							<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<!-- Permissions Table -->
+	<div class="card">
+		<div class="table-responsive">
+			<table class="table table-hover mb-0">
+				<thead class="table-light">
+					<tr>
+						<th>Key</th>
+						<th>Value</th>
+						<th>Category</th>
+						<th>IsEncryped</th>
+						<th class="text-center">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model.Any())
+					{
+						@foreach (var systemSetting in Model)
+						{
+							<tr>
+								<td>
+									<span class="fw-600">@systemSetting.Key</span>
+								</td>
+								<td>
+									<span>@systemSetting.Value</span>
+								</td>
+								<td>
+									<span>@systemSetting.Category</span>
+								</td>
+								<td>
+									<span class="text-center">@(systemSetting.IsEncrypted ? "✅" : "❌")</span>
+								</td>
+								<td class="text-center">
+									<div class="btn-group btn-group-sm" role="group">
+										<a href="javascript:void(0);"
+										   data-id="@systemSetting.Id"
+										   data-url="@Url.Action("Details", "SystemSettings")"
+										   onclick="openDetailsModal(this)"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove green"
+										   title="View">
+											<i class="fas fa-eye"></i>
+										</a>
+										<a href="@Url.Action("Edit", new { id = systemSetting.Id })"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove yellow; margin-left: 5px; margin-right: 5px"
+										   title="Edit">
+											<i class="fas fa-edit"></i>
+										</a>
+										<a href="javascript:void(0);"
+										   class="btn btn-outline-danger"
+										   style="border: 2px groove red"
+										   title="Delete"
+										   data-id="@systemSetting.Id"
+										   data-name="@systemSetting.Key"
+										   data-url="@Url.Action("Delete", "SystemSettings", new { id = systemSetting.Id })"
+										   onclick="openDeleteModal(this)">
+											<i class="fas fa-trash"></i>
+										</a>
+									</div>
+								</td>
+							</tr>
+						}
+
+						<!-- View Modal -->
+						<div class="modal fade" id="detailsModal" tabindex="-1">
+							<div class="modal-dialog modal-lg modal-dialog-centered">
+								<div class="modal-content" id="detailsModalContent">
+									<!-- _Details.cshtml will load items here -->
+								</div>
+							</div>
+						</div>
+
+						<!-- Delete Modal -->
+						<div class="modal fade" id="deleteModal" tabindex="-1">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title">Delete SystemSetting</h5>
+										<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+									</div>
+									<div class="modal-body">
+										<p>Are you sure you want to delete <strong id="deleteItemName"></strong>?</p>
+										<p class="text-danger small"><i class="fas fa-warning me-2"></i>This action cannot be undone.</p>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+										<button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+					else
+					{
+						<tr>
+							<td colspan="6" class="text-center py-5">
+								@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+								{
+									<i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+									<p class="text-muted mt-3">No system setting found matching "@ViewBag.Search"</p>
+									<a href="@Url.Action("Index")" class="btn btn-outline-primary mt-2">
+										<i class="fas fa-list me-1"></i>Show all system settings
+									</a>
+								}
+								else
+								{
+									<i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+									<p class="text-muted mt-3">No system setting found</p>
+									<a href="@Url.Action("Create")" class="btn btn-primary mt-2">
+										<i class="fas fa-plus me-1"></i>Add your first system setting
+									</a>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Pagination Bar -->
+		<form method="get" class="d-flex align-items-center justify-content-between mt-3">
+			<div class="d-flex align-items-center gap-2">
+				<label id="on-page"> OnPage: </label>
+				<select name="PageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+					<option value="5" selected="@(pageSize == 5)">5 items</option>
+					<option value="10" selected="@(pageSize == 10)">10 items</option>
+					<option value="20" selected="@(pageSize == 20)">20 items</option>
+					<option value="50" selected="@(pageSize == 50)">50 items</option>
+				</select>
+				<input type="hidden" name="search" value="@search" />
+			</div>
+
+			<ul class="pagination mb-0">
+				<!-- First page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = 1, PageSize = pageSize, search })">«</a>
+				</li>
+
+				<!-- Previous page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })"><</a>
+				</li>
+
+				<!-- Current page -->
+				<li class="page-item active">
+					<span class="page-link">@currentPage</span>
+				</li>
+
+				<!-- Next page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">></a>
+				</li>
+
+				<!-- Last page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = totalPages, PageSize = pageSize, search })">»</a>
+				</li>
+			</ul>
+		</form>
+
+	</div>
+</div>
+
+<script src="~/js/system_settings/index.js" asp-append-version="true"></script>
+

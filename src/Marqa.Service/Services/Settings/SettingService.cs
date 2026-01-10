@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
-using Marqa.DataAccess.UnitOfWork;
 using Marqa.Domain.Entities;
 using Marqa.Service.Exceptions;
 using Marqa.Service.Extensions;
 using Marqa.Service.Services.Settings.Models;
+using Marqa.Shared.Models;
+using Marqa.Shared.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marqa.Service.Services.Settings;
@@ -11,6 +12,7 @@ namespace Marqa.Service.Services.Settings;
 public class SettingService(
     IUnitOfWork unitOfWork, 
     IEncryptionService encryptionService,
+    IPaginationService paginationService,
     IValidator<SettingCreateModel> settingCreateValidator) : ISettingService
 {
     public async Task CreateAsync(SettingCreateModel model)
@@ -66,14 +68,20 @@ public class SettingService(
         return settings.ToDictionary(s => s.Key, s => s.Value);
     }
     
-    public async Task<List<Setting>> GetAllAsync()
+    public async Task<List<Setting>> GetAllAsync(PaginationParams @params, string search = null)
     {
-        return await unitOfWork.Settings
-            .SelectAllAsQueryable()
-            .ToListAsync();
+        var settings = unitOfWork.Settings
+            .SelectAllAsQueryable();
+
+        if(!string.IsNullOrWhiteSpace(search))
+            settings = settings.Where(s => 
+                s.Key.Contains(search)||
+                s.Category.Contains(search));
+
+        return await paginationService.Paginate(settings, @params).ToListAsync();
     }
 
-    public async Task<int> GetSettingsCount()
+    public async Task<int> GetSettingsCountAsync()
     {
         return await unitOfWork.Settings.SelectAllAsQueryable().CountAsync();
     }
