@@ -64,10 +64,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function openDetailsModal(button) {
-  const id = button.dataset.id;
+  const key = button.dataset.id;
   const baseUrl = button.dataset.url;
 
-  fetch(`${baseUrl}?id=${id}`)
+  fetch(`${baseUrl}?key=${key}`)
     .then(res => res.text())
     .then(html => {
       document.getElementById("detailsModalContent").innerHTML = html;

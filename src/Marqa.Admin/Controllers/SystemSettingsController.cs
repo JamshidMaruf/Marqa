@@ -1,10 +1,8 @@
-﻿using Marqa.Service.Services.Permissions;
-using Marqa.Service.Services.Permissions.Models;
+﻿using Marqa.Service.Services.Permissions.Models;
 using Marqa.Service.Services.Settings;
 using Marqa.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace Marqa.Admin.Controllers;
 
@@ -49,4 +47,21 @@ public class SystemSettingsController(ISettingService settingService) : Controll
             return View("Index");
         }
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(string key)
+    {
+        try
+        {
+            var result = await settingService.GetAsync(key);
+
+            return PartialView("_Details", result);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = ex.Message;
+            return RedirectToAction("Index");
+        }
+    }
+
 }

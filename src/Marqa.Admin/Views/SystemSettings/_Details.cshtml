@@ -1,0 +1,36 @@
+﻿@{
+	Layout = null;
+}
+
+@{
+	TempData["Title"] = "Details";
+}
+
+@model SettingViewModel
+
+<div class="modal-header">
+	<h5 class="modal-title">System-Setting Details</h5>
+	<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+	<dl class="row">
+		<dt class="col-sm-4">Key</dt>
+		<dd class="col-sm-8">@Model.Key</dd>
+
+		<dt class="col-sm-4">Value</dt>
+		<dd class="col-sm-8">@Model.Value</dd>
+
+		<dt class="col-sm-4">Category</dt>
+		<dd class="col-sm-8">@Model.Category</dd>
+
+		<dt class="col-sm-4">IsEncrypted</dt>
+		<dd class="col-sm-8">@(Model.IsEncrypted ? "yes" : "no")</dd>
+	</dl>
+</div>
+
+<div class="modal-footer">
+	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+		Close
+	</button>
+</div>
