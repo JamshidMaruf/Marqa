@@ -1,5 +1,97 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+	ViewData["Title"] = "Create System-Setting";
 }
+
+@model SettingCreateModel;
+
+<div class="container-fluid py-3">
+	<!-- Header -->
+	<div class="mb-3">
+		<h1 class="h4 mb-0 fw-700">Create Company</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-8">
+			<div class="card">
+				<div class="card-body">
+					<form method="post" asp-action="Create">
+
+						<!-- Key -->
+						<div class="mb-3">
+							<label asp-for="Key" class="form-label">
+								Key <span class="text-danger">*</span>
+							</label>
+							<input asp-for="Key" class="form-control" placeholder="Enter key" />
+							<span asp-validation-for="Key" class="text-danger small"></span>
+						</div>
+
+
+						<!-- Value -->
+						<div class="mb-3">
+							<label asp-for="Value" class="form-label">
+								Value <span class="text-danger">*</span>
+							</label>
+							<input asp-for="Value" class="form-control" placeholder="Enter value" />
+							<span asp-validation-for="Value" class="text-danger small"></span>
+						</div>
+
+
+						<!-- Category -->
+						<div class="mb-3">
+							<label asp-for="Category" class="form-label">
+								Category
+								<span class="text-danger">*</span>
+							</label>
+							<input asp-for="Category" type="tel" class="form-control" placeholder="Enter category" required>
+							<span asp-validation-for="Category" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3 form-check">
+							<input asp-for="IsEncrypted" class="form-check-input" />
+							<label asp-for="IsEncrypted" class="form-check-label">
+								Encrypt
+							</label>
+							<span asp-validation-for="IsEncrypted" class="text-danger small"></span>
+						</div>
+
+						<!-- Buttons -->
+						<div class="d-flex gap-2 mt-3">
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Cancel
+							</a>
+							<button type="submit" class="btn btn-primary" style="color: green">
+								<i class="fas fa-save me-1"></i>Create
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Info Card -->
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-body">
+					<h6 class="fw-700 mb-2">Tips</h6>
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<i class="fas fa-check text-success me-2"></i>
+							<small>Use a name for key</small>
+						</li>
+						<li class="mb-2">
+							<i class="fas fa-check text-success me-2"></i>
+							<small>Hit the encrypt box if value is sensetive</small>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}
+
