@@ -1,0 +1,48 @@
+﻿@{
+	Layout = null;
+}
+
+@{
+	TempData["Title"] = "Details";
+}
+
+@model UserViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">User Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <dl class="row">
+        <dt class="col-sm-4">FirstName</dt>
+        <dd class="col-sm-8">@Model.FirstName</dd>
+
+        <dt class="col-sm-4">LastName</dt>
+        <dd class="col-sm-8">@Model.LastName</dd>
+
+        <dt class="col-sm-4">Phone</dt>
+        <dd class="col-sm-8">@Model.Phone</dd>
+       
+        <dt class="col-sm-4">Email</dt>
+        <dd class="col-sm-8">@Model.Email</dd>
+
+        <dt class="col-sm-4">Role</dt>
+        <dd class="col-sm-8">@Model.Role</dd>
+
+        <dt class="col-sm-4">Status</dt>
+        <dd class="col-sm-8">@Model.Status</dd>
+
+        <dt class="col-sm-4">IsUsedSystem</dt>
+        <dd class="col-sm-8">@(Model.IsUseSystem ? "yes" : "no")</dd>
+
+		<dt class="col-sm-4">IsBlocked</dt>
+		<dd class="col-sm-8">@(Model.IsBlocked ? "yes" : "no")</dd>
+    </dl>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        Close
+    </button>
+</div>

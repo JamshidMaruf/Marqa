@@ -91,7 +91,7 @@ public class BotHandler(ILogger<BotHandler> logger,
     #region MessageChunks
     private async Task HandleLoginCommandAsync(long chatId)
     {
-        var phone = await userService.GetUserPhoneByChatIdAsync(chatId);
+        var phone = await userService.GetUserPhoneByTelegramChatIdAsync(chatId);
 
         if (phone != null)
         {
@@ -246,7 +246,7 @@ public class BotHandler(ILogger<BotHandler> logger,
     #region CallbackQueryChunks
     private async Task HandleRefreshLoginAsync(long chatId, string callbackId, string message)
     {
-        var phone = await userService.GetUserPhoneByChatIdAsync(chatId);
+        var phone = await userService.GetUserPhoneByTelegramChatIdAsync(chatId);
 
         if (phone != null)
         {

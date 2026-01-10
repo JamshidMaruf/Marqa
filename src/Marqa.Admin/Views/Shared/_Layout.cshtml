@@ -53,6 +53,12 @@
 					</a>
 				</li>
 
+				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")">
+					<a asp-controller="Users" asp-action="Index">
+						<i class='fa fa-user'></i> Users
+					</a>
+				</li>
+
 				<li class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "Employees" ? "active" : "")">
 					<a asp-controller="Employees" asp-action="Index">
 						<i class="fas fa-user-tie"></i> Employees

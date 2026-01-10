@@ -12,5 +12,6 @@ public class User : Auditable
     public string PasswordHash { get; set; }
     public bool IsActive { get; set; }
     public bool IsUseSystem { get; set; }
+    public bool IsBlocked { get; set; }
     public UserRole Role { get; set; }
 }

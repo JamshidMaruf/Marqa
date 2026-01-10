@@ -1,0 +1,282 @@
+﻿@model List<UserTableViewModel>
+
+@{
+	ViewData["Title"] = "Users";
+	int currentPage = ViewBag.CurrentPage ?? 1;
+	int pageSize = ViewBag.PageSize ?? 20;
+	int totalPages = ViewBag.TotalPages ?? 10;
+	string search = ViewBag.Search ?? "";
+}
+
+<link rel="stylesheet" href="~/css/users/index.css" asp-append-version="true" />
+
+<div class="container-fluid py-3">
+	@Html.AntiForgeryToken()
+
+	<!-- Header -->
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<div>
+			<h1 class="h4 mb-0 fw-700">Users</h1>
+			@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+			{
+				<p class="text-muted mb-0">
+					<small>
+						<i class="fas fa-search me-1"></i>
+						Showing results for: "<strong>@ViewBag.Search</strong>"
+					</small>
+				</p>
+			}
+		</div>
+	</div>
+
+	<!-- Search Card -->
+	<div class="card mb-3">
+		<div class="card-body">
+			<form method="get" class="row g-2">
+				<div class="col-md-9">
+					<div class="input-group">
+						<span class="input-group-text">
+							<i class="fas fa-search"></i>
+						</span>
+						<input type="text"
+							   name="search"
+							   class="form-control"
+							   placeholder="Search by firstname, lastname, phone, email..."
+							   value="@ViewBag.Search" />
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="d-flex gap-2">
+						<button type="submit" class="btn btn-primary flex-grow-1">
+							<i class="fas fa-search me-1"></i>Search
+						</button>
+						@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+						{
+							<a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+								<i class="fas fa-times me-1"></i>Clear
+							</a>
+						}
+					</div>
+				</div>
+			</form>
+
+			<!-- Search Results Info -->
+			@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+			{
+				<div class="mt-3">
+					<div class="alert alert-info alert-dismissible fade show mb-0 py-2" role="alert">
+						<div class="d-flex align-items-center">
+							<i class="fas fa-info-circle me-2"></i>
+							<div>
+								<span class="fw-600">@Model.Count()</span>
+								@(Model.Count() == 1 ? "user" : "users") found matching
+								"<strong>@ViewBag.Search</strong>"
+							</div>
+							<button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<!-- Users Table -->
+	<div class="card">
+		<div class="table-responsive">
+			<table class="table table-hover mb-0">
+				<thead class="table-light">
+					<tr>
+						<th>FirstName</th>
+						<th>LastName</th>
+						<th>Phone</th>
+						<th>Email</th>
+						<th>Role</th>
+						<th>Status</th>
+						<th>IsUsedSystem</th>
+						<th class="text-center">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (Model.Any())
+					{
+						@foreach (var user in Model)
+						{
+							<tr bgcolor=@(user.IsBlocked ? "red" : "green")>
+								<td>
+									<span>@user.FirstName</span>
+								</td>
+								<td>
+									<span>@user.LastName</span>
+								</td>
+								<td>
+									<span>@user.Phone</span>
+								</td>
+								<td>
+									<span>@user.Email</span>
+								</td>
+								<td>
+									<span>@user.Role</span>
+								</td>
+								<td>
+									<span>@user.Status</span>
+								</td>
+								<td>
+									<span class="text-center">@(user.IsUseSystem ? "✅" : "❌" )</span>
+								</td>
+								<td class="text-center">
+									<div class="btn-group btn-group-sm" role="group">
+										<a href="javascript:void(0);"
+										   data-id="@user.Id"
+										   data-url="@Url.Action("Details", "Users")"
+										   onclick="openDetailsModal(this)"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove green"
+										   title="View">
+											<i class="fas fa-eye"></i>
+										</a>
+										<a href="javascript:void(0);"
+										   data-id="@user.Id"
+										   data-url="@Url.Action("ChangePassword", "Users")"
+										   onclick="openDetailsModal(this)"
+										   class="btn btn-outline-secondary"
+										   style="border: 2px groove yellow"
+										   title="ChangePassword">
+											<i class="fas fa-pen"></i>
+										</a>
+										@if(!@user.IsBlocked)
+										{
+											<a href="javascript:void(0);"
+											   data-id="@user.Id"
+											   data-status="@(!user.IsBlocked)"
+											   data-url="@Url.Action("ChangeBlockStatus", "Users")"
+											   onclick="openBlockModal(this)"
+											   class="btn btn-outline-secondary"
+											   style="border: 2px groove red; margin-left: 5px; margin-right: 5px"
+											   title="Block">
+												<i class="fa-solid fa-skull-crossbones fa-lg"></i>
+											</a>
+										}
+										else
+										{
+											<a href="javascript:void(0);"
+											   data-id="@user.Id"
+											   data-status="@(user.IsBlocked)"
+											   data-url="@Url.Action("ChangeBlockStatus", "Users")"
+											   onclick="openBlockModal(this)"
+											   class="btn btn-outline-success"
+											   style="border: 2px groove black; margin-left: 5px; margin-right: 5px"
+											   title="Unblock">
+												<i class="fa fa-lock fa-lg" style="color: green;" aria-hidden="true"></i>
+											</a>
+										}
+									</div>
+								</td>
+							</tr>
+						}
+
+						<!-- View Modal -->
+						<div class="modal fade" id="detailsModal" tabindex="-1">
+							<div class="modal-dialog modal-lg modal-dialog-centered">
+								<div class="modal-content" id="detailsModalContent">
+									<!-- _Details.cshtml will load items here -->
+								</div>
+							</div>
+						</div>
+
+						<div class="modal fade" id="blockModal" tabindex="-1">
+							<div class="modal-dialog">
+								<div class="modal-content">
+
+									<div class="modal-header">
+										<h5 class="modal-title">Confirm action</h5>
+									</div>
+
+									<div class="modal-body">
+										<p id="blockMessage"></p>
+									</div>
+
+									<div class="modal-footer">
+										<button class="btn btn-secondary" data-bs-dismiss="modal">
+											Cancel
+										</button>
+										<button class="btn btn-danger" id="confirmBlockBtn">
+											Confirm
+										</button>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					}
+					else
+					{
+						<tr>
+							<td colspan="6" class="text-center py-5">
+								@if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+								{
+									<i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
+									<p class="text-muted mt-3">No users found matching "@ViewBag.Search"</p>
+									<a href="@Url.Action("Index")" class="btn btn-outline-primary mt-2">
+										<i class="fas fa-list me-1"></i>Show all users
+									</a>
+								}
+								else
+								{
+									<i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+									<p class="text-muted mt-3">No users found</p>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Pagination Bar -->
+		<form method="get" class="d-flex align-items-center justify-content-between mt-3">
+			<div class="d-flex align-items-center gap-2">
+				<label id="on-page"> OnPage: </label>
+				<select name="PageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+					<option value="5" selected="@(pageSize == 5)">5 items</option>
+					<option value="10" selected="@(pageSize == 10)">10 items</option>
+					<option value="20" selected="@(pageSize == 20)">20 items</option>
+					<option value="50" selected="@(pageSize == 50)">50 items</option>
+				</select>
+				<input type="hidden" name="search" value="@search" />
+			</div>
+
+			<ul class="pagination mb-0">
+				<!-- First page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = 1, PageSize = pageSize, search })">«</a>
+				</li>
+
+				<!-- Previous page -->
+				<li class="page-item @(currentPage == 1 ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage - 1, PageSize = pageSize, search })"><</a>
+				</li>
+
+				<!-- Current page -->
+				<li class="page-item active">
+					<span class="page-link">@currentPage</span>
+				</li>
+
+				<!-- Next page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = currentPage + 1, PageSize = pageSize, search })">></a>
+				</li>
+
+				<!-- Last page -->
+				<li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+					<a class="page-link" href="@Url.Action("Index", new { PageNumber = totalPages, PageSize = pageSize, search })">»</a>
+				</li>
+			</ul>
+		</form>
+
+	</div>
+</div>
+
+<script src="~/js/users/index.js" asp-append-version="true"></script>
+
+
+
